@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>高邮二王知识库 Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="nav">
+        <div class="brand">高邮二王知识库</div>
+        <div class="nav-links">
+          <a href="#intro">项目概述</a>
+          <a href="#flow">检字流程</a>
+          <a href="#cases">案例库</a>
+          <a href="#timeline">申报时间</a>
+          <a href="#team">团队</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">2026 求是学术 · 应用研究 · Demo</p>
+        <h1>高邮二王知识库构建及应用</h1>
+        <p>
+          以“王氏四种”为核心，围绕“经字互证”“一声之转”方法，搭建可检索、可解释、可视化的古典知识平台。
+        </p>
+        <a class="cta" href="#cases">查看交互示例</a>
+      </div>
+    </header>
+
+    <main>
+      <section id="intro" class="section">
+        <h2>项目概述</h2>
+        <div class="grid grid-3">
+          <article class="card">
+            <h3>研究对象</h3>
+            <p>王念孙、王引之父子及“王氏四种”文献体系。</p>
+          </article>
+          <article class="card">
+            <h3>方法核心</h3>
+            <p>形、音、义知一推三；经字互证；一声之转。</p>
+          </article>
+          <article class="card">
+            <h3>平台目标</h3>
+            <p>实现古籍深度标注、全文检索、案例图谱与流程可视化。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="database" class="section alt">
+        <div class="head-line">
+          <h2>数据库结构（Demo）</h2>
+          <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
+        </div>
+        <div id="dbStats" class="stats-grid"></div>
+        <div id="schemaGrid" class="grid grid-3"></div>
+      </section>
+
+      <section id="flow" class="section alt">
+        <h2>“经义不通”检字流程（Demo可视化）</h2>
+        <p class="flow-note">按附件中的 mermaid 逻辑重绘：先判断“字为原字/字非原字”，再沿“通假/同源/对文/同义并列”分流，最后回到“得出本字、求得字义”。</p>
+        <div class="flow-diagram">
+          <div class="flow-node start large">经义不通</div>
+
+          <div class="flow-branch">
+            <div class="flow-node blue large">字为原字</div>
+            <div class="flow-node red large">字非原字</div>
+          </div>
+
+          <div class="flow-branch labels">
+            <div class="flow-node light">单句中判断</div>
+            <div class="flow-node light">上下句判断</div>
+            <div class="flow-node pink">形讹</div>
+            <div class="flow-node pink">异文</div>
+          </div>
+
+          <div class="flow-branch labels">
+            <div class="flow-node light">判断为通假</div>
+            <div class="flow-node light">判断为同源词</div>
+            <div class="flow-node light">对文 / 同义并列复合词</div>
+          </div>
+
+          <div class="flow-branch labels">
+            <div class="flow-node light">考察古音是否同部<br />能否对转、旁转、通转</div>
+            <div class="flow-node light">语源同、语义同<br />音韵相通</div>
+            <div class="flow-node red">求出原字</div>
+          </div>
+
+          <div class="flow-branch labels">
+            <div class="flow-node out">得出本字、求得字义</div>
+            <div class="flow-node out">合字成词、两字同义</div>
+          </div>
+
+          <div class="flow-note end">“求出原字”可反推验证“字为原字”分支，形成闭环。</div>
+        </div>
+      </section>
+
+      <section id="cases" class="section">
+        <div class="head-line">
+          <h2>案例库（筛选演示）</h2>
+          <input id="searchInput" type="text" placeholder="输入关键词：如 犹豫 / 能不我知 / 术" />
+        </div>
+        <div id="caseList" class="grid grid-2"></div>
+      </section>
+
+      <section id="timeline" class="section alt">
+        <h2>2026 立项流程时间线</h2>
+        <ol class="timeline">
+          <li><strong>2月24日—3月18日</strong>：选题与组队，提交意向申请表给出题教师。</li>
+          <li><strong>3月19日 9:00—4月9日 17:00</strong>：项目负责人在线提交立项材料。</li>
+          <li><strong>4月10日 12:00前</strong>：指导教师在平台完成审核。</li>
+          <li><strong>4月中下旬—5月</strong>：学院初评、书院复评、公示与推荐。</li>
+          <li><strong>5月底</strong>：学校复核并正式立项。</li>
+        </ol>
+      </section>
+
+      <section id="team" class="section">
+        <h2>团队能力结构（示例）</h2>
+        <div class="grid grid-3">
+          <article class="card">
+            <h3>古文字与训诂</h3>
+            <p>负责案例拆解、文献校核、标注规范设计。</p>
+          </article>
+          <article class="card">
+            <h3>知识工程</h3>
+            <p>负责语料结构化、检索与图谱关系建模。</p>
+          </article>
+          <article class="card">
+            <h3>数据与可视化</h3>
+            <p>负责流程图展示、统计分析与交互呈现。</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Demo for “求是学术”项目展示 · 高邮二王知识库构建及应用</p>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
