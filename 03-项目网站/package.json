@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "高邮二王知识库构建及应用 Demo",
   "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node server.js"
   },

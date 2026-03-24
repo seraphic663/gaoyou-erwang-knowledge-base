@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "高邮二王知识库项目工作区",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "start": "node 03-项目网站/server.js",
     "start:web": "npm --prefix 03-项目网站 start"

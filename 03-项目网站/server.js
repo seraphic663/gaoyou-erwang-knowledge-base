@@ -7,7 +7,23 @@ const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 const WORKSPACE_ROOT = path.resolve(ROOT, '..');
 const WEB_DIR = fs.existsSync(path.join(ROOT, 'index.html')) ? ROOT : path.join(ROOT, 'web');
-const DATA_DIR = fs.existsSync(path.join(ROOT, 'data')) ? path.join(ROOT, 'data') : path.join(WORKSPACE_ROOT, 'data');
+const DATA_DIR = (() => {
+  const explicitDataDir = process.env.DATA_DIR || process.env.DATABASE_DIR;
+  if (explicitDataDir) {
+    return path.isAbsolute(explicitDataDir) ? explicitDataDir : path.resolve(ROOT, explicitDataDir);
+  }
+
+  const railwayVolumeDir = process.env.RAILWAY_VOLUME_MOUNT_PATH;
+  if (railwayVolumeDir) {
+    return railwayVolumeDir;
+  }
+
+  if (fs.existsSync(path.join(ROOT, 'data'))) {
+    return path.join(ROOT, 'data');
+  }
+
+  return path.join(WORKSPACE_ROOT, 'data');
+})();
 const MEDIA_DIR = fs.existsSync(path.join(ROOT, 'media')) ? path.join(ROOT, 'media') : path.join(WORKSPACE_ROOT, 'media');
 const DB_FILE = path.join(DATA_DIR, 'demo-db.json');
 
@@ -321,4 +337,5 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, () => {
   ensureDatabaseFile();
   console.log(`Demo server running at http://localhost:${PORT}`);
+  console.log(`Database file: ${DB_FILE}`);
 });

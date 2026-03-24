@@ -24,6 +24,35 @@ npm --prefix 03-项目网站 start
 
 http://localhost:3000
 
+## Railway 部署
+
+如果你把这个仓库 push 到 Railway，通常可以直接用，不需要额外改太多配置：
+
+1. 在 Railway 新建项目并连接这个 Git 仓库。
+2. 保持默认的 Node 部署方式即可，平台会自动读取根目录 `package.json` 和 `railway.toml`。
+3. 启动命令已经固定为：
+
+```bash
+npm start
+```
+
+4. 不需要手动配置端口，`server.js` 会自动使用 Railway 提供的 `PORT` 环境变量。
+
+5. 部署完成后，访问 Railway 分配的公开域名即可。
+
+### 数据持久化建议
+
+如果你希望数据库在 Railway 重启后仍然保留，建议再给服务挂一个 Volume，并设置其中一个环境变量：
+
+- `RAILWAY_VOLUME_MOUNT_PATH`：Railway 挂载卷的路径
+- `DATA_DIR`：你手动指定的数据目录
+
+服务会优先使用这些目录保存 `demo-db.json`，没有设置时也会自动初始化本地数据库文件。
+
+### 一句话结论
+
+把仓库 push 到 Railway 后，默认就能启动；如果你还要“重启后数据不丢”，再给它加 Volume 即可。
+
 ## 可靠性说明（已加固）
 
 - 网站可自动适配当前目录结构读取数据
