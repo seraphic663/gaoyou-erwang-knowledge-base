@@ -1,0 +1,10 @@
+{
+  "name": "gaoyou-erwang-demo",
+  "version": "1.0.0",
+  "description": "高邮二王知识库构建及应用 Demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED"
+}

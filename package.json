@@ -1,10 +1,10 @@
 {
-  "name": "gaoyou-erwang-demo",
+  "name": "gaoyou-erwang-workspace",
   "version": "1.0.0",
-  "description": "高邮二王知识库构建及应用 Demo",
-  "main": "server.js",
+  "private": true,
+  "description": "高邮二王知识库项目工作区",
   "scripts": {
-    "start": "node server.js"
-  },
-  "license": "UNLICENSED"
+    "start": "node 03-项目网站/server.js",
+    "start:web": "npm --prefix 03-项目网站 start"
+  }
 }

@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command": "node",
 			"args": [
-				"server.js"
+				"03-项目网站/server.js"
 			],
 			"isBackground": true,
 			"problemMatcher": [],
