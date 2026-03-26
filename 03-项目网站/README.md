@@ -68,7 +68,7 @@ http://localhost:3000/api/bootstrap
 
 - 以 `03-项目网站` 为工作目录
 - 启动命令仍然是 `npm start`
-- 需要确保数据目录可访问到仓库里的 `data/demo-db.json`
+- 默认数据文件位于当前目录的 `data/demo-db.json`
 
 ### 你最省事的做法
 
@@ -112,14 +112,16 @@ http://localhost:3000/api/bootstrap
 │  ├─ index.html / app.js / styles.css
 │  ├─ server.js
 │  ├─ package.json
-│  └─ README.md
-└─ data/
-	└─ demo-db.json
+│  ├─ README.md
+│  ├─ data/
+│  │  └─ demo-db.json
+│  └─ media/
+│     └─ image1.png
 ```
 
 ### 数据库结构
 
-当前 demo 数据库采用 `../data/demo-db.json`（相对 `03-项目网站`），内部按“多表”方式组织：
+当前 demo 数据库采用 `./data/demo-db.json`，内部按“多表”方式组织：
 
 - `works`：文献表
 - `passages`：原文段落表

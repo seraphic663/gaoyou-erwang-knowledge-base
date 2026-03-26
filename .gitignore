@@ -1,0 +1,22 @@
+# ---- OS / Editor ----
+.DS_Store
+Thumbs.db
+.vscode/*.log
+
+# ---- Python / Node cache (if any) ----
+__pycache__/
+*.pyc
+node_modules/
+
+# ---- Personal notes not for repo ----
+note/
+
+# ---- Runtime / backup artifacts ----
+**/*.broken.*
+
+# ---- Large literature files: keep out of git ----
+05-项目文献/**
+!05-项目文献/README.md
+
+# ---- Optional local generated data (uncomment if needed) ----
+# 03-项目网站/data/*.bak
