@@ -12,26 +12,48 @@
         <div class="brand">高邮二王知识库</div>
         <div class="nav-links">
           <a href="#intro">项目概述</a>
+          <a href="#data-overview">数据概览</a>
           <a href="#flow">检字流程</a>
           <a href="#cases">案例库</a>
           <a href="#timeline">申报时间</a>
           <a href="#team">团队</a>
+          <a href="./database.html">数据库架构</a>
         </div>
       </nav>
 
       <div class="hero-content">
         <p class="badge">2026 求是学术 · 应用研究 · Demo</p>
         <h1>高邮二王知识库构建及应用</h1>
-        <p>
+        <p class="hero-copy">
           以“王氏四种”为核心，围绕“经字互证”“一声之转”方法，搭建可检索、可解释、可视化的古典知识平台。
         </p>
-        <a class="cta" href="#cases">查看交互示例</a>
+        <div class="hero-actions">
+          <a class="cta" href="#cases">查看交互示例</a>
+          <a class="ghost-link" href="./database.html">查看数据库架构</a>
+        </div>
+        <div class="hero-panel">
+          <div class="hero-panel-item">
+            <span class="hero-kicker">对象</span>
+            <strong>二王著作 + 原始经典</strong>
+          </div>
+          <div class="hero-panel-item">
+            <span class="hero-kicker">核心</span>
+            <strong>最小必要 5 表闭环</strong>
+          </div>
+          <div class="hero-panel-item">
+            <span class="hero-kicker">目标</span>
+            <strong>先检索，再复盘，再扩展</strong>
+          </div>
+        </div>
       </div>
     </header>
 
     <main>
       <section id="intro" class="section">
-        <h2>项目概述</h2>
+        <div class="section-head">
+          <p class="section-kicker">Project Focus</p>
+          <h2>项目概述</h2>
+        </div>
         <div class="grid grid-3">
           <article class="card">
             <h3>研究对象</h3>
@@ -43,23 +65,44 @@
           </article>
           <article class="card">
             <h3>平台目标</h3>
-            <p>实现古籍深度标注、全文检索、案例图谱与流程可视化。</p>
+            <p>先完成最小必要数据库，再扩展为更完整的研究平台。</p>
           </article>
         </div>
       </section>
 
-      <section id="database" class="section alt">
+      <section id="data-overview" class="section alt">
         <div class="head-line">
-          <h2>数据库结构（Demo）</h2>
-          <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
+          <div>
+            <p class="section-kicker">Minimal Schema</p>
+            <h2>最小必要数据库概览</h2>
+            <p class="compact-note">首页只展示数据概况与使用入口，详细字段结构移至二级页面。</p>
+          </div>
+          <a class="page-link" href="./database.html">查看数据库架构</a>
         </div>
+        <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
         <div id="dbStats" class="stats-grid"></div>
-        <div id="schemaGrid" class="grid grid-3"></div>
+        <div class="grid grid-3">
+          <article class="card">
+            <h3>最小必要 5 表</h3>
+            <p>当前 Demo 严格按“著作、文本片段、词条、案例、证据”五张核心表组织。</p>
+          </article>
+          <article class="card">
+            <h3>首页只看业务</h3>
+            <p>首页聚焦项目目标、流程和案例，不直接堆叠数据库字段说明。</p>
+          </article>
+          <article class="card">
+            <h3>架构单独展示</h3>
+            <p>字段说明、主键、索引和用途放在二级页面，方便答辩时单独讲解。</p>
+          </article>
+        </div>
       </section>
 
       <section id="flow" class="section alt">
-        <h2>“经义不通”检字流程（Demo可视化）</h2>
-        <p class="flow-note">按附件中的 mermaid 逻辑重绘：先判断“字为原字/字非原字”，再沿“通假/同源/对文/同义并列”分流，最后回到“得出本字、求得字义”。</p>
+        <div class="section-head">
+          <p class="section-kicker">Method Flow</p>
+          <h2>“经义不通”检字流程</h2>
+        </div>
+        <p class="flow-note">按项目方案重绘：先判断“字为原字/字非原字”，再沿“通假/同源/对文/同义并列”分流，最后回到“得出本字、求得字义”。</p>
         <div class="flow-diagram">
           <div class="flow-node start large">经义不通</div>
 
@@ -98,14 +141,20 @@
 
       <section id="cases" class="section">
         <div class="head-line">
-          <h2>案例库（筛选演示）</h2>
-          <input id="searchInput" type="text" placeholder="输入关键词：如 犹豫 / 能不我知 / 术" />
+          <div>
+            <p class="section-kicker">Case Browser</p>
+            <h2>案例库</h2>
+          </div>
+          <input id="searchInput" type="text" placeholder="输入关键词：如 犹豫 / 不我知 / 术字乐甫" />
         </div>
         <div id="caseList" class="grid grid-2"></div>
       </section>
 
       <section id="timeline" class="section alt">
-        <h2>2026 立项流程时间线</h2>
+        <div class="section-head">
+          <p class="section-kicker">Schedule</p>
+          <h2>2026 立项流程时间线</h2>
+        </div>
         <ol class="timeline">
           <li><strong>2月24日—3月18日</strong>：选题与组队，提交意向申请表给出题教师。</li>
           <li><strong>3月19日 9:00—4月9日 17:00</strong>：项目负责人在线提交立项材料。</li>
@@ -116,7 +165,10 @@
       </section>
 
       <section id="team" class="section">
-        <h2>团队能力结构（示例）</h2>
+        <div class="section-head">
+          <p class="section-kicker">Capability Matrix</p>
+          <h2>团队能力结构</h2>
+        </div>
         <div class="grid grid-3">
           <article class="card">
             <h3>古文字与训诂</h3>

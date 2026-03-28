@@ -99,7 +99,8 @@ http://localhost:3000/api/bootstrap
 
 ## 现在做到什么程度
 
-- 前端展示页：项目概述、检字流程、案例库、时间线、团队结构
+- 前端展示页：首页聚焦项目概述、检字流程、案例库、时间线、团队结构
+- 二级架构页：单独展示最小必要版 5 表及字段说明
 - 后端本地 API：提供数据库统计、案例检索、结构信息
 - demo 数据库：使用文件型持久化数据，模拟多表结构
 - 可扩展架构：后续可以平滑替换成 SQLite / MySQL / PostgreSQL
@@ -109,7 +110,7 @@ http://localhost:3000/api/bootstrap
 ```text
 26大创/
 ├─ 03-项目网站/
-│  ├─ index.html / app.js / styles.css
+│  ├─ index.html / database.html / app.js / styles.css
 │  ├─ server.js
 │  ├─ package.json
 │  ├─ README.md
@@ -121,16 +122,15 @@ http://localhost:3000/api/bootstrap
 
 ### 数据库结构
 
-当前 demo 数据库采用 `./data/demo-db.json`，内部按“多表”方式组织：
+当前 demo 数据库采用 `./data/demo-db.json`，内部按“最小必要版 5 表”组织：
 
-- `works`：文献表
-- `passages`：原文段落表
-- `terms`：词条表
+- `works`：著作来源表
+- `passages`：文本片段表
+- `terms`：词条与术语表
 - `cases`：考释案例表
 - `evidences`：证据表
-- `relations`：关系表
 
-这种结构已经比单页前端数据库更工程化，原因是：
+这种结构已经能形成“著作 - 片段 - 词条 - 案例 - 证据”的最小闭环，原因是：
 
 - 数据有明确分层，便于扩展和维护
 - 可以单独替换存储层，而不影响前端页面

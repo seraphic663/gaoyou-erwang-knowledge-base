@@ -30,83 +30,123 @@ const DB_FILE = path.join(DATA_DIR, 'demo-db.json');
 const STORE_DEFINITIONS = [
   {
     name: 'works',
-    label: '文献表',
-    purpose: '记录《王氏四种》及相关版本信息。',
-    keyFields: ['id', 'title', 'author', 'version'],
-    indexes: ['category'],
+    label: '著作表',
+    purpose: '记录二王著作、原始经典与工具书，是所有文本与案例的上层来源表。',
+    keyFields: ['id', 'title', 'author', 'workType'],
+    indexes: ['workType', 'dynasty'],
+    fields: [
+      { name: 'id', description: '主键，唯一标识一部书。' },
+      { name: 'title', description: '书名，用于展示和检索。' },
+      { name: 'author', description: '作者或主要责任者。' },
+      { name: 'workType', description: '文献类型：二王著作、原始经典、工具书等。' },
+      { name: 'dynasty', description: '朝代信息，便于按时间背景筛选。' },
+      { name: 'timeNote', description: '写作或成书时间说明，当前先用文本记录。' },
+      { name: 'notes', description: '补充说明，如学术性质、用途等。' },
+    ],
   },
   {
     name: 'passages',
-    label: '原文段落表',
-    purpose: '存放 OCR/校对后的原文片段与页码定位。',
-    keyFields: ['id', 'workId', 'volume', 'page'],
-    indexes: ['workId'],
+    label: '文本片段表',
+    purpose: '记录可以被准确定位的文本片段，当前以条目、段落、引文片段为主。',
+    keyFields: ['id', 'workId', 'juan', 'passageType'],
+    indexes: ['workId', 'passageType'],
+    fields: [
+      { name: 'id', description: '主键。' },
+      { name: 'workId', description: '所属著作，对应 works.id。' },
+      { name: 'juan', description: '卷次；无卷次时可为空。' },
+      { name: 'chapter', description: '篇、章、类目等较高层级定位。' },
+      { name: 'locationNote', description: '更细位置说明，如条目号、页码、行号。' },
+      { name: 'rawText', description: '原始录入文本，尽量贴近底本。' },
+      { name: 'normalizedText', description: '规范化文本，便于统一检索。' },
+      { name: 'passageType', description: '片段类型：二王论述、原始经典、引证材料。' },
+    ],
   },
   {
     name: 'terms',
     label: '词条表',
-    purpose: '存放检字对象、别名与古音信息。',
-    keyFields: ['id', 'term', 'phonology'],
-    indexes: ['category'],
+    purpose: '记录检索词和方法术语，当前将字词对象与术语对象合并管理。',
+    keyFields: ['id', 'term', 'termType'],
+    indexes: ['termType', 'category'],
+    fields: [
+      { name: 'id', description: '主键。' },
+      { name: 'term', description: '词条本体，如“犹豫”“一声之转”。' },
+      { name: 'termType', description: '类型：字、词、术语。' },
+      { name: 'category', description: '分类标签，如联绵词、句法现象、方法术语。' },
+      { name: 'aliases', description: '别名、异体或相关写法。' },
+      { name: 'notes', description: '补充说明，如定义、音义摘要。' },
+    ],
   },
   {
     name: 'cases',
     label: '考释案例表',
-    purpose: '记录发疑—取证—释理—结论的完整考据链。',
-    keyFields: ['id', 'termId', 'title', 'status'],
-    indexes: ['termId', 'workId', 'status'],
+    purpose: '一条记录对应一则完整考据，连接二王论述、原始经典、方法和结论。',
+    keyFields: ['id', 'title', 'erwangPassageId', 'targetPassageId'],
+    indexes: ['termId', 'certainty', 'status'],
+    fields: [
+      { name: 'id', description: '主键。' },
+      { name: 'title', description: '案例标题，建议写成“问题类型 + 对象”。' },
+      { name: 'termId', description: '主要关联词条，对应 terms.id。' },
+      { name: 'erwangPassageId', description: '二王论述所在片段，对应 passages.id。' },
+      { name: 'targetPassageId', description: '被解释原文所在片段，对应 passages.id。' },
+      { name: 'problem', description: '问题触发点，即哪里不通或可疑。' },
+      { name: 'method', description: '当前案例的主方法，如改义、通假、改形。' },
+      { name: 'processText', description: '考据过程全文说明；最小版先整体保存。' },
+      { name: 'conclusion', description: '最终结论。' },
+      { name: 'certainty', description: '置信状态：确定、可疑、待核、多解。' },
+      { name: 'status', description: '数据状态：草稿、已校对、已审核。' },
+    ],
   },
   {
     name: 'evidences',
     label: '证据表',
-    purpose: '存放书证、引文、位置与证据类型。',
-    keyFields: ['id', 'caseId', 'sourceWorkId', 'passageId'],
-    indexes: ['caseId', 'sourceWorkId', 'passageId'],
-  },
-  {
-    name: 'relations',
-    label: '关系表',
-    purpose: '存放通假、同源、对文、双声等结构化关系。',
-    keyFields: ['id', 'fromType', 'toType', 'relationType'],
-    indexes: ['fromType', 'fromId', 'toType', 'toId', 'relationType'],
+    purpose: '一条记录对应一条证据，用来支撑某个考据案例。',
+    keyFields: ['id', 'caseId', 'sourcePassageId', 'evidenceType'],
+    indexes: ['caseId', 'sourcePassageId', 'evidenceType'],
+    fields: [
+      { name: 'id', description: '主键。' },
+      { name: 'caseId', description: '所属案例，对应 cases.id。' },
+      { name: 'sourcePassageId', description: '证据来源片段，对应 passages.id。' },
+      { name: 'evidenceType', description: '证据类型：书证、音证、义证、形证、语法证据。' },
+      { name: 'quoteText', description: '实际引文，可为来源片段的关键部分。' },
+      { name: 'note', description: '证据解释，说明为何能支撑该案例。' },
+    ],
   },
 ];
 
 const SEED_DB = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   tables: {
     works: [
-      { id: 1, title: '广雅疏证', author: '王念孙', version: '家刻本 / 点校本', category: '训诂总集', note: '以因声求义疏证《广雅》。' },
-      { id: 2, title: '读书杂志', author: '王念孙', version: '通行点校本', category: '校勘札记', note: '涉及《逸周书》《史记》等校读。' },
-      { id: 3, title: '经义述闻', author: '王引之', version: '通行点校本', category: '经学札记', note: '汇集父子二人训诂成果。' },
-      { id: 4, title: '经传释词', author: '王引之', version: '通行点校本', category: '虚词研究', note: '系统研究上古汉语虚词。' },
+      { id: 1, title: '经义述闻', author: '王引之', workType: '二王著作', dynasty: '清', timeNote: '清嘉庆间成书', notes: '汇集父子二人训诂成果。' },
+      { id: 2, title: '经传释词', author: '王引之', workType: '二王著作', dynasty: '清', timeNote: '清嘉庆间刊行', notes: '系统研究上古汉语虚词。' },
+      { id: 3, title: '诗经', author: '佚名', workType: '原始经典', dynasty: '先秦', timeNote: '西周至春秋时期形成', notes: '二王常据以展开经义考证。' },
+      { id: 4, title: '左传', author: '左丘明旧题', workType: '原始经典', dynasty: '先秦', timeNote: '战国至两汉间传世', notes: '常作为名物、句法与训释书证来源。' },
+      { id: 5, title: '尔雅', author: '佚名', workType: '工具书', dynasty: '先秦至两汉', timeNote: '早期训诂辞书', notes: '用作义项和训释证据。' },
     ],
     passages: [
-      { id: 1, workId: 3, volume: '卷三', page: 'P45', originalText: '犹豫，双声字也，字或作犹与。', normalizedText: '犹豫，双声字也，字或作犹与。', keywords: ['犹豫', '犹与', '双声'] },
-      { id: 2, workId: 3, volume: '卷八', page: 'P126', originalText: '不我知，谓不知我也。', normalizedText: '不我知，谓不知我也。', keywords: ['不我知', '宾语前置'] },
-      { id: 3, workId: 4, volume: '卷二', page: 'P33', originalText: '术字乐甫，术通遂，遂训安。', normalizedText: '术字乐甫，术通遂，遂训安。', keywords: ['术', '遂', '乐甫'] },
+      { id: 1, workId: 1, juan: '卷三', chapter: '', locationNote: '条目“犹豫”', rawText: '犹豫，双声字也，字或作犹与。', normalizedText: '犹豫，双声字也，字或作犹与。', passageType: '二王论述' },
+      { id: 2, workId: 1, juan: '卷八', chapter: '', locationNote: '条目“不我知”', rawText: '不我知，谓不知我也。', normalizedText: '不我知，谓不知我也。', passageType: '二王论述' },
+      { id: 3, workId: 2, juan: '卷二', chapter: '', locationNote: '条目“术字乐甫”', rawText: '术字乐甫，术通遂，遂训安。', normalizedText: '术字乐甫，术通遂，遂训安。', passageType: '二王论述' },
+      { id: 4, workId: 3, juan: '《王风》', chapter: '黍离', locationNote: '相关句法讨论背景', rawText: '知我者谓我心忧，不知我者谓我何求。', normalizedText: '知我者谓我心忧，不知我者谓我何求。', passageType: '原始经典' },
+      { id: 5, workId: 4, juan: '昭公二十年', chapter: '', locationNote: '宋公子术字乐甫相关背景', rawText: '宋公子城字子朱，公子地字子仲，公子术字乐甫。', normalizedText: '宋公子城字子朱，公子地字子仲，公子术字乐甫。', passageType: '原始经典' },
+      { id: 6, workId: 5, juan: '', chapter: '释诂', locationNote: '训释书证', rawText: '与，犹也。', normalizedText: '与，犹也。', passageType: '引证材料' },
     ],
     terms: [
-      { id: 1, term: '犹豫', aliases: ['犹与', '夷犹', '容与'], phonology: '双声联绵词 / 一声之转', category: '联绵词', gloss: '表示迟疑、徘徊之义。' },
-      { id: 2, term: '能不我知', aliases: ['不我知', '能通而'], phonology: '能 / 而 古通', category: '通假与句法', gloss: '说明宾语前置与字通现象。' },
-      { id: 3, term: '术字乐甫', aliases: ['遂', '安', '乐'], phonology: '形音义互证', category: '名与字', gloss: '用于展示词义递进和名字关系。' },
+      { id: 1, term: '犹豫', termType: '词', category: '联绵词', aliases: ['犹与', '夷犹', '容与'], notes: '与双声、一声之转相关。' },
+      { id: 2, term: '不我知', termType: '词', category: '句法现象', aliases: ['不知我'], notes: '常与宾语前置和旧注误释问题关联。' },
+      { id: 3, term: '术字乐甫', termType: '词', category: '名与字', aliases: ['术', '遂', '安', '乐'], notes: '用于展示音义链条和名字号互证。' },
+      { id: 4, term: '一声之转', termType: '术语', category: '方法术语', aliases: [], notes: '二王常用的方法术语之一。' },
     ],
     cases: [
-      { id: 1, termId: 1, workId: 3, title: '双声词考释：犹豫', problem: '如何解释犹豫、犹与、夷犹、容与之间的关系？', method: '一声之转 / 联绵词', steps: ['旁征引书证', '比较同义连绵词', '判断为一声之转'], conclusion: '犹豫与犹与、夷犹、容与同属一组联绵词，义存乎声。', status: 'published' },
-      { id: 2, termId: 2, workId: 3, title: '句法与通假：能不我知', problem: '为何旧注会把“能”解释得不准确？', method: '宾语前置 + 古字通', steps: ['辨析不我知的句法', '确认宾语前置', '说明能通而'], conclusion: '此处应释为“不知我”，“能”宜训“而”。', status: 'published' },
-      { id: 3, termId: 3, workId: 4, title: '名与字关系：宋公子术字乐甫', problem: '“术”、“遂”、“安”、“乐”如何互证？', method: '形音义互证', steps: ['术通遂', '遂训安', '安与乐通'], conclusion: '遂与乐相通，名与字的关系可由音义链条贯通。', status: 'draft' },
+      { id: 1, title: '双声词考释：犹豫', termId: 1, erwangPassageId: 1, targetPassageId: null, problem: '如何解释“犹豫”与“犹与”“夷犹”“容与”的关系？', method: '联绵词 / 一声之转', processText: '先指出“犹豫”为双声字，随后旁征“犹与”“夷犹”“容与”等相关词形，再结合训释书证说明其义相通，最后判定为同组联绵词。', conclusion: '犹豫与犹与、夷犹、容与可视为同组词形，义存乎声。', certainty: '确定', status: '已审核' },
+      { id: 2, title: '句法与训释：不我知', termId: 2, erwangPassageId: 2, targetPassageId: 4, problem: '旧注将相关句式解释得过于牵强，需先判断句法再处理字义。', method: '句法分析 / 改义', processText: '先辨析“不我知”为否定句宾语前置，再回到句意说明应读作“不知我”，从而修正旧注误解。', conclusion: '应先按宾语前置句式理解，再作“不知我”的训释。', certainty: '确定', status: '已审核' },
+      { id: 3, title: '名与字关系：宋公子术字乐甫', termId: 3, erwangPassageId: 3, targetPassageId: 5, problem: '“术”“遂”“安”“乐”如何构成可追溯的音义链条？', method: '形音义互证', processText: '从“术通遂”入手，再以“遂训安”推进，最后说明“安”与“乐”相通，借此贯通名与字之间的关系。', conclusion: '可通过“术—遂—安—乐”的链条解释名与字的对应关系。', certainty: '待核', status: '草稿' },
     ],
     evidences: [
-      { id: 1, caseId: 1, sourceWorkId: 3, passageId: 1, quote: '犹豫，双声字也，字或作犹与。', type: '书证', location: '《经义述闻》卷三' },
-      { id: 2, caseId: 2, sourceWorkId: 3, passageId: 2, quote: '不我知，谓不知我也。', type: '句法证据', location: '《经义述闻》卷八' },
-      { id: 3, caseId: 3, sourceWorkId: 4, passageId: 3, quote: '术通遂，遂训安。', type: '字形与音义证据', location: '《经传释词》卷二' },
-    ],
-    relations: [
-      { id: 1, fromType: 'term', fromId: 1, toType: 'term', toId: 1, relationType: '一声之转', description: '犹豫与犹与、夷犹、容与构成同组词链。', confidence: 0.96 },
-      { id: 2, fromType: 'term', fromId: 2, toType: 'case', toId: 2, relationType: '对应案例', description: '“能不我知”对应句法与通假案例。', confidence: 0.94 },
-      { id: 3, fromType: 'case', fromId: 1, toType: 'evidence', toId: 1, relationType: '证据支撑', description: '案例 1 由《经义述闻》卷三书证支撑。', confidence: 0.98 },
-      { id: 4, fromType: 'case', fromId: 2, toType: 'evidence', toId: 2, relationType: '证据支撑', description: '案例 2 由句法判断与书证共同支撑。', confidence: 0.97 },
-      { id: 5, fromType: 'case', fromId: 3, toType: 'evidence', toId: 3, relationType: '证据支撑', description: '案例 3 由字形与音义链条支撑。', confidence: 0.95 },
+      { id: 1, caseId: 1, sourcePassageId: 1, evidenceType: '书证', quoteText: '犹豫，双声字也，字或作犹与。', note: '直接说明“犹豫”与“犹与”的词形关系。' },
+      { id: 2, caseId: 1, sourcePassageId: 6, evidenceType: '义证', quoteText: '与，犹也。', note: '提供训释辞书中的义项支撑。' },
+      { id: 3, caseId: 2, sourcePassageId: 2, evidenceType: '语法证据', quoteText: '不我知，谓不知我也。', note: '直接给出对宾语前置句式的解释。' },
+      { id: 4, caseId: 3, sourcePassageId: 3, evidenceType: '义证', quoteText: '术通遂，遂训安。', note: '展示“术—遂—安”的中间链条。' },
     ],
   },
 };
@@ -114,6 +154,23 @@ const SEED_DB = {
 function ensureDatabaseFile() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(DB_FILE, JSON.stringify(SEED_DB, null, 2), 'utf8');
+    return;
+  }
+
+  try {
+    const raw = fs.readFileSync(DB_FILE, 'utf8');
+    const parsed = JSON.parse(raw.replace(/^\uFEFF/, ''));
+    const tableNames = Object.keys(parsed?.tables || {});
+    const isLatestSchema =
+      parsed?.schemaVersion === SEED_DB.schemaVersion &&
+      ['works', 'passages', 'terms', 'cases', 'evidences'].every((name) => tableNames.includes(name)) &&
+      !tableNames.includes('relations');
+
+    if (!isLatestSchema) {
+      fs.writeFileSync(DB_FILE, JSON.stringify(SEED_DB, null, 2), 'utf8');
+    }
+  } catch {
     fs.writeFileSync(DB_FILE, JSON.stringify(SEED_DB, null, 2), 'utf8');
   }
 }
@@ -153,18 +210,30 @@ function getEvidenceMap(db) {
   return new Map(db.tables.evidences.map((item) => [item.id, item]));
 }
 
+function getPassageMap(db) {
+  return new Map(db.tables.passages.map((item) => [item.id, item]));
+}
+
 function enrichCase(db, item) {
   const workMap = getWorkMap(db);
+  const passageMap = getPassageMap(db);
   const termMap = getTermMap(db);
   const evidenceMap = getEvidenceMap(db);
   const caseEvidences = db.tables.evidences.filter((evidence) => evidence.caseId === item.id);
+  const erwangPassage = passageMap.get(item.erwangPassageId);
+  const targetPassage = passageMap.get(item.targetPassageId);
+  const erwangWork = erwangPassage ? workMap.get(erwangPassage.workId) : null;
+  const targetWork = targetPassage ? workMap.get(targetPassage.workId) : null;
 
   return {
     ...item,
-    workTitle: workMap.get(item.workId)?.title || '',
     termName: termMap.get(item.termId)?.term || '',
+    erwangWorkTitle: erwangWork?.title || '',
+    targetWorkTitle: targetWork?.title || '',
+    erwangLocation: erwangPassage ? [erwangPassage.juan, erwangPassage.chapter, erwangPassage.locationNote].filter(Boolean).join(' · ') : '',
+    targetLocation: targetPassage ? [targetPassage.juan, targetPassage.chapter, targetPassage.locationNote].filter(Boolean).join(' · ') : '',
     evidenceCount: caseEvidences.length,
-    evidenceQuotes: caseEvidences.map((evidence) => evidenceMap.get(evidence.id)?.quote || evidence.quote),
+    evidenceQuotes: caseEvidences.map((evidence) => evidenceMap.get(evidence.id)?.quoteText || evidence.quoteText),
   };
 }
 
@@ -178,11 +247,13 @@ function searchCases(db, query) {
       item.title,
       item.problem,
       item.method,
-      item.steps.join(' '),
+      item.processText,
       item.conclusion,
+      item.certainty,
       item.status,
       item.termName,
-      item.workTitle,
+      item.erwangWorkTitle,
+      item.targetWorkTitle,
       item.evidenceQuotes.join(' '),
     ]
       .join(' ')

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>数据库架构 · 高邮二王知识库 Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="subhero">
+      <nav class="nav">
+        <div class="brand">高邮二王知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">返回首页</a>
+          <a href="#schema">字段结构</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">Secondary View · Minimal Schema</p>
+        <h1>数据库架构说明</h1>
+        <p class="hero-copy">当前 Demo 只展示最小必要版 5 表。字段解释、用途和索引均集中在本页，不出现在首页。</p>
+        <div class="hero-panel">
+          <div class="hero-panel-item">
+            <span class="hero-kicker">阶段</span>
+            <strong>最小必要版</strong>
+          </div>
+          <div class="hero-panel-item">
+            <span class="hero-kicker">重点</span>
+            <strong>字段够用、关系清楚</strong>
+          </div>
+          <div class="hero-panel-item">
+            <span class="hero-kicker">边界</span>
+            <strong>暂不上关系图谱表</strong>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="section-head">
+          <p class="section-kicker">Reading Guide</p>
+          <h2>阅读方式</h2>
+        </div>
+        <div class="grid grid-3">
+          <article class="card">
+            <h3>为什么只有 5 表</h3>
+            <p>为了保证现在就能录案例、做检索、做展示，不把版本、关系、层级拆得过重。</p>
+          </article>
+          <article class="card">
+            <h3>当前边界</h3>
+            <p>先完成著作、片段、词条、案例、证据的闭环；更复杂的版本与关系后续再扩展。</p>
+          </article>
+          <article class="card">
+            <h3>后续升级方向</h3>
+            <p>案例量增加后，再补版本表、步骤表和关系表，逐步过渡到较完整版。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="schema" class="section alt">
+        <div class="head-line">
+          <div>
+            <p class="section-kicker">Schema Detail</p>
+            <h2>字段结构</h2>
+          </div>
+          <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
+        </div>
+        <div id="dbStats" class="stats-grid"></div>
+        <div id="schemaGrid" class="grid grid-2"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Schema View · 高邮二王知识库 Demo</p>
+    </footer>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
