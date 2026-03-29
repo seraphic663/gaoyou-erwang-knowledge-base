@@ -13,6 +13,7 @@ note/
 
 # ---- Runtime / backup artifacts ----
 **/*.broken.*
+~$*.docx
 
 # ---- Large literature files: keep out of git ----
 05-项目文献/**
