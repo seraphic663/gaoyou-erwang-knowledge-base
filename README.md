@@ -36,6 +36,18 @@ npm start
 
 http://localhost:3000
 
+## SQLite 实库同步
+
+网站现在默认优先读取 `03-项目网站/data/sqlite-snapshot.json`。
+
+如果你更新了 `大创/data2/dictionary.db`，在仓库根目录执行：
+
+```bash
+npm run sync:sqlite
+```
+
+这会把 SQLite 实库重新导出为网站可直接读取的统一快照。Railway 部署时不需要运行 Python，只需要仓库里已经包含这个快照文件即可。
+
 ## Railway 部署
 
 如果你把这个仓库 push 到 Railway，通常可以直接用，不需要额外改太多配置：
@@ -52,6 +64,13 @@ npm start
 
 5. 部署完成后，访问 Railway 分配的公开域名即可。
 
+### 当前默认数据来源
+
+- 优先：`03-项目网站/data/sqlite-snapshot.json`
+- 回退：`03-项目网站/data/demo-db.json`
+
+因此，只要你在 push 前执行过一次 `npm run sync:sqlite`，Railway 上就是“直接可用”的，不依赖 Railway 容器里再装 Python 或再读本地 SQLite。
+
 ### 数据持久化建议
 
 如果你希望数据库在 Railway 重启后仍然保留，建议再给服务挂一个 Volume，并设置其中一个环境变量：
@@ -63,7 +82,7 @@ npm start
 
 ### 一句话结论
 
-把仓库 push 到 Railway 后，默认就能启动；如果你还要“重启后数据不丢”，再给它加 Volume 即可。
+把仓库 push 到 Railway 后，默认就能启动；如果你已经同步好 SQLite 快照，线上会直接读取实库导出的数据。
 
 ## 05 文件夹太大时怎么处理（推荐）
 

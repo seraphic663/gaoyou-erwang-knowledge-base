@@ -81,9 +81,10 @@ function renderSchema(stores) {
   });
 }
 
-function renderCases(items) {
+function renderCases(result) {
   if (!list) return;
 
+  const items = result.items || [];
   list.innerHTML = '';
   if (!items.length) {
     list.innerHTML = '<article class="card"><h3>暂无结果</h3><p>请更换关键词继续检索。</p></article>';
@@ -99,7 +100,7 @@ function renderCases(items) {
     card.className = 'card case-card';
     card.innerHTML = `
       <div class="case-topline">
-        <span class="case-term">${escapeHtml(item.termName || '未单独关联')}</span>
+        <span class="case-term">${escapeHtml(item.termLabel || item.termName || '未单独关联')}</span>
         <div class="case-tags">
           <span class="tag">${escapeHtml(item.method)}</span>
           <span class="tag muted">${escapeHtml(item.certainty)}</span>
@@ -123,6 +124,16 @@ function renderCases(items) {
     `;
     list.appendChild(card);
   });
+
+  if (result.truncated) {
+    const notice = document.createElement('article');
+    notice.className = 'card';
+    notice.innerHTML = `
+      <h3>结果已截断</h3>
+      <p>当前检索命中 ${escapeHtml(String(result.total))} 条，仅展示前 ${escapeHtml(String(result.limit))} 条以保证首页可读性。</p>
+    `;
+    list.appendChild(notice);
+  }
 }
 
 async function loadBootstrap() {
@@ -133,16 +144,16 @@ async function loadBootstrap() {
   renderStats(bootstrap.counts);
   renderSchema(bootstrap.stores);
   if (dbStatus) {
-    dbStatus.textContent = `数据库状态：已连接（${bootstrap.totalRecords} 条总记录）`;
+    dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
   }
   if (searchInput) {
-    searchInput.placeholder = `输入关键词：如 犹豫 / 不我知 / 术字乐甫（当前词条 ${bootstrap.sampleTerms.length} 条）`;
+    searchInput.placeholder = `输入关键词：如 犹豫 / 不我知 / 术字乐甫（当前词条 ${bootstrap.counts.terms} 条）`;
   }
 }
 
 async function searchCases(query) {
   const data = await requestJson(`/api/cases?q=${encodeURIComponent(query)}`);
-  renderCases(data.items || []);
+  renderCases(data);
 }
 
 async function init() {

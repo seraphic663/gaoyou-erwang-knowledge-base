@@ -102,8 +102,8 @@ http://localhost:3000/api/bootstrap
 - 前端展示页：首页聚焦项目概述、检字流程、案例库、时间线、团队结构
 - 二级架构页：单独展示最小必要版 5 表及字段说明
 - 后端本地 API：提供数据库统计、案例检索、结构信息
-- demo 数据库：使用文件型持久化数据，模拟多表结构
-- 可扩展架构：后续可以平滑替换成 SQLite / MySQL / PostgreSQL
+- 统一数据源层：支持 `Demo JSON` 与 `SQLite 实库（大创）`
+- 可扩展架构：后续可以继续扩到更正式的 SQLite / MySQL / PostgreSQL 服务
 
 ## 工程架构
 
@@ -122,7 +122,13 @@ http://localhost:3000/api/bootstrap
 
 ### 数据库结构
 
-当前 demo 数据库采用 `./data/demo-db.json`，内部按“最小必要版 5 表”组织：
+当前网站后端已经改为“统一数据源接口”，默认优先接入由 SQLite 实库导出的统一快照：
+
+- `大创/data2/dictionary.db`：真实 SQLite 数据源
+- `03-项目网站/data/sqlite-snapshot.json`：由 Python 脚本导出的统一快照
+- `03-项目网站/data/demo-db.json`：回退用 Demo 数据源
+
+无论底层来源是什么，网站 API 都按“最小必要版 5 表”输出统一结构：
 
 - `works`：著作来源表
 - `passages`：文本片段表
@@ -135,6 +141,20 @@ http://localhost:3000/api/bootstrap
 - 数据有明确分层，便于扩展和维护
 - 可以单独替换存储层，而不影响前端页面
 - 能支持后续新增搜索、筛选、图谱、导出等能力
+
+## 数据源切换
+
+- 默认行为：若检测到 `03-项目网站/data/sqlite-snapshot.json`，网站优先使用 SQLite 快照
+- 强制使用 demo：设置环境变量 `DATA_SOURCE=demo`
+- 强制使用 SQLite：设置环境变量 `DATA_SOURCE=sqlite`
+
+当 SQLite 数据更新后，执行一次：
+
+```bash
+python 03-项目网站/scripts/sqlite_bridge.py export
+```
+
+即可重新生成网站使用的统一快照。
 
 ## 接口
 
@@ -193,4 +213,9 @@ http://localhost:3000
 
 ## 说明
 
-当前项目是 demo 级实现，重点是展示工程结构和研究逻辑，不追求生产级部署安全性。
+当前项目仍是 demo 级实现，但后端已经完成一次工程化重构：
+
+- 静态页面与数据源适配分离
+- Node 服务只负责 HTTP 与页面分发
+- SQLite 读取通过 Python 标准库桥接完成
+- 页面不再直接依赖某一种数据库格式
