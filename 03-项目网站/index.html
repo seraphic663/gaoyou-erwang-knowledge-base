@@ -142,10 +142,24 @@
       <section id="cases" class="section">
         <div class="head-line">
           <div>
-            <p class="section-kicker">Case Browser</p>
-            <h2>案例库</h2>
+            <p class="section-kicker">Search Browser</p>
+            <h2>检索结果</h2>
           </div>
-          <input id="searchInput" type="text" placeholder="输入关键词：如 犹豫 / 不我知 / 术字乐甫" />
+          <input id="searchInput" type="text" placeholder="输入单字、词语或义项：如 始 / 犹豫 / 不我知" />
+        </div>
+        <div id="searchSummary" class="search-summary"></div>
+        <div class="result-head">
+          <div>
+            <p class="section-kicker">Matched Terms</p>
+            <h3>匹配字词</h3>
+          </div>
+        </div>
+        <div id="termList" class="grid grid-3"></div>
+        <div class="result-head">
+          <div>
+            <p class="section-kicker">Related Cases</p>
+            <h3>相关案例</h3>
+          </div>
         </div>
         <div id="caseList" class="grid grid-2"></div>
       </section>

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const {
+  buildSearch,
   buildBootstrap,
   buildContext,
   buildHealth,
@@ -47,6 +48,10 @@ class SQLiteSnapshotSource {
 
   getSchema() {
     return buildSchema(buildContext(this.loadSnapshot()));
+  }
+
+  search(query) {
+    return buildSearch(buildContext(this.loadSnapshot()), query);
   }
 
   searchCases(query) {

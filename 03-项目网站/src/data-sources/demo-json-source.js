@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const {
+  buildSearch,
   buildBootstrap,
   buildContext,
   buildHealth,
@@ -147,6 +148,10 @@ class DemoJsonSource {
 
   getSchema() {
     return buildSchema(buildContext(this.loadSnapshot()));
+  }
+
+  search(query) {
+    return buildSearch(buildContext(this.loadSnapshot()), query);
   }
 
   searchCases(query) {

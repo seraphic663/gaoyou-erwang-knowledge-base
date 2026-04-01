@@ -96,6 +96,11 @@ function createServer() {
         return sendJson(res, 200, dataSource.searchCases(query));
       }
 
+      if (parsedUrl.pathname === '/api/search') {
+        const query = parsedUrl.query.q || '';
+        return sendJson(res, 200, dataSource.search(query));
+      }
+
       if (parsedUrl.pathname === '/api/terms') {
         return sendJson(res, 200, dataSource.getTerms());
       }

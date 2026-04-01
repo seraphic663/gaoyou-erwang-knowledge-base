@@ -315,6 +315,20 @@ h2 {
   color: var(--sub);
 }
 
+.search-summary:empty {
+  display: none;
+}
+
+.result-head {
+  margin-top: 28px;
+  margin-bottom: 14px;
+}
+
+.result-head h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
 .stats-grid {
   display: grid;
   gap: 12px;
@@ -401,6 +415,68 @@ h2 {
   overflow: hidden;
 }
 
+.term-card {
+  display: grid;
+  gap: 14px;
+}
+
+.term-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.term-glyph {
+  min-width: 60px;
+  height: 60px;
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(33, 79, 156, 0.12), rgba(185, 129, 47, 0.16));
+  color: var(--pri-2);
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.term-meta-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.term-core {
+  margin: 0;
+  color: var(--ink);
+}
+
+.mini-chip-list,
+.term-footer,
+.case-members {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mini-chip,
+.term-case-ref {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.mini-chip {
+  background: rgba(33, 79, 156, 0.08);
+  color: var(--pri-2);
+}
+
+.term-case-ref {
+  background: rgba(185, 129, 47, 0.12);
+  color: #8a5a14;
+}
+
 .case-card::before {
   content: '';
   position: absolute;
@@ -433,6 +509,11 @@ h2 {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.case-subtitle {
+  margin: 0 0 12px;
+  color: var(--sub);
 }
 
 .case-meta,
