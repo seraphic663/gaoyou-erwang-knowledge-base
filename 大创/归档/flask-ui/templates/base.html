@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}古汉语考据数据库{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #faf7f2;
+            --bg-card: #ffffff;
+            --accent: #8b4513;
+            --accent-light: #f5e6d3;
+            --text-primary: #2c1810;
+            --text-secondary: #5c3d2e;
+            --border-color: #e8d5c4;
+        }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Noto Serif SC', serif;
+        }
+        .navbar {
+            background-color: var(--accent) !important;
+        }
+        .navbar-brand, .nav-link, .navbar-text {
+            color: #fff !important;
+            font-family: 'Noto Serif SC', serif;
+        }
+        .nav-link:hover { opacity: 0.85; }
+        .card {
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .card-header {
+            background-color: var(--accent-light);
+            border-bottom: 1px solid var(--border-color);
+            color: var(--accent);
+            font-weight: 600;
+        }
+        .btn-accent {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+        }
+        .btn-accent:hover {
+            background-color: #6b3310;
+            color: #fff;
+        }
+        .search-box {
+            border-color: var(--accent);
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.2rem rgba(139,69,19,0.25);
+        }
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .text-accent { color: var(--accent) !important; }
+        .badge-accent {
+            background-color: var(--accent-light);
+            color: var(--accent);
+        }
+        footer {
+            background-color: var(--accent);
+            color: #fff;
+            padding: 1.5rem 0;
+            margin-top: 3rem;
+            font-family: 'Noto Serif SC', serif;
+        }
+        .section-title {
+            border-left: 4px solid var(--accent);
+            padding-left: 12px;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+        }
+        .case-item, .term-item {
+            border-left: 3px solid transparent;
+            padding-left: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .case-item:hover, .term-item:hover {
+            border-left-color: var(--accent);
+            background-color: var(--accent-light);
+        }
+        .search-empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+        .hero-section {
+            background: linear-gradient(135deg, var(--accent) 0%, #a0522d 100%);
+            color: white;
+            padding: 3.5rem 0;
+            margin-bottom: 2.5rem;
+        }
+        .hero-section h1 {
+            font-weight: 700;
+            font-size: 2.2rem;
+        }
+        .certainty-badge {
+            font-size: 0.78rem;
+            padding: 3px 8px;
+        }
+        .certainty-确定 { background: #d4edda; color: #155724; }
+        .certainty-可疑 { background: #fff3cd; color: #856404; }
+        .certainty-待核 { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="/">古汉语考据数据库</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="/">首页</a></li>
+        <li class="nav-item"><a class="nav-link" href="/terms">词条</a></li>
+        <li class="nav-item"><a class="nav-link" href="/cases">案例</a></li>
+        <li class="nav-item"><a class="nav-link" href="/stats">统计</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<footer class="text-center mt-5">
+  <div class="container">
+    <p class="mb-1" style="font-size:1.1rem;">古汉语考据数据库 &nbsp;|&nbsp; 第二版</p>
+    <p class="mb-0" style="opacity:0.7;font-size:0.85rem;">数据来源：source.txt &nbsp;·&nbsp; 基于 SQLite + Flask</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

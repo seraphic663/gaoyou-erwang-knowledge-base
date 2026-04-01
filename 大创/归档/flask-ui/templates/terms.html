@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}所有词条 — 古汉语考据数据库{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3" style="font-size:0.85rem;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="text-accent">首页</a></li>
+        <li class="breadcrumb-item active">词条</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>词条列表</span>
+        <span class="badge badge-accent">{{ terms|length }} 条</span>
+    </div>
+    {% if terms %}
+    <ul class="list-group list-group-flush">
+        {% for t in terms %}
+        <li class="list-group-item">
+            <a href="/term/{{ t.id }}" class="text-decoration-none">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong class="text-accent" style="font-size:1.1rem;">{{ t.term }}</strong>
+                        {% if t.term_type %}
+                        <span class="badge badge-accent ms-1">{{ t.term_type }}</span>
+                        {% endif %}
+                        {% if t.category %}
+                        <span class="badge bg-secondary ms-1" style="font-size:0.75rem;">{{ t.category }}</span>
+                        {% endif %}
+                    </div>
+                    <span class="text-muted" style="font-size:0.8rem;">→</span>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="card-body text-muted text-center py-5">
+        暂无词条数据，请先运行数据导入脚本。
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

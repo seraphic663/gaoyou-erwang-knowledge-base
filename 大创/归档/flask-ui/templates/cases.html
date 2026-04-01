@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}所有案例 — 古汉语考据数据库{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3" style="font-size:0.85rem;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="text-accent">首页</a></li>
+        <li class="breadcrumb-item active">案例</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>考据案例列表</span>
+        <span class="badge badge-accent">{{ cases|length }} 条</span>
+    </div>
+    {% if cases %}
+    <ul class="list-group list-group-flush">
+        {% for c in cases %}
+        <li class="list-group-item">
+            <a href="/case/{{ c.id }}" class="text-decoration-none">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong class="text-accent">{{ c.title }}</strong>
+                        {% if c.section_title %}
+                        <div style="font-size:0.82rem;color:var(--text-secondary);">{{ c.section_title }}</div>
+                        {% endif %}
+                        {% if c.conclusion %}
+                        <div class="mt-1" style="font-size:0.85rem;color:var(--text-secondary);">
+                            {{ c.conclusion[:100] }}{% if c.conclusion|length > 100 %}…{% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="text-end ms-3" style="white-space:nowrap;">
+                        {% if c.certainty %}
+                        <span class="badge certainty-badge certainty-{{ c.certainty }}">{{ c.certainty }}</span>
+                        {% endif %}
+                        <span class="badge bg-secondary certainty-badge ms-1">{{ c.status }}</span>
+                    </div>
+                </div>
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="card-body text-muted text-center py-5">
+        暂无案例数据，请先运行数据导入脚本。
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}{{ case.title }} — 案例详情{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3" style="font-size:0.85rem;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="text-accent">首页</a></li>
+        <li class="breadcrumb-item"><a href="/cases" class="text-accent">案例</a></li>
+        <li class="breadcrumb-item active">案例详情</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- 案例基本信息 -->
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-header">案例信息</div>
+            <div class="card-body">
+                <h4 class="text-accent mb-2">{{ case.title }}</h4>
+
+                {% if case.section_title %}
+                <p><strong>章节：</strong> {{ case.section_title }}</p>
+                {% endif %}
+                {% if case.volume_title %}
+                <p><strong>卷次：</strong> {{ case.volume_title }}</p>
+                {% endif %}
+                {% if case.def_word %}
+                <p><strong>释词：</strong> {{ case.def_word }}</p>
+                {% endif %}
+
+                <div class="d-flex gap-2 mt-3 flex-wrap">
+                    {% if case.certainty %}
+                    <span class="badge certainty-badge certainty-{{ case.certainty }}">{{ case.certainty }}</span>
+                    {% endif %}
+                    {% if case.status %}
+                    <span class="badge bg-secondary certainty-badge">{{ case.status }}</span>
+                    {% endif %}
+                </div>
+
+                {% if case.raw_head %}
+                <div class="mt-3 p-2" style="background:#f5f0e8;border-radius:4px;font-size:0.88rem;">
+                    <strong>原始字头：</strong>{{ case.raw_head }}
+                </div>
+                {% endif %}
+
+                <p class="text-muted mt-3" style="font-size:0.78rem;">案例 ID：{{ case.id }}</p>
+            </div>
+        </div>
+
+        <!-- 关联词条 -->
+        {% if term_ids %}
+        <div class="card">
+            <div class="card-header">关联词条</div>
+            <div class="card-body">
+                {% for tid in term_ids %}
+                <a href="/term/{{ tid }}" class="text-accent me-3">{{ tid }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- 案例内容 -->
+    <div class="col-lg-7">
+        {% if case.process_text %}
+        <div class="card mb-3">
+            <div class="card-header">考证过程</div>
+            <div class="card-body" style="line-height:1.9;font-size:0.95rem;">
+                {{ case.process_text }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if case.problem %}
+        <div class="card mb-3">
+            <div class="card-header">问题</div>
+            <div class="card-body" style="line-height:1.9;font-size:0.95rem;">
+                {{ case.problem }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if case.method %}
+        <div class="card mb-3">
+            <div class="card-header">方法</div>
+            <div class="card-body" style="line-height:1.9;font-size:0.95rem;">
+                {{ case.method }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if case.conclusion %}
+        <div class="card mb-3" style="border-color:var(--accent);">
+            <div class="card-header" style="background-color:var(--accent-light);">结论</div>
+            <div class="card-body" style="line-height:1.9;font-size:0.95rem;font-weight:600;color:var(--accent);">
+                {{ case.conclusion }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 文献证据 -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>文献证据</span>
+                <span class="badge badge-accent">{{ evidences|length }}</span>
+            </div>
+            {% if evidences %}
+            <ul class="list-group list-group-flush">
+                {% for e in evidences %}
+                <li class="list-group-item" style="font-size:0.88rem;">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>
+                            {% if e.term_char %}
+                            <span style="font-size:1.2rem;color:var(--accent);font-weight:bold;margin-right:0.5rem;">
+                                {{ e.term_char }}
+                            </span>
+                            {% endif %}
+                            {% if e.evidence_type %}
+                            <span class="badge bg-info certainty-badge">{{ e.evidence_type }}</span>
+                            {% endif %}
+                            {% if e.work_title %}
+                            <span class="badge bg-secondary certainty-badge">{{ e.work_title }}</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    {# 核心引用句（优先显示）#}
+                    {% if e.core_snippet %}
+                    <div style="line-height:1.8;border-left:3px solid var(--accent);
+                                padding:0.3rem 0.6rem;background:#fdf8f2;margin-bottom:0.3rem;
+                                border-radius:0 4px 4px 0;">
+                        「{{ e.core_snippet }}」
+                    </div>
+                    {% endif %}
+                    {% if e.quote_text and e.quote_text != e.core_snippet %}
+                    <div style="line-height:1.8;color:var(--text-secondary);padding-left:0.5rem;">
+                        {{ e.quote_text }}
+                    </div>
+                    {% endif %}
+                    {% if e.note %}
+                    <div class="text-muted mt-1" style="font-size:0.82rem;">{{ e.note }}</div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="card-body text-muted">暂无证据记录</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

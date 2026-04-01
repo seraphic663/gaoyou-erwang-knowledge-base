@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ term.term }} — 词条详情{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-3" style="font-size:0.85rem;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/" class="text-accent">首页</a></li>
+        <li class="breadcrumb-item"><a href="/terms" class="text-accent">词条</a></li>
+        <li class="breadcrumb-item active">词条详情</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <!-- 词条信息 -->
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">词条信息</div>
+            <div class="card-body">
+                <h2 class="text-accent mb-3" style="font-size:2.5rem;">{{ term.term }}</h2>
+                {# 核心训释（一两句话提炼，直接显示）#}
+                {% if term.core_meaning %}
+                <div style="font-style:italic;font-size:0.95rem;color:var(--accent);
+                            border-left:3px solid var(--accent);padding-left:0.8rem;margin-bottom:1rem;
+                            line-height:1.7;">
+                    {{ term.core_meaning }}
+                </div>
+                {% endif %}
+                {% if term.term_type %}
+                <p><strong>类型：</strong><span class="badge badge-accent">{{ term.term_type }}</span></p>
+                {% endif %}
+                {% if term.category %}
+                <p><strong>分类：</strong> {{ term.category }}</p>
+                {% endif %}
+                {% if aliases %}
+                <p><strong>别名：</strong>
+                    {% for a in aliases %}
+                    <span class="badge bg-secondary me-1">{{ a }}</span>
+                    {% endfor %}
+                </p>
+                {% endif %}
+                {% if term.notes %}
+                <p><strong>备注：</strong><br>{{ term.notes }}</p>
+                {% endif %}
+                <p class="text-muted" style="font-size:0.8rem;">词条 ID：{{ term.id }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 相关案例 -->
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>相关考据案例</span>
+                <span class="badge badge-accent">{{ cases|length }}</span>
+            </div>
+            {% if cases %}
+            <ul class="list-group list-group-flush">
+                {% for c in cases %}
+                <li class="list-group-item">
+                    <a href="/case/{{ c.id }}" class="text-decoration-none">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong class="text-accent">{{ c.title }}</strong>
+                                {% if c.section_title %}
+                                <div style="font-size:0.82rem;color:var(--text-secondary);">{{ c.section_title }}</div>
+                                {% endif %}
+                                {% if c.conclusion %}
+                                <div class="mt-1" style="font-size:0.85rem;color:var(--text-secondary);">
+                                    {{ c.conclusion[:80] }}{% if c.conclusion|length > 80 %}…{% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="text-end">
+                                {% if c.certainty %}
+                                <span class="badge certainty-badge certainty-{{ c.certainty }}">{{ c.certainty }}</span>
+                                {% endif %}
+                                <span class="badge bg-secondary certainty-badge ms-1">{{ c.status }}</span>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div class="card-body text-muted">暂无相关案例</div>
+            {% endif %}
+        </div>
+
+        {# ── 该字证据（如果有传入 evidences）#}
+        {% if evidences %}
+        <div class="card mt-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>该字证据</span>
+                <span class="badge badge-accent">{{ evidences|length }}</span>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for e in evidences %}
+                <li class="list-group-item" style="font-size:0.85rem;">
+                    <div class="mb-1">
+                        <span class="badge bg-info certainty-badge" style="font-size:0.68rem;">{{ e.evidence_type or '书证' }}</span>
+                        <span class="badge bg-secondary certainty-badge" style="font-size:0.68rem;">{{ e.work_title or '' }}</span>
+                    </div>
+                    {% if e.core_snippet %}
+                    <div style="border-left:3px solid var(--accent);padding:0.25rem 0.6rem;
+                                background:#fdf8f2;border-radius:0 4px 4px 0;margin-bottom:0.25rem;line-height:1.7;">
+                        「{{ e.core_snippet }}」
+                    </div>
+                    {% endif %}
+                    {% if e.note %}
+                    <div style="font-size:0.78rem;color:var(--text-secondary);">{{ e.note }}</div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

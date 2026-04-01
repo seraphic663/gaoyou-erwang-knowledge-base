@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}首页 — 古汉语考据数据库{% endblock %}
+
+{% block content %}
+<!-- 顶部横幅 -->
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="mb-3">古汉语考据数据库</h1>
+        <p style="opacity:0.85;font-size:1.05rem;">检索词条 · 查阅案例 · 追溯文献证据</p>
+    </div>
+</div>
+
+<!-- 搜索框 -->
+<div class="row justify-content-center mb-5">
+    <div class="col-lg-7 col-md-9">
+        <form action="/search" method="get" class="d-flex gap-2">
+            <input
+                type="text"
+                name="q"
+                class="form-control search-box"
+                placeholder="输入字、词或术语搜索…"
+                style="font-size:1.1rem;"
+                required
+            >
+            <button type="submit" class="btn btn-accent px-4" style="white-space:nowrap;">
+                搜索
+            </button>
+        </form>
+        <div class="text-center mt-2" style="font-size:0.82rem;color:var(--text-secondary);">
+            <a href="/terms" class="text-accent">浏览所有词条</a>
+            &nbsp;·&nbsp;
+            <a href="/cases" class="text-accent">浏览所有案例</a>
+        </div>
+    </div>
+</div>
+
+<!-- 统计数据 -->
+<div class="row g-4 mb-4">
+    <div class="col-6 col-md-2 offset-md-1">
+        <div class="card stat-card">
+            <div class="stat-number">{{ stats.work_count }}</div>
+            <div class="stat-label">著作</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card">
+            <div class="stat-number">{{ stats.passage_count }}</div>
+            <div class="stat-label">文本片段</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card">
+            <div class="stat-number">{{ stats.term_count }}</div>
+            <div class="stat-label">词条</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card">
+            <div class="stat-number">{{ stats.case_count }}</div>
+            <div class="stat-label">考据案例</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="card stat-card">
+            <div class="stat-number">{{ stats.evidence_count }}</div>
+            <div class="stat-label">文献证据</div>
+        </div>
+    </div>
+</div>
+
+<!-- 功能入口 -->
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">词条浏览</div>
+            <div class="card-body">
+                <p class="card-text text-secondary">按字／词／术语分类，可查看每个词条下的所有考据案例。</p>
+                <a href="/terms" class="btn btn-accent btn-sm">进入浏览</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">案例浏览</div>
+            <div class="card-body">
+                <p class="card-text text-secondary">查看所有考据案例，了解字词训释的依据与结论。</p>
+                <a href="/cases" class="btn btn-accent btn-sm">进入浏览</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">数据统计</div>
+            <div class="card-body">
+                <p class="card-text text-secondary">查看数据库各类记录的统计信息与分布概况。</p>
+                <a href="/stats" class="btn btn-accent btn-sm">查看统计</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
