@@ -99,7 +99,8 @@ http://localhost:3000/api/bootstrap
 
 ## 现在做到什么程度
 
-- 前端展示页：首页聚焦项目概述、检字流程、案例库、时间线、团队结构
+- 前端展示页：首页聚焦项目概述、检字流程、检索入口、时间线、团队结构
+- 二级详情页：支持字词详情页与案例详情页，适合答辩时逐条展开说明
 - 二级架构页：单独展示最小必要版 5 表及字段说明
 - 后端本地 API：提供数据库统计、案例检索、结构信息
 - 统一数据源层：支持 `Demo JSON` 与 `SQLite 实库（大创）`
@@ -110,7 +111,8 @@ http://localhost:3000/api/bootstrap
 ```text
 26大创/
 ├─ 03-项目网站/
-│  ├─ index.html / database.html / app.js / styles.css
+│  ├─ index.html / database.html / term.html / case.html
+│  ├─ app.js / detail.js / styles.css
 │  ├─ server.js
 │  ├─ package.json
 │  ├─ README.md
@@ -160,7 +162,10 @@ python 03-项目网站/scripts/sqlite_bridge.py export
 
 - `GET /api/bootstrap`：返回数据库统计、结构和示例数据
 - `GET /api/schema`：返回表结构和记录数
+- `GET /api/search?q=关键词`：同时返回匹配字词与相关案例
 - `GET /api/cases?q=关键词`：按关键词检索案例
+- `GET /api/term?id=编号`：返回单个字词的详情数据
+- `GET /api/case?id=编号`：返回单个案例的详情数据
 - `GET /api/terms`：返回词条表
 - `GET /api/health`：服务健康检查（可用于联调）
 

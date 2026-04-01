@@ -1,10 +1,12 @@
 const fs = require('fs');
 const {
+  buildCasePayload,
   buildSearch,
   buildBootstrap,
   buildContext,
   buildHealth,
   buildSchema,
+  buildTermPayload,
   buildTermsPayload,
   searchCases,
 } = require('./shared');
@@ -56,6 +58,14 @@ class SQLiteSnapshotSource {
 
   searchCases(query) {
     return searchCases(buildContext(this.loadSnapshot()), query);
+  }
+
+  getTerm(termId) {
+    return buildTermPayload(buildContext(this.loadSnapshot()), termId);
+  }
+
+  getCase(caseId) {
+    return buildCasePayload(buildContext(this.loadSnapshot()), caseId);
   }
 
   getTerms() {

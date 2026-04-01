@@ -1,4 +1,5 @@
 ﻿const list = document.querySelector('#caseList');
+const caseList = list;
 const termList = document.querySelector('#termList');
 const searchInput = document.querySelector('#searchInput');
 const dbStatus = document.querySelector('#dbStatus');
@@ -15,6 +16,14 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+function buildTermHref(id) {
+  return `./term.html?id=${encodeURIComponent(String(id))}`;
+}
+
+function buildCaseHref(id) {
+  return `./case.html?id=${encodeURIComponent(String(id))}`;
 }
 
 async function requestJson(path) {
@@ -118,14 +127,20 @@ function renderTerms(result) {
       .map((alias) => `<span class="mini-chip">${escapeHtml(alias)}</span>`)
       .join('');
     const relatedCases = (item.relatedCases || [])
-      .map((title) => `<span class="term-case-ref">${escapeHtml(title)}</span>`)
+      .map(
+        (caseItem) => `
+          <a class="term-case-ref" href="${buildCaseHref(caseItem.id)}">
+            ${escapeHtml(caseItem.displayTitle)}
+          </a>
+        `,
+      )
       .join('');
 
     const card = document.createElement('article');
     card.className = 'card term-card';
     card.innerHTML = `
       <div class="term-card-top">
-        <div class="term-glyph">${escapeHtml(item.term || '未录入')}</div>
+        <a class="term-glyph term-glyph-link" href="${buildTermHref(item.id)}">${escapeHtml(item.term || '未录入')}</a>
         <div class="term-meta-stack">
           <div class="case-tags">
             ${meta.map((value) => `<span class="tag">${escapeHtml(value)}</span>`).join('') || '<span class="tag muted">未分类</span>'}
@@ -136,6 +151,9 @@ function renderTerms(result) {
       <p class="term-core">${escapeHtml(item.coreMeaning || item.notes || '暂无释义摘要')}</p>
       ${aliases ? `<div class="mini-chip-list">${aliases}</div>` : ''}
       ${relatedCases ? `<div class="term-footer">${relatedCases}</div>` : ''}
+      <div class="term-actions">
+        <a class="detail-link" href="${buildTermHref(item.id)}">查看字词详情</a>
+      </div>
     `;
     termList.appendChild(card);
   });
@@ -152,12 +170,12 @@ function renderTerms(result) {
 }
 
 function renderCases(result) {
-  if (!list) return;
+  if (!caseList) return;
 
   const items = result.items || [];
-  list.innerHTML = '';
+  caseList.innerHTML = '';
   if (!items.length) {
-    list.innerHTML = '<article class="card"><h3>暂无相关案例</h3><p>当前关键词没有匹配到可展示的考释案例。</p></article>';
+    caseList.innerHTML = '<article class="card"><h3>暂无相关案例</h3><p>当前关键词没有匹配到可展示的考释案例。</p></article>';
     return;
   }
 
@@ -196,8 +214,11 @@ function renderCases(result) {
         <p><strong>状态</strong><span>${escapeHtml(item.status || '未标注')}</span></p>
       </div>
       ${evidencePreview ? `<div class="quote-list">${evidencePreview}</div>` : ''}
+      <div class="case-actions">
+        <a class="detail-link" href="${buildCaseHref(item.id)}">查看案例详情</a>
+      </div>
     `;
-    list.appendChild(card);
+    caseList.appendChild(card);
   });
 
   if (result.truncated) {
@@ -207,7 +228,7 @@ function renderCases(result) {
       <h3>案例结果已截断</h3>
       <p>当前检索命中 ${escapeHtml(String(result.total))} 条，仅展示前 ${escapeHtml(String(result.limit))} 条以保证首页可读性。</p>
     `;
-    list.appendChild(notice);
+    caseList.appendChild(notice);
   }
 }
 
@@ -253,8 +274,8 @@ async function init() {
     if (termList) {
       termList.innerHTML = '<article class="card"><h3>暂无字词数据</h3><p>后端 API 未启动，前端无法加载字词入口。</p></article>';
     }
-    if (list) {
-      list.innerHTML = '<article class="card"><h3>暂无案例数据</h3><p>后端 API 未启动，前端无法读取案例结果。</p></article>';
+    if (caseList) {
+      caseList.innerHTML = '<article class="card"><h3>暂无案例数据</h3><p>后端 API 未启动，前端无法读取案例结果。</p></article>';
     }
     console.error(error);
   }

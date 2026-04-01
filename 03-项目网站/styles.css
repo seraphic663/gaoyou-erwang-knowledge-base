@@ -440,6 +440,16 @@ h2 {
   font-weight: 700;
 }
 
+.term-glyph-link {
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.term-glyph-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(18, 38, 63, 0.08);
+}
+
 .term-meta-stack {
   display: grid;
   gap: 8px;
@@ -475,6 +485,158 @@ h2 {
 .term-case-ref {
   background: rgba(185, 129, 47, 0.12);
   color: #8a5a14;
+  text-decoration: none;
+}
+
+.term-actions,
+.case-actions {
+  margin-top: 4px;
+}
+
+.detail-link,
+.inline-link {
+  color: var(--pri-2);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.detail-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(33, 79, 156, 0.08);
+}
+
+.detail-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.detail-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.detail-focus-card {
+  display: grid;
+  gap: 18px;
+}
+
+.detail-focus-top {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.detail-glyph {
+  min-width: 110px;
+  min-height: 110px;
+  display: grid;
+  place-items: center;
+  border-radius: 28px;
+  background: linear-gradient(135deg, rgba(33, 79, 156, 0.12), rgba(185, 129, 47, 0.16));
+  color: var(--pri-2);
+  font-family: "STSong", "Songti SC", "SimSun", serif;
+  font-size: 56px;
+  font-weight: 700;
+}
+
+.detail-focus-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.detail-lead,
+.detail-paragraph {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.detail-card-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.detail-card {
+  padding: 16px;
+}
+
+.detail-list {
+  display: grid;
+  gap: 10px;
+}
+
+.detail-list p,
+.fold-body p {
+  margin: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.detail-list strong,
+.fold-body strong {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sub);
+}
+
+.detail-block {
+  display: grid;
+  gap: 10px;
+}
+
+.detail-block h3 {
+  margin: 0;
+}
+
+.fold-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.fold-card summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 16px 18px;
+  font-weight: 700;
+}
+
+.fold-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold-card summary::after {
+  content: '展开';
+  float: right;
+  color: var(--sub);
+  font-weight: 400;
+}
+
+.fold-card[open] summary::after {
+  content: '收起';
+}
+
+.fold-body {
+  padding: 0 18px 18px;
+}
+
+.evidence-card {
+  display: grid;
+  gap: 12px;
+}
+
+.term-nav-chip {
+  text-decoration: none;
+}
+
+.inline-tag-link {
+  text-decoration: none;
 }
 
 .case-card::before {
@@ -672,5 +834,15 @@ h2 {
 
   .case-footer {
     grid-template-columns: 1fr;
+  }
+
+  .detail-focus-top {
+    flex-direction: column;
+  }
+
+  .detail-glyph {
+    min-width: 88px;
+    min-height: 88px;
+    font-size: 44px;
   }
 }

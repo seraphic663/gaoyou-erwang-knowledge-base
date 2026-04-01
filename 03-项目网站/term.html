@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>字词详情 · 高邮二王知识库 Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-detail-view="term">
+    <header class="subhero">
+      <nav class="nav">
+        <div class="brand">高邮二王知识库</div>
+        <div class="nav-links">
+          <a href="./index.html#cases">返回检索页</a>
+          <a href="./database.html">数据库架构</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">Secondary View · Term Detail</p>
+        <h1 id="detailTitle">字词详情</h1>
+        <p id="detailLead" class="hero-copy">正在读取字词信息...</p>
+        <div id="detailMeta" class="hero-panel"></div>
+      </div>
+    </header>
+
+    <main class="section">
+      <p id="detailStatus" class="db-status">正在读取详情...</p>
+      <div id="detailMain" class="detail-layout"></div>
+    </main>
+
+    <footer class="footer">
+      <p>Term Detail · 高邮二王知识库 Demo</p>
+    </footer>
+
+    <script src="./detail.js"></script>
+  </body>
+</html>

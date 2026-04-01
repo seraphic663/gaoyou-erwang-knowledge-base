@@ -176,6 +176,33 @@ function enrichCase(context, caseRecord) {
   };
 }
 
+function enrichEvidence(context, evidenceRecord) {
+  const work = evidenceRecord.work_id ? context.workMap.get(evidenceRecord.work_id) : null;
+  const passage = evidenceRecord.source_passage_id ? context.passageMap.get(evidenceRecord.source_passage_id) : null;
+  const term = evidenceRecord.term_id ? context.termMap.get(evidenceRecord.term_id) : null;
+  const caseRecord = context.caseMap.get(evidenceRecord.case_id) || null;
+  const caseDisplay = caseRecord
+    ? buildCaseDisplay(caseRecord.title, caseRecord.section_title, caseRecord.volume_title)
+    : { displayTitle: '', displaySubtitle: '' };
+
+  return {
+    id: evidenceRecord.id,
+    caseId: evidenceRecord.case_id,
+    caseTitle: caseDisplay.displayTitle,
+    caseSubtitle: caseDisplay.displaySubtitle,
+    termId: evidenceRecord.term_id || null,
+    termName: term?.term || '',
+    workId: evidenceRecord.work_id || null,
+    workTitle: work?.title || '',
+    sourcePassageId: evidenceRecord.source_passage_id || null,
+    sourceLocation: buildLocation(passage),
+    evidenceType: evidenceRecord.evidence_type || '',
+    snippet: evidenceRecord.core_snippet || evidenceRecord.quote_text || '',
+    quoteText: evidenceRecord.quote_text || '',
+    note: evidenceRecord.note || '',
+  };
+}
+
 function buildTermCard(context, termRecord) {
   const aliases = parseJsonArray(termRecord.aliases);
   const caseIds = parseJsonArray(termRecord.case_ids);
@@ -183,7 +210,13 @@ function buildTermCard(context, termRecord) {
     .map((caseId) => context.caseMap.get(caseId))
     .filter(Boolean)
     .slice(0, 3)
-    .map((item) => buildCaseDisplay(item.title, item.section_title, item.volume_title).displayTitle);
+    .map((item) => {
+      const display = buildCaseDisplay(item.title, item.section_title, item.volume_title);
+      return {
+        id: item.id,
+        displayTitle: display.displayTitle,
+      };
+    });
 
   return {
     id: termRecord.id,
@@ -195,6 +228,84 @@ function buildTermCard(context, termRecord) {
     coreMeaning: termRecord.core_meaning || '',
     caseCount: caseIds.length,
     relatedCases,
+  };
+}
+
+function buildTermDetail(context, termId) {
+  const normalizedId = Number(termId);
+  const termRecord = context.termMap.get(normalizedId);
+  if (!termRecord) {
+    return null;
+  }
+
+  const card = buildTermCard(context, termRecord);
+  const caseIds = parseJsonArray(termRecord.case_ids);
+  const relatedCases = caseIds
+    .map((caseId) => context.caseMap.get(caseId))
+    .filter(Boolean)
+    .map((item) => enrichCase(context, item));
+  const evidences = safeArray(context.snapshot.tables?.evidences)
+    .filter((item) => item.term_id === normalizedId)
+    .map((item) => enrichEvidence(context, item));
+  const relatedWorks = [...new Set(evidences.map((item) => item.workTitle).filter(Boolean))];
+  const evidenceTypes = [...new Set(evidences.map((item) => item.evidenceType).filter(Boolean))];
+
+  return {
+    ok: true,
+    source: context.snapshot.source,
+    sourceLabel: context.snapshot.sourceLabel,
+    id: card.id,
+    term: card.term,
+    termType: card.termType,
+    category: card.category,
+    aliases: card.aliases,
+    notes: termRecord.notes || '',
+    coreMeaning: termRecord.core_meaning || '',
+    caseCount: card.caseCount,
+    evidenceCount: evidences.length,
+    relatedWorks,
+    evidenceTypes,
+    relatedCases,
+    evidences: evidences.slice(0, 24),
+    evidencesTruncated: evidences.length > 24,
+    raw: {
+      id: termRecord.id,
+      case_ids: caseIds,
+    },
+  };
+}
+
+function buildCaseDetail(context, caseId) {
+  const normalizedId = Number(caseId);
+  const caseRecord = context.caseMap.get(normalizedId);
+  if (!caseRecord) {
+    return null;
+  }
+
+  const detail = enrichCase(context, caseRecord);
+  const terms = detail.termIds
+    .map((termId) => context.termMap.get(termId))
+    .filter(Boolean)
+    .map((item) => buildTermCard(context, item));
+  const evidences = (context.evidenceByCase.get(normalizedId) || []).map((item) => enrichEvidence(context, item));
+  const relatedWorks = [...new Set(evidences.map((item) => item.workTitle).filter(Boolean))];
+  const evidenceTypes = [...new Set(evidences.map((item) => item.evidenceType).filter(Boolean))];
+
+  return {
+    ok: true,
+    source: context.snapshot.source,
+    sourceLabel: context.snapshot.sourceLabel,
+    ...detail,
+    terms,
+    evidences,
+    relatedWorks,
+    evidenceTypes,
+    raw: {
+      id: caseRecord.id,
+      erwang_passage_id: caseRecord.erwang_passage_id || null,
+      target_passage_id: caseRecord.target_passage_id || null,
+      term_ids: detail.termIds,
+    },
   };
 }
 
@@ -362,6 +473,14 @@ function buildTermsPayload(context) {
   };
 }
 
+function buildTermPayload(context, termId) {
+  return buildTermDetail(context, termId);
+}
+
+function buildCasePayload(context, caseId) {
+  return buildCaseDetail(context, caseId);
+}
+
 function buildHealth(context, extra = {}) {
   return {
     ok: true,
@@ -374,11 +493,13 @@ function buildHealth(context, extra = {}) {
 }
 
 module.exports = {
+  buildCasePayload,
   buildSearch,
   buildBootstrap,
   buildContext,
   buildHealth,
   buildSchema,
+  buildTermPayload,
   buildTermsPayload,
   parseJsonArray,
   searchCases,

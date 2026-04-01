@@ -101,6 +101,22 @@ function createServer() {
         return sendJson(res, 200, dataSource.search(query));
       }
 
+      if (parsedUrl.pathname === '/api/term') {
+        const payload = dataSource.getTerm(parsedUrl.query.id);
+        if (!payload) {
+          return sendJson(res, 404, { ok: false, message: 'Term not found' });
+        }
+        return sendJson(res, 200, payload);
+      }
+
+      if (parsedUrl.pathname === '/api/case') {
+        const payload = dataSource.getCase(parsedUrl.query.id);
+        if (!payload) {
+          return sendJson(res, 404, { ok: false, message: 'Case not found' });
+        }
+        return sendJson(res, 200, payload);
+      }
+
       if (parsedUrl.pathname === '/api/terms') {
         return sendJson(res, 200, dataSource.getTerms());
       }
