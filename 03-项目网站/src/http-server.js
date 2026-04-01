@@ -91,6 +91,19 @@ function createServer() {
         return sendJson(res, 200, dataSource.getSchema());
       }
 
+      if (parsedUrl.pathname === '/api/browser/bootstrap') {
+        return sendJson(res, 200, dataSource.getBrowserBootstrap());
+      }
+
+      if (parsedUrl.pathname === '/api/browser') {
+        return sendJson(res, 200, dataSource.browse({
+          view: parsedUrl.query.view,
+          category: parsedUrl.query.category,
+          mode: parsedUrl.query.mode,
+          query: parsedUrl.query.q || '',
+        }));
+      }
+
       if (parsedUrl.pathname === '/api/cases') {
         const query = parsedUrl.query.q || '';
         return sendJson(res, 200, dataSource.searchCases(query));

@@ -17,33 +17,65 @@
           <a href="#cases">案例库</a>
           <a href="#timeline">申报时间</a>
           <a href="#team">团队</a>
-          <a href="./database.html">数据库架构</a>
+          <a href="./database.html?view=terms">数据库浏览</a>
         </div>
       </nav>
 
-      <div class="hero-content">
-        <p class="badge">2026 求是学术 · 应用研究 · Demo</p>
-        <h1>高邮二王知识库构建及应用</h1>
-        <p class="hero-copy">
-          以“王氏四种”为核心，围绕“经字互证”“一声之转”方法，搭建可检索、可解释、可视化的古典知识平台。
-        </p>
-        <div class="hero-actions">
-          <a class="cta" href="#cases">查看交互示例</a>
-          <a class="ghost-link" href="./database.html">查看数据库架构</a>
+      <div class="hero-content hero-stage">
+        <div class="hero-copy-col">
+          <p class="badge">2026 求是学术 · 应用研究 · Demo</p>
+          <h1>高邮二王知识库构建及应用</h1>
+          <p class="hero-copy">
+            以“王氏四种”为核心，围绕“经字互证”“一声之转”方法，搭建可检索、可解释、可视化的古典知识平台。
+          </p>
+          <div class="hero-actions">
+            <a class="cta" href="./database.html?view=cases">快速进入案例库</a>
+            <a class="ghost-link" href="./database.html?view=terms">浏览数据库</a>
+            <a class="ghost-link" href="#flow">查看流程图</a>
+          </div>
+          <p class="hero-scroll-copy">向下滚动查看项目说明、数据库概览与检字流程。</p>
         </div>
-        <div class="hero-panel">
-          <div class="hero-panel-item">
-            <span class="hero-kicker">对象</span>
-            <strong>二王著作 + 原始经典</strong>
-          </div>
-          <div class="hero-panel-item">
-            <span class="hero-kicker">核心</span>
-            <strong>最小必要 5 表闭环</strong>
-          </div>
-          <div class="hero-panel-item">
-            <span class="hero-kicker">目标</span>
-            <strong>先检索，再复盘，再扩展</strong>
-          </div>
+
+        <div class="hero-showcase">
+          <article class="showcase-shell">
+            <div class="showcase-bar">
+              <span></span><span></span><span></span>
+            </div>
+            <div class="showcase-main">
+              <div>
+                <p class="section-kicker showcase-kicker">Fast Entry</p>
+                <h3>一屏进入字词库、案例库和研究流程。</h3>
+                <p class="compact-note showcase-note">首屏负责展示项目气质和快速入口，具体浏览交给数据库页与详情页。</p>
+              </div>
+              <div class="showcase-links">
+                <a class="showcase-link" href="./database.html?view=cases">案例浏览</a>
+                <a class="showcase-link" href="./database.html?view=terms">字词浏览</a>
+                <a class="showcase-link" href="#cases">首页检索</a>
+              </div>
+            </div>
+            <div class="showcase-stats">
+              <div class="showcase-stat">
+                <span>词条</span>
+                <strong id="heroTermCount">3385</strong>
+              </div>
+              <div class="showcase-stat">
+                <span>案例</span>
+                <strong id="heroCaseCount">815</strong>
+              </div>
+              <div class="showcase-stat">
+                <span>证据</span>
+                <strong id="heroEvidenceCount">7120</strong>
+              </div>
+            </div>
+            <div class="showcase-feature">
+              <div>
+                <p class="section-kicker showcase-kicker">Featured Case</p>
+                <strong id="heroFeatureTitle">《广雅疏证》案例入口</strong>
+                <p id="heroFeatureMeta" class="compact-note">优先展示一条代表性案例，作为数据库浏览快速入口。</p>
+              </div>
+              <a id="heroFeatureLink" class="detail-link" href="./database.html?view=cases">打开案例入口</a>
+            </div>
+          </article>
         </div>
       </div>
     </header>
@@ -77,7 +109,7 @@
             <h2>最小必要数据库概览</h2>
             <p class="compact-note">首页只展示数据概况与使用入口，详细字段结构移至二级页面。</p>
           </div>
-          <a class="page-link" href="./database.html">查看数据库架构</a>
+          <a class="page-link" href="./database.html?view=schema">查看数据库架构</a>
         </div>
         <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
         <div id="dbStats" class="stats-grid"></div>
@@ -102,41 +134,11 @@
           <p class="section-kicker">Method Flow</p>
           <h2>“经义不通”检字流程</h2>
         </div>
-        <p class="flow-note">按项目方案重绘：先判断“字为原字/字非原字”，再沿“通假/同源/对文/同义并列”分流，最后回到“得出本字、求得字义”。</p>
-        <div class="flow-diagram">
-          <div class="flow-node start large">经义不通</div>
-
-          <div class="flow-branch">
-            <div class="flow-node blue large">字为原字</div>
-            <div class="flow-node red large">字非原字</div>
-          </div>
-
-          <div class="flow-branch labels">
-            <div class="flow-node light">单句中判断</div>
-            <div class="flow-node light">上下句判断</div>
-            <div class="flow-node pink">形讹</div>
-            <div class="flow-node pink">异文</div>
-          </div>
-
-          <div class="flow-branch labels">
-            <div class="flow-node light">判断为通假</div>
-            <div class="flow-node light">判断为同源词</div>
-            <div class="flow-node light">对文 / 同义并列复合词</div>
-          </div>
-
-          <div class="flow-branch labels">
-            <div class="flow-node light">考察古音是否同部<br />能否对转、旁转、通转</div>
-            <div class="flow-node light">语源同、语义同<br />音韵相通</div>
-            <div class="flow-node red">求出原字</div>
-          </div>
-
-          <div class="flow-branch labels">
-            <div class="flow-node out">得出本字、求得字义</div>
-            <div class="flow-node out">合字成词、两字同义</div>
-          </div>
-
-          <div class="flow-note end">“求出原字”可反推验证“字为原字”分支，形成闭环。</div>
-        </div>
+        <p class="flow-note">流程图已按最新版本更新为图像版，适合首页展示和答辩投屏。后续如需交互式流程页，可再拆成 HTML 模块。</p>
+        <figure class="flow-figure">
+          <img src="./media/step.png" alt="高邮二王知识库检字流程图" />
+          <figcaption>最新检字流程图：从经义不通出发，分流判断原字、通假、同源与对文关系，最终回到字义确认。</figcaption>
+        </figure>
       </section>
 
       <section id="cases" class="section">
@@ -145,7 +147,14 @@
             <p class="section-kicker">Search Browser</p>
             <h2>检索结果</h2>
           </div>
-          <input id="searchInput" type="text" placeholder="输入单字、词语或义项：如 始 / 犹豫 / 不我知" />
+        </div>
+        <div class="search-panel card">
+          <div class="search-bar">
+            <input id="searchInput" type="text" placeholder="输入单字、词语或义项：如 始 / 犹豫 / 不我知" />
+            <button id="clearSearch" class="search-clear" type="button">清空</button>
+          </div>
+          <p class="compact-note">可搜单字、义项、方法词。首页默认只预览少量结果，更多内容按需展开。</p>
+          <div id="searchQuick" class="search-quick"></div>
         </div>
         <div id="searchSummary" class="search-summary"></div>
         <div class="result-head">

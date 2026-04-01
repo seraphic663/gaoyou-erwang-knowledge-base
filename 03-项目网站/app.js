@@ -2,10 +2,18 @@
 const caseList = list;
 const termList = document.querySelector('#termList');
 const searchInput = document.querySelector('#searchInput');
+const clearSearch = document.querySelector('#clearSearch');
+const searchQuick = document.querySelector('#searchQuick');
 const dbStatus = document.querySelector('#dbStatus');
 const dbStats = document.querySelector('#dbStats');
 const schemaGrid = document.querySelector('#schemaGrid');
 const searchSummary = document.querySelector('#searchSummary');
+const heroTermCount = document.querySelector('#heroTermCount');
+const heroCaseCount = document.querySelector('#heroCaseCount');
+const heroEvidenceCount = document.querySelector('#heroEvidenceCount');
+const heroFeatureTitle = document.querySelector('#heroFeatureTitle');
+const heroFeatureMeta = document.querySelector('#heroFeatureMeta');
+const heroFeatureLink = document.querySelector('#heroFeatureLink');
 
 let searchTimer = null;
 
@@ -26,12 +34,84 @@ function buildCaseHref(id) {
   return `./case.html?id=${encodeURIComponent(String(id))}`;
 }
 
+function buildDatabaseHref(view, query = '') {
+  const params = new URLSearchParams();
+  params.set('view', view);
+  if (query) {
+    params.set('q', query);
+    params.set('mode', 'fulltext');
+  }
+  return `./database.html?${params.toString()}`;
+}
+
 async function requestJson(path) {
   const response = await fetch(path);
   if (!response.ok) {
     throw new Error(`Request failed: ${response.status}`);
   }
   return response.json();
+}
+
+function summarizeText(value, maxLength = 88) {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!text) {
+    return '';
+  }
+  if (text.length <= maxLength) {
+    return text;
+  }
+  return `${text.slice(0, maxLength - 1)}…`;
+}
+
+function splitItems(items, visibleCount) {
+  return {
+    visible: items.slice(0, visibleCount),
+    hidden: items.slice(visibleCount),
+  };
+}
+
+function renderQuickSearch(bootstrap) {
+  if (!searchQuick) return;
+
+  const fixedKeywords = ['始', '敬', '君', '通假', '同源', '义证'];
+  const sampleKeywords = (bootstrap?.sampleTerms || [])
+    .map((item) => item.term)
+    .filter(Boolean)
+    .slice(0, 6);
+  const keywords = [...new Set([...fixedKeywords, ...sampleKeywords])].slice(0, 10);
+
+  searchQuick.innerHTML = keywords
+    .map((keyword) => `<button class="quick-chip" type="button" data-keyword="${escapeHtml(keyword)}">${escapeHtml(keyword)}</button>`)
+    .join('');
+}
+
+function renderHeroShowcase(bootstrap) {
+  if (heroTermCount) {
+    heroTermCount.textContent = String(bootstrap.counts?.terms ?? 0);
+  }
+  if (heroCaseCount) {
+    heroCaseCount.textContent = String(bootstrap.counts?.cases ?? 0);
+  }
+  if (heroEvidenceCount) {
+    heroEvidenceCount.textContent = String(bootstrap.counts?.evidences ?? 0);
+  }
+
+  const featuredCase = bootstrap.featuredCases?.[0];
+  if (!featuredCase) {
+    return;
+  }
+
+  if (heroFeatureTitle) {
+    heroFeatureTitle.textContent = featuredCase.displayTitle || featuredCase.title || '案例入口';
+  }
+  if (heroFeatureMeta) {
+    heroFeatureMeta.textContent = [featuredCase.displaySubtitle, featuredCase.termLabel, `证据 ${featuredCase.evidenceCount || 0} 条`]
+      .filter(Boolean)
+      .join(' · ');
+  }
+  if (heroFeatureLink) {
+    heroFeatureLink.setAttribute('href', buildCaseHref(featuredCase.id));
+  }
 }
 
 function renderStats(counts) {
@@ -98,19 +178,16 @@ function renderSearchSummary(result) {
   const query = String(result.query || '').trim();
   const termTotal = result.terms?.total ?? 0;
   const caseTotal = result.cases?.total ?? 0;
-  const summary = query
-    ? `当前检索 “${escapeHtml(query)}” ，命中 ${escapeHtml(String(termTotal))} 个字词、${escapeHtml(String(caseTotal))} 个相关案例。`
-    : `当前展示高频字词入口与对应案例，共预览 ${escapeHtml(String(termTotal))} 个字词、${escapeHtml(String(caseTotal))} 个案例。`;
+  const summary = query ? `检索“${escapeHtml(query)}”` : '默认预览';
 
   searchSummary.innerHTML = `
-    <article class="card">
-      <h3>检索说明</h3>
-      <p>${summary}</p>
-    </article>
+    <span class="summary-pill">${summary}</span>
+    <span class="summary-pill muted">字词 ${escapeHtml(String(termTotal))}</span>
+    <span class="summary-pill muted">案例 ${escapeHtml(String(caseTotal))}</span>
   `;
 }
 
-function renderTerms(result) {
+function renderTerms(result, query = '') {
   if (!termList) return;
 
   const items = result.items || [];
@@ -120,13 +197,16 @@ function renderTerms(result) {
     return;
   }
 
-  items.forEach((item) => {
+  const visibleCount = 6;
+  const groups = splitItems(items, visibleCount);
+  const renderTermCard = (item) => {
     const meta = [item.termType, item.category].filter(Boolean);
     const aliases = (item.aliases || [])
-      .slice(0, 6)
+      .slice(0, 3)
       .map((alias) => `<span class="mini-chip">${escapeHtml(alias)}</span>`)
       .join('');
-    const relatedCases = (item.relatedCases || [])
+    const relatedCaseItems = (item.relatedCases || []).slice(0, 2);
+    const relatedCases = relatedCaseItems
       .map(
         (caseItem) => `
           <a class="term-case-ref" href="${buildCaseHref(caseItem.id)}">
@@ -135,10 +215,10 @@ function renderTerms(result) {
         `,
       )
       .join('');
+    const extraCaseCount = Math.max((item.relatedCases || []).length - relatedCaseItems.length, 0);
 
-    const card = document.createElement('article');
-    card.className = 'card term-card';
-    card.innerHTML = `
+    return `
+      <article class="card term-card">
       <div class="term-card-top">
         <a class="term-glyph term-glyph-link" href="${buildTermHref(item.id)}">${escapeHtml(item.term || '未录入')}</a>
         <div class="term-meta-stack">
@@ -148,28 +228,30 @@ function renderTerms(result) {
           <p class="compact-note">关联案例 ${escapeHtml(String(item.caseCount || 0))} 条</p>
         </div>
       </div>
-      <p class="term-core">${escapeHtml(item.coreMeaning || item.notes || '暂无释义摘要')}</p>
+      <p class="term-core">${escapeHtml(summarizeText(item.coreMeaning || item.notes || '暂无释义摘要', 72))}</p>
       ${aliases ? `<div class="mini-chip-list">${aliases}</div>` : ''}
       ${relatedCases ? `<div class="term-footer">${relatedCases}</div>` : ''}
+      ${extraCaseCount ? `<p class="compact-note">其余 ${escapeHtml(String(extraCaseCount))} 条案例请进入详情页查看。</p>` : ''}
       <div class="term-actions">
         <a class="detail-link" href="${buildTermHref(item.id)}">查看字词详情</a>
       </div>
+      </article>
     `;
-    termList.appendChild(card);
-  });
+  };
 
-  if (result.truncated) {
-    const notice = document.createElement('article');
-    notice.className = 'card';
-    notice.innerHTML = `
-      <h3>字词结果已截断</h3>
-      <p>当前命中 ${escapeHtml(String(result.total))} 条，仅展示前 ${escapeHtml(String(result.limit))} 条以保持首页清晰。</p>
-    `;
-    termList.appendChild(notice);
-  }
+  termList.innerHTML = groups.visible.map(renderTermCard).join('');
+
+  const linkCard = document.createElement('article');
+  linkCard.className = 'card result-link-card';
+  linkCard.innerHTML = `
+    <h3>阅读全部字词</h3>
+    <p>首页固定只展示 6 个字词入口，完整列表请进入数据库浏览页继续查看。</p>
+    <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词浏览</a>
+  `;
+  termList.appendChild(linkCard);
 }
 
-function renderCases(result) {
+function renderCases(result, query = '') {
   if (!caseList) return;
 
   const items = result.items || [];
@@ -179,17 +261,22 @@ function renderCases(result) {
     return;
   }
 
-  items.forEach((item) => {
-    const termMembers = (item.termNames || [])
+  const visibleCount = 6;
+  const groups = splitItems(items, visibleCount);
+  const renderCaseCard = (item) => {
+    const visibleTerms = (item.termNames || []).slice(0, 6);
+    const extraTerms = Math.max((item.termNames || []).length - visibleTerms.length, 0);
+    const termMembers = visibleTerms
       .map((term) => `<span class="mini-chip">${escapeHtml(term)}</span>`)
       .join('');
     const evidencePreview = (item.evidenceQuotes || [])
-      .slice(0, 2)
+      .slice(0, 1)
       .map((quote) => `<span class="quote-chip">${escapeHtml(quote)}</span>`)
       .join('');
-    const card = document.createElement('article');
-    card.className = 'card case-card';
-    card.innerHTML = `
+    const summaryText = summarizeText(item.conclusion || item.problem || item.processText || '暂无摘要', 96);
+
+    return `
+      <article class="card case-card">
       <div class="case-topline">
         <span class="case-term">${escapeHtml(item.termLabel || item.termName || '未单独关联')}</span>
         <div class="case-tags">
@@ -200,14 +287,11 @@ function renderCases(result) {
       <h3>${escapeHtml(item.displayTitle || item.title || '未命名案例')}</h3>
       ${item.displaySubtitle ? `<p class="case-subtitle">${escapeHtml(item.displaySubtitle)}</p>` : ''}
       ${termMembers ? `<div class="case-members">${termMembers}</div>` : ''}
+      ${extraTerms ? `<p class="compact-note">另有 ${escapeHtml(String(extraTerms))} 个相关字词，进入详情页展开。</p>` : ''}
+      <p class="case-summary">${escapeHtml(summaryText)}</p>
       <div class="case-meta">
         <p><strong>二王出处</strong><span>${escapeHtml(item.erwangWorkTitle || '未录入')}${item.erwangLocation ? ` · ${escapeHtml(item.erwangLocation)}` : ''}</span></p>
         <p><strong>原始文本</strong><span>${escapeHtml(item.targetWorkTitle || '暂未关联原始经典')}${item.targetLocation ? ` · ${escapeHtml(item.targetLocation)}` : ''}</span></p>
-      </div>
-      <div class="case-body">
-        <p><strong>问题</strong><span>${escapeHtml(item.problem || '暂无问题描述')}</span></p>
-        <p><strong>过程</strong><span>${escapeHtml(item.processText || '暂无过程摘要')}</span></p>
-        <p><strong>结论</strong><span>${escapeHtml(item.conclusion || '暂无结论')}</span></p>
       </div>
       <div class="case-footer">
         <p><strong>证据数量</strong><span>${escapeHtml(String(item.evidenceCount || 0))} 条</span></p>
@@ -217,19 +301,20 @@ function renderCases(result) {
       <div class="case-actions">
         <a class="detail-link" href="${buildCaseHref(item.id)}">查看案例详情</a>
       </div>
+      </article>
     `;
-    caseList.appendChild(card);
-  });
+  };
 
-  if (result.truncated) {
-    const notice = document.createElement('article');
-    notice.className = 'card';
-    notice.innerHTML = `
-      <h3>案例结果已截断</h3>
-      <p>当前检索命中 ${escapeHtml(String(result.total))} 条，仅展示前 ${escapeHtml(String(result.limit))} 条以保证首页可读性。</p>
-    `;
-    caseList.appendChild(notice);
-  }
+  caseList.innerHTML = groups.visible.map(renderCaseCard).join('');
+
+  const linkCard = document.createElement('article');
+  linkCard.className = 'card result-link-card';
+  linkCard.innerHTML = `
+    <h3>阅读全部案例</h3>
+    <p>首页固定只展示 6 个案例预览，完整列表请进入数据库浏览页继续阅读。</p>
+    <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例浏览</a>
+  `;
+  caseList.appendChild(linkCard);
 }
 
 async function loadBootstrap() {
@@ -239,6 +324,8 @@ async function loadBootstrap() {
   const bootstrap = await requestJson('/api/bootstrap');
   renderStats(bootstrap.counts);
   renderSchema(bootstrap.stores);
+  renderQuickSearch(bootstrap);
+  renderHeroShowcase(bootstrap);
   if (dbStatus) {
     dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
   }
@@ -250,8 +337,8 @@ async function loadBootstrap() {
 async function searchContent(query) {
   const data = await requestJson(`/api/search?q=${encodeURIComponent(query)}`);
   renderSearchSummary(data);
-  renderTerms(data.terms || {});
-  renderCases(data.cases || {});
+  renderTerms(data.terms || {}, data.query || '');
+  renderCases(data.cases || {}, data.query || '');
 }
 
 async function init() {
@@ -293,6 +380,34 @@ if (searchInput) {
         console.error(error);
       });
     }, 180);
+  });
+}
+
+if (clearSearch) {
+  clearSearch.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      searchContent('').catch((error) => {
+        console.error(error);
+      });
+    }
+  });
+}
+
+if (searchQuick) {
+  searchQuick.addEventListener('click', (event) => {
+    const trigger = event.target.closest('[data-keyword]');
+    if (!trigger) {
+      return;
+    }
+
+    const keyword = trigger.getAttribute('data-keyword') || '';
+    if (searchInput) {
+      searchInput.value = keyword;
+    }
+    searchContent(keyword).catch((error) => {
+      console.error(error);
+    });
   });
 }
 

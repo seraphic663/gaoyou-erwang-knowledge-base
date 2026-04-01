@@ -34,6 +34,13 @@ function summarizeText(value, maxLength = 180) {
   return `${text.slice(0, maxLength - 1)}…`;
 }
 
+function splitItems(items, visibleCount) {
+  return {
+    visible: items.slice(0, visibleCount),
+    hidden: items.slice(visibleCount),
+  };
+}
+
 function getRequiredId() {
   const params = new URLSearchParams(window.location.search);
   return params.get('id') || '';
@@ -103,7 +110,7 @@ function renderTermDetail(payload) {
   const relatedWorks = (payload.relatedWorks || [])
     .map((work) => `<span class="term-case-ref">${escapeHtml(work)}</span>`)
     .join('');
-  const relatedCases = (payload.relatedCases || [])
+  const relatedCaseCards = (payload.relatedCases || [])
     .map(
       (item) => `
         <article class="card detail-card">
@@ -120,8 +127,8 @@ function renderTermDetail(payload) {
           <a class="detail-link" href="${buildCaseHref(item.id)}">进入案例详情</a>
         </article>
       `,
-    )
-    .join('');
+    );
+  const relatedCaseGroups = splitItems(relatedCaseCards, 4);
   const evidences = (payload.evidences || [])
     .map(
       (item) => `
@@ -165,8 +172,16 @@ function renderTermDetail(payload) {
       <div class="grid grid-2">
         <article class="card">
           <h3>关联案例</h3>
-          <p class="compact-note">这个字词参与了哪些考释条目。</p>
-          <div class="detail-card-grid">${relatedCases || '<p class="compact-note">暂无关联案例。</p>'}</div>
+          <p class="compact-note">默认只展示前 4 条，剩余案例按需展开。</p>
+          <div class="detail-card-grid">${relatedCaseGroups.visible.join('') || '<p class="compact-note">暂无关联案例。</p>'}</div>
+          ${relatedCaseGroups.hidden.length ? `
+            <details class="fold-card inline-fold">
+              <summary>展开剩余 ${relatedCaseGroups.hidden.length} 条关联案例</summary>
+              <div class="fold-body detail-card-grid">
+                ${relatedCaseGroups.hidden.join('')}
+              </div>
+            </details>
+          ` : ''}
         </article>
         <article class="card">
           <h3>证据概况</h3>
@@ -176,11 +191,11 @@ function renderTermDetail(payload) {
         </article>
       </div>
 
-      <details class="fold-card" open>
+      <details class="fold-card">
         <summary>证据摘录</summary>
         <div class="fold-body detail-card-grid">
           ${evidences || '<p class="compact-note">暂无证据摘录。</p>'}
-          ${payload.evidencesTruncated ? '<p class="compact-note">当前仅展示前 24 条证据，更多证据后续可继续分层加载。</p>' : ''}
+          ${payload.evidencesTruncated ? '<p class="compact-note">当前仅展示前 12 条证据，更多证据已折叠在数据层，不在页面继续展开。</p>' : ''}
         </div>
       </details>
 
@@ -215,7 +230,14 @@ function renderCaseDetail(payload) {
     detailStatus.textContent = `数据来源：${payload.sourceLabel}`;
   }
 
-  const termLinks = (payload.terms || [])
+  const evidenceTypeList = (payload.evidenceTypes || [])
+    .map((type) => `<span class="tag">${escapeHtml(type)}</span>`)
+    .join('');
+  const relatedWorks = (payload.relatedWorks || [])
+    .map((work) => `<span class="term-case-ref">${escapeHtml(work)}</span>`)
+    .join('');
+  const termGroups = splitItems(payload.terms || [], 10);
+  const visibleTermLinks = termGroups.visible
     .map(
       (item) => `
         <a class="mini-chip term-nav-chip" href="${buildTermHref(item.id)}">
@@ -224,11 +246,14 @@ function renderCaseDetail(payload) {
       `,
     )
     .join('');
-  const evidenceTypeList = (payload.evidenceTypes || [])
-    .map((type) => `<span class="tag">${escapeHtml(type)}</span>`)
-    .join('');
-  const relatedWorks = (payload.relatedWorks || [])
-    .map((work) => `<span class="term-case-ref">${escapeHtml(work)}</span>`)
+  const hiddenTermLinks = termGroups.hidden
+    .map(
+      (item) => `
+        <a class="mini-chip term-nav-chip" href="${buildTermHref(item.id)}">
+          ${escapeHtml(item.term)}
+        </a>
+      `,
+    )
     .join('');
   const evidences = (payload.evidences || [])
     .map(
@@ -265,7 +290,15 @@ function renderCaseDetail(payload) {
           </div>
         </div>
         ${payload.displaySubtitle ? `<p class="case-subtitle">${escapeHtml(payload.displaySubtitle)}</p>` : ''}
-        ${termLinks ? `<div class="case-members">${termLinks}</div>` : ''}
+        ${visibleTermLinks ? `<div class="case-members">${visibleTermLinks}</div>` : ''}
+        ${hiddenTermLinks ? `
+          <details class="fold-card inline-fold">
+            <summary>展开剩余 ${termGroups.hidden.length} 个关联字词</summary>
+            <div class="fold-body case-members">
+              ${hiddenTermLinks}
+            </div>
+          </details>
+        ` : ''}
         <div class="grid grid-2">
           <div class="detail-block">
             <h3>问题</h3>
@@ -293,17 +326,18 @@ function renderCaseDetail(payload) {
         </article>
       </div>
 
-      <details class="fold-card" open>
+      <details class="fold-card">
         <summary>考据过程</summary>
         <div class="fold-body">
           <p class="detail-paragraph">${escapeHtml(payload.processText || '当前案例暂无过程文本。')}</p>
         </div>
       </details>
 
-      <details class="fold-card" open>
+      <details class="fold-card">
         <summary>证据链</summary>
         <div class="fold-body detail-card-grid">
           ${evidences || '<p class="compact-note">暂无证据链条。</p>'}
+          ${payload.evidencesTruncated ? '<p class="compact-note">当前仅展示前 12 条证据，页面不再继续堆叠。</p>' : ''}
         </div>
       </details>
 

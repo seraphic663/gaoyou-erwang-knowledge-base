@@ -34,6 +34,10 @@ function trimText(value, maxLength = 64) {
   return `${text.slice(0, maxLength - 1)}…`;
 }
 
+function normalizeKeyword(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
 function summarizeTermNames(termNames) {
   const names = termNames.filter(Boolean);
   if (!names.length) {
@@ -231,6 +235,61 @@ function buildTermCard(context, termRecord) {
   };
 }
 
+function buildBrowserTermItem(context, termRecord) {
+  const card = buildTermCard(context, termRecord);
+
+  return {
+    ...card,
+    preview: trimText(termRecord.core_meaning || termRecord.notes || '', 88),
+    searchEntry: [termRecord.term, termRecord.term_type, termRecord.category, ...card.aliases].join(' '),
+    searchFulltext: [termRecord.term, termRecord.term_type, termRecord.category, ...card.aliases, termRecord.core_meaning || '', termRecord.notes || ''].join(' '),
+  };
+}
+
+function buildBrowserCaseItem(context, caseRecord) {
+  const detail = enrichCase(context, caseRecord);
+
+  return {
+    ...detail,
+    preview: trimText(detail.conclusion || detail.problem || detail.processText || '', 108),
+    searchEntry: [
+      detail.displayTitle,
+      detail.displaySubtitle,
+      detail.termLabel,
+      detail.termNames.join(' '),
+      detail.sectionTitle,
+      detail.method,
+    ].join(' '),
+    searchFulltext: [
+      detail.displayTitle,
+      detail.displaySubtitle,
+      detail.termLabel,
+      detail.termNames.join(' '),
+      detail.problem,
+      detail.processText,
+      detail.conclusion,
+      detail.erwangWorkTitle,
+      detail.targetWorkTitle,
+      detail.erwangLocation,
+      detail.targetLocation,
+      detail.evidenceQuotes.join(' '),
+    ].join(' '),
+  };
+}
+
+function buildCategoryBuckets(items, pickValue) {
+  const bucketMap = new Map();
+
+  items.forEach((item) => {
+    const value = pickValue(item) || '未分类';
+    bucketMap.set(value, (bucketMap.get(value) || 0) + 1);
+  });
+
+  return [...bucketMap.entries()]
+    .map(([value, count]) => ({ value, label: value, count }))
+    .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, 'zh-CN'));
+}
+
 function buildTermDetail(context, termId) {
   const normalizedId = Number(termId);
   const termRecord = context.termMap.get(normalizedId);
@@ -266,8 +325,8 @@ function buildTermDetail(context, termId) {
     relatedWorks,
     evidenceTypes,
     relatedCases,
-    evidences: evidences.slice(0, 24),
-    evidencesTruncated: evidences.length > 24,
+    evidences: evidences.slice(0, 12),
+    evidencesTruncated: evidences.length > 12,
     raw: {
       id: termRecord.id,
       case_ids: caseIds,
@@ -297,7 +356,8 @@ function buildCaseDetail(context, caseId) {
     sourceLabel: context.snapshot.sourceLabel,
     ...detail,
     terms,
-    evidences,
+    evidences: evidences.slice(0, 12),
+    evidencesTruncated: evidences.length > 12,
     relatedWorks,
     evidenceTypes,
     raw: {
@@ -366,7 +426,7 @@ function searchTerms(context, query) {
       return left.card.id - right.card.id;
     });
 
-  const limit = keyword ? 18 : 12;
+  const limit = 6;
   const sliced = items.slice(0, limit).map((item) => item.card);
 
   return {
@@ -378,7 +438,7 @@ function searchTerms(context, query) {
 }
 
 function searchCases(context, query) {
-  const keyword = String(query || '').trim().toLowerCase();
+  const keyword = normalizeKeyword(query);
   const allItems = context.cases.map((item) => enrichCase(context, item));
 
   const filteredItems = keyword
@@ -408,7 +468,7 @@ function searchCases(context, query) {
       })
     : allItems;
 
-  const limit = keyword ? 60 : 24;
+  const limit = 6;
   const items = filteredItems.slice(0, limit);
 
   return {
@@ -473,6 +533,112 @@ function buildTermsPayload(context) {
   };
 }
 
+function buildBrowserBootstrap(context) {
+  const browserTerms = context.terms.map((item) => buildBrowserTermItem(context, item));
+  const browserCases = context.cases.map((item) => buildBrowserCaseItem(context, item));
+
+  return {
+    ok: true,
+    source: context.snapshot.source,
+    sourceLabel: context.snapshot.sourceLabel,
+    counts: context.counts,
+    views: [
+      { value: 'terms', label: '字词浏览', count: browserTerms.length },
+      { value: 'cases', label: '案例浏览', count: browserCases.length },
+      { value: 'schema', label: '架构说明', count: context.counts.terms + context.counts.cases },
+    ],
+    termCategories: [
+      { value: 'all', label: '全部字词', count: browserTerms.length },
+      ...buildCategoryBuckets(browserTerms, (item) => item.category),
+    ],
+    caseCategories: [
+      { value: 'all', label: '全部案例', count: browserCases.length },
+      ...buildCategoryBuckets(browserCases, (item) => item.sectionTitle),
+    ],
+    stores: buildStores(context.counts),
+  };
+}
+
+function buildBrowserResult(context, options = {}) {
+  const view = options.view === 'cases' ? 'cases' : 'terms';
+  const category = String(options.category || 'all').trim() || 'all';
+  const mode = options.mode === 'fulltext' ? 'fulltext' : 'entry';
+  const keyword = normalizeKeyword(options.query);
+
+  if (view === 'cases') {
+    const items = context.cases
+      .map((item) => buildBrowserCaseItem(context, item))
+      .filter((item) => (category === 'all' ? true : (item.sectionTitle || '未分类') === category))
+      .filter((item) => {
+        if (!keyword) {
+          return true;
+        }
+
+        const haystack = mode === 'fulltext' ? item.searchFulltext : item.searchEntry;
+        return haystack.toLowerCase().includes(keyword);
+      })
+      .sort((left, right) => right.evidenceCount - left.evidenceCount || left.id - right.id)
+      .map(({ searchEntry, searchFulltext, ...item }) => item);
+
+    return {
+      ok: true,
+      source: context.snapshot.source,
+      sourceLabel: context.snapshot.sourceLabel,
+      view,
+      mode,
+      category,
+      query: String(options.query || ''),
+      total: items.length,
+      items,
+    };
+  }
+
+  const items = context.terms
+    .map((item) => ({
+      raw: item,
+      browserItem: buildBrowserTermItem(context, item),
+    }))
+    .filter(({ browserItem }) => (category === 'all' ? true : (browserItem.category || '未分类') === category))
+    .filter(({ browserItem }) => {
+      if (!keyword) {
+        return true;
+      }
+
+      const haystack = mode === 'fulltext' ? browserItem.searchFulltext : browserItem.searchEntry;
+      return haystack.toLowerCase().includes(keyword);
+    })
+    .sort((left, right) => {
+      if (keyword && mode === 'entry') {
+        const scoreDiff = scoreTerm(left.raw, keyword) - scoreTerm(right.raw, keyword);
+        if (scoreDiff !== 0) {
+          return -scoreDiff;
+        }
+      }
+
+      if (right.browserItem.caseCount !== left.browserItem.caseCount) {
+        return right.browserItem.caseCount - left.browserItem.caseCount;
+      }
+
+      return left.browserItem.id - right.browserItem.id;
+    })
+    .map(({ browserItem }) => {
+      const { searchEntry, searchFulltext, ...item } = browserItem;
+      return item;
+    });
+
+  return {
+    ok: true,
+    source: context.snapshot.source,
+    sourceLabel: context.snapshot.sourceLabel,
+    view,
+    mode,
+    category,
+    query: String(options.query || ''),
+    total: items.length,
+    items,
+  };
+}
+
 function buildTermPayload(context, termId) {
   return buildTermDetail(context, termId);
 }
@@ -493,6 +659,8 @@ function buildHealth(context, extra = {}) {
 }
 
 module.exports = {
+  buildBrowserBootstrap,
+  buildBrowserResult,
   buildCasePayload,
   buildSearch,
   buildBootstrap,

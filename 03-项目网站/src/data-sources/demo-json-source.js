@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const {
+  buildBrowserBootstrap,
+  buildBrowserResult,
   buildCasePayload,
   buildSearch,
   buildBootstrap,
@@ -166,6 +168,14 @@ class DemoJsonSource {
 
   getCase(caseId) {
     return buildCasePayload(buildContext(this.loadSnapshot()), caseId);
+  }
+
+  getBrowserBootstrap() {
+    return buildBrowserBootstrap(buildContext(this.loadSnapshot()));
+  }
+
+  browse(options) {
+    return buildBrowserResult(buildContext(this.loadSnapshot()), options);
   }
 
   getTerms() {

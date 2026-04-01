@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>数据库架构 · 高邮二王知识库 Demo</title>
+    <title>数据库浏览 · 高邮二王知识库 Demo</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -12,70 +12,84 @@
         <div class="brand">高邮二王知识库</div>
         <div class="nav-links">
           <a href="./index.html">返回首页</a>
-          <a href="#schema">字段结构</a>
+          <a href="./term.html?id=1">字词示例</a>
+          <a href="./case.html?id=1">案例示例</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">Secondary View · Minimal Schema</p>
-        <h1>数据库架构说明</h1>
-        <p class="hero-copy">当前 Demo 只展示最小必要版 5 表。字段解释、用途和索引均集中在本页，不出现在首页。</p>
-        <div class="hero-panel">
-          <div class="hero-panel-item">
-            <span class="hero-kicker">阶段</span>
-            <strong>最小必要版</strong>
-          </div>
-          <div class="hero-panel-item">
-            <span class="hero-kicker">重点</span>
-            <strong>字段够用、关系清楚</strong>
-          </div>
-          <div class="hero-panel-item">
-            <span class="hero-kicker">边界</span>
-            <strong>暂不上关系图谱表</strong>
-          </div>
-        </div>
+        <p class="badge">Secondary View · Data Browser</p>
+        <h1>数据库浏览</h1>
+        <p class="hero-copy">左侧切换浏览类别，右侧查看全部结果、筛选条件与对应条目。具体条目再进入详情页阅读。</p>
+        <div id="browserHeroMeta" class="hero-panel"></div>
       </div>
     </header>
 
     <main>
       <section class="section">
-        <div class="section-head">
-          <p class="section-kicker">Reading Guide</p>
-          <h2>阅读方式</h2>
-        </div>
-        <div class="grid grid-3">
-          <article class="card">
-            <h3>为什么只有 5 表</h3>
-            <p>为了保证现在就能录案例、做检索、做展示，不把版本、关系、层级拆得过重。</p>
-          </article>
-          <article class="card">
-            <h3>当前边界</h3>
-            <p>先完成著作、片段、词条、案例、证据的闭环；更复杂的版本与关系后续再扩展。</p>
-          </article>
-          <article class="card">
-            <h3>后续升级方向</h3>
-            <p>案例量增加后，再补版本表、步骤表和关系表，逐步过渡到较完整版。</p>
-          </article>
-        </div>
-      </section>
+        <p id="browserStatus" class="db-status">正在读取数据库浏览信息...</p>
 
-      <section id="schema" class="section alt">
-        <div class="head-line">
-          <div>
-            <p class="section-kicker">Schema Detail</p>
-            <h2>字段结构</h2>
-          </div>
-          <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
+        <div class="browser-layout">
+          <aside class="browser-sidebar">
+            <article class="card sidebar-card">
+              <h3>浏览类别</h3>
+              <div id="browserNav" class="sidebar-nav"></div>
+            </article>
+
+            <article class="card sidebar-card">
+              <h3>分类筛选</h3>
+              <div id="browserFilters" class="sidebar-filter-list"></div>
+            </article>
+          </aside>
+
+          <section class="browser-main">
+            <article class="card browser-toolbar">
+              <div class="head-line">
+                <div>
+                  <p class="section-kicker">Search Controls</p>
+                  <h2 id="browserHeading">字词浏览</h2>
+                </div>
+              </div>
+
+              <div class="browser-search-grid">
+                <label class="toolbar-field">
+                  <span>关键词</span>
+                  <input id="browserSearchInput" type="text" placeholder="输入词条、义项、正文关键词" />
+                </label>
+                <label class="toolbar-field">
+                  <span>搜索方式</span>
+                  <select id="browserModeSelect">
+                    <option value="entry">按词条/标题检索</option>
+                    <option value="fulltext">按正文/全文检索</option>
+                  </select>
+                </label>
+              </div>
+
+              <div class="toolbar-actions">
+                <button id="browserSearchButton" class="page-link toolbar-button" type="button">执行检索</button>
+                <button id="browserResetButton" class="search-clear toolbar-button" type="button">重置</button>
+              </div>
+            </article>
+
+            <div id="browserSummary" class="search-summary"></div>
+
+            <section id="browserSchemaSection" class="browser-panel" hidden>
+              <div id="browserStats" class="stats-grid"></div>
+              <div id="browserSchemaGrid" class="grid grid-2"></div>
+            </section>
+
+            <section id="browserListSection" class="browser-panel">
+              <div id="browserList" class="grid grid-2"></div>
+            </section>
+          </section>
         </div>
-        <div id="dbStats" class="stats-grid"></div>
-        <div id="schemaGrid" class="grid grid-2"></div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>Schema View · 高邮二王知识库 Demo</p>
+      <p>Data Browser · 高邮二王知识库 Demo</p>
     </footer>
 
-    <script src="./app.js"></script>
+    <script src="./browser.js"></script>
   </body>
 </html>
