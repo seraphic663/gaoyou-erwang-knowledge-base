@@ -68,6 +68,7 @@ body {
   margin: 0 auto;
   padding: 18px 20px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
   align-items: center;
@@ -75,7 +76,7 @@ body {
 
 .brand {
   font-weight: 700;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: 0.04em;
 }
 
@@ -1150,6 +1151,10 @@ h2 {
 }
 
 @media (max-width: 700px) {
+  .nav {
+    align-items: flex-start;
+  }
+
   .flow-branch {
     grid-template-columns: 1fr;
   }

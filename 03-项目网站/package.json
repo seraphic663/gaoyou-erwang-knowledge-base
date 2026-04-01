@@ -1,7 +1,7 @@
 {
   "name": "gaoyou-erwang-demo",
   "version": "1.0.0",
-  "description": "高邮二王知识库构建及应用 Demo",
+  "description": "高邮二王考据过程知识库构建及应用 Demo",
   "main": "server.js",
   "engines": {
     "node": ">=18"

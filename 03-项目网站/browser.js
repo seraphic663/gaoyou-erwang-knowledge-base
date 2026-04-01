@@ -285,7 +285,7 @@ async function runBrowse() {
   if (state.view === 'schema') {
     browserListSection.hidden = true;
     browserSchemaSection.hidden = false;
-    browserHeading.textContent = '架构说明';
+    browserHeading.textContent = '整理结构';
     browserModeSelect.value = 'entry';
     browserModeSelect.disabled = true;
     browserSearchInput.value = '';

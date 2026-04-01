@@ -73,7 +73,7 @@ function splitItems(items, visibleCount) {
 function renderQuickSearch(bootstrap) {
   if (!searchQuick) return;
 
-  const fixedKeywords = ['始', '敬', '君', '通假', '同源', '义证'];
+  const fixedKeywords = ['始', '敬', '不我知', '通假', '因声求义', '义证'];
   const sampleKeywords = (bootstrap?.sampleTerms || [])
     .map((item) => item.term)
     .filter(Boolean)
@@ -197,7 +197,7 @@ function renderTerms(result, query = '') {
     return;
   }
 
-  const visibleCount = 6;
+  const visibleCount = 5;
   const groups = splitItems(items, visibleCount);
   const renderTermCard = (item) => {
     const meta = [item.termType, item.category].filter(Boolean);
@@ -245,7 +245,7 @@ function renderTerms(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部字词</h3>
-    <p>首页固定只展示 6 个字词入口，完整列表请进入数据库浏览页继续查看。</p>
+    <p>当前区域固定展示 5 个字词入口，完整列表请进入数据库浏览页继续查看。</p>
     <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词浏览</a>
   `;
   termList.appendChild(linkCard);
@@ -261,7 +261,7 @@ function renderCases(result, query = '') {
     return;
   }
 
-  const visibleCount = 6;
+  const visibleCount = 5;
   const groups = splitItems(items, visibleCount);
   const renderCaseCard = (item) => {
     const visibleTerms = (item.termNames || []).slice(0, 6);
@@ -311,7 +311,7 @@ function renderCases(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部案例</h3>
-    <p>首页固定只展示 6 个案例预览，完整列表请进入数据库浏览页继续阅读。</p>
+    <p>当前区域固定展示 5 个案例预览，完整列表请进入数据库浏览页继续阅读。</p>
     <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例浏览</a>
   `;
   caseList.appendChild(linkCard);
@@ -330,7 +330,7 @@ async function loadBootstrap() {
     dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
   }
   if (searchInput) {
-    searchInput.placeholder = `输入单字、词语或义项：如 始 / 犹豫 / 不我知（当前词条 ${bootstrap.counts.terms} 条）`;
+    searchInput.placeholder = `输入字词、方法词或片段：如 始 / 犹豫 / 不我知（当前词条 ${bootstrap.counts.terms} 条）`;
   }
 }
 

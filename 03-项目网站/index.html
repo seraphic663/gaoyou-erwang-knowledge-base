@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>高邮二王知识库 Demo</title>
+    <title>高邮二王考据过程知识库 Demo</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="hero">
       <nav class="nav">
-        <div class="brand">高邮二王知识库</div>
+        <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
-          <a href="#intro">项目概述</a>
-          <a href="#data-overview">数据概览</a>
-          <a href="#flow">检字流程</a>
-          <a href="#cases">案例库</a>
+          <a href="#research">研究问题</a>
+          <a href="#data-overview">整理方法</a>
+          <a href="#case-walkthrough">案例链条</a>
+          <a href="#cases">案例试查</a>
           <a href="#timeline">申报时间</a>
           <a href="#team">团队</a>
           <a href="./database.html?view=terms">数据库浏览</a>
@@ -24,16 +24,16 @@
       <div class="hero-content hero-stage">
         <div class="hero-copy-col">
           <p class="badge">2026 求是学术 · 应用研究 · Demo</p>
-          <h1>高邮二王知识库构建及应用</h1>
+          <h1>高邮二王考据过程知识库构建及应用</h1>
           <p class="hero-copy">
-            以“王氏四种”为核心，围绕“经字互证”“一声之转”方法，搭建可检索、可解释、可视化的古典知识平台。
+            以“王氏四种”为核心材料，围绕高邮二王如何发疑、取证、比较并达成解释这一问题，整理可检索、可复核、可比较的考据案例与证据链条。
           </p>
           <div class="hero-actions">
-            <a class="cta" href="./database.html?view=cases">快速进入案例库</a>
+            <a class="cta" href="./database.html?view=cases">进入案例浏览</a>
+            <a class="ghost-link" href="#research">查看研究问题</a>
             <a class="ghost-link" href="./database.html?view=terms">浏览数据库</a>
-            <a class="ghost-link" href="#flow">查看流程图</a>
           </div>
-          <p class="hero-scroll-copy">向下滚动查看项目说明、数据库概览与检字流程。</p>
+          <p class="hero-scroll-copy">向下滚动查看研究问题、整理方法、案例链条与试查入口。</p>
         </div>
 
         <div class="hero-showcase">
@@ -43,14 +43,14 @@
             </div>
             <div class="showcase-main">
               <div>
-                <p class="section-kicker showcase-kicker">Fast Entry</p>
-                <h3>一屏进入字词库、案例库和研究流程。</h3>
-                <p class="compact-note showcase-note">首屏负责展示项目气质和快速入口，具体浏览交给数据库页与详情页。</p>
+                <p class="section-kicker showcase-kicker">Research Focus</p>
+                <h3>先看二王如何完成一条考据。</h3>
+                <p class="compact-note showcase-note">这一屏先交代研究对象、过程保存方式和代表性案例入口，后面再进入具体浏览。</p>
               </div>
               <div class="showcase-links">
-                <a class="showcase-link" href="./database.html?view=cases">案例浏览</a>
-                <a class="showcase-link" href="./database.html?view=terms">字词浏览</a>
-                <a class="showcase-link" href="#cases">首页检索</a>
+                <a class="showcase-link" href="#research">研究问题</a>
+                <a class="showcase-link" href="#case-walkthrough">案例链条</a>
+                <a class="showcase-link" href="./database.html?view=cases">数据库浏览</a>
               </div>
             </div>
             <div class="showcase-stats">
@@ -71,7 +71,7 @@
               <div>
                 <p class="section-kicker showcase-kicker">Featured Case</p>
                 <strong id="heroFeatureTitle">《广雅疏证》案例入口</strong>
-                <p id="heroFeatureMeta" class="compact-note">优先展示一条代表性案例，作为数据库浏览快速入口。</p>
+                <p id="heroFeatureMeta" class="compact-note">优先展示一条代表性案例，作为“问题—证据—结论”链条入口。</p>
               </div>
               <a id="heroFeatureLink" class="detail-link" href="./database.html?view=cases">打开案例入口</a>
             </div>
@@ -81,23 +81,27 @@
     </header>
 
     <main>
-      <section id="intro" class="section">
+      <section id="research" class="section">
         <div class="section-head">
-          <p class="section-kicker">Project Focus</p>
-          <h2>项目概述</h2>
+          <p class="section-kicker">Research Focus</p>
+          <h2>研究问题与对象</h2>
         </div>
-        <div class="grid grid-3">
+        <div class="grid grid-2">
           <article class="card">
             <h3>研究对象</h3>
-            <p>王念孙、王引之父子及“王氏四种”文献体系。</p>
+            <p>研究重心落在高邮二王及“王氏四种”所呈现出的考据方法、代表性条目与相关引证材料。</p>
           </article>
           <article class="card">
-            <h3>方法核心</h3>
-            <p>形、音、义知一推三；经字互证；一声之转。</p>
+            <h3>核心问题</h3>
+            <p>项目关心的是，能否把二王的考据过程整理成可复核、可比较的专题研究材料，并支持后续持续积累。</p>
           </article>
           <article class="card">
-            <h3>平台目标</h3>
-            <p>先完成最小必要数据库，再扩展为更完整的研究平台。</p>
+            <h3>现有痛点</h3>
+            <p>一条考释往往分散在二王原文、所涉经文与引证书证之间。现有古籍平台能帮助找到文本，却难以把判断链条重新串起来。</p>
+          </article>
+          <article class="card">
+            <h3>整理单位</h3>
+            <p>网站当前以“单条考据案例”为基本单位，逐条保存问题触发点、主要证据、过程说明、出处位置与结论状态。</p>
           </article>
         </div>
       </section>
@@ -105,26 +109,26 @@
       <section id="data-overview" class="section alt">
         <div class="head-line">
           <div>
-            <p class="section-kicker">Minimal Schema</p>
-            <h2>最小必要数据库概览</h2>
-            <p class="compact-note">首页只展示数据概况与使用入口，详细字段结构移至二级页面。</p>
+            <p class="section-kicker">Method Response</p>
+            <h2>为什么要做最小必要数据库</h2>
+            <p class="compact-note">这里先解释数据库为何如此设计，字段细节放到二级页面单独查看。</p>
           </div>
-          <a class="page-link" href="./database.html?view=schema">查看数据库架构</a>
+          <a class="page-link" href="./database.html?view=schema">查看整理结构</a>
         </div>
         <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
         <div id="dbStats" class="stats-grid"></div>
         <div class="grid grid-3">
           <article class="card">
-            <h3>最小必要 5 表</h3>
-            <p>当前 Demo 严格按“著作、文本片段、词条、案例、证据”五张核心表组织。</p>
+            <h3>材料不是平面条目</h3>
+            <p>一条考据至少牵涉二王论述、原始经典、引证书证和结论说明，普通扁平摘录难以保留其上下文和判断顺序。</p>
           </article>
           <article class="card">
-            <h3>首页只看业务</h3>
-            <p>首页聚焦项目目标、流程和案例，不直接堆叠数据库字段说明。</p>
+            <h3>五表是对材料结构的回应</h3>
+            <p>当前 Demo 以“著作、文本片段、词条、案例、证据”五张核心表组织数据，目的是把问题、出处、证据和结论放进同一条记录链。</p>
           </article>
           <article class="card">
-            <h3>架构单独展示</h3>
-            <p>字段说明、主键、索引和用途放在二级页面，方便答辩时单独讲解。</p>
+            <h3>数据库服务比较阅读</h3>
+            <p>整理完成后，研究者既可以由字词进入案例，也可以由案例回到经文与书证；数据库承担的是研究整理和比较阅读的支撑工作。</p>
           </article>
         </div>
       </section>
@@ -132,42 +136,71 @@
       <section id="flow" class="section alt">
         <div class="section-head">
           <p class="section-kicker">Method Flow</p>
-          <h2>“经义不通”检字流程</h2>
+          <h2>二王校读流程</h2>
         </div>
-        <p class="flow-note">流程图已按最新版本更新为图像版，适合首页展示和答辩投屏。后续如需交互式流程页，可再拆成 HTML 模块。</p>
+        <p class="flow-note">流程图展示的是二王在“经义不通”时的一般判断路径，也是后续案例整理与字段设计的重要依据。</p>
         <figure class="flow-figure">
-          <img src="./media/step.png" alt="高邮二王知识库检字流程图" />
-          <figcaption>最新检字流程图：从经义不通出发，分流判断原字、通假、同源与对文关系，最终回到字义确认。</figcaption>
+          <img src="./media/step.png" alt="高邮二王考据过程知识库检字流程图" />
+          <figcaption>从“经义不通”出发，分流判断原字、通假、同源与对文关系，最终回到字义确认与解释成立。</figcaption>
         </figure>
+      </section>
+
+      <section id="case-walkthrough" class="section">
+        <div class="head-line">
+          <div>
+            <p class="section-kicker">Case Chain</p>
+            <h2>一条案例如何成立</h2>
+            <p class="compact-note">这里把一条考据如何从问题走到结论，按阅读顺序拆开说明。</p>
+          </div>
+          <a class="page-link" href="./database.html?view=cases">查看全部案例</a>
+        </div>
+        <div class="grid grid-2">
+          <article class="card">
+            <h3>1. 先确定疑难在哪里</h3>
+            <p>以单条案例为单位记录“哪里不通、哪里可疑、为何需要重新解释”，避免只保存最终释义而丢掉问题起点。</p>
+          </article>
+          <article class="card">
+            <h3>2. 回到二王原文</h3>
+            <p>每条案例都要能定位到二王论述所在片段，保证后续阅读始终可以回到原文上下文。</p>
+          </article>
+          <article class="card">
+            <h3>3. 补齐经文与书证</h3>
+            <p>把所涉原始经典和引证材料一起连回案例，才能看清二王是怎样取证、怎样比较、怎样排除其他解释的。</p>
+          </article>
+          <article class="card">
+            <h3>4. 再形成可复核结论</h3>
+            <p>最后保存结论、证据类型与状态标记，使案例既能用于展示，也能继续比较同类问题中的判断路径。</p>
+          </article>
+        </div>
       </section>
 
       <section id="cases" class="section">
         <div class="head-line">
           <div>
-            <p class="section-kicker">Search Browser</p>
-            <h2>检索结果</h2>
+            <p class="section-kicker">Case Search</p>
+            <h2>从字词或问题进入案例</h2>
           </div>
         </div>
         <div class="search-panel card">
           <div class="search-bar">
-            <input id="searchInput" type="text" placeholder="输入单字、词语或义项：如 始 / 犹豫 / 不我知" />
+            <input id="searchInput" type="text" placeholder="输入字词、方法词或经典片段：如 始 / 犹豫 / 不我知" />
             <button id="clearSearch" class="search-clear" type="button">清空</button>
           </div>
-          <p class="compact-note">可搜单字、义项、方法词。首页默认只预览少量结果，更多内容按需展开。</p>
+          <p class="compact-note">可从字词、方法词或问题片段进入。当前区域预览少量结果，完整浏览放在数据库页与详情页。</p>
           <div id="searchQuick" class="search-quick"></div>
         </div>
         <div id="searchSummary" class="search-summary"></div>
         <div class="result-head">
           <div>
             <p class="section-kicker">Matched Terms</p>
-            <h3>匹配字词</h3>
+            <h3>相关字词</h3>
           </div>
         </div>
         <div id="termList" class="grid grid-3"></div>
         <div class="result-head">
           <div>
             <p class="section-kicker">Related Cases</p>
-            <h3>相关案例</h3>
+            <h3>相关考据案例</h3>
           </div>
         </div>
         <div id="caseList" class="grid grid-2"></div>
@@ -189,28 +222,28 @@
 
       <section id="team" class="section">
         <div class="section-head">
-          <p class="section-kicker">Capability Matrix</p>
-          <h2>团队能力结构</h2>
+          <p class="section-kicker">Team Roles</p>
+          <h2>团队分工结构</h2>
         </div>
         <div class="grid grid-3">
           <article class="card">
-            <h3>古文字与训诂</h3>
-            <p>负责案例拆解、文献校核、标注规范设计。</p>
+            <h3>古籍整理与学术审核</h3>
+            <p>负责案例拆解、文献校核、术语统一与疑难讨论，保证整理结果不脱离训诂学和文献学依据。</p>
           </article>
           <article class="card">
-            <h3>知识工程</h3>
-            <p>负责语料结构化、检索与图谱关系建模。</p>
+            <h3>知识库实现</h3>
+            <p>负责最小必要数据库、数据接口、检索逻辑与页面原型，把已整理材料做成可查、可看、可演示的工具。</p>
           </article>
           <article class="card">
-            <h3>数据与可视化</h3>
-            <p>负责流程图展示、统计分析与交互呈现。</p>
+            <h3>数据整理与展示</h3>
+            <p>负责录入规则、统计整理、流程图和页面展示，让案例、出处、证据和结论能够形成稳定的阅读路径。</p>
           </article>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>Demo for “求是学术”项目展示 · 高邮二王知识库构建及应用</p>
+      <p>Demo for “求是学术”项目展示 · 高邮二王考据过程知识库构建及应用</p>
     </footer>
 
     <script src="./app.js"></script>
