@@ -33,7 +33,7 @@ def load_snapshot() -> dict:
         snapshot = {
             "schemaVersion": 3,
             "source": "sqlite",
-            "sourceLabel": "SQLite 实库（大创）",
+            "sourceLabel": "SQLite 实库",
             "meta": {
                 "dbFile": str(DB_FILE),
             },
