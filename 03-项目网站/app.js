@@ -11,9 +11,6 @@ const searchSummary = document.querySelector('#searchSummary');
 const heroTermCount = document.querySelector('#heroTermCount');
 const heroCaseCount = document.querySelector('#heroCaseCount');
 const heroEvidenceCount = document.querySelector('#heroEvidenceCount');
-const heroFeatureTitle = document.querySelector('#heroFeatureTitle');
-const heroFeatureMeta = document.querySelector('#heroFeatureMeta');
-const heroFeatureLink = document.querySelector('#heroFeatureLink');
 
 let searchTimer = null;
 
@@ -73,7 +70,7 @@ function splitItems(items, visibleCount) {
 function renderQuickSearch(bootstrap) {
   if (!searchQuick) return;
 
-  const fixedKeywords = ['始', '敬', '不我知', '通假', '因声求义', '义证'];
+  const fixedKeywords = ['害澣害否', '曷', '葛覃', '始', '通假', '因声求义', '义证'];
   const sampleKeywords = (bootstrap?.sampleTerms || [])
     .map((item) => item.term)
     .filter(Boolean)
@@ -94,23 +91,6 @@ function renderHeroShowcase(bootstrap) {
   }
   if (heroEvidenceCount) {
     heroEvidenceCount.textContent = String(bootstrap.counts?.evidences ?? 0);
-  }
-
-  const featuredCase = bootstrap.featuredCases?.[0];
-  if (!featuredCase) {
-    return;
-  }
-
-  if (heroFeatureTitle) {
-    heroFeatureTitle.textContent = featuredCase.displayTitle || featuredCase.title || '案例入口';
-  }
-  if (heroFeatureMeta) {
-    heroFeatureMeta.textContent = [featuredCase.displaySubtitle, featuredCase.termLabel, `证据 ${featuredCase.evidenceCount || 0} 条`]
-      .filter(Boolean)
-      .join(' · ');
-  }
-  if (heroFeatureLink) {
-    heroFeatureLink.setAttribute('href', buildCaseHref(featuredCase.id));
   }
 }
 

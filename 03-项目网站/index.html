@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>高邮二王考据过程知识库 Demo</title>
+    <title>高邮二王考据过程知识库构建及应用</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -12,28 +12,27 @@
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
           <a href="#research">研究问题</a>
-          <a href="#data-overview">整理方法</a>
-          <a href="#case-walkthrough">案例链条</a>
+          <a href="#data-overview">整理思路</a>
+          <a href="#case-walkthrough">代表性案例</a>
           <a href="#cases">案例试查</a>
-          <a href="#timeline">申报时间</a>
-          <a href="#team">团队</a>
+          <a href="#supporting">补充信息</a>
           <a href="./database.html?view=terms">数据库浏览</a>
         </div>
       </nav>
 
       <div class="hero-content hero-stage">
         <div class="hero-copy-col">
-          <p class="badge">2026 求是学术 · 应用研究 · Demo</p>
+          <p class="badge">2026 求是学术 · 研究整理原型</p>
           <h1>高邮二王考据过程知识库构建及应用</h1>
           <p class="hero-copy">
-            以“王氏四种”为核心材料，围绕高邮二王如何发疑、取证、比较并达成解释这一问题，整理可检索、可复核、可比较的考据案例与证据链条。
+            围绕“王氏四种”中的典型疑难，整理高邮二王如何发疑、取证、比较并达成解释的过程。这里首先展示的不是平台功能，而是一条考据怎样成立。
           </p>
           <div class="hero-actions">
-            <a class="cta" href="./database.html?view=cases">进入案例浏览</a>
+            <a class="cta" href="./database.html?view=cases&amp;q=%E5%AE%B3%E6%BE%A3%E5%AE%B3%E5%90%A6&amp;mode=fulltext">先看《葛覃》案例</a>
             <a class="ghost-link" href="#research">查看研究问题</a>
             <a class="ghost-link" href="./database.html?view=terms">浏览数据库</a>
           </div>
-          <p class="hero-scroll-copy">向下滚动查看研究问题、整理方法、案例链条与试查入口。</p>
+          <p class="hero-scroll-copy">下方依次交代研究问题、最小必要数据库、案例链条与试查入口。</p>
         </div>
 
         <div class="hero-showcase">
@@ -43,14 +42,23 @@
             </div>
             <div class="showcase-main">
               <div>
-                <p class="section-kicker showcase-kicker">Research Focus</p>
-                <h3>先看二王如何完成一条考据。</h3>
-                <p class="compact-note showcase-note">这一屏先交代研究对象、过程保存方式和代表性案例入口，后面再进入具体浏览。</p>
+                <p class="section-kicker showcase-kicker">代表性实例</p>
+                <h3>从《葛覃》“害澣害否”看一条判断怎样成立。</h3>
+                <p class="compact-note showcase-note">二王不是只给结论，而是先指出“害”与“曷”声转相关，再据《毛传》“害，何也”与释文“害，与曷同”把问题重新落实到训释链条中。</p>
               </div>
               <div class="showcase-links">
-                <a class="showcase-link" href="#research">研究问题</a>
-                <a class="showcase-link" href="#case-walkthrough">案例链条</a>
-                <a class="showcase-link" href="./database.html?view=cases">数据库浏览</a>
+                <a class="showcase-link showcase-link-stack" href="./database.html?view=cases&amp;q=%E5%AE%B3%E6%BE%A3%E5%AE%B3%E5%90%A6&amp;mode=fulltext">
+                  <span>疑难句</span>
+                  <strong>害澣害否</strong>
+                </a>
+                <a class="showcase-link showcase-link-stack" href="./database.html?view=terms&amp;q=%E6%9B%B7&amp;mode=fulltext">
+                  <span>关键字</span>
+                  <strong>害 / 曷</strong>
+                </a>
+                <a class="showcase-link showcase-link-stack" href="#case-walkthrough">
+                  <span>阅读路径</span>
+                  <strong>问题到结论</strong>
+                </a>
               </div>
             </div>
             <div class="showcase-stats">
@@ -69,11 +77,11 @@
             </div>
             <div class="showcase-feature">
               <div>
-                <p class="section-kicker showcase-kicker">Featured Case</p>
-                <strong id="heroFeatureTitle">《广雅疏证》案例入口</strong>
-                <p id="heroFeatureMeta" class="compact-note">优先展示一条代表性案例，作为“问题—证据—结论”链条入口。</p>
+                <p class="section-kicker showcase-kicker">站内入口</p>
+                <strong>进入该例相关案例与字词</strong>
+                <p class="compact-note">当前站内可继续查看“曷”相关字词、书证摘录与同类案例，便于把单条例子放回更大的整理脉络中。</p>
               </div>
-              <a id="heroFeatureLink" class="detail-link" href="./database.html?view=cases">打开案例入口</a>
+              <a class="detail-link" href="./database.html?view=cases&amp;q=%E5%AE%B3%E6%BE%A3%E5%AE%B3%E5%90%A6&amp;mode=fulltext">打开该例入口</a>
             </div>
           </article>
         </div>
@@ -83,25 +91,25 @@
     <main>
       <section id="research" class="section">
         <div class="section-head">
-          <p class="section-kicker">Research Focus</p>
+          <p class="section-kicker">问题意识</p>
           <h2>研究问题与对象</h2>
         </div>
         <div class="grid grid-2">
           <article class="card">
             <h3>研究对象</h3>
-            <p>研究重心落在高邮二王及“王氏四种”所呈现出的考据方法、代表性条目与相关引证材料。</p>
+            <p>研究重心落在高邮二王及“王氏四种”所呈现出的考据方法、代表性条目与相关引证材料，而不是泛化为一般古籍平台。</p>
           </article>
           <article class="card">
             <h3>核心问题</h3>
-            <p>项目关心的是，能否把二王的考据过程整理成可复核、可比较的专题研究材料，并支持后续持续积累。</p>
+            <p>本项目要回答的不是“能否再做一个网站”，而是二王的考据过程能否被整理成可复核、可比较、可持续积累的专题研究材料。</p>
           </article>
           <article class="card">
             <h3>现有痛点</h3>
-            <p>一条考释往往分散在二王原文、所涉经文与引证书证之间。现有古籍平台能帮助找到文本，却难以把判断链条重新串起来。</p>
+            <p>一条考释往往分散在二王原文、所涉经文与引证书证之间。现有古籍平台多能帮助找到文本，却难以把判断链条重新串起来。</p>
           </article>
           <article class="card">
             <h3>整理单位</h3>
-            <p>网站当前以“单条考据案例”为基本单位，逐条保存问题触发点、主要证据、过程说明、出处位置与结论状态。</p>
+            <p>网站当前以“单条考据案例”为基本单位，逐条保存问题触发点、主要证据、过程说明、出处位置与结论状态，使“问题 - 证据 - 比较 - 结论”能够落到具体记录上。</p>
           </article>
         </div>
       </section>
@@ -109,9 +117,9 @@
       <section id="data-overview" class="section alt">
         <div class="head-line">
           <div>
-            <p class="section-kicker">Method Response</p>
+            <p class="section-kicker">整理思路</p>
             <h2>为什么要做最小必要数据库</h2>
-            <p class="compact-note">这里先解释数据库为何如此设计，字段细节放到二级页面单独查看。</p>
+            <p class="compact-note">首页只解释为什么要这样整理材料；字段细节与结构总览放到二级页面单独查看。</p>
           </div>
           <a class="page-link" href="./database.html?view=schema">查看整理结构</a>
         </div>
@@ -120,11 +128,11 @@
         <div class="grid grid-3">
           <article class="card">
             <h3>材料不是平面条目</h3>
-            <p>一条考据至少牵涉二王论述、原始经典、引证书证和结论说明，普通扁平摘录难以保留其上下文和判断顺序。</p>
+            <p>一条考据至少牵涉二王论述、原始经典、引证书证和结论说明。若只做扁平摘录，往往最先丢掉的正是判断顺序与上下文。</p>
           </article>
           <article class="card">
             <h3>五表是对材料结构的回应</h3>
-            <p>当前 Demo 以“著作、文本片段、词条、案例、证据”五张核心表组织数据，目的是把问题、出处、证据和结论放进同一条记录链。</p>
+            <p>当前原型以“著作、文本片段、词条、案例、证据”五张核心表组织数据，目的是把问题、出处、证据和结论放进同一条记录链。</p>
           </article>
           <article class="card">
             <h3>数据库服务比较阅读</h3>
@@ -135,7 +143,7 @@
 
       <section id="flow" class="section alt">
         <div class="section-head">
-          <p class="section-kicker">Method Flow</p>
+          <p class="section-kicker">方法线索</p>
           <h2>二王校读流程</h2>
         </div>
         <p class="flow-note">流程图展示的是二王在“经义不通”时的一般判断路径，也是后续案例整理与字段设计的重要依据。</p>
@@ -148,9 +156,9 @@
       <section id="case-walkthrough" class="section">
         <div class="head-line">
           <div>
-            <p class="section-kicker">Case Chain</p>
+            <p class="section-kicker">代表性案例</p>
             <h2>一条案例如何成立</h2>
-            <p class="compact-note">这里把一条考据如何从问题走到结论，按阅读顺序拆开说明。</p>
+            <p class="compact-note">以下四步对应的是首页主推的阅读顺序，也是后续案例详情页的基本组织方式。</p>
           </div>
           <a class="page-link" href="./database.html?view=cases">查看全部案例</a>
         </div>
@@ -177,7 +185,7 @@
       <section id="cases" class="section">
         <div class="head-line">
           <div>
-            <p class="section-kicker">Case Search</p>
+            <p class="section-kicker">试查入口</p>
             <h2>从字词或问题进入案例</h2>
           </div>
         </div>
@@ -192,58 +200,64 @@
         <div id="searchSummary" class="search-summary"></div>
         <div class="result-head">
           <div>
-            <p class="section-kicker">Matched Terms</p>
+            <p class="section-kicker">相关字词</p>
             <h3>相关字词</h3>
           </div>
         </div>
         <div id="termList" class="grid grid-3"></div>
         <div class="result-head">
           <div>
-            <p class="section-kicker">Related Cases</p>
+            <p class="section-kicker">相关案例</p>
             <h3>相关考据案例</h3>
           </div>
         </div>
         <div id="caseList" class="grid grid-2"></div>
       </section>
 
-      <section id="timeline" class="section alt">
+      <section id="supporting" class="section alt">
         <div class="section-head">
-          <p class="section-kicker">Schedule</p>
-          <h2>2026 立项流程时间线</h2>
+          <p class="section-kicker">补充信息</p>
+          <h2>申报安排与团队协作</h2>
         </div>
-        <ol class="timeline">
-          <li><strong>2月24日—3月18日</strong>：选题与组队，提交意向申请表给出题教师。</li>
-          <li><strong>3月19日 9:00—4月9日 17:00</strong>：项目负责人在线提交立项材料。</li>
-          <li><strong>4月10日 12:00前</strong>：指导教师在平台完成审核。</li>
-          <li><strong>4月中下旬—5月</strong>：学院初评、书院复评、公示与推荐。</li>
-          <li><strong>5月底</strong>：学校复核并正式立项。</li>
-        </ol>
-      </section>
-
-      <section id="team" class="section">
-        <div class="section-head">
-          <p class="section-kicker">Team Roles</p>
-          <h2>团队分工结构</h2>
-        </div>
-        <div class="grid grid-3">
-          <article class="card">
-            <h3>古籍整理与学术审核</h3>
-            <p>负责案例拆解、文献校核、术语统一与疑难讨论，保证整理结果不脱离训诂学和文献学依据。</p>
-          </article>
-          <article class="card">
-            <h3>知识库实现</h3>
-            <p>负责最小必要数据库、数据接口、检索逻辑与页面原型，把已整理材料做成可查、可看、可演示的工具。</p>
-          </article>
-          <article class="card">
-            <h3>数据整理与展示</h3>
-            <p>负责录入规则、统计整理、流程图和页面展示，让案例、出处、证据和结论能够形成稳定的阅读路径。</p>
-          </article>
+        <p class="compact-note">时间节点和团队结构保留在首页底部，避免打断前面的学术主线；需要时可展开查看。</p>
+        <div class="grid grid-2">
+          <details class="fold-card" open>
+            <summary>2026 立项流程时间线</summary>
+            <div class="fold-body">
+              <ol class="timeline">
+                <li><strong>2月24日—3月18日</strong>：选题与组队，提交意向申请表给出题教师。</li>
+                <li><strong>3月19日 9:00—4月9日 17:00</strong>：项目负责人在线提交立项材料。</li>
+                <li><strong>4月10日 12:00前</strong>：指导教师在平台完成审核。</li>
+                <li><strong>4月中下旬—5月</strong>：学院初评、书院复评、公示与推荐。</li>
+                <li><strong>5月底</strong>：学校复核并正式立项。</li>
+              </ol>
+            </div>
+          </details>
+          <details class="fold-card">
+            <summary>团队分工结构</summary>
+            <div class="fold-body">
+              <div class="grid grid-3">
+                <article class="card">
+                  <h3>古籍整理与学术审核</h3>
+                  <p>负责案例拆解、文献校核、术语统一与疑难讨论，保证整理结果不脱离训诂学和文献学依据。</p>
+                </article>
+                <article class="card">
+                  <h3>知识库实现</h3>
+                  <p>负责最小必要数据库、数据接口、检索逻辑与页面原型，把已整理材料做成可查、可看、可演示的工具。</p>
+                </article>
+                <article class="card">
+                  <h3>数据整理与展示</h3>
+                  <p>负责录入规则、统计整理、流程图和页面展示，让案例、出处、证据和结论能够形成稳定的阅读路径。</p>
+                </article>
+              </div>
+            </div>
+          </details>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>Demo for “求是学术”项目展示 · 高邮二王考据过程知识库构建及应用</p>
+      <p>高邮二王考据过程知识库构建及应用 · 研究整理原型</p>
     </footer>
 
     <script src="./app.js"></script>
