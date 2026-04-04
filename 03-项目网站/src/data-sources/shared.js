@@ -543,9 +543,9 @@ function buildBrowserBootstrap(context) {
     sourceLabel: context.snapshot.sourceLabel,
     counts: context.counts,
     views: [
-      { value: 'terms', label: '字词浏览', count: browserTerms.length },
-      { value: 'cases', label: '案例浏览', count: browserCases.length },
-      { value: 'schema', label: '架构说明', count: context.counts.terms + context.counts.cases },
+      { value: 'terms', label: '字词整理', count: browserTerms.length },
+      { value: 'cases', label: '案例整理', count: browserCases.length },
+      { value: 'schema', label: '结构总览', count: context.counts.terms + context.counts.cases },
     ],
     termCategories: [
       { value: 'all', label: '全部字词', count: browserTerms.length },

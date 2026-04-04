@@ -205,8 +205,8 @@ function renderSidebar() {
 function renderSummary(result) {
   if (!browserSummary) return;
 
-  const viewLabel = state.view === 'cases' ? '案例' : state.view === 'schema' ? '架构' : '字词';
-  const modeLabel = state.mode === 'fulltext' ? '全文检索' : '词条检索';
+  const viewLabel = state.view === 'cases' ? '案例整理' : state.view === 'schema' ? '结构总览' : '字词整理';
+  const modeLabel = state.mode === 'fulltext' ? '正文检索' : '条目检索';
   const categoryLabel = getCurrentCategories().find((item) => item.value === state.category)?.label || '全部';
 
   browserSummary.innerHTML = `
@@ -218,6 +218,11 @@ function renderSummary(result) {
 }
 
 function renderTermResults(items) {
+  if (!items.length) {
+    browserList.innerHTML = '<article class="card"><h3>暂无符合条件的字词记录</h3><p>请更换字词、义项或引文关键词继续检索。</p></article>';
+    return;
+  }
+
   browserList.innerHTML = items
     .map(
       (item) => `
@@ -249,6 +254,11 @@ function renderTermResults(items) {
 }
 
 function renderCaseResults(items) {
+  if (!items.length) {
+    browserList.innerHTML = '<article class="card"><h3>暂无符合条件的考据案例</h3><p>请更换问题片段、方法词或相关字词继续检索。</p></article>';
+    return;
+  }
+
   browserList.innerHTML = items
     .map(
       (item) => `
@@ -285,7 +295,7 @@ async function runBrowse() {
   if (state.view === 'schema') {
     browserListSection.hidden = true;
     browserSchemaSection.hidden = false;
-    browserHeading.textContent = '整理结构';
+    browserHeading.textContent = '最小必要数据库结构';
     browserModeSelect.value = 'entry';
     browserModeSelect.disabled = true;
     browserSearchInput.value = '';
@@ -303,7 +313,7 @@ async function runBrowse() {
   browserSearchInput.value = state.query;
   browserListSection.hidden = false;
   browserSchemaSection.hidden = true;
-  browserHeading.textContent = state.view === 'cases' ? '案例浏览' : '字词浏览';
+  browserHeading.textContent = state.view === 'cases' ? '考据案例整理结果' : '字词整理结果';
 
   const params = new URLSearchParams({
     view: state.view,
@@ -329,7 +339,7 @@ async function init() {
   state.bootstrap = bootstrap;
   renderHeroMeta();
   if (browserStatus) {
-    browserStatus.textContent = `数据来源：${bootstrap.sourceLabel}`;
+    browserStatus.textContent = `整理数据来源：${bootstrap.sourceLabel}`;
   }
   await runBrowse();
 }
@@ -380,10 +390,10 @@ browserSearchInput?.addEventListener('keydown', async (event) => {
 
 init().catch((error) => {
   if (browserStatus) {
-    browserStatus.textContent = '数据库浏览加载失败';
+    browserStatus.textContent = '整理结果加载失败';
   }
   if (browserList) {
-    browserList.innerHTML = '<article class="card"><h3>无法加载浏览器</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
+    browserList.innerHTML = '<article class="card"><h3>无法读取整理结果</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
   }
   console.error(error);
 });

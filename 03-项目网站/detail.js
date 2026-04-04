@@ -98,7 +98,7 @@ function renderTermDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = `数据来源：${payload.sourceLabel}`;
+    detailStatus.textContent = `整理数据来源：${payload.sourceLabel}`;
   }
 
   const aliasList = (payload.aliases || [])
@@ -172,7 +172,7 @@ function renderTermDetail(payload) {
       <div class="grid grid-2">
         <article class="card">
           <h3>关联案例</h3>
-          <p class="compact-note">默认只展示前 4 条，剩余案例按需展开。</p>
+          <p class="compact-note">默认只展示前 4 条相关考据案例，剩余部分按需展开。</p>
           <div class="detail-card-grid">${relatedCaseGroups.visible.join('') || '<p class="compact-note">暂无关联案例。</p>'}</div>
           ${relatedCaseGroups.hidden.length ? `
             <details class="fold-card inline-fold">
@@ -185,7 +185,7 @@ function renderTermDetail(payload) {
         </article>
         <article class="card">
           <h3>证据概况</h3>
-          <p class="compact-note">优先展示证据类型和涉及文献，详细引文放在折叠区。</p>
+          <p class="compact-note">优先展示证据类型和涉及文献，详细引文与出处信息放在折叠区。</p>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
@@ -227,7 +227,7 @@ function renderCaseDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = `数据来源：${payload.sourceLabel}`;
+    detailStatus.textContent = `整理数据来源：${payload.sourceLabel}`;
   }
 
   const evidenceTypeList = (payload.evidenceTypes || [])
@@ -321,6 +321,7 @@ function renderCaseDetail(payload) {
         </article>
         <article class="card">
           <h3>证据概况</h3>
+          <p class="compact-note">这里汇总的是支撑该条判断的主要证据类型与涉及文献。</p>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
