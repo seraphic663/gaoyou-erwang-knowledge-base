@@ -7,8 +7,10 @@
   --pri: #6b4a2c;
   --pri-2: #53341b;
   --accent: #a54d2a;
+  --accent-deep: #8f4424;
   --accent-soft: #d3b38f;
   --jade: #5c6652;
+  --muted: #6f6251;
   --line: rgba(84, 58, 30, 0.18);
   --line-strong: rgba(84, 58, 30, 0.32);
   --paper-shadow: 0 18px 42px rgba(71, 46, 20, 0.12);
@@ -1138,6 +1140,35 @@ h2 {
   margin: 0 0 16px;
   color: var(--sub);
   max-width: 860px;
+}
+
+.flow-placeholder {
+  display: grid;
+  gap: 14px;
+}
+
+.flow-placeholder-box {
+  min-height: 260px;
+  border-radius: 24px;
+  border: 1px dashed rgba(84, 58, 30, 0.32);
+  background:
+    linear-gradient(180deg, rgba(251, 246, 237, 0.84), rgba(245, 236, 220, 0.78));
+  position: relative;
+}
+
+.flow-placeholder-box::before {
+  content: "流程图占位";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  color: rgba(84, 58, 30, 0.46);
+}
+
+.flow-placeholder-note {
+  margin: 0;
+  color: var(--sub);
 }
 
 .flow-figure {
