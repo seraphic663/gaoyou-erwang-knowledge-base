@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>整理结果浏览 · 高邮二王考据过程知识库</title>
+    <title>数据库浏览 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -18,16 +18,16 @@
       </nav>
 
       <div class="hero-content">
-        <p class="badge">专题整理 · 结果浏览</p>
-        <h1>整理结果浏览</h1>
-        <p class="hero-copy">这里集中回看围绕“王氏四种”所整理的字词、案例与最小必要数据库结构，供案头检索、证据比勘与出处核验之用。</p>
+        <p class="badge">专题数据库 · 数据库浏览</p>
+        <h1>数据库浏览</h1>
+        <p class="hero-copy">这里集中回看围绕“王氏四种”所整理的字词、案例与数据库结构，供案头检索、证据比勘与出处核验之用。</p>
         <div id="browserHeroMeta" class="hero-panel"></div>
       </div>
     </header>
 
     <main>
       <section class="section">
-        <p id="browserStatus" class="db-status">正在读取整理结果...</p>
+        <p id="browserStatus" class="db-status">正在读取数据库...</p>
 
         <div class="browser-layout">
           <aside class="browser-sidebar">
@@ -47,7 +47,7 @@
               <div class="head-line">
                 <div>
                   <p class="section-kicker">检索案头</p>
-                  <h2 id="browserHeading">字词整理结果</h2>
+                  <h2 id="browserHeading">字词数据库</h2>
                 </div>
               </div>
 
@@ -71,23 +71,44 @@
               </div>
             </article>
 
+            <details class="fold-card browser-preset-fold">
+              <summary>展开常用检索预设</summary>
+              <div id="browserPresets" class="fold-body browser-preset-list">
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="entry" data-preset-query="周">我想精准查询某个字词，例如“周”</button>
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="取">我想从字词库正文里找一个常见义项，例如“取”</button>
+                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="entry" data-preset-query="">我想先通看全部考据案例</button>
+                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="古文">我想从案例正文里直接找问题片段，例如“古文”</button>
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="通假">我想找和通假、音训有关的字词</button>
+                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="章句">我想看带有某类整理线索的案例，例如“章句”</button>
+                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="广雅疏证">我想只看《广雅疏证》相关案例</button>
+                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">我想直接查看数据库结构和统计</button>
+              </div>
+            </details>
+
             <div id="browserSummary" class="search-summary"></div>
 
             <section id="browserSchemaSection" class="browser-panel" hidden>
-              <div id="browserStats" class="stats-grid"></div>
-              <div id="browserSchemaGrid" class="grid grid-2"></div>
+              <details class="fold-card browser-schema-fold">
+                <summary id="browserSchemaSummary">展开数据库结构与统计</summary>
+                <div class="fold-body">
+                  <div id="browserStats" class="stats-grid"></div>
+                  <div id="browserSchemaGrid" class="grid grid-2"></div>
+                </div>
+              </details>
             </section>
 
             <section id="browserListSection" class="browser-panel">
               <div id="browserList" class="grid grid-2"></div>
             </section>
+
+            <div id="browserPagination" class="browser-pagination"></div>
           </section>
         </div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>整理结果浏览 · 高邮二王考据过程知识库专题整理原型</p>
+      <p>数据库浏览 · 高邮二王考据过程知识库专题整理原型</p>
     </footer>
 
     <script src="./browser.js"></script>

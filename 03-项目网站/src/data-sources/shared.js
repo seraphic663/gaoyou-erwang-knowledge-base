@@ -564,9 +564,12 @@ function buildBrowserResult(context, options = {}) {
   const category = String(options.category || 'all').trim() || 'all';
   const mode = options.mode === 'fulltext' ? 'fulltext' : 'entry';
   const keyword = normalizeKeyword(options.query);
+  const requestedPage = Number.parseInt(options.page, 10);
+  const pageSize = 20;
+  const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
 
   if (view === 'cases') {
-    const items = context.cases
+    const allItems = context.cases
       .map((item) => buildBrowserCaseItem(context, item))
       .filter((item) => (category === 'all' ? true : (item.sectionTitle || '未分类') === category))
       .filter((item) => {
@@ -579,6 +582,11 @@ function buildBrowserResult(context, options = {}) {
       })
       .sort((left, right) => right.evidenceCount - left.evidenceCount || left.id - right.id)
       .map(({ searchEntry, searchFulltext, ...item }) => item);
+    const total = allItems.length;
+    const totalPages = Math.max(1, Math.ceil(total / pageSize));
+    const currentPage = Math.min(page, totalPages);
+    const start = (currentPage - 1) * pageSize;
+    const items = allItems.slice(start, start + pageSize);
 
     return {
       ok: true,
@@ -588,12 +596,15 @@ function buildBrowserResult(context, options = {}) {
       mode,
       category,
       query: String(options.query || ''),
-      total: items.length,
+      total,
+      page: currentPage,
+      pageSize,
+      totalPages,
       items,
     };
   }
 
-  const items = context.terms
+  const allItems = context.terms
     .map((item) => ({
       raw: item,
       browserItem: buildBrowserTermItem(context, item),
@@ -625,6 +636,11 @@ function buildBrowserResult(context, options = {}) {
       const { searchEntry, searchFulltext, ...item } = browserItem;
       return item;
     });
+  const total = allItems.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * pageSize;
+  const items = allItems.slice(start, start + pageSize);
 
   return {
     ok: true,
@@ -634,7 +650,10 @@ function buildBrowserResult(context, options = {}) {
     mode,
     category,
     query: String(options.query || ''),
-    total: items.length,
+    total,
+    page: currentPage,
+    pageSize,
+    totalPages,
     items,
   };
 }

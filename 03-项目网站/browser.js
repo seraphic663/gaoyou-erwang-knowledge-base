@@ -7,18 +7,23 @@ const browserModeSelect = document.querySelector('#browserModeSelect');
 const browserSearchButton = document.querySelector('#browserSearchButton');
 const browserResetButton = document.querySelector('#browserResetButton');
 const browserSummary = document.querySelector('#browserSummary');
+const browserPresets = document.querySelector('#browserPresets');
 const browserList = document.querySelector('#browserList');
 const browserListSection = document.querySelector('#browserListSection');
 const browserSchemaSection = document.querySelector('#browserSchemaSection');
+const browserSchemaSummary = document.querySelector('#browserSchemaSummary');
 const browserStats = document.querySelector('#browserStats');
 const browserSchemaGrid = document.querySelector('#browserSchemaGrid');
 const browserHeroMeta = document.querySelector('#browserHeroMeta');
+const browserPagination = document.querySelector('#browserPagination');
 
 const state = {
   view: 'terms',
   category: 'all',
   mode: 'entry',
   query: '',
+  page: 1,
+  pageSize: 20,
   bootstrap: null,
 };
 
@@ -29,6 +34,10 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 async function requestJson(path) {
@@ -48,6 +57,36 @@ function summarizeText(value, maxLength = 88) {
     return text;
   }
   return `${text.slice(0, maxLength - 1)}…`;
+}
+
+function highlightText(text, keyword) {
+  const raw = String(text || '');
+  const query = String(keyword || '').trim();
+  if (!query) {
+    return escapeHtml(raw);
+  }
+
+  const pattern = new RegExp(`(${escapeRegExp(query)})`, 'ig');
+  return escapeHtml(raw).replace(pattern, '<mark class="match-mark">$1</mark>');
+}
+
+function buildMatchSnippet(candidates, keyword) {
+  const query = String(keyword || '').trim().toLowerCase();
+  if (!query) {
+    return '';
+  }
+
+  const matchSource = candidates.find((item) => String(item || '').toLowerCase().includes(query));
+  if (!matchSource) {
+    return '';
+  }
+
+  const source = String(matchSource).replace(/\s+/g, ' ').trim();
+  const matchIndex = source.toLowerCase().indexOf(query);
+  const start = Math.max(0, matchIndex - 20);
+  const end = Math.min(source.length, matchIndex + query.length + 24);
+  const snippet = `${start > 0 ? '…' : ''}${source.slice(start, end)}${end < source.length ? '…' : ''}`;
+  return highlightText(snippet, keyword);
 }
 
 function buildTermHref(id) {
@@ -70,6 +109,9 @@ function syncUrl() {
   if (state.query) {
     params.set('q', state.query);
   }
+  if (state.page > 1) {
+    params.set('page', String(state.page));
+  }
   history.replaceState(null, '', `./database.html?${params.toString()}`);
 }
 
@@ -79,6 +121,7 @@ function loadUrlState() {
   const category = params.get('category');
   const mode = params.get('mode');
   const query = params.get('q');
+  const page = Number.parseInt(params.get('page') || '', 10);
 
   if (view === 'cases' || view === 'schema') {
     state.view = view;
@@ -91,6 +134,9 @@ function loadUrlState() {
   }
   if (query) {
     state.query = query;
+  }
+  if (Number.isFinite(page) && page > 0) {
+    state.page = page;
   }
 }
 
@@ -205,15 +251,77 @@ function renderSidebar() {
 function renderSummary(result) {
   if (!browserSummary) return;
 
-  const viewLabel = state.view === 'cases' ? '案例整理' : state.view === 'schema' ? '结构总览' : '字词整理';
-  const modeLabel = state.mode === 'fulltext' ? '正文检索' : '条目检索';
   const categoryLabel = getCurrentCategories().find((item) => item.value === state.category)?.label || '全部';
 
   browserSummary.innerHTML = `
-    <span class="summary-pill">${escapeHtml(viewLabel)}</span>
-    <span class="summary-pill muted">${escapeHtml(categoryLabel)}</span>
-    <span class="summary-pill muted">${escapeHtml(modeLabel)}</span>
-    <span class="summary-pill muted">结果 ${escapeHtml(String(result.total || 0))}</span>
+    <div class="summary-row">
+      <div class="summary-block">
+        <span class="summary-label">浏览视图</span>
+        <div class="summary-group" aria-label="数据库视图">
+          <button class="summary-pill summary-pill-button${state.view === 'terms' ? ' active' : ''}" type="button" data-summary-view="terms">字词</button>
+          <button class="summary-pill summary-pill-button${state.view === 'cases' ? ' active' : ''}" type="button" data-summary-view="cases">考据案例</button>
+          <button class="summary-pill summary-pill-button${state.view === 'schema' ? ' active' : ''}" type="button" data-summary-view="schema">结构</button>
+        </div>
+      </div>
+      <div class="summary-block">
+        <span class="summary-label">检索方式</span>
+        <div class="summary-group" aria-label="检索方式">
+          <button class="summary-pill summary-pill-button${state.mode === 'entry' ? ' active' : ''}" type="button" data-summary-mode="entry">条目检索</button>
+          <button class="summary-pill summary-pill-button${state.mode === 'fulltext' ? ' active' : ''}" type="button" data-summary-mode="fulltext">正文检索</button>
+        </div>
+      </div>
+    </div>
+    <div class="summary-row summary-row-meta">
+      <span class="summary-pill muted">当前分类：${escapeHtml(categoryLabel)}</span>
+      <button class="summary-pill summary-pill-button muted" type="button" data-summary-action="result">结果：${escapeHtml(String(result.total || 0))} 条</button>
+    </div>
+  `;
+}
+
+function renderPagination(result) {
+  if (!browserPagination) return;
+
+  const total = Number(result.total || 0);
+  const totalPages = Number(result.totalPages || 1);
+  const currentPage = Number(result.page || 1);
+
+  if (state.view === 'schema' || totalPages <= 1) {
+    browserPagination.innerHTML = '';
+    browserPagination.hidden = true;
+    return;
+  }
+
+  const pageButtons = [];
+  const start = Math.max(1, currentPage - 2);
+  const end = Math.min(totalPages, currentPage + 2);
+
+  for (let page = start; page <= end; page += 1) {
+    pageButtons.push(`
+      <button class="pagination-button${page === currentPage ? ' active' : ''}" type="button" data-page="${page}">
+        ${escapeHtml(String(page))}
+      </button>
+    `);
+  }
+
+  browserPagination.hidden = false;
+  browserPagination.innerHTML = `
+    <div class="card pagination-card">
+      <div class="pagination-meta">
+        <span>每页 20 条</span>
+        <span>第 ${escapeHtml(String(currentPage))} / ${escapeHtml(String(totalPages))} 页</span>
+        <span>共 ${escapeHtml(String(total))} 条</span>
+      </div>
+      <div class="pagination-controls">
+        <button class="pagination-button" type="button" data-page-action="prev" ${currentPage <= 1 ? 'disabled' : ''}>上一页</button>
+        ${pageButtons.join('')}
+        <button class="pagination-button" type="button" data-page-action="next" ${currentPage >= totalPages ? 'disabled' : ''}>下一页</button>
+      </div>
+      <form id="browserPaginationForm" class="pagination-jump">
+        <label for="browserPageInput">页码</label>
+        <input id="browserPageInput" type="number" min="1" max="${escapeHtml(String(totalPages))}" value="${escapeHtml(String(currentPage))}" />
+        <button class="pagination-button" type="submit">跳转</button>
+      </form>
+    </div>
   `;
 }
 
@@ -238,6 +346,7 @@ function renderTermResults(items) {
             </div>
           </div>
           <p class="term-core">${escapeHtml(summarizeText(item.preview || item.coreMeaning || item.notes || '暂无摘要', 110))}</p>
+          ${state.query ? `<p class="match-note">匹配：${buildMatchSnippet([item.term, ...(item.aliases || []), item.coreMeaning, item.notes], state.query) || '当前卡片存在匹配'}</p>` : ''}
           <div class="term-footer">
             ${(item.relatedCases || [])
               .slice(0, 2)
@@ -276,6 +385,7 @@ function renderCaseResults(items) {
             ${(item.termNames || []).slice(0, 8).map((term) => `<span class="mini-chip">${escapeHtml(term)}</span>`).join('')}
           </div>
           <p class="case-summary">${escapeHtml(summarizeText(item.preview || item.conclusion || item.problem || '', 120))}</p>
+          ${state.query ? `<p class="match-note">匹配：${buildMatchSnippet([item.displayTitle, item.displaySubtitle, item.termLabel, ...(item.termNames || []), item.problem, item.conclusion, ...(item.evidenceQuotes || [])], state.query) || '当前卡片存在匹配'}</p>` : ''}
           <div class="case-footer">
             <p><strong>证据数量</strong><span>${escapeHtml(String(item.evidenceCount || 0))} 条</span></p>
             <p><strong>状态</strong><span>${escapeHtml(item.status || '未标注')}</span></p>
@@ -289,17 +399,48 @@ function renderCaseResults(items) {
     .join('');
 }
 
+function prepareSearchFromCurrentView() {
+  if (state.view !== 'schema') {
+    return;
+  }
+
+  state.view = 'terms';
+  state.category = 'all';
+  state.page = 1;
+}
+
+function applyPreset(trigger) {
+  state.view = trigger.getAttribute('data-preset-view') || 'terms';
+  state.mode = trigger.getAttribute('data-preset-mode') === 'fulltext' ? 'fulltext' : 'entry';
+  state.query = trigger.getAttribute('data-preset-query') || '';
+  state.category = trigger.getAttribute('data-preset-category') || 'all';
+  state.page = 1;
+
+  if (state.view === 'schema') {
+    state.mode = 'entry';
+    state.query = '';
+    state.category = 'all';
+  }
+}
+
 async function runBrowse() {
   renderSidebar();
 
   if (state.view === 'schema') {
     browserListSection.hidden = true;
     browserSchemaSection.hidden = false;
-    browserHeading.textContent = '最小必要数据库结构';
-    browserModeSelect.value = 'entry';
-    browserModeSelect.disabled = true;
-    browserSearchInput.value = '';
-    browserSearchInput.disabled = true;
+    if (browserPagination) {
+      browserPagination.innerHTML = '';
+      browserPagination.hidden = true;
+    }
+    browserHeading.textContent = '数据库结构';
+    browserModeSelect.disabled = false;
+    browserSearchInput.disabled = false;
+    browserModeSelect.value = state.mode;
+    browserSearchInput.value = state.query;
+    if (browserSchemaSummary && state.bootstrap?.counts) {
+      browserSchemaSummary.textContent = `展开数据库结构与统计（著作 ${state.bootstrap.counts.works || 0} / 词条 ${state.bootstrap.counts.terms || 0} / 案例 ${state.bootstrap.counts.cases || 0}）`;
+    }
     renderSummary({ total: (state.bootstrap?.stores || []).length });
     renderStats(state.bootstrap?.counts || {});
     renderSchema(state.bootstrap?.stores || []);
@@ -313,17 +454,21 @@ async function runBrowse() {
   browserSearchInput.value = state.query;
   browserListSection.hidden = false;
   browserSchemaSection.hidden = true;
-  browserHeading.textContent = state.view === 'cases' ? '考据案例整理结果' : '字词整理结果';
+  browserHeading.textContent = state.view === 'cases' ? '考据案例数据库' : '字词数据库';
 
   const params = new URLSearchParams({
     view: state.view,
     category: state.category,
     mode: state.mode,
     q: state.query,
+    page: String(state.page),
+    pageSize: String(state.pageSize),
   });
   const result = await requestJson(`/api/browser?${params.toString()}`);
+  state.page = Number(result.page || 1);
 
   renderSummary(result);
+  renderPagination(result);
   if (state.view === 'cases') {
     renderCaseResults(result.items || []);
   } else {
@@ -350,6 +495,7 @@ browserNav?.addEventListener('click', async (event) => {
 
   state.view = trigger.getAttribute('data-view') || 'terms';
   state.category = 'all';
+  state.page = 1;
   if (state.view === 'schema') {
     state.mode = 'entry';
     state.query = '';
@@ -363,6 +509,7 @@ browserFilters?.addEventListener('click', async (event) => {
   if (!trigger) return;
 
   state.category = trigger.getAttribute('data-category') || 'all';
+  state.page = 1;
   renderSidebar();
   await runBrowse();
 });
@@ -370,6 +517,8 @@ browserFilters?.addEventListener('click', async (event) => {
 browserSearchButton?.addEventListener('click', async () => {
   state.query = browserSearchInput?.value.trim() || '';
   state.mode = browserModeSelect?.value === 'fulltext' ? 'fulltext' : 'entry';
+  state.page = 1;
+  prepareSearchFromCurrentView();
   await runBrowse();
 });
 
@@ -377,7 +526,97 @@ browserResetButton?.addEventListener('click', async () => {
   state.category = 'all';
   state.mode = 'entry';
   state.query = '';
+  state.page = 1;
   renderSidebar();
+  await runBrowse();
+});
+
+browserPresets?.addEventListener('click', async (event) => {
+  const trigger = event.target.closest('[data-preset-view]');
+  if (!trigger) return;
+
+  applyPreset(trigger);
+  if (browserSearchInput) {
+    browserSearchInput.value = state.query;
+  }
+  if (browserModeSelect) {
+    browserModeSelect.value = state.mode;
+  }
+  await runBrowse();
+});
+
+browserSummary?.addEventListener('click', async (event) => {
+  const viewTrigger = event.target.closest('[data-summary-view]');
+  if (viewTrigger) {
+    state.view = viewTrigger.getAttribute('data-summary-view') || 'terms';
+    state.category = 'all';
+    state.page = 1;
+    if (state.view === 'schema') {
+      state.mode = 'entry';
+      state.query = '';
+    }
+    await runBrowse();
+    return;
+  }
+
+  const modeTrigger = event.target.closest('[data-summary-mode]');
+  if (modeTrigger) {
+    state.mode = modeTrigger.getAttribute('data-summary-mode') === 'fulltext' ? 'fulltext' : 'entry';
+    browserModeSelect.value = state.mode;
+    state.page = 1;
+    await runBrowse();
+    return;
+  }
+
+  const trigger = event.target.closest('[data-summary-action]');
+  if (!trigger) return;
+
+  const action = trigger.getAttribute('data-summary-action');
+  if (action === 'result') {
+    if (state.view === 'schema') {
+      browserSchemaSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      browserListSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+});
+
+browserPagination?.addEventListener('click', async (event) => {
+  const pageButton = event.target.closest('[data-page]');
+  if (pageButton) {
+    state.page = Number(pageButton.getAttribute('data-page')) || 1;
+    await runBrowse();
+    return;
+  }
+
+  const actionButton = event.target.closest('[data-page-action]');
+  if (!actionButton) return;
+
+  const action = actionButton.getAttribute('data-page-action');
+  if (action === 'prev' && state.page > 1) {
+    state.page -= 1;
+    await runBrowse();
+    return;
+  }
+
+  if (action === 'next') {
+    state.page += 1;
+    await runBrowse();
+  }
+});
+
+browserPagination?.addEventListener('submit', async (event) => {
+  const form = event.target.closest('#browserPaginationForm');
+  if (!form) return;
+
+  event.preventDefault();
+  const input = form.querySelector('#browserPageInput');
+  const nextPage = Number(input?.value || 1);
+  if (!Number.isFinite(nextPage) || nextPage < 1) {
+    return;
+  }
+
+  state.page = Math.floor(nextPage);
   await runBrowse();
 });
 
@@ -385,15 +624,17 @@ browserSearchInput?.addEventListener('keydown', async (event) => {
   if (event.key !== 'Enter') return;
   state.query = browserSearchInput?.value.trim() || '';
   state.mode = browserModeSelect?.value === 'fulltext' ? 'fulltext' : 'entry';
+  state.page = 1;
+  prepareSearchFromCurrentView();
   await runBrowse();
 });
 
 init().catch((error) => {
   if (browserStatus) {
-    browserStatus.textContent = '整理结果加载失败';
+    browserStatus.textContent = '数据库加载失败';
   }
   if (browserList) {
-    browserList.innerHTML = '<article class="card"><h3>无法读取整理结果</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
+    browserList.innerHTML = '<article class="card"><h3>无法读取数据库</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
   }
   console.error(error);
 });

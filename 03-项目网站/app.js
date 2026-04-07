@@ -225,8 +225,8 @@ function renderTerms(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部字词</h3>
-    <p>当前区域固定展示 5 个字词入口，完整列表请进入整理结果页继续查看。</p>
-    <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词整理结果</a>
+    <p>当前区域固定展示 5 个字词入口，完整列表请进入数据库页继续查看。</p>
+    <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词数据库</a>
   `;
   termList.appendChild(linkCard);
 }
@@ -291,8 +291,8 @@ function renderCases(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部案例</h3>
-    <p>当前区域固定展示 5 个案例预览，完整列表请进入整理结果页继续阅读。</p>
-    <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例整理结果</a>
+    <p>当前区域固定展示 5 个案例预览，完整列表请进入数据库页继续阅读。</p>
+    <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例数据库</a>
   `;
   caseList.appendChild(linkCard);
 }

@@ -101,6 +101,8 @@ function createServer() {
           category: parsedUrl.query.category,
           mode: parsedUrl.query.mode,
           query: parsedUrl.query.q || '',
+          page: parsedUrl.query.page,
+          pageSize: parsedUrl.query.pageSize,
         }));
       }
 
