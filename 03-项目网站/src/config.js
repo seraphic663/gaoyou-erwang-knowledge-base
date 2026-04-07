@@ -67,6 +67,6 @@ module.exports = {
   SOURCE_MODE: resolveSourceMode(),
   DEMO_DB_FILE: path.join(DATA_DIR, 'demo-db.json'),
   SQLITE_SNAPSHOT_FILE: path.join(DATA_DIR, 'sqlite-snapshot.json'),
-  SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, '大创', 'data2', 'dictionary.db'),
+  SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data2', 'dictionary.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
 };

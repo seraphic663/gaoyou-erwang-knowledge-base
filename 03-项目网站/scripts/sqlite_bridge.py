@@ -2,7 +2,7 @@
 """
 sqlite_bridge.py
 
-将 大创/data2/dictionary.db 规范化为网站后端可直接消费的五表快照。
+将 02-数据库/data2/dictionary.db 规范化为网站后端可直接消费的五表快照。
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-DB_FILE = WORKSPACE_ROOT / "大创" / "data2" / "dictionary.db"
+DB_FILE = WORKSPACE_ROOT / "02-数据库" / "data2" / "dictionary.db"
 SNAPSHOT_FILE = WORKSPACE_ROOT / "03-项目网站" / "data" / "sqlite-snapshot.json"
 
 
