@@ -70,7 +70,7 @@ function splitItems(items, visibleCount) {
 function renderQuickSearch(bootstrap) {
   if (!searchQuick) return;
 
-  const fixedKeywords = ['害澣害否', '曷', '葛覃', '始', '通假', '因声求义', '义证'];
+  const fixedKeywords = ['曷', '始', '通假', '因声求义', '义证', '莫莫', '皇皇'];
   const sampleKeywords = (bootstrap?.sampleTerms || [])
     .map((item) => item.term)
     .filter(Boolean)
