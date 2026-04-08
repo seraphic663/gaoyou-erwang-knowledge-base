@@ -437,7 +437,7 @@ select {
 }
 
 .section-head {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .section {
@@ -516,6 +516,7 @@ h2 {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  margin-bottom: 22px;
 }
 
 #searchInput {
@@ -533,10 +534,34 @@ h2 {
   box-shadow: 0 0 0 4px rgba(165, 77, 42, 0.08);
 }
 
+#browserSearchInput,
+#browserModeSelect {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(84, 58, 30, 0.18);
+  outline: none;
+  background: rgba(253, 249, 240, 0.94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
+  color: var(--ink);
+}
+
+#browserSearchInput:focus,
+#browserModeSelect:focus {
+  border-color: rgba(165, 77, 42, 0.42);
+  box-shadow: 0 0 0 4px rgba(165, 77, 42, 0.08);
+}
+
 .search-panel {
   display: grid;
   gap: 12px;
   margin-top: 18px;
+}
+
+.search-shortcuts {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .search-bar {
@@ -668,6 +693,10 @@ h2 {
 .result-head h3 {
   margin: 0;
   font-size: 20px;
+}
+
+.search-result-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .stats-grid {
@@ -1515,6 +1544,7 @@ h2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+  margin-top: 24px;
 }
 
 .case-step-card {
@@ -1659,6 +1689,10 @@ h2 {
   .case-step-grid,
   .knowledge-grid,
   .case-structure-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .search-result-grid {
     grid-template-columns: 1fr;
   }
 

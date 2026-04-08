@@ -23,6 +23,10 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function buildTermHref(id) {
   return `./term.html?id=${encodeURIComponent(String(id))}`;
 }
@@ -60,6 +64,36 @@ function summarizeText(value, maxLength = 88) {
   return `${text.slice(0, maxLength - 1)}…`;
 }
 
+function highlightText(text, keyword) {
+  const raw = String(text || '');
+  const query = String(keyword || '').trim();
+  if (!query) {
+    return escapeHtml(raw);
+  }
+
+  const pattern = new RegExp(`(${escapeRegExp(query)})`, 'ig');
+  return escapeHtml(raw).replace(pattern, '<mark class="match-mark">$1</mark>');
+}
+
+function buildMatchSnippet(candidates, keyword) {
+  const query = String(keyword || '').trim().toLowerCase();
+  if (!query) {
+    return '';
+  }
+
+  const matchSource = candidates.find((item) => String(item || '').toLowerCase().includes(query));
+  if (!matchSource) {
+    return '';
+  }
+
+  const source = String(matchSource).replace(/\s+/g, ' ').trim();
+  const matchIndex = source.toLowerCase().indexOf(query);
+  const start = Math.max(0, matchIndex - 20);
+  const end = Math.min(source.length, matchIndex + query.length + 24);
+  const snippet = `${start > 0 ? '…' : ''}${source.slice(start, end)}${end < source.length ? '…' : ''}`;
+  return highlightText(snippet, keyword);
+}
+
 function splitItems(items, visibleCount) {
   return {
     visible: items.slice(0, visibleCount),
@@ -70,7 +104,7 @@ function splitItems(items, visibleCount) {
 function renderQuickSearch(bootstrap) {
   if (!searchQuick) return;
 
-  const fixedKeywords = ['曷', '始', '通假', '因声求义', '义证', '莫莫', '皇皇'];
+  const fixedKeywords = ['周', '取', '通假', '古文', '章句', '广雅疏证', '曷', '始', '皇皇'];
   const sampleKeywords = (bootstrap?.sampleTerms || [])
     .map((item) => item.term)
     .filter(Boolean)
@@ -161,9 +195,7 @@ function renderSearchSummary(result) {
   const summary = query ? `检索“${escapeHtml(query)}”` : '默认预览';
 
   searchSummary.innerHTML = `
-    <span class="summary-pill">${summary}</span>
-    <span class="summary-pill muted">字词 ${escapeHtml(String(termTotal))}</span>
-    <span class="summary-pill muted">案例 ${escapeHtml(String(caseTotal))}</span>
+    <span class="summary-pill">${summary} · 字词 ${escapeHtml(String(termTotal))} · 案例 ${escapeHtml(String(caseTotal))}</span>
   `;
 }
 
@@ -177,7 +209,7 @@ function renderTerms(result, query = '') {
     return;
   }
 
-  const visibleCount = 5;
+  const visibleCount = 3;
   const groups = splitItems(items, visibleCount);
   const renderTermCard = (item) => {
     const meta = [item.termType, item.category].filter(Boolean);
@@ -209,6 +241,7 @@ function renderTerms(result, query = '') {
         </div>
       </div>
       <p class="term-core">${escapeHtml(summarizeText(item.coreMeaning || item.notes || '暂无释义摘要', 72))}</p>
+      ${query ? `<p class="match-note">匹配：${buildMatchSnippet([item.term, ...(item.aliases || []), item.coreMeaning, item.notes], query) || '当前卡片存在匹配'}</p>` : ''}
       ${aliases ? `<div class="mini-chip-list">${aliases}</div>` : ''}
       ${relatedCases ? `<div class="term-footer">${relatedCases}</div>` : ''}
       ${extraCaseCount ? `<p class="compact-note">其余 ${escapeHtml(String(extraCaseCount))} 条案例请进入详情页查看。</p>` : ''}
@@ -225,7 +258,7 @@ function renderTerms(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部字词</h3>
-    <p>当前区域固定展示 5 个字词入口，完整列表请进入数据库页继续查看。</p>
+    <p>当前区域固定展示 3 个字词入口，完整列表请进入数据库页继续查看。</p>
     <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词数据库</a>
   `;
   termList.appendChild(linkCard);
@@ -241,7 +274,7 @@ function renderCases(result, query = '') {
     return;
   }
 
-  const visibleCount = 5;
+  const visibleCount = 3;
   const groups = splitItems(items, visibleCount);
   const renderCaseCard = (item) => {
     const visibleTerms = (item.termNames || []).slice(0, 6);
@@ -269,6 +302,7 @@ function renderCases(result, query = '') {
       ${termMembers ? `<div class="case-members">${termMembers}</div>` : ''}
       ${extraTerms ? `<p class="compact-note">另有 ${escapeHtml(String(extraTerms))} 个相关字词，进入详情页展开。</p>` : ''}
       <p class="case-summary">${escapeHtml(summaryText)}</p>
+      ${query ? `<p class="match-note">匹配：${buildMatchSnippet([item.displayTitle, item.displaySubtitle, item.termLabel, ...(item.termNames || []), item.problem, item.conclusion, ...(item.evidenceQuotes || [])], query) || '当前卡片存在匹配'}</p>` : ''}
       <div class="case-meta">
         <p><strong>二王出处</strong><span>${escapeHtml(item.erwangWorkTitle || '未录入')}${item.erwangLocation ? ` · ${escapeHtml(item.erwangLocation)}` : ''}</span></p>
         <p><strong>原始文本</strong><span>${escapeHtml(item.targetWorkTitle || '暂未关联原始经典')}${item.targetLocation ? ` · ${escapeHtml(item.targetLocation)}` : ''}</span></p>
@@ -291,7 +325,7 @@ function renderCases(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部案例</h3>
-    <p>当前区域固定展示 5 个案例预览，完整列表请进入数据库页继续阅读。</p>
+    <p>当前区域固定展示 3 个案例预览，完整列表请进入数据库页继续阅读。</p>
     <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例数据库</a>
   `;
   caseList.appendChild(linkCard);
@@ -310,7 +344,7 @@ async function loadBootstrap() {
     dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
   }
   if (searchInput) {
-    searchInput.placeholder = `输入字词、方法词或片段：如 始 / 犹豫 / 不我知（当前词条 ${bootstrap.counts.terms} 条）`;
+    searchInput.placeholder = '输入字词、方法词或片段：如 周 / 取 / 通假';
   }
 }
 
