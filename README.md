@@ -40,7 +40,7 @@ http://localhost:3000
 
 网站现在默认优先读取 `03-项目网站/data/sqlite-snapshot.json`。
 
-如果你更新了 `02-数据库/data2/dictionary.db`，在仓库根目录执行：
+如果你更新了 `02-数据库/data/dictionary.db`，在仓库根目录执行：
 
 ```bash
 npm run sync:sqlite
@@ -112,4 +112,4 @@ npm start
 - 已将数据库设计文档与数据加工脚本收口到 `02-数据库/`
 - 已将旧 Flask 界面、旧样例脚本与旧数据库移出当前主链路
 - 当前主链路明确为：
-  `02-数据库/data2/dictionary.db` -> `npm run sync:sqlite` -> `03-项目网站/data/sqlite-snapshot.json` -> `npm start`
+  `02-数据库/data/dictionary.db` -> `npm run sync:sqlite` -> `03-项目网站/data/sqlite-snapshot.json` -> `npm start`

@@ -112,9 +112,9 @@ http://localhost:3000/api/bootstrap
 26大创/
 ├─ 02-数据库/
 │  ├─ 数据库.md
-│  ├─ parser2.py / parsed_full.py / bulk_importer.py / db2.py
+│  ├─ parser.py / parsed_data.py / bulk_importer.py / database.py
 │  ├─ source.txt
-│  └─ data2/
+│  └─ data/
 │     └─ dictionary.db
 ├─ 03-项目网站/
 │  ├─ index.html / database.html / term.html / case.html
@@ -132,7 +132,7 @@ http://localhost:3000/api/bootstrap
 
 当前网站后端已经改为“统一数据源接口”，默认优先接入由 SQLite 实库导出的统一快照：
 
-- `02-数据库/data2/dictionary.db`：真实 SQLite 数据源
+- `02-数据库/data/dictionary.db`：真实 SQLite 数据源
 - `03-项目网站/data/sqlite-snapshot.json`：由 Python 脚本导出的统一快照
 - `03-项目网站/data/demo-db.json`：回退用 Demo 数据源
 

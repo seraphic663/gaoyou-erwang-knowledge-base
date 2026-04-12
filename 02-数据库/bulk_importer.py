@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-bulk_importer.py — 批量导入 parsed_full.py 数据到 SQLite
+bulk_importer.py — 批量导入 parsed_data.py 数据到 SQLite
 用法：
   python bulk_importer.py          # 完整导入（重建数据库）
   python bulk_importer.py --dry-run  # 仅打印统计，不写入
@@ -13,10 +13,10 @@ try:
 except Exception:
     pass
 
-# ── 加载 parsed_full.py ───────────────────────────────────────────────
-PF = Path(__file__).parent / "parsed_full.py"
+# ── 加载 parsed_data.py ───────────────────────────────────────────────
+PF = Path(__file__).parent / "parsed_data.py"
 if not PF.exists():
-    sys.exit("[ERROR] parsed_full.py not found. Run parser2.py first.")
+    sys.exit("[ERROR] parsed_data.py not found. Run parser.py first.")
 _ns = {}
 with open(PF, encoding="utf-8") as f:
     exec(f.read(), _ns)
@@ -26,7 +26,7 @@ EVIDENCES = _ns.get("EVIDENCES_DEF", [])
 SKIP_LOG  = _ns.get("SKIP_LOG", [])
 
 # ── DB ────────────────────────────────────────────────────────────────
-import db2
+import database
 
 EV_TYPE_MAP = {
     "书证": "书证", "声训": "声训", "义证": "义证",
@@ -111,7 +111,7 @@ def import_all(dry=False):
 
     if not dry:
         print("[1/5] Reset DB...")
-        db2.reset()
+        database.reset()
 
     # ── 2. WORKS ──────────────────────────────────────────────
     wmap = {}
@@ -130,7 +130,7 @@ def import_all(dry=False):
         if dry:
             print(f"  work: {title}")
         else:
-            wid = db2.upsert_work(title, author, wtype, dynasty, tnote, notes)
+            wid = database.upsert_work(title, author, wtype, dynasty, tnote, notes)
             wmap[title] = wid
             if row[0]:
                 wmap[str(row[0])] = wid
@@ -160,7 +160,7 @@ def import_all(dry=False):
                 print(f"  term: {term} type={ttype} cat={cat}")
         else:
             try:
-                tid = db2.insert_term(
+                tid = database.insert_term(
                     term=term, term_type=ttype,
                     category=cat or "同义实词",
                     aliases=als if isinstance(als, list) else [],
@@ -168,7 +168,7 @@ def import_all(dry=False):
                 )
                 tmap[term] = tid
             except Exception:
-                rows = db2.search_terms(term, limit=1)
+                rows = database.search_terms(term, limit=1)
                 if rows:
                     tmap[term] = rows[0]["id"]
     print(f"  -> {len(tmap)} terms (bad: {bad_t})")
@@ -179,7 +179,7 @@ def import_all(dry=False):
     ev_meta: dict[tuple, str] = {}  # (term_char, line_no) → gloss
     ev_src_lines: list = []
     ev_start_found = False
-    pf_src = open(Path(__file__).parent / "parsed_full.py", encoding="utf-8")
+    pf_src = open(Path(__file__).parent / "parsed_data.py", encoding="utf-8")
     for raw_line in pf_src:
         if "EVIDENCES_DEF = [" in raw_line:
             ev_start_found = True
@@ -211,7 +211,7 @@ def import_all(dry=False):
         if dry:
             print(f"  case: line={line_no} gloss={gloss} terms={len(tids)}")
         else:
-            cid = db2.insert_case(
+            cid = database.insert_case(
                 title=gloss_title, section_title="释诂",
                 volume_title="广雅疏证卷第一上", term_ids=tids,
                 problem=gloss_problem,
@@ -224,7 +224,7 @@ def import_all(dry=False):
                 tid = tmap.get(tc)
                 if not tid:
                     continue
-                ex = db2.get_term_by_id(tid)
+                ex = database.get_term_by_id(tid)
                 if not ex:
                     continue
                 try:
@@ -233,7 +233,7 @@ def import_all(dry=False):
                     cids = []
                 if cid not in cids:
                     cids.append(cid)
-                    db2.update_term_case_ids(tid, cids)
+                    database.update_term_case_ids(tid, cids)
         ncases += 1
     print(f"  -> {ncases} cases")
 
@@ -250,7 +250,7 @@ def import_all(dry=False):
         qt   = (row[3] or "")[:500]
         cs   = (row[4] or "")[:200]
         note = (row[5] or "")[:200]
-        # row[6] 是 line_no（新增字段，parser2.py 写入）
+        # row[6] 是 line_no（新增字段，parser.py 写入）
         ev_line_no = row[6] if len(row) > 6 else 0
         # 从 entry_key_terms 找该行(ln, gloss)对应的 case_id
         key_cid = None
@@ -268,7 +268,7 @@ def import_all(dry=False):
             ev_ok += 1
             continue
         try:
-            db2.insert_evidence(
+            database.insert_evidence(
                 case_id=cid, term_id=tid, evidence_type=et,
                 work_id=wid, quote_text=qt,
                 core_snippet=cs, note=note,
@@ -278,7 +278,7 @@ def import_all(dry=False):
             ev_bad += 1
     print(f"  -> {ev_ok} inserted (bad: {ev_bad})")
 
-    st = db2.stats()
+    st = database.stats()
     print()
     print("=" * 50)
     print("  DONE")
