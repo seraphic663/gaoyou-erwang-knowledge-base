@@ -16,9 +16,5 @@ note/
 ~$*.docx
 **/cloudflared.exe
 
-# ---- Large literature files: keep out of git ----
-05-项目文献/**
-!05-项目文献/README.md
-
 # ---- Optional local generated data (uncomment if needed) ----
 # 03-项目网站/data/*.bak
