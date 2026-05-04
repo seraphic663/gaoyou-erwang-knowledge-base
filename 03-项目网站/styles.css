@@ -68,8 +68,7 @@ body::before {
     radial-gradient(circle at 82% 24%, rgba(165, 77, 42, 0.18), transparent 18%),
     linear-gradient(135deg, #2d2117, #59402a 56%, #866449);
   color: #f8f0df;
-  padding-bottom: 48px;
-  min-height: 88vh;
+  padding-bottom: clamp(28px, 5vw, 52px);
   box-shadow: inset 0 -18px 40px rgba(49, 29, 12, 0.16);
 }
 
@@ -81,18 +80,18 @@ body::before {
     radial-gradient(circle at 84% 22%, rgba(165, 77, 42, 0.14), transparent 24%),
     linear-gradient(135deg, #38281c, #5f4630 60%, #8a6847);
   color: #f8f0df;
-  padding-bottom: 40px;
+  padding-bottom: 32px;
   box-shadow: inset 0 -16px 32px rgba(49, 29, 12, 0.14);
 }
 
 .nav {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 22px 20px 18px;
+  padding: 18px 20px 14px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
 }
 
@@ -151,25 +150,38 @@ body::before {
 
 .hero-content {
   max-width: 1100px;
-  margin: 20px auto 0;
+  margin: 16px auto 0;
   padding: 0 20px;
   position: relative;
   z-index: 1;
 }
 
+.subhero .hero-content {
+  display: grid;
+  gap: 14px;
+}
+
+.subhero h1 {
+  margin: 8px 0;
+}
+
+.subhero .hero-panel {
+  margin-top: 0;
+}
+
 .hero-stage {
   display: grid;
-  gap: 32px;
+  gap: 26px;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
   align-items: start;
-  padding-bottom: 40px;
+  padding-bottom: 18px;
 }
 
 .hero-copy-col {
   display: grid;
-  gap: 18px;
+  gap: 14px;
   align-content: start;
-  padding: 32px;
+  padding: 28px;
   border-radius: 28px;
   border: 1px solid rgba(248, 238, 220, 0.16);
   background:
@@ -298,8 +310,8 @@ select {
 
 .showcase-shell {
   display: grid;
-  gap: 18px;
-  padding: 24px;
+  gap: 16px;
+  padding: 22px;
   border-radius: 30px;
   background:
     linear-gradient(180deg, rgba(254, 248, 236, 0.98), rgba(242, 231, 213, 0.96)),
@@ -334,7 +346,7 @@ select {
 .showcase-main,
 .showcase-feature {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .showcase-head {
@@ -449,7 +461,7 @@ select {
 .showcase-feature {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 22px;
   background: linear-gradient(180deg, rgba(248, 239, 223, 0.82), rgba(241, 230, 210, 0.82));
   border: 1px solid rgba(86, 60, 33, 0.14);
@@ -488,13 +500,13 @@ select {
 }
 
 .section-head {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .section {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 58px 20px;
+  padding: clamp(34px, 4.4vw, 42px) 20px;
   position: relative;
 }
 
@@ -514,7 +526,7 @@ h2 {
 
 .grid {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .grid-2 {
@@ -525,7 +537,7 @@ h2 {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 20px;
-  padding: 20px;
+  padding: 18px;
   box-shadow: var(--paper-shadow);
   backdrop-filter: blur(5px);
   transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
@@ -553,22 +565,22 @@ h2 {
 
 .card h3 {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-size: 20px;
 }
 
 .head-line {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 #searchInput {
   width: min(420px, 100%);
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(84, 58, 30, 0.18);
   outline: none;
@@ -584,7 +596,7 @@ h2 {
 #browserSearchInput,
 #browserModeSelect {
   width: 100%;
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(84, 58, 30, 0.18);
   outline: none;
@@ -601,19 +613,19 @@ h2 {
 
 .search-panel {
   display: grid;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .search-shortcuts {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .search-bar {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   flex-wrap: wrap;
 }
@@ -623,7 +635,7 @@ h2 {
   background: rgba(253, 249, 240, 0.92);
   color: var(--sub);
   border-radius: 999px;
-  padding: 10px 14px;
+  padding: 9px 13px;
   cursor: pointer;
 }
 
@@ -650,7 +662,7 @@ h2 {
 }
 
 .db-status {
-  margin: 12px 0 16px;
+  margin: 8px 0 12px;
   color: var(--jade);
   font-size: 14px;
 }
@@ -666,13 +678,13 @@ h2 {
 
 .search-summary {
   display: grid;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .summary-row {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   flex-wrap: wrap;
   align-items: flex-start;
 }
@@ -733,8 +745,8 @@ h2 {
 }
 
 .result-head {
-  margin-top: 28px;
-  margin-bottom: 14px;
+  margin-top: 22px;
+  margin-bottom: 10px;
 }
 
 .result-head h3 {
@@ -748,16 +760,16 @@ h2 {
 
 .stats-grid {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .stat-card {
   background: var(--card-strong);
   border: 1px solid var(--line);
   border-radius: 18px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   box-shadow: 0 10px 24px rgba(71, 46, 20, 0.06);
 }
 
@@ -932,22 +944,22 @@ h2 {
 
 .detail-layout {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .detail-stack {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .detail-focus-card {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .detail-focus-top {
   display: flex;
-  gap: 18px;
+  gap: 14px;
   align-items: flex-start;
 }
 
@@ -967,7 +979,7 @@ h2 {
 
 .detail-focus-copy {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .detail-lead,
@@ -978,17 +990,17 @@ h2 {
 
 .detail-card-grid {
   display: grid;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .detail-card {
-  padding: 16px;
+  padding: 14px;
 }
 
 .detail-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .detail-list p,
@@ -1008,7 +1020,7 @@ h2 {
 
 .detail-block {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .detail-block h3 {
@@ -1024,7 +1036,7 @@ h2 {
 }
 
 .inline-fold {
-  margin-top: 14px;
+  margin-top: 10px;
   background: rgba(252, 247, 238, 0.82);
 }
 
@@ -1034,19 +1046,19 @@ h2 {
 
 .result-grid {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .result-link-card {
   display: grid;
-  gap: 12px;
+  gap: 10px;
   align-content: center;
 }
 
 .browser-layout {
   display: grid;
-  gap: 18px;
+  gap: 14px;
   grid-template-columns: 280px minmax(0, 1fr);
 }
 
@@ -1054,7 +1066,7 @@ h2 {
 .browser-main,
 .browser-panel {
   display: grid;
-  gap: 18px;
+  gap: 14px;
 }
 
 .browser-sidebar {
@@ -1066,13 +1078,13 @@ h2 {
 .sidebar-card,
 .browser-toolbar {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .sidebar-nav,
 .sidebar-filter-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .sidebar-empty {
@@ -1086,7 +1098,7 @@ h2 {
   background: rgba(252, 247, 238, 0.88);
   color: var(--ink);
   border-radius: 16px;
-  padding: 10px 12px;
+  padding: 9px 12px;
   text-align: left;
   cursor: pointer;
 }
@@ -1107,13 +1119,13 @@ h2 {
 
 .browser-search-grid {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.8fr);
 }
 
 .toolbar-field {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .toolbar-field span {
@@ -1123,7 +1135,7 @@ h2 {
 
 .toolbar-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -1141,7 +1153,7 @@ h2 {
 
 .browser-preset-list {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -1150,7 +1162,7 @@ h2 {
   background: rgba(253, 249, 240, 0.94);
   color: var(--ink);
   border-radius: 999px;
-  padding: 10px 14px;
+  padding: 9px 13px;
   cursor: pointer;
   font: inherit;
   text-align: left;
@@ -1167,14 +1179,14 @@ h2 {
 
 .pagination-card {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .pagination-meta,
 .pagination-controls,
 .pagination-jump {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
   align-items: center;
 }
@@ -1217,7 +1229,7 @@ h2 {
 .fold-card summary {
   cursor: pointer;
   list-style: none;
-  padding: 16px 18px;
+  padding: 14px 16px;
   font-weight: 700;
 }
 
@@ -1237,12 +1249,12 @@ h2 {
 }
 
 .fold-body {
-  padding: 0 18px 18px;
+  padding: 0 16px 16px;
 }
 
 .evidence-card {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .term-nav-chip {
@@ -1266,7 +1278,7 @@ h2 {
   align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 
@@ -1288,20 +1300,20 @@ h2 {
 }
 
 .case-subtitle {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: var(--sub);
 }
 
 .case-summary {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
 }
 
 .case-meta,
 .case-body,
 .case-footer {
   display: grid;
-  gap: 10px;
-  margin-top: 14px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .case-meta {
@@ -1333,7 +1345,7 @@ h2 {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .quote-chip {
@@ -1347,14 +1359,14 @@ h2 {
 }
 
 .flow-note {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   color: var(--sub);
   max-width: 860px;
 }
 
 .flow-placeholder {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .flow-placeholder-box {
@@ -1384,7 +1396,7 @@ h2 {
 .flow-figure {
   margin: 0;
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .flow-figure img {
@@ -1397,7 +1409,7 @@ h2 {
 
 .flow-figure figcaption {
   color: var(--sub);
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
 .flow-figure figcaption p {
@@ -1405,13 +1417,13 @@ h2 {
 }
 
 .flow-figure figcaption p + p {
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
 .flow-diagram {
   display: grid;
-  gap: 14px;
-  padding: 20px;
+  gap: 12px;
+  padding: 18px;
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(252, 247, 238, 0.94), rgba(244, 236, 221, 0.9));
   border: 1px solid var(--line);
@@ -1420,7 +1432,7 @@ h2 {
 
 .flow-branch {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -1431,7 +1443,7 @@ h2 {
 .flow-node {
   position: relative;
   border-radius: 16px;
-  padding: 16px 14px;
+  padding: 14px 12px;
   color: #fff;
   font-weight: 700;
   text-align: center;
@@ -1439,7 +1451,7 @@ h2 {
 }
 
 .flow-node.large {
-  padding: 18px 14px;
+  padding: 16px 12px;
   font-size: 20px;
 }
 
@@ -1478,7 +1490,7 @@ h2 {
 .footer {
   text-align: center;
   color: var(--sub);
-  padding: 26px 20px 34px;
+  padding: 22px 20px 28px;
   font-size: 13px;
 }
 
@@ -1526,8 +1538,8 @@ h2 {
 .case-study-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 18px;
-  margin-bottom: 18px;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .case-quote-card,
@@ -1542,7 +1554,7 @@ h2 {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .case-quote p {
@@ -1559,12 +1571,12 @@ h2 {
 .case-structure-flow {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-  margin: 18px 0;
+  gap: 8px;
+  margin: 14px 0;
 }
 
 .case-structure-flow span {
-  padding: 12px 10px;
+  padding: 10px 8px;
   border-radius: 14px;
   border: 1px solid rgba(160, 90, 58, 0.24);
   background: rgba(255, 248, 238, 0.88);
@@ -1576,15 +1588,28 @@ h2 {
 .case-step-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 24px;
+  gap: 14px;
+  margin-top: 18px;
 }
 
 .case-step-card {
   min-height: 100%;
   display: grid;
   align-content: start;
-  gap: 10px;
+  gap: 8px;
+}
+
+.case-step-card h3 {
+  margin-bottom: 8px;
+}
+
+.case-step-card p {
+  margin: 0;
+  line-height: 1.75;
+}
+
+.case-step-card p + p {
+  margin-top: 6px;
 }
 
 .case-step-card-wide {
@@ -1602,32 +1627,28 @@ h2 {
   color: var(--accent-deep);
   font-size: 18px;
   font-weight: 800;
-  margin-bottom: 14px;
+  margin-bottom: 8px;
 }
 
 .case-step-list {
   margin: 0;
   padding-left: 18px;
   display: grid;
-  gap: 10px;
+  gap: 8px;
   color: var(--muted);
-}
-
-.knowledge-hero .hero-content {
-  gap: 18px;
 }
 
 .knowledge-anchor-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
 }
 
 .knowledge-anchor-chip {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 8px;
+  padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(160, 90, 58, 0.24);
   background: rgba(255, 248, 238, 0.78);
@@ -1641,7 +1662,7 @@ h2 {
 
 .knowledge-shell {
   display: grid;
-  gap: 36px;
+  gap: 26px;
 }
 
 .knowledge-section-meta {
@@ -1653,14 +1674,14 @@ h2 {
 .knowledge-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 14px;
 }
 
 .glossary-card-head {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .glossary-card-head h3 {
@@ -1682,7 +1703,7 @@ h2 {
 .glossary-definition {
   margin: 0;
   color: var(--muted);
-  line-height: 1.9;
+  line-height: 1.75;
 }
 
 @media (max-width: 700px) {

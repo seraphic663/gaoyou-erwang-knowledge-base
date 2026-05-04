@@ -98,7 +98,7 @@ function renderTermDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = payload.sourceLabel ? `统一数据库来源：${payload.sourceLabel}；当前为字词记录视图` : '';
+    detailStatus.textContent = payload.sourceLabel ? `数据库来源：${payload.sourceLabel}` : '';
   }
 
   const aliasList = (payload.aliases || [])
@@ -171,8 +171,7 @@ function renderTermDetail(payload) {
 
       <div class="grid grid-2">
         <article class="card">
-          <h3>同库关联案例</h3>
-          <p class="compact-note">这些案例不是另一个数据库，而是同一专题数据库中与本字词关联的案例记录。</p>
+          <h3>关联案例</h3>
           <div class="detail-card-grid">${relatedCaseGroups.visible.join('') || '<p class="compact-note">暂无关联案例。</p>'}</div>
           ${relatedCaseGroups.hidden.length ? `
             <details class="fold-card inline-fold">
@@ -184,8 +183,7 @@ function renderTermDetail(payload) {
           ` : ''}
         </article>
         <article class="card">
-          <h3>同库证据概况</h3>
-          <p class="compact-note">证据记录与字词、案例同库保存，详细引文放在下方。</p>
+          <h3>证据概况</h3>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
@@ -195,7 +193,6 @@ function renderTermDetail(payload) {
         <summary>证据摘录</summary>
         <div class="fold-body detail-card-grid">
           ${evidences || '<p class="compact-note">暂无证据摘录。</p>'}
-          ${payload.evidencesTruncated ? '<p class="compact-note">更多证据保留在数据层，当前页不继续堆叠。</p>' : ''}
         </div>
       </details>
     </section>
@@ -217,7 +214,7 @@ function renderCaseDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = payload.sourceLabel ? `统一数据库来源：${payload.sourceLabel}；当前为案例记录视图` : '';
+    detailStatus.textContent = payload.sourceLabel ? `数据库来源：${payload.sourceLabel}` : '';
   }
 
   const evidenceTypeList = (payload.evidenceTypes || [])
@@ -255,7 +252,6 @@ function renderCaseDetail(payload) {
             ${item.termName ? `<a class="tag muted inline-tag-link" href="${buildTermHref(item.termId)}">${escapeHtml(item.termName)}</a>` : ''}
           </div>
           <p class="detail-paragraph">${escapeHtml(summarizeText(item.snippet || item.quoteText || '暂无摘录', 180))}</p>
-          ${item.quoteText && item.quoteText !== item.snippet ? `<p class="compact-note">摘录已压缩，完整引文见下方折叠区。</p>` : ''}
           <details class="fold-card">
             <summary>展开引文与备注</summary>
             <div class="fold-body">
@@ -310,8 +306,7 @@ function renderCaseDetail(payload) {
           </div>
         </article>
         <article class="card">
-          <h3>同库证据概况</h3>
-          <p class="compact-note">这里汇总同一专题数据库中支撑本案例的证据类型与涉及文献。</p>
+          <h3>证据概况</h3>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
@@ -328,7 +323,6 @@ function renderCaseDetail(payload) {
         <summary>证据链</summary>
         <div class="fold-body detail-card-grid">
           ${evidences || '<p class="compact-note">暂无证据链条。</p>'}
-          ${payload.evidencesTruncated ? '<p class="compact-note">更多证据保留在数据层，当前页不继续堆叠。</p>' : ''}
         </div>
       </details>
     </section>

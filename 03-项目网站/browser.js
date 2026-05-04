@@ -256,8 +256,8 @@ function renderSummary(result) {
   browserSummary.innerHTML = `
     <div class="summary-row">
       <div class="summary-block">
-        <span class="summary-label">同库视角</span>
-        <div class="summary-group" aria-label="统一数据库视角">
+        <span class="summary-label">浏览内容</span>
+        <div class="summary-group" aria-label="数据库视图">
           <button class="summary-pill summary-pill-button${state.view === 'terms' ? ' active' : ''}" type="button" data-summary-view="terms">字词索引</button>
           <button class="summary-pill summary-pill-button${state.view === 'cases' ? ' active' : ''}" type="button" data-summary-view="cases">案例索引</button>
           <button class="summary-pill summary-pill-button${state.view === 'schema' ? ' active' : ''}" type="button" data-summary-view="schema">结构总览</button>
@@ -433,13 +433,13 @@ async function runBrowse() {
       browserPagination.innerHTML = '';
       browserPagination.hidden = true;
     }
-    browserHeading.textContent = '统一数据库结构';
+    browserHeading.textContent = '数据库结构';
     browserModeSelect.disabled = false;
     browserSearchInput.disabled = false;
     browserModeSelect.value = state.mode;
     browserSearchInput.value = state.query;
     if (browserSchemaSummary && state.bootstrap?.counts) {
-      browserSchemaSummary.textContent = `展开统一数据库结构与统计（著作 ${state.bootstrap.counts.works || 0} / 词条 ${state.bootstrap.counts.terms || 0} / 案例 ${state.bootstrap.counts.cases || 0}）`;
+      browserSchemaSummary.textContent = `展开数据库结构与统计（著作 ${state.bootstrap.counts.works || 0} / 词条 ${state.bootstrap.counts.terms || 0} / 案例 ${state.bootstrap.counts.cases || 0}）`;
     }
     renderSummary({ total: (state.bootstrap?.stores || []).length });
     renderStats(state.bootstrap?.counts || {});
@@ -454,7 +454,7 @@ async function runBrowse() {
   browserSearchInput.value = state.query;
   browserListSection.hidden = false;
   browserSchemaSection.hidden = true;
-  browserHeading.textContent = state.view === 'cases' ? '案例索引视角' : '字词索引视角';
+  browserHeading.textContent = state.view === 'cases' ? '案例库' : '字词库';
 
   const params = new URLSearchParams({
     view: state.view,
@@ -484,7 +484,7 @@ async function init() {
   state.bootstrap = bootstrap;
   renderHeroMeta();
   if (browserStatus) {
-    browserStatus.textContent = `统一数据库来源：${bootstrap.sourceLabel}；当前只是在同一库内切换浏览视角`;
+    browserStatus.textContent = `数据库来源：${bootstrap.sourceLabel}`;
   }
   await runBrowse();
 }
@@ -631,10 +631,10 @@ browserSearchInput?.addEventListener('keydown', async (event) => {
 
 init().catch((error) => {
   if (browserStatus) {
-    browserStatus.textContent = '统一数据库加载失败';
+    browserStatus.textContent = '数据库加载失败';
   }
   if (browserList) {
-    browserList.innerHTML = '<article class="card"><h3>无法读取统一数据库</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
+    browserList.innerHTML = '<article class="card"><h3>无法读取数据库</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
   }
   console.error(error);
 });

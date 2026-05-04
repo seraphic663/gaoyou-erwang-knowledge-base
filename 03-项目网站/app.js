@@ -243,8 +243,8 @@ function renderTerms(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部字词</h3>
-    <p>当前区域固定展示 3 个字词入口；完整列表在统一数据库的字词视角中查看。</p>
-    <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词视角</a>
+    <p>更多字词记录见数据库。</p>
+    <a class="detail-link" href="${buildDatabaseHref('terms', query)}">进入字词库</a>
   `;
   termList.appendChild(linkCard);
 }
@@ -310,22 +310,22 @@ function renderCases(result, query = '') {
   linkCard.className = 'card result-link-card';
   linkCard.innerHTML = `
     <h3>阅读全部案例</h3>
-    <p>当前区域固定展示 3 个案例预览；完整列表在统一数据库的案例视角中阅读。</p>
-    <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例视角</a>
+    <p>更多考据案例见数据库。</p>
+    <a class="detail-link" href="${buildDatabaseHref('cases', query)}">进入案例库</a>
   `;
   caseList.appendChild(linkCard);
 }
 
 async function loadBootstrap() {
   if (dbStatus) {
-    dbStatus.textContent = '统一数据库状态：连接中...';
+    dbStatus.textContent = '数据库状态：连接中...';
   }
   const bootstrap = await requestJson('/api/bootstrap');
   renderStats(bootstrap.counts);
   renderSchema(bootstrap.stores);
   renderQuickSearch(bootstrap);
   if (dbStatus) {
-    dbStatus.textContent = `统一数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
+    dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
   }
   if (searchInput) {
     searchInput.placeholder = '输入字词、方法词或片段：如 周 / 取 / 通假';
@@ -345,13 +345,13 @@ async function init() {
     await searchContent('');
   } catch (error) {
     if (dbStatus) {
-      dbStatus.textContent = '统一数据库状态：连接失败，请先运行本地服务';
+      dbStatus.textContent = '数据库状态：连接失败，请先运行本地服务';
     }
     if (dbStats) {
       dbStats.innerHTML = '';
     }
     if (schemaGrid) {
-      schemaGrid.innerHTML = '<article class="card"><h3>无法加载统一数据库</h3><p>请使用 <code>npm start</code> 启动根目录服务后再访问。</p></article>';
+      schemaGrid.innerHTML = '<article class="card"><h3>无法加载数据库</h3><p>请使用 <code>npm start</code> 启动根目录服务后再访问。</p></article>';
     }
     if (searchSummary) {
       searchSummary.innerHTML = '';
@@ -373,7 +373,7 @@ if (searchInput) {
     searchTimer = setTimeout(() => {
       searchContent(query).catch((error) => {
         if (dbStatus) {
-          dbStatus.textContent = '统一数据库状态：搜索失败';
+          dbStatus.textContent = '数据库状态：搜索失败';
         }
         console.error(error);
       });
