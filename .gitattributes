@@ -1,3 +1,0 @@
-# Keep data-processing utilities from dominating GitHub language statistics.
-02-数据库/*.py linguist-vendored
-03-项目网站/scripts/*.py linguist-vendored

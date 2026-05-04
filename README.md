@@ -69,4 +69,4 @@ npm run sync:sqlite
 - 保留可重建链路：`source.txt`、`parser.py`、`bulk_importer.py`、`database.py`、`dictionary.db`、`sqlite-snapshot.json`。
 - 不再提交生成型中间文件，例如 `parsed_data.py`、空库、SQLite journal。
 - 大体量文献资料建议迁出 Git 或使用 Git LFS；仓库内优先保留清单、摘录和标注成果。
-- `.gitattributes` 已将数据处理脚本标记为 `linguist-vendored`，避免 GitHub 语言统计把项目误判为 Python 项目。
+- `02-数据库` 中的 Python 脚本重新计入 GitHub 语言统计；它们体量很小，保留可解释数据库可重建性。
