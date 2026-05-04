@@ -4,6 +4,8 @@
 
 线上地址：https://gaoyou-demo1.up.railway.app/
 
+备用地址：https://gaoyou-erwang-253902-6-1428564300.sh.run.tcloudbase.com
+
 ## 部署状态
 
 - Railway：当前线上主展示地址，继续使用根目录 `railway.toml` 和 `npm start`。
