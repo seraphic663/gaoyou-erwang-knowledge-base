@@ -4,6 +4,11 @@
 
 线上地址：https://gaoyou-demo1.up.railway.app/
 
+## 部署状态
+
+- Railway：当前线上主展示地址，继续使用根目录 `railway.toml` 和 `npm start`。
+- CloudBase Run：已准备根目录 `Dockerfile` 与 `.dockerignore`，用于腾讯云中文站并行部署；具体控制台配置见 [03-项目网站/CloudBase-Run-并行部署报告.md](03-%E9%A1%B9%E7%9B%AE%E7%BD%91%E7%AB%99/CloudBase-Run-%E5%B9%B6%E8%A1%8C%E9%83%A8%E7%BD%B2%E6%8A%A5%E5%91%8A.md)。
+
 ## 当前主链路
 
 ```text
