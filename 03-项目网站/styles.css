@@ -521,10 +521,6 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
-.grid-3 {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
 .card {
   background: var(--card);
   border: 1px solid var(--line);
@@ -1477,21 +1473,6 @@ h2 {
 .flow-diagram > .flow-note.end {
   text-align: center;
   margin-top: 6px;
-}
-
-.timeline {
-  margin: 0;
-  padding-left: 22px;
-  position: relative;
-}
-
-.timeline li {
-  margin-bottom: 12px;
-  padding-left: 8px;
-}
-
-.timeline li::marker {
-  color: var(--accent);
 }
 
 .footer {
