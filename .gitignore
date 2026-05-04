@@ -15,6 +15,11 @@ note/
 **/*.broken.*
 ~$*.docx
 **/cloudflared.exe
+*.db-journal
+
+# ---- Generated database intermediates ----
+02-数据库/parsed_data.py
+02-数据库/data/dictionary.empty.db
 
 # ---- Optional local generated data (uncomment if needed) ----
 # 03-项目网站/data/*.bak

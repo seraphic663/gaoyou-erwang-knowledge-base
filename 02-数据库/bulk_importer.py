@@ -1,32 +1,62 @@
 # -*- coding: utf-8 -*-
 """
-bulk_importer.py — 批量导入 parsed_data.py 数据到 SQLite
+bulk_importer.py — 直接解析 source.txt 并批量导入 SQLite
 用法：
   python bulk_importer.py          # 完整导入（重建数据库）
   python bulk_importer.py --dry-run  # 仅打印统计，不写入
 """
 import sys, json, re, argparse
-from pathlib import Path
 
 try:
     sys.stdout.reconfigure(encoding='utf-8')
 except Exception:
     pass
 
-# ── 加载 parsed_data.py ───────────────────────────────────────────────
-PF = Path(__file__).parent / "parsed_data.py"
-if not PF.exists():
-    sys.exit("[ERROR] parsed_data.py not found. Run parser.py first.")
-_ns = {}
-with open(PF, encoding="utf-8") as f:
-    exec(f.read(), _ns)
-WORKS     = _ns.get("WORKS", [])
-TERMS_DEF = _ns.get("TERMS_DEF", [])
-EVIDENCES = _ns.get("EVIDENCES_DEF", [])
-SKIP_LOG  = _ns.get("SKIP_LOG", [])
-
 # ── DB ────────────────────────────────────────────────────────────────
 import database
+import parser as source_parser
+
+
+def _build_import_payload():
+    parsed, skipped = source_parser.parse_source_file()
+
+    works = [
+        (i, wname, wname, "原始经典", "", "", "")
+        for i, wname in enumerate(sorted(source_parser.CANONICAL_WORK_NAMES), 1)
+    ]
+
+    terms = []
+    seen_terms = set()
+    for item in parsed:
+        if item.term in seen_terms:
+            continue
+        seen_terms.add(item.term)
+        terms.append((
+            item.term,
+            item.term_type,
+            item.category,
+            item.aliases,
+            item.core_meaning[:100],
+            item.note,
+        ))
+
+    evidences = []
+    for item in parsed:
+        if not item.explanation.strip():
+            continue
+        evidences.append((
+            item.term,
+            item.evidence_type,
+            item.work_title,
+            item.quote_text[:150],
+            item.core_snippet[:80],
+            item.note,
+            item.line_no,
+            item.gloss,
+        ))
+
+    skip_log = [item.content for item in skipped]
+    return parsed, works, terms, evidences, skip_log
 
 EV_TYPE_MAP = {
     "书证": "书证", "声训": "声训", "义证": "义证",
@@ -100,13 +130,16 @@ def extract_gloss(cm):
 
 
 def import_all(dry=False):
+    parsed_terms, works, terms_def, evidences, skip_log = _build_import_payload()
+
     print("=" * 50)
     print("  bulk_importer")
     print("=" * 50)
-    print(f"  WORKS:     {len(WORKS)}")
-    print(f"  TERMS:     {len(TERMS_DEF)}")
-    print(f"  EVIDENCES: {len(EVIDENCES)}")
-    print(f"  SKIP_LOG:  {len(SKIP_LOG)}")
+    print("  source:    source.txt -> parser.py")
+    print(f"  WORKS:     {len(works)}")
+    print(f"  TERMS:     {len(terms_def)}")
+    print(f"  EVIDENCES: {len(evidences)}")
+    print(f"  SKIP_LOG:  {len(skip_log)}")
     print()
 
     if not dry:
@@ -115,8 +148,9 @@ def import_all(dry=False):
 
     # ── 2. WORKS ──────────────────────────────────────────────
     wmap = {}
-    print(f"[2/5] WORKS ({len(WORKS)})...")
-    for row in WORKS:
+    work_count = 0
+    print(f"[2/5] WORKS ({len(works)})...")
+    for row in works:
         if len(row) < 2:
             continue
         title = row[1]
@@ -129,18 +163,23 @@ def import_all(dry=False):
             continue
         if dry:
             print(f"  work: {title}")
+            wid = int(row[0]) if row[0] else len(wmap) + 1
+            wmap[title] = wid
+            wmap[str(row[0])] = wid
+            work_count += 1
         else:
             wid = database.upsert_work(title, author, wtype, dynasty, tnote, notes)
             wmap[title] = wid
             if row[0]:
                 wmap[str(row[0])] = wid
-    print(f"  -> {len(wmap)} works")
+            work_count += 1
+    print(f"  -> {work_count} works")
 
     # ── 3. TERMS ───────────────────────────────────────────────
     tmap = {}
-    print(f"[3/5] TERMS ({len(TERMS_DEF)})...")
+    print(f"[3/5] TERMS ({len(terms_def)})...")
     bad_t = 0
-    for row in TERMS_DEF:
+    for row in terms_def:
         if not row or len(row) < 6:
             bad_t += 1
             continue
@@ -158,6 +197,7 @@ def import_all(dry=False):
         if dry:
             if len(tmap) < 3:
                 print(f"  term: {term} type={ttype} cat={cat}")
+            tmap[term] = len(tmap) + 1
         else:
             try:
                 tid = database.insert_term(
@@ -174,32 +214,19 @@ def import_all(dry=False):
     print(f"  -> {len(tmap)} terms (bad: {bad_t})")
 
     # ── 4. CASES（按 line_no + gloss 唯一确定，不合并同名 gloss）──
-    # 从 EVIDENCES_DEF 的注释中解析行号，构建 (line_no, gloss) → case_id 映射
-    # 从 EVIDENCES_DEF 源码注释中解析行号和 gloss
-    ev_meta: dict[tuple, str] = {}  # (term_char, line_no) → gloss
-    ev_src_lines: list = []
-    ev_start_found = False
-    pf_src = open(Path(__file__).parent / "parsed_data.py", encoding="utf-8")
-    for raw_line in pf_src:
-        if "EVIDENCES_DEF = [" in raw_line:
-            ev_start_found = True
-        if not ev_start_found:
-            continue
-        m = re.match(r'\s*# ── (.+?)（行 (\d+)）\s+「(.+?)也」', raw_line)
-        if m:
-            ev_src_lines.append((m.group(1), int(m.group(2)), m.group(3)))
-
-    pf_src.close()
-    for (tc, ln, gloss) in ev_src_lines:
-        ev_meta[(tc, ln)] = gloss
-
     # 按 (line_no, gloss) 分组构建 cases
     entry_key_terms: dict[tuple, list] = {}  # (line_no, gloss) → [term_chars]
-    for (tc, ln), gloss in ev_meta.items():
-        entry_key_terms.setdefault((ln, gloss), []).append(tc)
+    for item in parsed_terms:
+        if not item.explanation.strip():
+            continue
+        key = (item.line_no, item.gloss)
+        bucket = entry_key_terms.setdefault(key, [])
+        if item.term not in bucket:
+            bucket.append(item.term)
 
     gcid = {}
     ncases = 0
+    dry_case_id = 1
     for (line_no, gloss) in sorted(entry_key_terms.keys(), key=lambda x: x[0]):
         chars = entry_key_terms[(line_no, gloss)]
         tids = [tmap[c] for c in chars if c in tmap]
@@ -210,6 +237,8 @@ def import_all(dry=False):
         gloss_conclusion = f"以上诸字均有「{gloss}」义，可由文献、声训、通假互证成立。"
         if dry:
             print(f"  case: line={line_no} gloss={gloss} terms={len(tids)}")
+            gcid[(line_no, gloss)] = dry_case_id
+            dry_case_id += 1
         else:
             cid = database.insert_case(
                 title=gloss_title, section_title="释诂",
@@ -238,9 +267,9 @@ def import_all(dry=False):
     print(f"  -> {ncases} cases")
 
     # ── 5. EVIDENCES ─────────────────────────────────────────
-    print(f"[5/5] EVIDENCES ({len(EVIDENCES)})...")
+    print(f"[5/5] EVIDENCES ({len(evidences)})...")
     ev_ok = ev_bad = 0
-    for row in EVIDENCES:
+    for row in evidences:
         if not row or len(row) < 6:
             ev_bad += 1
             continue
@@ -250,7 +279,7 @@ def import_all(dry=False):
         qt   = (row[3] or "")[:500]
         cs   = (row[4] or "")[:200]
         note = (row[5] or "")[:200]
-        # row[6] 是 line_no（新增字段，parser.py 写入）
+        # row[6] 是 line_no；row[7] 是 gloss
         ev_line_no = row[6] if len(row) > 6 else 0
         # 从 entry_key_terms 找该行(ln, gloss)对应的 case_id
         key_cid = None
@@ -286,7 +315,7 @@ def import_all(dry=False):
     print(f"  terms:      {st['term_count']}")
     print(f"  cases:      {st['case_count']}")
     print(f"  evidences:  {st['evidence_count']}")
-    print(f"  SKIP_LOG:   {len(SKIP_LOG)} (not imported)")
+    print(f"  SKIP_LOG:   {len(skip_log)} (not imported)")
     print("=" * 50)
     return st
 
