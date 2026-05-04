@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>数据库浏览 · 高邮二王考据过程知识库</title>
+    <title>统一专题数据库 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -12,27 +12,27 @@
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
           <a href="./index.html">返回首页</a>
-          <a href="./database.html?view=terms">字词库</a>
-          <a href="./database.html?view=cases">案例库</a>
+          <a href="./database.html?view=terms">字词视角</a>
+          <a href="./database.html?view=cases">案例视角</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">专题数据库 · 数据库浏览</p>
-        <h1>数据库浏览</h1>
-        <p class="hero-copy">这里不再重复首页说明，只负责检索、筛选和回看结构。要读一条判断怎样成立，请从案例页或详情页进入。</p>
+        <p class="badge">统一专题数据库 · 浏览入口</p>
+        <h1>一个数据库，多种浏览视角</h1>
+        <p class="hero-copy">本页只浏览同一个专题数据库。左侧切换的是字词索引、案例索引和结构总览，不是切换到不同数据库。</p>
         <div id="browserHeroMeta" class="hero-panel"></div>
       </div>
     </header>
 
     <main>
       <section class="section">
-        <p id="browserStatus" class="db-status">正在读取数据库...</p>
+        <p id="browserStatus" class="db-status">正在读取统一专题数据库...</p>
 
         <div class="browser-layout">
           <aside class="browser-sidebar">
             <article class="card sidebar-card">
-              <h3>浏览内容</h3>
+              <h3>数据库视角</h3>
               <div id="browserNav" class="sidebar-nav"></div>
             </article>
 
@@ -46,8 +46,8 @@
             <article class="card browser-toolbar">
               <div class="head-line">
                 <div>
-                  <p class="section-kicker">正式检索</p>
-                  <h2 id="browserHeading">字词数据库</h2>
+                  <p class="section-kicker">统一检索</p>
+                  <h2 id="browserHeading">字词索引视角</h2>
                 </div>
               </div>
 
@@ -57,7 +57,7 @@
                   <input id="browserSearchInput" type="text" placeholder="输入词条、义项、正文关键词" />
                 </label>
                 <label class="toolbar-field">
-                  <span>搜索方式</span>
+                  <span>检索范围</span>
                   <select id="browserModeSelect">
                     <option value="entry">按字词/标题检索</option>
                     <option value="fulltext">按正文/引文检索</option>
@@ -77,7 +77,7 @@
                 <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="entry" data-preset-query="周">查某个字词：周</button>
                 <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="通假">查某类术语：通假</button>
                 <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="古文">查案例片段：古文</button>
-                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">看数据库结构</button>
+                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">看统一库结构</button>
               </div>
             </details>
 
@@ -85,7 +85,7 @@
 
             <section id="browserSchemaSection" class="browser-panel" hidden>
               <details class="fold-card browser-schema-fold">
-                <summary id="browserSchemaSummary">展开数据库结构与统计</summary>
+                <summary id="browserSchemaSummary">展开统一数据库结构与统计</summary>
                 <div class="fold-body">
                   <div id="browserStats" class="stats-grid"></div>
                   <div id="browserSchemaGrid" class="grid grid-2"></div>
@@ -104,7 +104,7 @@
     </main>
 
     <footer class="footer">
-      <p>数据库浏览 · 高邮二王考据过程知识库专题整理原型</p>
+      <p>统一专题数据库 · 字词、案例与证据同库关联</p>
     </footer>
 
     <script src="./browser.js"></script>

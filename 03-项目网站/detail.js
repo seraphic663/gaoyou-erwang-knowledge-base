@@ -98,7 +98,7 @@ function renderTermDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = payload.sourceLabel ? `数据来源：${payload.sourceLabel}` : '';
+    detailStatus.textContent = payload.sourceLabel ? `统一数据库来源：${payload.sourceLabel}；当前为字词记录视图` : '';
   }
 
   const aliasList = (payload.aliases || [])
@@ -171,8 +171,8 @@ function renderTermDetail(payload) {
 
       <div class="grid grid-2">
         <article class="card">
-          <h3>关联案例</h3>
-          <p class="compact-note">先展示最相关的几条，剩余部分按需展开。</p>
+          <h3>同库关联案例</h3>
+          <p class="compact-note">这些案例不是另一个数据库，而是同一专题数据库中与本字词关联的案例记录。</p>
           <div class="detail-card-grid">${relatedCaseGroups.visible.join('') || '<p class="compact-note">暂无关联案例。</p>'}</div>
           ${relatedCaseGroups.hidden.length ? `
             <details class="fold-card inline-fold">
@@ -184,8 +184,8 @@ function renderTermDetail(payload) {
           ` : ''}
         </article>
         <article class="card">
-          <h3>证据概况</h3>
-          <p class="compact-note">先看证据类型与涉及文献，详细引文放在下方。</p>
+          <h3>同库证据概况</h3>
+          <p class="compact-note">证据记录与字词、案例同库保存，详细引文放在下方。</p>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
@@ -217,7 +217,7 @@ function renderCaseDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = payload.sourceLabel ? `数据来源：${payload.sourceLabel}` : '';
+    detailStatus.textContent = payload.sourceLabel ? `统一数据库来源：${payload.sourceLabel}；当前为案例记录视图` : '';
   }
 
   const evidenceTypeList = (payload.evidenceTypes || [])
@@ -310,8 +310,8 @@ function renderCaseDetail(payload) {
           </div>
         </article>
         <article class="card">
-          <h3>证据概况</h3>
-          <p class="compact-note">这里先汇总主要证据类型与涉及文献。</p>
+          <h3>同库证据概况</h3>
+          <p class="compact-note">这里汇总同一专题数据库中支撑本案例的证据类型与涉及文献。</p>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
