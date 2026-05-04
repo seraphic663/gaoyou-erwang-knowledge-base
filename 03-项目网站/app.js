@@ -8,9 +8,6 @@ const dbStatus = document.querySelector('#dbStatus');
 const dbStats = document.querySelector('#dbStats');
 const schemaGrid = document.querySelector('#schemaGrid');
 const searchSummary = document.querySelector('#searchSummary');
-const heroTermCount = document.querySelector('#heroTermCount');
-const heroCaseCount = document.querySelector('#heroCaseCount');
-const heroEvidenceCount = document.querySelector('#heroEvidenceCount');
 
 let searchTimer = null;
 
@@ -114,18 +111,6 @@ function renderQuickSearch(bootstrap) {
   searchQuick.innerHTML = keywords
     .map((keyword) => `<button class="quick-chip" type="button" data-keyword="${escapeHtml(keyword)}">${escapeHtml(keyword)}</button>`)
     .join('');
-}
-
-function renderHeroShowcase(bootstrap) {
-  if (heroTermCount) {
-    heroTermCount.textContent = String(bootstrap.counts?.terms ?? 0);
-  }
-  if (heroCaseCount) {
-    heroCaseCount.textContent = String(bootstrap.counts?.cases ?? 0);
-  }
-  if (heroEvidenceCount) {
-    heroEvidenceCount.textContent = String(bootstrap.counts?.evidences ?? 0);
-  }
 }
 
 function renderStats(counts) {
@@ -339,7 +324,6 @@ async function loadBootstrap() {
   renderStats(bootstrap.counts);
   renderSchema(bootstrap.stores);
   renderQuickSearch(bootstrap);
-  renderHeroShowcase(bootstrap);
   if (dbStatus) {
     dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
   }

@@ -12,15 +12,15 @@
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
           <a href="./index.html">返回首页</a>
-          <a href="./term.html?id=1">字词示例</a>
-          <a href="./case.html?id=1">案例示例</a>
+          <a href="./database.html?view=terms">字词库</a>
+          <a href="./database.html?view=cases">案例库</a>
         </div>
       </nav>
 
       <div class="hero-content">
         <p class="badge">专题数据库 · 数据库浏览</p>
         <h1>数据库浏览</h1>
-        <p class="hero-copy">这里集中回看围绕“王氏四种”所整理的字词、案例与数据库结构，供案头检索、证据比勘与出处核验之用。</p>
+        <p class="hero-copy">这里不再重复首页说明，只负责检索、筛选和回看结构。要读一条判断怎样成立，请从案例页或详情页进入。</p>
         <div id="browserHeroMeta" class="hero-panel"></div>
       </div>
     </header>
@@ -32,12 +32,12 @@
         <div class="browser-layout">
           <aside class="browser-sidebar">
             <article class="card sidebar-card">
-              <h3>整理门类</h3>
+              <h3>浏览内容</h3>
               <div id="browserNav" class="sidebar-nav"></div>
             </article>
 
             <article class="card sidebar-card">
-              <h3>分层检索</h3>
+              <h3>筛选范围</h3>
               <div id="browserFilters" class="sidebar-filter-list"></div>
             </article>
           </aside>
@@ -46,7 +46,7 @@
             <article class="card browser-toolbar">
               <div class="head-line">
                 <div>
-                  <p class="section-kicker">检索案头</p>
+                  <p class="section-kicker">正式检索</p>
                   <h2 id="browserHeading">字词数据库</h2>
                 </div>
               </div>
@@ -72,16 +72,12 @@
             </article>
 
             <details class="fold-card browser-preset-fold">
-              <summary>展开常用检索预设</summary>
+              <summary>展开常用预设</summary>
               <div id="browserPresets" class="fold-body browser-preset-list">
-                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="entry" data-preset-query="周">我想精准查询某个字词，例如“周”</button>
-                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="取">我想从字词库正文里找一个常见义项，例如“取”</button>
-                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="entry" data-preset-query="">我想先通看全部考据案例</button>
-                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="古文">我想从案例正文里直接找问题片段，例如“古文”</button>
-                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="通假">我想找和通假、音训有关的字词</button>
-                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="章句">我想看带有某类整理线索的案例，例如“章句”</button>
-                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="广雅疏证">我想只看《广雅疏证》相关案例</button>
-                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">我想直接查看数据库结构和统计</button>
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="entry" data-preset-query="周">查某个字词：周</button>
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="通假">查某类术语：通假</button>
+                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="古文">查案例片段：古文</button>
+                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">看数据库结构</button>
               </div>
             </details>
 

@@ -98,7 +98,7 @@ function renderTermDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = `整理数据来源：${payload.sourceLabel}`;
+    detailStatus.textContent = payload.sourceLabel ? `数据来源：${payload.sourceLabel}` : '';
   }
 
   const aliasList = (payload.aliases || [])
@@ -172,7 +172,7 @@ function renderTermDetail(payload) {
       <div class="grid grid-2">
         <article class="card">
           <h3>关联案例</h3>
-          <p class="compact-note">默认只展示前 4 条相关考据案例，剩余部分按需展开。</p>
+          <p class="compact-note">先展示最相关的几条，剩余部分按需展开。</p>
           <div class="detail-card-grid">${relatedCaseGroups.visible.join('') || '<p class="compact-note">暂无关联案例。</p>'}</div>
           ${relatedCaseGroups.hidden.length ? `
             <details class="fold-card inline-fold">
@@ -185,7 +185,7 @@ function renderTermDetail(payload) {
         </article>
         <article class="card">
           <h3>证据概况</h3>
-          <p class="compact-note">优先展示证据类型和涉及文献，详细引文与出处信息放在折叠区。</p>
+          <p class="compact-note">先看证据类型与涉及文献，详细引文放在下方。</p>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
@@ -195,17 +195,7 @@ function renderTermDetail(payload) {
         <summary>证据摘录</summary>
         <div class="fold-body detail-card-grid">
           ${evidences || '<p class="compact-note">暂无证据摘录。</p>'}
-          ${payload.evidencesTruncated ? '<p class="compact-note">当前仅展示前 12 条证据，更多证据已折叠在数据层，不在页面继续展开。</p>' : ''}
-        </div>
-      </details>
-
-      <details class="fold-card">
-        <summary>原始字段与补充备注</summary>
-        <div class="fold-body">
-          <p><strong>词条编号</strong><span>${escapeHtml(String(payload.raw?.id || ''))}</span></p>
-          <p><strong>case_ids</strong><span>${escapeHtml(JSON.stringify(payload.raw?.case_ids || []))}</span></p>
-          <p><strong>core_meaning</strong><span>${escapeHtml(payload.coreMeaning || '无')}</span></p>
-          <p><strong>notes</strong><span>${escapeHtml(payload.notes || '无')}</span></p>
+          ${payload.evidencesTruncated ? '<p class="compact-note">更多证据保留在数据层，当前页不继续堆叠。</p>' : ''}
         </div>
       </details>
     </section>
@@ -227,7 +217,7 @@ function renderCaseDetail(payload) {
   ]);
 
   if (detailStatus) {
-    detailStatus.textContent = `整理数据来源：${payload.sourceLabel}`;
+    detailStatus.textContent = payload.sourceLabel ? `数据来源：${payload.sourceLabel}` : '';
   }
 
   const evidenceTypeList = (payload.evidenceTypes || [])
@@ -321,7 +311,7 @@ function renderCaseDetail(payload) {
         </article>
         <article class="card">
           <h3>证据概况</h3>
-          <p class="compact-note">这里汇总的是支撑该条判断的主要证据类型与涉及文献。</p>
+          <p class="compact-note">这里先汇总主要证据类型与涉及文献。</p>
           ${evidenceTypeList ? `<div class="schema-meta">${evidenceTypeList}</div>` : '<p class="compact-note">暂无证据类型标注。</p>'}
           ${relatedWorks ? `<div class="term-footer">${relatedWorks}</div>` : ''}
         </article>
@@ -338,17 +328,7 @@ function renderCaseDetail(payload) {
         <summary>证据链</summary>
         <div class="fold-body detail-card-grid">
           ${evidences || '<p class="compact-note">暂无证据链条。</p>'}
-          ${payload.evidencesTruncated ? '<p class="compact-note">当前仅展示前 12 条证据，页面不再继续堆叠。</p>' : ''}
-        </div>
-      </details>
-
-      <details class="fold-card">
-        <summary>原始字段</summary>
-        <div class="fold-body">
-          <p><strong>案例编号</strong><span>${escapeHtml(String(payload.raw?.id || ''))}</span></p>
-          <p><strong>term_ids</strong><span>${escapeHtml(JSON.stringify(payload.raw?.term_ids || []))}</span></p>
-          <p><strong>erwang_passage_id</strong><span>${escapeHtml(String(payload.raw?.erwang_passage_id ?? 'null'))}</span></p>
-          <p><strong>target_passage_id</strong><span>${escapeHtml(String(payload.raw?.target_passage_id ?? 'null'))}</span></p>
+          ${payload.evidencesTruncated ? '<p class="compact-note">更多证据保留在数据层，当前页不继续堆叠。</p>' : ''}
         </div>
       </details>
     </section>
