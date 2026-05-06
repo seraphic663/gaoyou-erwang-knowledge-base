@@ -1,0 +1,1576 @@
+{
+  "cases": [
+    {
+      "case_title": "㠯、以、已异体字关系",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "㠯、以、已",
+      "problem": "三字是否异体关系",
+      "claim": "㠯、以、已为异体字",
+      "method_tags": [
+        "训释",
+        "异体",
+        "书证"
+      ],
+      "terms": [
+        {
+          "term": "㠯",
+          "term_type": "字",
+          "relation_type": "异体",
+          "related_term": "以",
+          "note": "",
+          "source_paragraph_indexes": [
+            1
+          ],
+          "source_comment_ids": [
+            "0"
+          ]
+        },
+        {
+          "term": "㠯",
+          "term_type": "字",
+          "relation_type": "异体",
+          "related_term": "已",
+          "note": "",
+          "source_paragraph_indexes": [
+            1
+          ],
+          "source_comment_ids": [
+            "0"
+          ]
+        },
+        {
+          "term": "以",
+          "term_type": "字",
+          "relation_type": "异体",
+          "related_term": "已",
+          "note": "",
+          "source_paragraph_indexes": [
+            1
+          ],
+          "source_comment_ids": [
+            "0"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·檀弓》郑玄注",
+          "quote": "以與已字本同",
+          "role": "直接证据",
+          "term": "以",
+          "source_paragraph_indexes": [
+            1
+          ],
+          "source_comment_ids": [
+            "0"
+          ]
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "王氏根据郑注认为三字有异体关系",
+          "source_paragraph_indexes": [
+            1
+          ],
+          "source_comment_ids": [
+            "0"
+          ]
+        }
+      ],
+      "conclusion": "㠯、以、已为异体字",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 3,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，语词之“用”也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "‘以’的常用义",
+      "claim": "“以”为语词之“用”",
+      "method_tags": [
+        "训释",
+        "书证"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "用",
+          "note": "",
+          "source_paragraph_indexes": [
+            2
+          ],
+          "source_comment_ids": [
+            "1"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《书·尧典》",
+          "quote": "以亲九族",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            2
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”为语词之“用”",
+          "source_paragraph_indexes": [
+            2
+          ],
+          "source_comment_ids": [
+            "1"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "引用《书·尧典》为例",
+          "source_paragraph_indexes": [
+            2
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "“以”可训为“用”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 4,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，犹“由”也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "“以”的引申义",
+      "claim": "“以”犹“由”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "同义互证"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "由",
+          "note": "",
+          "source_paragraph_indexes": [
+            3
+          ],
+          "source_comment_ids": [
+            "3"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《汉书·刘向传》注",
+          "quote": "以，由也",
+          "role": "直接证据",
+          "term": "以",
+          "source_paragraph_indexes": [
+            3
+          ],
+          "source_comment_ids": [
+            "3"
+          ]
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《大戴礼·子张问入官》",
+          "quote": "忿数者，狱之所由生也；距谏者，虑之所以塞也",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            3
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”犹“由”",
+          "source_paragraph_indexes": [
+            3
+          ],
+          "source_comment_ids": [
+            "3"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "引《汉书》注和《大戴礼》为例",
+          "source_paragraph_indexes": [
+            3
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "“以”可训为“由”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 5,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，为也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "“以”的义项",
+      "claim": "“以”为“为”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "义证"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "为",
+          "note": "",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": [
+            "4"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《玉篇》",
+          "quote": "以，为也",
+          "role": "字书证据",
+          "term": "以",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": [
+            "4"
+          ]
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《诗·瞻卬》",
+          "quote": "天何以刺",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”为“为”",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": [
+            "4"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "引《玉篇》及《诗》为例",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释理",
+          "text": "归纳“何以若此”句式",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": [
+            "5"
+          ]
+        }
+      ],
+      "conclusion": "“以”可训为“为”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 6,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，犹“谓”也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "“以”的假借义",
+      "claim": "“以”犹“谓”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "句义解释"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "谓",
+          "note": "",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": [
+            "7"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·檀弓》",
+          "quote": "昔者吾有斯子也，吾以将为贤人也",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《左传·昭公二十五年》",
+          "quote": "公以告臧孙，臧孙以难。告郈孙，郈孙以可，劝",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《齐策》",
+          "quote": "臣之妻私臣，臣之妾畏臣，臣之客欲有求于臣，皆以美于徐公",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”犹“谓”",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": [
+            "7"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "引三则书证并解释句意",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": [
+            "8",
+            "9"
+          ]
+        }
+      ],
+      "conclusion": "“以”可训为“谓”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 7,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，犹“与”也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "“以”表伴随",
+      "claim": "“以”犹“与”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "同义互证",
+        "对文散文"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "与",
+          "note": "古人自有复语耳",
+          "source_paragraph_indexes": [
+            15,
+            20
+          ],
+          "source_comment_ids": [
+            "10",
+            "11"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《广雅》",
+          "quote": "以，与也",
+          "role": "字书证据",
+          "term": "以",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·盘庚》",
+          "quote": "尔忱不属，惟胥以沈",
+          "role": "例证并引传",
+          "term": "以",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《诗·江有汜》",
+          "quote": "不我以",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《诗·击鼓》",
+          "quote": "不我以归",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《诗·桑柔》",
+          "quote": "不胥以穀",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《仪礼·乡射礼》",
+          "quote": "主人以宾揖",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《仪礼·大射仪》",
+          "quote": "以耦左还",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·檀弓》",
+          "quote": "吾未尝以就公室",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《易·鼎》初六",
+          "quote": "得妾以其子",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《诗·小明》",
+          "quote": "神之听之，式谷以女",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·郊特牲》",
+          "quote": "宾入大门而奏《肆夏》示易以敬也",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《左传·襄公二十年》",
+          "quote": "赋《常棣》之七章以卒",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《左传·襄公二十九年》",
+          "quote": "乐氏其以宋升降乎？",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《论语·微子》",
+          "quote": "而谁以易之",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《诗·旄邱》",
+          "quote": "何其处也，必有与也。何其久也，必有以也",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《管子·形势》",
+          "quote": "訾讆之人，勿与任大，谟臣者可以远举，顾忧者可与致道",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《吕氏春秋·乐成》",
+          "quote": "故民不可与虑化举始，而可以乐成功",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "异文",
+          "work": "《越语》与《史记·越世家》",
+          "quote": "节事者与地”与“节事者以地",
+          "role": "异文互证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            22,
+            23
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "异文",
+          "work": "《吕氏春秋·精谕》与《淮南·道应》",
+          "quote": "人可与微言乎”与“人可以微言",
+          "role": "异文互证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            25,
+            26
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "异文",
+          "work": "《淮南子·权勋》与《说苑·敬慎》",
+          "quote": "不谷无与复战矣”与“吾无以复战矣",
+          "role": "异文互证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            28,
+            29
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "异文",
+          "work": "《燕策》与《史记·燕世家》",
+          "quote": "得贤士与共国”与“得贤士以共国",
+          "role": "异文互证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            31,
+            32
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”犹“与”",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "引《广雅》及《书》《诗》多例",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "引《仪礼》《礼记》《易》《诗》等多例",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释理",
+          "text": "指出“以”“与”互文，古人复语，并列举异文为证",
+          "source_paragraph_indexes": [
+            20
+          ],
+          "source_comment_ids": [
+            "10",
+            "11"
+          ]
+        }
+      ],
+      "conclusion": "“以”可训为“与”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 8,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，犹“及”也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "“以”表及至义",
+      "claim": "“以”犹“及”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "义证"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "及",
+          "note": "",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《易·小畜》九五虞翻注",
+          "quote": "富以其邻",
+          "role": "例证并引注",
+          "term": "以",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《易·泰》初九",
+          "quote": "拔茅茹，以其汇",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《易·剥》初六、六二、六四",
+          "quote": "剥床以足、以辨、以肤",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《易·复》上六",
+          "quote": "用行师，终有大败，以其国君",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《周语》引《汤誓》",
+          "quote": "余一人有罪，无以万夫",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”犹“及”",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "引《易》多例及《周语》为证",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "反驳",
+          "text": "驳王弼训“以”为“用”之失",
+          "source_paragraph_indexes": [
+            33
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "“以”可训为“及”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 9,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "以，犹“而”也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "以",
+      "problem": "“以”表并列或承接",
+      "claim": "“以”犹“而”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "同义互证",
+        "对文散文"
+      ],
+      "terms": [
+        {
+          "term": "以",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "而",
+          "note": "互文耳",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": [
+            "12"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《易·泰》六四",
+          "quote": "不戒以孚",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·牧誓》",
+          "quote": "俾暴虐于百姓，以奸宄于商邑",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·金縢》",
+          "quote": "天大雷电以风",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·乐记》",
+          "quote": "治世之音安以乐，乱世之音怨以怒，亡国之音哀以思",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《大戴礼·曾子制言》",
+          "quote": "富以苟，不如贫以誉；生以辱，不如死以荣",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《左传·闵公二年》",
+          "quote": "亲以无灾，又何患焉",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《左传·昭公二十年》",
+          "quote": "济其不及，以泄其过",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《晋语》",
+          "quote": "狐偃惠以有谋，赵衰文以忠贞，贾佗多识以恭敬",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《吴语》",
+          "quote": "昔楚灵王不君，其臣箴谏以不入",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《公羊传·庄公二十四年》",
+          "quote": "戎众以无义",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《论语·为政》",
+          "quote": "季康子问使民敬忠以劝",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《易·同人彖传》",
+          "quote": "文明以健，中正而应",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《系辞传》",
+          "quote": "蓍之德圆而神，卦之德方以知",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·聘义》",
+          "quote": "温润而泽，仁也；缜密以栗，知也",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《左传·昭公十一年》",
+          "quote": "桀克有缗以丧其国，纣克东夷而陨其身",
+          "role": "互文例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“以”犹“而”",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": [
+            "12"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "列举十余条书证，并指出互文现象",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "“以”可训为“而”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 10,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "已，既也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "已",
+      "problem": "“已”的常用义",
+      "claim": "“已”为“既”",
+      "method_tags": [
+        "训释"
+      ],
+      "terms": [
+        {
+          "term": "已",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "既",
+          "note": "常语也",
+          "source_paragraph_indexes": [
+            50
+          ],
+          "source_comment_ids": [
+            "13"
+          ]
+        }
+      ],
+      "evidences": [],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“已，既也”",
+          "source_paragraph_indexes": [
+            50
+          ],
+          "source_comment_ids": [
+            "13"
+          ]
+        }
+      ],
+      "conclusion": "“已”可训为“既”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 11,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "已，太也，甚也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "已",
+      "problem": "“已”表程度",
+      "claim": "“已”为“太”“甚”",
+      "method_tags": [
+        "训释",
+        "书证"
+      ],
+      "terms": [
+        {
+          "term": "已",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "太",
+          "note": "或作“以”",
+          "source_paragraph_indexes": [
+            51
+          ],
+          "source_comment_ids": [
+            "14"
+          ]
+        },
+        {
+          "term": "已",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "甚",
+          "note": "",
+          "source_paragraph_indexes": [
+            51
+          ],
+          "source_comment_ids": [
+            "14"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《左传·文公五年》",
+          "quote": "嬴曰：‘以刚。’",
+          "role": "异文例证（已作以）",
+          "term": "以",
+          "source_paragraph_indexes": [
+            51
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“已，太也，甚也”",
+          "source_paragraph_indexes": [
+            51
+          ],
+          "source_comment_ids": [
+            "14"
+          ]
+        }
+      ],
+      "conclusion": "“已”可训为“太”“甚”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 12,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "已，此也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "已",
+      "problem": "“已”表近指",
+      "claim": "“已”为“此”",
+      "method_tags": [
+        "训释",
+        "书证",
+        "句义解释"
+      ],
+      "terms": [
+        {
+          "term": "已",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "此",
+          "note": "或作“以”",
+          "source_paragraph_indexes": [
+            52,
+            66
+          ],
+          "source_comment_ids": [
+            "15",
+            "16"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《尔雅》",
+          "quote": "已，此也",
+          "role": "字书证据",
+          "term": "已",
+          "source_paragraph_indexes": [
+            52
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《庄子·齐物论》",
+          "quote": "已而不知其然谓之道",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": [
+            "15"
+          ]
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《庄子·养生主》",
+          "quote": "已而为知者，殆而已矣",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《淮南·道应》",
+          "quote": "已虽无除其患...",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·祭统》",
+          "quote": "对扬以辟之勤大命，施于烝彝鼎",
+          "role": "例证，以作此",
+          "term": "以",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《射义》引诗",
+          "quote": "大夫君子，凡以庶士",
+          "role": "例证",
+          "term": "以",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“已，此也”",
+          "source_paragraph_indexes": [
+            52
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "引《尔雅》及《庄子》《淮南》等多例",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": [
+            "15",
+            "16"
+          ]
+        },
+        {
+          "step_type": "释词",
+          "text": "解释“已”承上文指此，并驳旧注",
+          "source_paragraph_indexes": [
+            66
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "“已”可训为“此”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 13,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "已，语终辞也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "已",
+      "problem": "“已”作句末语气词",
+      "claim": "“已”为语终辞，与“矣”同义",
+      "method_tags": [
+        "训释",
+        "书证",
+        "同义互证"
+      ],
+      "terms": [
+        {
+          "term": "已",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "矣",
+          "note": "连言之曰“已矣”",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": [
+            "17"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《汉书·宣帝纪》颜师古注",
+          "quote": "已，语终辞也",
+          "role": "直接证据",
+          "term": "已",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": [
+            "17"
+          ]
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·洛诰》",
+          "quote": "公定予往已",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《礼记·檀弓》卢植注",
+          "quote": "已者，辞也",
+          "role": "注证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“已，语终辞也”",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": [
+            "17"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "引颜注及《书》《礼》注",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释理",
+          "text": "指出“已”与“矣”同义，连言“已矣”",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": [
+            "17"
+          ]
+        }
+      ],
+      "conclusion": "“已”为语终辞，同“矣”",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 14,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    },
+    {
+      "case_title": "已，叹词也",
+      "source_work": "《经传释词》",
+      "target_work": "",
+      "target_text": "已",
+      "problem": "“已”作感叹词",
+      "claim": "“已”为叹词",
+      "method_tags": [
+        "训释",
+        "书证",
+        "同义互证"
+      ],
+      "terms": [
+        {
+          "term": "已",
+          "term_type": "虚词",
+          "relation_type": "同义",
+          "related_term": "熙（叹词）",
+          "note": "义并同",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": [
+            "18"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《书·大诰》某氏传",
+          "quote": "已！予惟小子！",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": [
+            "18"
+          ]
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《汉书·翟义传》颜师古注",
+          "quote": "熙，叹辞",
+          "role": "异文证据（已作熙）",
+          "term": "已",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": [
+            "18"
+          ]
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·康诰》",
+          "quote": "已！女惟小子！",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·梓材》",
+          "quote": "已！若兹监！",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《书·洛诰》",
+          "quote": "已！女惟冲子！",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "《庄子·庚桑楚》",
+          "quote": "已！我安逃此而可？",
+          "role": "例证",
+          "term": "已",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "提出“已，叹词也”",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": [
+            "18"
+          ]
+        },
+        {
+          "step_type": "取证",
+          "text": "引《书》多例、《汉志》注、《庄子》",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "“已”可用作叹词",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 15,
+        "imported_at": "2026-05-06T17:24:22"
+      }
+    }
+  ],
+  "database_ingestion": {
+    "imported": true,
+    "database": "D:\\26大创\\04-项目文献\\D-标注\\json\\annotation_db\\annotation_results.db",
+    "imported_at": "2026-05-06T17:24:22"
+  }
+}

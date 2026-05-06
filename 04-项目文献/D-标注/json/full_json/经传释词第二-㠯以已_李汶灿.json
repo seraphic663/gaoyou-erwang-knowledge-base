@@ -1,0 +1,5138 @@
+{
+  "schema_version": "annotation_docx_full_json_v1",
+  "source_file": {
+    "name": "经传释词第二-㠯以已_李汶灿.docx",
+    "path": "D-标注\\经传释词第二-㠯以已_李汶灿.docx",
+    "size_bytes": 854013,
+    "modified_time": "2026-04-24T16:54:45"
+  },
+  "document_stats": {
+    "paragraph_count": 97,
+    "nonempty_paragraph_count": 57,
+    "table_count": 0,
+    "comment_count": 19,
+    "anchored_comment_count": 19,
+    "annotation_block_count": 0,
+    "footnote_count": 0,
+    "endnote_count": 0,
+    "paragraph_text_length": 4568,
+    "comment_text_length": 343
+  },
+  "doc_type": "word_comments_first",
+  "paragraphs": [
+    {
+      "index": 1,
+      "style": "Normal",
+      "text": "㠯①、或作“以”、或作“已”。㠯，或作“以”​，或作“已”​。鄭注《禮記·檀弓》曰：​“‘以’與‘已’字本同。​”②",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "㠯",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "、",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "或作",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“以”、或作“已”。㠯，或作“以”​，或作“已”​。鄭注《禮記·檀弓》曰：​“‘以’與‘已’字本同。​”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        }
+      ],
+      "comment_ids": [
+        "0"
+      ]
+    },
+    {
+      "index": 2,
+      "style": "Normal",
+      "text": "以，語詞之“用”也。《書·堯典》曰：“以親九族。”③是也。常語也。④",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "以，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "語詞之",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“用”也。《書·堯典》曰：“以親九族。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "是也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "常語",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        }
+      ],
+      "comment_ids": [
+        "1",
+        "2"
+      ]
+    },
+    {
+      "index": 3,
+      "style": "Normal",
+      "text": "《漢書·劉向傳》注曰：“由也。”⑤《大戴禮·子張問入官》篇曰：“忿數者，獄之所由生也；距諫者，慮之所以塞也。”⑥以，亦“由”也。此亦常語。⑦",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《漢書·劉向傳》注曰：“由也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《大戴禮·子張問入官》篇曰：“忿數者，獄之所由生也；距諫者，慮之所以塞也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "以，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "亦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“由”也。此亦常語。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        }
+      ],
+      "comment_ids": [
+        "3"
+      ]
+    },
+    {
+      "index": 4,
+      "style": "Normal",
+      "text": "《玉篇》曰：“以，為也。”⑧​《詩·瞻卬》曰：“天何以刺。”⑨言天何為刺也。凡經傳言“何以若此”者，皆謂“何為若此”也。亦常語。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《玉篇》曰：“以，為也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "⑧",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "​《詩·瞻卬》曰：“天何以刺。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑨",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "言天何為刺也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "凡經傳言“何以若此”者，皆謂“何為若此”也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "亦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "常語",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": [
+        "4",
+        "5",
+        "6"
+      ]
+    },
+    {
+      "index": 5,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 6,
+      "style": "Normal",
+      "text": "⑤《汉书·楚元王传》：诚见阴阳不调，不敢不通所闻。窃推春秋灾异，以救今事一二，条其所以，不宜宣泄。臣谨重封昧死上。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑤《汉书·楚元王传》：诚见阴阳不调，不敢不通所闻。窃推春秋灾异，以救今事一二，条其所以，不宜宣泄。臣谨重封昧死上。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 7,
+      "style": "Normal",
+      "text": "注：师古曰：“以，由也。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "注：师古曰：“以，由也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 8,
+      "style": "Normal",
+      "text": "⑥（这一段是在孔子家语里找到的）《孔子家语·入官》：且夫忿数者，官狱所由生也；距谏者，虑之所以塞也；慢易者，礼之所以失也；怠惰者，时之所以后也；奢侈者，财之所以不足也；专独者，事之所以不成也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑥（这一段是在孔子家语里找到的）《孔子家语·入官》：且夫忿数者，官狱所由生也；距谏者，虑之所以塞也；慢易者，礼之所以失也；怠惰者，时之所以后也；奢侈者，财之所以不足也；专独者，事之所以不成也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 9,
+      "style": "Normal",
+      "text": "⑨《詩·瞻卬》：天何以刺？①何神不富？舍尔介狄，维予胥忌。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑨",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "《詩·瞻卬》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "天何以刺",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "？",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "Calibri"
+        },
+        {
+          "text": "何神不富？舍尔介狄，维予胥忌。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 10,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 11,
+      "style": "Normal",
+      "text": "以，猶“謂”也。①​《禮記·檀弓》曰：​“昔者吾有斯子也，吾以將為賢人也。”言吾谓将为贤人也。②昭二十五年左传曰：“公以告臧孙，臧孙以难。告郈孙，郈孙以可，劝。”③（​《釋文》曰：​“郈孫以可，絕句。勸，勸公逐季氏也。​”​）言臧孫謂難，郈孫謂可也。​《齊策》曰：​“臣之妻私臣，臣之妾畏臣，臣之客欲有求於臣，皆以美於徐公。​”④言皆謂美於徐公也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "以，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "猶",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“謂”也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "​《禮記·檀弓》曰：​“昔者吾有斯子也，吾以將為賢",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "人也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "言吾谓将为贤人也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "昭二十五年左传曰：“公以告臧孙，臧孙以难。告郈孙，郈孙以可，劝。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（​《釋文》曰：​“郈孫以可，絕句。勸，勸公逐季氏也。​”​）言臧孫謂難，郈孫謂可也。​《齊策》曰：​“臣之妻私臣，臣之妾畏臣，臣之客欲有求於臣，皆以美於徐公。​”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "言皆謂美於徐公也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": [
+        "7",
+        "8",
+        "9"
+      ]
+    },
+    {
+      "index": 12,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 13,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 14,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 15,
+      "style": "Normal",
+      "text": "《廣雅》曰：​“以，與也。​”​②《書·盤庚》曰：​“爾忱不屬，惟胥以沈。​③”某氏《傳》曰：​“相與沈溺。​”​《詩·江有汜》曰：​“不我以。​”​④《擊鼓》曰：​“不我以歸。​”⑤​《桑柔》曰：​“不胥以穀。​”​⑥",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《廣雅》曰：​“以，與也。​”​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《書·盤庚》曰：​“爾忱不屬，惟胥以沈。​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "”某氏《傳》曰：​“相與沈溺。​”​《詩·江有汜》曰：​“不我以。​”​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《擊鼓》曰：​“不我以歸。​”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "​《桑柔》曰：​“不胥以穀。​”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 16,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 17,
+      "style": "Normal",
+      "text": "⑥《诗经·桑柔》：瞻彼中林，甡甡其鹿，朋友巳𧮂，不胥以穀。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《诗经·桑柔》：瞻彼中林，甡甡其鹿，朋友巳𧮂，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "不胥以穀",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 18,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 19,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 20,
+      "style": "Normal",
+      "text": "《儀禮·鄉射禮》曰：“主人以賓揖。”①又曰：“各以其耦進。”②​《大射儀》曰：“以耦左還。”《箋》《注》並曰：“以，猶與也。”​③《禮記·檀弓》曰：“吾未嘗以就公室。”注曰：“未嘗與到公室，觀其行也。”​④《易·鼎》初六曰：“得妾以其子。”言得妾與其子也。⑤​《詩·小明》曰：“神之聽之，式穀以女。”言式穀與汝也。⑥（​《箋》訓“以”為“用”，失之。）《禮記·郊特牲》曰：“賓入大門而奏《肆夏》示易以敬也。”言示易與敬也。⑦襄二十年《左傳》曰：“賦《常棣》之七章以卒。”言賦七章與卒章也。⑧二十九年曰：​“樂氏其以宋升降乎？”言與宋升降也。⑨《論語·微子》篇曰：“而誰以易之。”言誰與易之也。⑩《詩·江有汜》曰：“不我以”，“不我與。”⑪《旄邱》曰：“何其處也，必有與也。何其久也，必有以也。”⑫（​《傳》曰：​“必以有功德。”失之。）以，亦“與”也，古人自有複語耳。《管子·形勢》篇曰：“訾讆之人，勿與任大，謨臣者可以遠舉，顧憂者可與致道。”​⑬《呂氏春秋·樂成》篇曰：“故民不可與慮化舉始，而可以樂成功。”⑭皆以“與”​“以”互文，故《鄉射禮》“各以其耦進”，今文“以”為“與”。《越語》​“節事者與地”，《史記·越世家》“與”為“以”。⑮《呂氏春秋·精諭》篇：​“人可與微言乎？”《淮南·道應》篇“與”為“以”。⑯《權勳》篇“不穀無與複戰矣”，《說苑·敬慎》篇“與”為“以”。⑰《燕策》“得賢士與共國”，《史記·燕世家》“與”為“以”。⑱",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《儀禮·鄉射禮》曰：“主人以賓揖。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "Calibri"
+        },
+        {
+          "text": "又曰：“各以其耦進。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "Calibri"
+        },
+        {
+          "text": "​《大射儀》曰：“以耦左還。”《箋》《注》並曰：“以，猶與也。”​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《禮記·檀弓》曰：“吾未嘗以就公室。”注曰：“未嘗與到公室，觀其行也。”​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《易·鼎》初六曰：“得妾以其子。”言得妾與其子也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "​《詩·小明》曰：“神之聽之，式穀以女。”言式穀與汝也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（​《箋》訓“以”為“用”，失之。）《禮記·郊特牲》曰：“賓入大門而奏《肆夏》示易以敬也。”言示易與敬也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "襄二十年《左傳》曰：“賦《常棣》之七章以卒。”言賦七章與卒章也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑧",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "二十九年曰：​“樂氏其以宋升降乎？”言與宋升降也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑨",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《論語·微子》篇曰：“而誰以易之。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "言誰與易之也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑩",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《詩·江有汜》曰：“不我以”，“不我與。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑪",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《旄邱》曰：“何其處也，必有與也。何其久也，必有以也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑫",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（​《傳》曰：​“必以有功德。”失之。）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "以，亦“與”也，古人自有複語耳。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "《管子·形勢》篇曰：“訾讆之人，勿與任大，謨臣者可以遠舉，顧憂者可與致道。”​",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑬",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《呂氏春秋·樂成》篇曰：“故民不可與慮化舉始，而可以樂成功。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑭",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "皆以“與”​“以”互文",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，故《鄉射禮》“各以其耦進”，今文“以”為“與”。《越語》​“節事者與地”，《史記·越世家》“與”為“以”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑮",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《呂氏春秋·精諭》篇：​“人可與微言乎？”《淮南·道應》篇“與”為“以”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑯",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《權勳》篇“不穀無與複戰矣”，《說苑·敬慎》篇“與”為“以”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑰",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《燕策》“得賢士與共國”，《史記·燕世家》“與”為“以”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑱",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        }
+      ],
+      "comment_ids": [
+        "10",
+        "11"
+      ]
+    },
+    {
+      "index": 21,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 22,
+      "style": "Normal",
+      "text": "⑮《越语》：“王曰：‘为三者奈何？’范蠡对曰：‘持盈者与天，定倾者与人，节事者与地。’”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑮《越语》：“王曰：‘为三者奈何？’范蠡对曰：‘持盈者与天，定倾者与人，节事者",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "与地",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 23,
+      "style": "Normal",
+      "text": "《史记·越世家》：“‘以不听子故至于此，为之奈何？’蠡对曰：‘持满者与天，定倾者与人，节事者以地。’”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《史记·越世家》：“‘以不听子故至于此，为之奈何？’蠡对曰：‘持满者与天，定倾者与人，节事者",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "以地",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 24,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 25,
+      "style": "Normal",
+      "text": "⑯《吕氏春秋》：“圣人之相知，岂待言哉！白公问于孔子曰：‘人可与微言乎？’孔子不应。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑯《吕氏春秋》：“圣人之相知，岂待言哉！白公问于孔子曰：‘人",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "可与微言",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "乎？’孔子不应。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 26,
+      "style": "Normal",
+      "text": "《淮南子》：“白公问于孔子曰：‘人可以微言？’孔子不应。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《淮南子》：“白公问于孔子曰：‘人",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "可以微言",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "？’孔子不应。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 27,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 28,
+      "style": "Normal",
+      "text": "⑰《淮南子》：“恭王大怒，曰：‘今日之战，不谷亲伤，所恃者司马也，而司马又若此，是亡楚国之社稷，而不率吾众也。不谷无与复战矣。’于是罢师而去之，斩司马子反为聊。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑰《淮南子》：“恭王大怒，曰：‘今日之战，不谷亲伤，所恃者司马也，而司马又若此，是亡楚国之社稷，而不率吾众也。不谷",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "无与复战",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "矣。’于是罢师而去之，斩司马子反为聊。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 29,
+      "style": "Normal",
+      "text": "《说苑》：“于是恭王驾往入幄，闻酒臭曰：‘今日之战，所恃者司马，司马至醉如此，是亡吾国而不恤吾众也，吾无以复战矣。’”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《说苑》：“于是恭王驾往入幄，闻酒臭曰：‘今日之战，所恃者司马，司马至醉如此，是亡吾国而不恤吾众也，吾无以复战矣。’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 30,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 31,
+      "style": "Normal",
+      "text": "⑱《战国策·燕策》：“不足以报，然得贤士与共国，以雪先王之耻，孤之䫁也。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑱《战国策·燕策》：“不足以报，然",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "得贤士与共国",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，以雪先王之耻，孤之䫁也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 32,
+      "style": "Normal",
+      "text": "《史记》：“然诚得贤士以共国，以雪先王之耻，孤之愿也。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《史记》：“然诚",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "得贤士以共国",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，以雪先王之耻，孤之愿也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 33,
+      "style": "Normal",
+      "text": "以，猶“及”也。①《易·小畜》九五曰：“富以其鄰。”虞翻注曰：“以，及也。”②（《泰》六四、《謙》六五並曰：“不富以其鄰。”）《泰》初九曰：“拔茅茹，以其匯。”言及其匯也③（《否》初六同）。《剝》初六曰：“剝床以足。”六二曰：“剝床以辨。”六四曰：“剝床以膚。”言及足、及辨、及膚也。④《複》上六曰：“用行師，終有大敗，以其國君（句），凶。”言及其國君也。⑤（王弼訓“以”為“用”，雲“用之於國，則反乎君道”，失之。此家大人說。）《周語》引《湯誓》曰：“餘一人有罪，無以萬夫。”言無及萬夫也。⑥",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "以，猶“及”也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《易·小畜》九五曰：“富以其鄰。”虞翻注曰：“以，及也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（《泰》六四、《謙》六五並曰：“不富以其鄰。”）《泰》初九曰：“拔茅茹，以其匯。”言及其匯也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（《否》初六同）。《剝》初六曰：“剝床以足。”六二曰：“剝床以辨。”六四曰：“剝床以膚。”言及足、及辨、及膚也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《複》上六曰：“用行師，終有大敗，以其國君（句），凶。”言及其國君也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（王弼訓“以”為“用”，雲“用之於國，則反乎君道”，失之。此家大人說。）《周語》引《湯誓》曰：“餘一人有罪，無以萬夫。”言無及萬夫也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 34,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 35,
+      "style": "Normal",
+      "text": "以，猶“而”也。①《易·泰》六四曰：“不戒以孚。”②猶《系辭傳》言“不疾而速，不行而至”也。③《書·牧誓》曰：“俾暴虐於百姓，以奸宄於商邑。”④《金縢》曰：“天大雷電以風。”⑤（隱九年《左傳》曰：“大雨霖以震。”⑥）《禮記·樂記》曰：“治世之音安以樂，亂世之音怨以怒，亡國之音哀以思。”⑦《大戴禮·曾子制言》篇曰：“富以苟，不如貧以譽；生以辱，不如死以榮。”⑧閔二年《左傳》曰：“親以無災，又何患焉？”⑨昭二十年曰：“濟其不及，以泄其過。”⑩《晉語》曰：“狐偃惠以有謀，趙衰文以忠貞，賈佗多識以恭敬。”⑪《吳語》曰：“昔楚靈王不君，其臣箴諫以不入。”⑫莊二十四年《公羊傳》曰：“戎眾以無義。”（以，猶“而”也。僖二十一年《傳》曰：“楚，夷國也，強而無義。”是其證。何注曰：“戎師多，又常以無義為事。”失之。）⑬《論語·為政》篇曰：“季康子問使民敬忠以勸，如之何？”⑭“以”字並與“而”同義。《易·同人彖傳》曰：“文明以健，中正而應。”⑮《系辭傳》曰：“蓍之德圓而神，卦之德方以知。”⑯《禮記·聘義》曰：“溫潤而澤，仁也；縝密以栗，知也。”⑰昭十一年《左傳》曰：“桀克有緡以喪其國，紂克東夷而隕其身。”⑱以，亦“而”也，互文耳。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "以，猶“而”也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《易·泰》六四曰：“不戒以孚。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "猶《系辭傳》言“不疾而速，不行而至”也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《書·牧誓》曰：“俾暴虐於百姓，以奸宄於商邑。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《金縢》曰：“天大雷電以風。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "（隱九年《左傳》曰：“大雨霖以震。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "）《禮記·樂記》曰：“治世之音安以樂，亂世之音怨以怒，亡國之音哀以思。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《大戴禮·曾子制言》篇曰：“富以苟，不如貧以譽；生以辱，不如死以榮。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑧",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "閔二年《左傳》曰：“親以無災，又何患焉？”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑨",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "昭二十年曰：“濟其不及，以泄其過。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑩",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《晉語》曰：“狐偃惠以有謀，趙衰文以忠貞，賈佗多識以恭敬。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑪",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《吳語》曰：“昔楚靈王不君，其臣箴諫以不入。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑫",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "莊二十四年《公羊傳》曰：“戎眾以無義。”（以，猶“而”也。僖二十一年《傳》曰：“楚，夷國也，強而無義。”是其證。何注曰：“戎師多，又常以無義為事。”失之。）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑬",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《論語·為政》篇曰：“季康子問使民敬忠以勸，如之何？”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑭",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "“以”字並與“而”同義。《易·同人彖傳》曰：“文明以健，中正而應。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑮",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《系辭傳》曰：“蓍之德圓而神，卦之德方以知。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑯",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《禮記·聘義》曰：“溫潤而澤，仁也；縝密以栗，知也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑰",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "昭十一年《左傳》曰：“桀克有緡以喪其國，紂克東夷而隕其身。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑱",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "以，亦“而”也，互文耳。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": [
+        "12"
+      ]
+    },
+    {
+      "index": 36,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 37,
+      "style": "Normal",
+      "text": "⑬《公羊传》：“戎将侵曹，曹羁谏日：‘戎众以无义，君请勿自敌也。’”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑬《公羊传》：“戎将侵曹，曹羁谏日：‘",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "戎众以无义",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，君请勿自敌也。’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 38,
+      "style": "Normal",
+      "text": "《公羊传》：“夷谏曰：‘楚，夷国也，强而无义，请君以兵车之□往。’”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《公羊传》：“夷谏曰：‘楚，夷国也，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "强而无义",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，请君以兵车之□往。’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 39,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 40,
+      "style": "Normal",
+      "text": "⑭《论语》：“季康子问：‘使民敬、忠以劝，如之何？’子曰：临之以庄，则敬；孝慈，则忠；举善而教不能，则民劝。’”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑭",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "《论语》：“季康子问：‘使民敬、",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "忠以劝",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，如之何？’子曰：临之以庄，则敬；孝慈，则忠；举善而教不能，则民劝。’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 41,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 42,
+      "style": "Normal",
+      "text": "⑮《周易·同人》“同人曰：同人于野，亨，利涉大川，乾行也。文明以健，中正而应。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑮《周易·同人》“同人曰：同人于野，亨，利涉大川，乾行也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "文明以健",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "中正而应",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 43,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 44,
+      "style": "Normal",
+      "text": "⑯《易传·系词上》：“是故圣人以通天下之志，以定天下之业，以断天下之疑。是故蓍之德圆而神，卦之德方以知，六爻之义易以贡。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑯《易传·系词上》：“是故圣人以通天下之志，以定天下之业，以断天下之疑。是故蓍之",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "德圆而神",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，卦之",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "德方以知",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，六爻之义易以贡。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 45,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 46,
+      "style": "Normal",
+      "text": "⑰《礼记》：“夫昔者君子比德于玉焉：温润而泽，仁也；缜密以栗，知也；廉而不刿，义也；垂之如队，礼也……”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑰《礼记》：“夫昔者君子比德于玉焉：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "温润而泽",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，仁也；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "缜密以栗",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "，知也；廉而不刿，义也；垂之如队，礼也……”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 47,
+      "style": "Normal",
+      "text": "\t",
+      "is_empty": true,
+      "runs": [
+        {
+          "text": "\t",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 48,
+      "style": "Normal",
+      "text": "⑱《左传·昭公十一》：“陈人听命，而遂县之。今又诱蔡而杀其君，以围其国，虽幸而克，必受其咎，弗能久矣。桀克有𦈏，以丧其国。纣克东夷，而陨其身。楚小位下，而亟暴于二王，能无咎乎？”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑱《左传·昭公十一》：“陈人听命，而遂县之。今又诱蔡而杀其君，以围其国，虽幸而克，必受其咎，弗能久矣。桀克有𦈏，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "以丧其国",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。纣克东夷，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "而陨其身",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。楚小位下，而亟暴于二王，能无咎乎？”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 49,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 50,
+      "style": "Normal",
+      "text": "已，旣也。常語也。①",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "已，旣也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "常語也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": [
+        "13"
+      ]
+    },
+    {
+      "index": 51,
+      "style": "Normal",
+      "text": "鄭注考工記曰：「已，太也，甚也。」亦常語也。②或作「以」。文五年左傳：「嬴曰：『以剛。』」③是也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "鄭注考工記曰：「已，太也，甚也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "亦常語也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。②或作「以」。文五年左傳：「嬴曰：『以剛。』」③是也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": [
+        "14"
+      ]
+    },
+    {
+      "index": 52,
+      "style": "Normal",
+      "text": "爾雅曰：「已，此也。」⑤",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "爾雅曰：「已，此也。」⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 53,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 54,
+      "style": "Normal",
+      "text": "接注⑤：“故《尚书·皋陶谟》：‘迩可远在兹。’《史记·夏本纪》作‘近可远在已’异文耳。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "接注⑤：“故《尚书·皋陶谟》：‘迩可远在兹。’《史记·夏本纪》作‘近可远在已’异文耳。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 55,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 56,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 57,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 58,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 59,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 60,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 61,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 62,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 63,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 64,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 65,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 66,
+      "style": "Normal",
+      "text": "莊子齊物論篇曰：「已而不知其然謂之道。」「已」字承上文而言，言此而不知其然也。①養生主篇曰：「已而爲知者，殆而已矣。」言此而爲知者也。郭象注曰：「已困於知而不知止，又爲知以救之。」非是。②此戴氏東原說。③淮南道應篇曰：「已雖無除其患，天地之間，六合之內，可陶冶而變化也。」④無，不也。言此雖不除其患也。此邵氏二雲說。⑤或作「以」。禮記祭統：「衞孔悝之鼎銘曰：『對揚以辟之勤大命，施於烝彝鼎。』」⑥以，此也。指上文而言也。辟，君也。言對揚此君之勤大命，著之於烝彝鼎也。鄭讀對揚以辟之爲句，云：「辟，明也。言遂揚君命，以明我先祖之德。」失之。君命謂之勤大命，猶𨿅誥言文、武勤敎也。⑧鄭以勤大命爲行君之命，亦失之。此家大人說，下同。射義引詩曰：「大夫君子，凡以庶士。」亦言凡此庶士也。⑦",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "莊子齊物論篇曰：「已而不知其然謂之道。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "「已」字承上文而言，言此而不知其然也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。①養生主篇曰：「已而爲知者，殆而已矣。」言此而爲知者也。郭象注曰：「已困於知而不知止，又爲知以救之。」非是。②此戴氏東原說。③淮南道應篇曰：「已雖無除其患，天地之間，六合之內，可陶冶而變化也。」④無，不也。言此雖不除其患也。此邵氏二雲說。⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "或作「以」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。禮記祭統：「衞孔悝之鼎銘曰：『對揚以辟之勤大命，施於烝彝鼎。』」⑥以，此也。指上文而言也。辟，君也。言對揚此君之勤大命，著之於烝彝鼎也。鄭讀對揚以辟之爲句，云：「辟，明也。言遂揚君命，以明我先祖之德。」失之。君命謂之勤大命，猶𨿅誥言文、武勤敎也。⑧鄭以勤大命爲行君之命，亦失之。此家大人說，下同。射義引詩曰：「大夫君子，凡以庶士。」亦言凡此庶士也。⑦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": [
+        "15",
+        "16"
+      ]
+    },
+    {
+      "index": 67,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 68,
+      "style": "Normal",
+      "text": "接⑦注：“故诗曰：曾孙侯氏，四正具举，大夫君子，凡以庶士，小大莫处，御于君所，以燕以射，则燕则誉。”传为貍首诗，今本亡。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "接⑦注：“故诗曰：曾孙侯氏，四正具举，大夫君子，凡以庶士，小大莫处，御于君所，以燕以射，则燕则誉。”传为貍首诗，今本亡。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 69,
+      "style": "Normal",
+      "text": "⑧《尚书·洛诰》：“勤施于四方，旁作穆穆迓衡，不迷文武勤教，予冲子夙夜毖祀。”（这句话可以理解成文武百官辛勤实行您的教化；本段句读有多种说法）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑧《尚书·洛诰》：“勤施于四方，旁作穆穆迓衡，不迷文武勤教，予冲子夙夜毖祀。”（这句话可以理解成文武百官辛勤实行您的教化；本段句读有多种说法）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 70,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 71,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 72,
+      "style": "Normal",
+      "text": "顏師古注漢書宣帝紀曰：「已，語終辭也。」①書洛誥曰：「公定予往已。」②禮記檀弓曰：「生事畢而鬼事始已，」盧植注曰：「已者，辭也。」③見通典禮六十四。「已」，爲語終之詞，則與「矣」同義；連言之則曰「已矣」，論語曰：「始可與言詩已矣，」是也。④學而、八佾二篇。猶「乎」與「哉」同義，而連言之則曰「乎哉」也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "顏師古注漢書宣帝紀曰：「已，語終辭也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "Calibri"
+        },
+        {
+          "text": "書洛誥曰：「公定予往已。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "Calibri"
+        },
+        {
+          "text": "禮記檀弓曰：「生事畢而鬼事始已，」盧植注曰：「已者，辭也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "Calibri"
+        },
+        {
+          "text": "見通典禮六十四。「已」，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "爲語終之詞，則與「矣」同義；連言之則曰「已矣」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，論語曰：「始可與言詩已矣，」是也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "學而、八佾二篇。猶「乎」與「哉」同義，而連言之則曰「乎哉」也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        }
+      ],
+      "comment_ids": [
+        "17"
+      ]
+    },
+    {
+      "index": 73,
+      "style": "Normal",
+      "text": "已，歎詞也。①書大誥曰：「已！予惟小子！」某氏傳曰：「已，發端歎辭也。」②漢書翟義傳作熙。顏師古注曰：「熙，歎辭。」③康誥曰：「已！女惟小子！」又曰：「已！女乃其速由茲義率殺！」④梓材曰：「已！若茲監！」⑤洛誥曰：「已！女惟沖子！」⑥莊子庚桑楚篇曰：「已！我安逃此而可？」⑦義並同也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "已，歎詞也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "書大誥曰：「已！予惟小子！」某氏傳曰：「已，發端歎辭也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "漢書翟義傳作熙。顏師古注曰：「熙，歎辭。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "康誥曰：「已！女惟小子！」又曰：「已！女乃其速由茲義率殺！」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "梓材曰：「已！若茲監！」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "洛誥曰：「已！女惟沖子！」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "莊子庚桑楚篇曰：「已！我安逃此而可？」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "⑦",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "義並同也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "方正公文小标宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": [
+        "18"
+      ]
+    },
+    {
+      "index": 74,
+      "style": "Normal",
+      "text": "㠯、以，已",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "㠯、以，已",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 75,
+      "style": "Normal",
+      "text": "㠯",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "㠯",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 76,
+      "style": "Normal",
+      "text": "或作以，或作已",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "或作以，或作已",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 77,
+      "style": "Normal",
+      "text": "以：",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "以：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 78,
+      "style": "Normal",
+      "text": "1.语词之“用”也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "1.语词之“用”也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 79,
+      "style": "Normal",
+      "text": "2.亦“由”也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "2.亦“由”也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 80,
+      "style": "Normal",
+      "text": "3.为也；凡“何以”，皆谓“何为”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "3.为也；凡“何以”，皆谓“何为”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 81,
+      "style": "Normal",
+      "text": "4.犹“谓”也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "4.犹“谓”也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 82,
+      "style": "Normal",
+      "text": "5.犹“与”也；《广雅》；亦“与”也，古人自有复语耳；皆以“与”“以”互文",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "5.犹“与”也；《广雅》；亦“与”也，古人自有复语耳；皆以“与”“以”互文",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 83,
+      "style": "Normal",
+      "text": "6.犹“及”也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "6.犹“及”也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 84,
+      "style": "Normal",
+      "text": "7.犹“而”也；以亦“而”也，互文耳",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "7.犹“而”也；以亦“而”也，互文耳",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 85,
+      "style": "Normal",
+      "text": "已",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "已",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 86,
+      "style": "Normal",
+      "text": "既也，常语也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "既也，常语也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 87,
+      "style": "Normal",
+      "text": "已，太，甚也，亦常语也，或作以",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "已，太，甚也，亦常语也，或作以",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 88,
+      "style": "Normal",
+      "text": "《尔雅》已，此也；或作以；",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《尔雅》已，此也；或作以；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 89,
+      "style": "Normal",
+      "text": "已，语终词也；已为语终之词汇，则与“矣”同义，连言之则曰“已矣”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "已，语终词也；已为语终之词汇，则与“矣”同义，连言之则曰“已矣”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 90,
+      "style": "Normal",
+      "text": "已，叹词也；义竝同也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "已，叹词也；义竝同也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 91,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 92,
+      "style": "Normal",
+      "text": "引用文献排列：",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "引用文献排列：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 93,
+      "style": "Normal",
+      "text": "《書·堯典》\n《禮記·檀弓》\n《漢書·劉向傳》\n《大戴禮·子張問入官》\n《孔子家語·入官》\n《玉篇》\n《詩·瞻卬》\n《禮記·檀弓》\n《左傳·昭公二十五年》\n《齊策》\n《廣雅》\n《書·盤庚》\n《詩·江有汜》\n《詩·擊鼓》\n《詩·桑柔》\n《儀禮·鄉射禮》\n《儀禮·大射儀》\n《禮記·檀弓》\n《易·鼎》\n《詩·小明》\n《禮記·郊特牲》\n《左傳·襄公二十年》\n《左傳·襄公二十九年》\n《論語·微子》\n《詩·江有汜》\n《詩·旄邱》\n《管子·形勢》\n《呂氏春秋·樂成》\n《越語》\n《史記·越世家》\n《呂氏春秋·精諭》\n《淮南·道應》\n《淮南子》\n《說苑·敬慎》\n《燕策》\n《史記·燕世家》\n《易·小畜》\n《易·泰》\n《易·否》\n《易·剝》\n《易·復》\n《周語》\n《湯誓》\n《易·泰》\n《繫辭傳》\n《書·牧誓》\n《書·金縢》\n《左傳·隱公九年》\n《禮記·樂記》\n《大戴禮·曾子制言》\n《左傳·閔公二年》\n《左傳·昭公二十年》\n《晉語》\n《吳語》\n《公羊傳·莊公二十四年》\n《論語·為政》\n《易·同人彖傳》\n《繫辭傳》\n《禮記·聘義》\n《左傳·昭公十一年》\n鄭注《考工記》\n《左傳·文公五年》\n《爾雅》\n《尚書·皋陶謨》\n《史記·夏本紀》\n《莊子·齊物論》\n《莊子·養生主》\n《淮南·道應》\n《禮記·祭統》\n《射義》\n《尚書·洛誥》\n《漢書·宣帝紀》\n《書·洛誥》\n《禮記·檀弓》\n《論語》\n《書·大誥》\n《漢書·翟義傳》\n《書·康誥》\n《書·梓材》\n《書·洛誥》\n《莊子·庚桑楚》",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《書·堯典》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·檀弓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《漢書·劉向傳》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《大戴禮·子張問入官》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《孔子家語·入官》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《玉篇》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·瞻卬》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·檀弓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·昭公二十五年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《齊策》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《廣雅》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·盤庚》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·江有汜》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·擊鼓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·桑柔》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《儀禮·鄉射禮》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《儀禮·大射儀》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·檀弓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·鼎》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·小明》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·郊特牲》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·襄公二十年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·襄公二十九年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《論語·微子》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·江有汜》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《詩·旄邱》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《管子·形勢》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《呂氏春秋·樂成》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《越語》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《史記·越世家》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《呂氏春秋·精諭》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《淮南·道應》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《淮南子》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《說苑·敬慎》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《燕策》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《史記·燕世家》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·小畜》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·泰》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·否》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·剝》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·復》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《周語》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《湯誓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·泰》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《繫辭傳》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·牧誓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·金縢》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·隱公九年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·樂記》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《大戴禮·曾子制言》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·閔公二年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·昭公二十年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《晉語》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《吳語》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《公羊傳·莊公二十四年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《論語·為政》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《易·同人彖傳》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《繫辭傳》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·聘義》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·昭公十一年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "鄭注《考工記》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《左傳·文公五年》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《爾雅》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《尚書·皋陶謨》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《史記·夏本紀》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《莊子·齊物論》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《莊子·養生主》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《淮南·道應》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·祭統》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《射義》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《尚書·洛誥》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《漢書·宣帝紀》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·洛誥》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《禮記·檀弓》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《論語》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·大誥》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《漢書·翟義傳》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·康誥》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·梓材》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《書·洛誥》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "\n",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "《莊子·庚桑楚》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 94,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 95,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 96,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 97,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    }
+  ],
+  "tables": [],
+  "comments": [
+    {
+      "id": "0",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T16:57:45Z",
+      "text": "王氏认为这三个字有异体字关系",
+      "anchor_text": "或作",
+      "paragraph_indexes": [
+        1
+      ]
+    },
+    {
+      "id": "1",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:03:45Z",
+      "text": "用某个较为常见的词语解释另一个词语的某个义项",
+      "anchor_text": "語詞之",
+      "paragraph_indexes": [
+        2
+      ]
+    },
+    {
+      "id": "2",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T16:58:55Z",
+      "text": "虚词的常见用法,王引之只释其义,不引书证,不加考辨",
+      "anchor_text": "常語",
+      "paragraph_indexes": [
+        2
+      ]
+    },
+    {
+      "id": "3",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:04:58Z",
+      "text": "用一个同义词解释一个词语的某一个义项",
+      "anchor_text": "亦",
+      "paragraph_indexes": [
+        3
+      ]
+    },
+    {
+      "id": "4",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:05:43Z",
+      "text": "引用字书引出一个词语的某个义项",
+      "anchor_text": "《玉篇》曰：“以，為也。”",
+      "paragraph_indexes": [
+        4
+      ]
+    },
+    {
+      "id": "5",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:06:17Z",
+      "text": "对书籍中的规律性现象进行归纳总结性结论",
+      "anchor_text": "凡經傳言“何以若此”者，皆謂“何為若此”也。",
+      "paragraph_indexes": [
+        4
+      ]
+    },
+    {
+      "id": "6",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:26:54Z",
+      "text": "虚词的常见用法,王引之只释其义,不引书证,不加考辨",
+      "anchor_text": "常語",
+      "paragraph_indexes": [
+        4
+      ]
+    },
+    {
+      "id": "7",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:07:01Z",
+      "text": "用一个词语解释另一个词语的一个义项",
+      "anchor_text": "猶",
+      "paragraph_indexes": [
+        11
+      ]
+    },
+    {
+      "id": "8",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-13T17:07:35Z",
+      "text": "解释在本条义项解释下的句意",
+      "anchor_text": "言吾谓将为贤人也。②",
+      "paragraph_indexes": [
+        11
+      ]
+    },
+    {
+      "id": "9",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:04:53Z",
+      "text": "解释在此词条解释下的句意",
+      "anchor_text": "言皆謂美於徐公也",
+      "paragraph_indexes": [
+        11
+      ]
+    },
+    {
+      "id": "10",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:05:42Z",
+      "text": "用一个同一词解释另一个词的某个义项",
+      "anchor_text": "以，亦“與”也，古人自有複語耳。",
+      "paragraph_indexes": [
+        20
+      ]
+    },
+    {
+      "id": "11",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:06:15Z",
+      "text": "规律性总结；互文指前后句文意互为补充，为同义词",
+      "anchor_text": "皆以“與”​“以”互文",
+      "paragraph_indexes": [
+        20
+      ]
+    },
+    {
+      "id": "12",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:08:08Z",
+      "text": "用一个同义词解释另一个词语的某个义项",
+      "anchor_text": "以，亦“而”也，互文耳。",
+      "paragraph_indexes": [
+        35
+      ]
+    },
+    {
+      "id": "13",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:08:55Z",
+      "text": "虚词的常见用法,王引之只释其义,不引书证,不加考辨",
+      "anchor_text": "常語也",
+      "paragraph_indexes": [
+        50
+      ]
+    },
+    {
+      "id": "14",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:09:01Z",
+      "text": "虚词的常见用法,王引之只释其义,不引书证,不加考辨",
+      "anchor_text": "亦常語也",
+      "paragraph_indexes": [
+        51
+      ]
+    },
+    {
+      "id": "15",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:09:19Z",
+      "text": "承接上文，解释此词条下的句意",
+      "anchor_text": "「已」字承上文而言，言此而不知其然也",
+      "paragraph_indexes": [
+        66
+      ]
+    },
+    {
+      "id": "16",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:09:50Z",
+      "text": "该虚词的此义项在某些情况下被写作别的词",
+      "anchor_text": "或作「以」",
+      "paragraph_indexes": [
+        66
+      ]
+    },
+    {
+      "id": "17",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:11:36Z",
+      "text": "句末语气词。用同义词解释该义项的用法",
+      "anchor_text": "爲語終之詞，則與「矣」同義；連言之則曰「已矣」",
+      "paragraph_indexes": [
+        72
+      ]
+    },
+    {
+      "id": "18",
+      "author": "顶呱呱 [2]",
+      "date": "2026-04-20T22:12:21Z",
+      "text": "意义相同",
+      "anchor_text": "義並同也。",
+      "paragraph_indexes": [
+        73
+      ]
+    }
+  ],
+  "notes": {
+    "footnotes": [],
+    "endnotes": []
+  },
+  "annotation_blocks": [],
+  "package_inventory": [
+    {
+      "name": "[Content_Types].xml",
+      "size": 5790,
+      "compressed_size": 585,
+      "crc": "b8d2fba4"
+    },
+    {
+      "name": "_rels/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "_rels/.rels",
+      "size": 737,
+      "compressed_size": 253,
+      "crc": "1f222201"
+    },
+    {
+      "name": "customXml/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "customXml/_rels/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "customXml/_rels/item1.xml.rels",
+      "size": 296,
+      "compressed_size": 188,
+      "crc": "7a393f74"
+    },
+    {
+      "name": "customXml/item1.xml",
+      "size": 475,
+      "compressed_size": 198,
+      "crc": "b447ce2f"
+    },
+    {
+      "name": "customXml/itemProps1.xml",
+      "size": 327,
+      "compressed_size": 229,
+      "crc": "457b4363"
+    },
+    {
+      "name": "docProps/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "docProps/app.xml",
+      "size": 633,
+      "compressed_size": 358,
+      "crc": "c158a482"
+    },
+    {
+      "name": "docProps/core.xml",
+      "size": 633,
+      "compressed_size": 351,
+      "crc": "eb0a60e6"
+    },
+    {
+      "name": "docProps/custom.xml",
+      "size": 750,
+      "compressed_size": 405,
+      "crc": "00912921"
+    },
+    {
+      "name": "word/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/_rels/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/_rels/document.xml.rels",
+      "size": 4696,
+      "compressed_size": 536,
+      "crc": "473ba531"
+    },
+    {
+      "name": "word/_rels/fontTable.xml.rels",
+      "size": 685,
+      "compressed_size": 205,
+      "crc": "0d7c8188"
+    },
+    {
+      "name": "word/comments.xml",
+      "size": 9054,
+      "compressed_size": 1532,
+      "crc": "3b24df47"
+    },
+    {
+      "name": "word/commentsExtended.xml",
+      "size": 2259,
+      "compressed_size": 584,
+      "crc": "f54238f3"
+    },
+    {
+      "name": "word/document.xml",
+      "size": 131201,
+      "compressed_size": 13500,
+      "crc": "b233120a"
+    },
+    {
+      "name": "word/fontTable.xml",
+      "size": 4439,
+      "compressed_size": 1146,
+      "crc": "5300c6e7"
+    },
+    {
+      "name": "word/fonts/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/fonts/font1.odttf",
+      "size": 535720,
+      "compressed_size": 187514,
+      "crc": "abfaa787"
+    },
+    {
+      "name": "word/fonts/font2.odttf",
+      "size": 588796,
+      "compressed_size": 300529,
+      "crc": "fe44e399"
+    },
+    {
+      "name": "word/fonts/font3.odttf",
+      "size": 488220,
+      "compressed_size": 244120,
+      "crc": "b7edcfa4"
+    },
+    {
+      "name": "word/fonts/font4.odttf",
+      "size": 743844,
+      "compressed_size": 46016,
+      "crc": "92866aa1"
+    },
+    {
+      "name": "word/footer1.xml",
+      "size": 17777,
+      "compressed_size": 5830,
+      "crc": "798741bd"
+    },
+    {
+      "name": "word/footer10.xml",
+      "size": 8845,
+      "compressed_size": 2084,
+      "crc": "f4dcfdc2"
+    },
+    {
+      "name": "word/footer11.xml",
+      "size": 7071,
+      "compressed_size": 1899,
+      "crc": "8b76e3d2"
+    },
+    {
+      "name": "word/footer12.xml",
+      "size": 10026,
+      "compressed_size": 1800,
+      "crc": "28728ffd"
+    },
+    {
+      "name": "word/footer13.xml",
+      "size": 1579,
+      "compressed_size": 570,
+      "crc": "4b9555ae"
+    },
+    {
+      "name": "word/footer2.xml",
+      "size": 1341,
+      "compressed_size": 444,
+      "crc": "0d792081"
+    },
+    {
+      "name": "word/footer3.xml",
+      "size": 1341,
+      "compressed_size": 445,
+      "crc": "28ca1d66"
+    },
+    {
+      "name": "word/footer4.xml",
+      "size": 12200,
+      "compressed_size": 4793,
+      "crc": "0632913e"
+    },
+    {
+      "name": "word/footer5.xml",
+      "size": 13221,
+      "compressed_size": 5264,
+      "crc": "cec543a9"
+    },
+    {
+      "name": "word/footer6.xml",
+      "size": 19778,
+      "compressed_size": 2525,
+      "crc": "dc914714"
+    },
+    {
+      "name": "word/footer7.xml",
+      "size": 16831,
+      "compressed_size": 5174,
+      "crc": "77d8ce27"
+    },
+    {
+      "name": "word/footer8.xml",
+      "size": 17326,
+      "compressed_size": 2403,
+      "crc": "d296232f"
+    },
+    {
+      "name": "word/footer9.xml",
+      "size": 11342,
+      "compressed_size": 2310,
+      "crc": "04dee22d"
+    },
+    {
+      "name": "word/header1.xml",
+      "size": 1381,
+      "compressed_size": 466,
+      "crc": "02fca52c"
+    },
+    {
+      "name": "word/header10.xml",
+      "size": 1404,
+      "compressed_size": 477,
+      "crc": "d5040827"
+    },
+    {
+      "name": "word/header11.xml",
+      "size": 1404,
+      "compressed_size": 478,
+      "crc": "0b31d6b3"
+    },
+    {
+      "name": "word/header12.xml",
+      "size": 1404,
+      "compressed_size": 476,
+      "crc": "573600df"
+    },
+    {
+      "name": "word/header13.xml",
+      "size": 1404,
+      "compressed_size": 477,
+      "crc": "c41dae72"
+    },
+    {
+      "name": "word/header2.xml",
+      "size": 1341,
+      "compressed_size": 445,
+      "crc": "08c66bcb"
+    },
+    {
+      "name": "word/header3.xml",
+      "size": 1341,
+      "compressed_size": 444,
+      "crc": "a3170db0"
+    },
+    {
+      "name": "word/header4.xml",
+      "size": 1381,
+      "compressed_size": 465,
+      "crc": "86da8508"
+    },
+    {
+      "name": "word/header5.xml",
+      "size": 1720,
+      "compressed_size": 573,
+      "crc": "c5087919"
+    },
+    {
+      "name": "word/header6.xml",
+      "size": 1720,
+      "compressed_size": 573,
+      "crc": "34c33a5f"
+    },
+    {
+      "name": "word/header7.xml",
+      "size": 1381,
+      "compressed_size": 466,
+      "crc": "d5b1ead6"
+    },
+    {
+      "name": "word/header8.xml",
+      "size": 1381,
+      "compressed_size": 465,
+      "crc": "1de965d9"
+    },
+    {
+      "name": "word/header9.xml",
+      "size": 1381,
+      "compressed_size": 465,
+      "crc": "ddc36156"
+    },
+    {
+      "name": "word/numbering.xml",
+      "size": 1613,
+      "compressed_size": 564,
+      "crc": "ac3cb819"
+    },
+    {
+      "name": "word/people.xml",
+      "size": 1405,
+      "compressed_size": 493,
+      "crc": "ae41ff49"
+    },
+    {
+      "name": "word/settings.xml",
+      "size": 6504,
+      "compressed_size": 2133,
+      "crc": "0263ccad"
+    },
+    {
+      "name": "word/styles.xml",
+      "size": 26029,
+      "compressed_size": 2931,
+      "crc": "582d593b"
+    },
+    {
+      "name": "word/theme/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/theme/theme1.xml",
+      "size": 6331,
+      "compressed_size": 1546,
+      "crc": "f21ab5dd"
+    }
+  ],
+  "checksums": {
+    "source_docx_sha256": "fec1e9bfe5865c3233a272aa6450753043d10c1a6d5879e35f25189eb7094433",
+    "paragraph_text_sha256": "227480c9a48f5fb3d9d113f608bf0adced9c668db6d6759e75d91fe06b92a1d7",
+    "comment_text_sha256": "4fddbd42d4c87198e01fa63651ebf405f5795b66c16f307b42de95aa67d0c928"
+  },
+  "controlled_vocabularies": {
+    "method_tags": [
+      "义证",
+      "书证",
+      "句义解释",
+      "同义互证",
+      "声训",
+      "对文散文",
+      "异体",
+      "异文",
+      "形证",
+      "校勘",
+      "补正",
+      "训释",
+      "语法证据",
+      "通假"
+    ],
+    "relation_types": [
+      "",
+      "古今字",
+      "同义",
+      "声近义同",
+      "对文异义",
+      "异体",
+      "异文",
+      "当作",
+      "散文同义",
+      "误字",
+      "递训",
+      "通假"
+    ],
+    "evidence_types": [
+      "义证",
+      "书证",
+      "声训",
+      "异文",
+      "形证",
+      "语法证据"
+    ],
+    "step_types": [
+      "反驳",
+      "发疑",
+      "取证",
+      "立论",
+      "结论",
+      "补证",
+      "释理",
+      "释词"
+    ],
+    "certainty": [
+      "确定",
+      "可疑",
+      "待核"
+    ],
+    "status": [
+      "草稿",
+      "已校对",
+      "已审核"
+    ]
+  }
+}

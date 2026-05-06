@@ -1,0 +1,240 @@
+{
+  "cases": [
+    {
+      "case_title": "平原之隰",
+      "source_work": "读书杂志",
+      "target_work": "管子",
+      "target_text": "平原之隰，奚有於高",
+      "problem": "今本正文作“平原之隰，奚有於高”，今本後《解》：“所謂平原者，下澤也，雖有小封，不得爲高”，“隰”與“封”矛盾。",
+      "claim": "原文當作“平隰之封，奚有於高”",
+      "method_tags": [
+        "校勘",
+        "书证",
+        "义证"
+      ],
+      "terms": [
+        {
+          "term": "原",
+          "term_type": "字",
+          "relation_type": "误字",
+          "related_term": "隰",
+          "note": "“原”误作“隰”",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "隰",
+          "term_type": "字",
+          "relation_type": "误字",
+          "related_term": "封",
+          "note": "“隰”误作“封”",
+          "source_paragraph_indexes": [
+            15
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "管子注",
+          "quote": "言平隰之澤，雖有小封，不成於高。",
+          "role": "支持论点，证明存在“平隰之封”的版本",
+          "source_paragraph_indexes": [
+            17
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "发疑",
+          "text": "今本正文作“平原之隰，奚有於高”，今本後《解》：“所謂平原者，下澤也，雖有小封，不得爲高”，“隰”與“封”矛盾。",
+          "source_paragraph_indexes": [
+            22
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "立论",
+          "text": "此當作“平隰之封，奚有於高”。",
+          "source_paragraph_indexes": [
+            23
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。",
+          "source_paragraph_indexes": [
+            24
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释理",
+          "text": "根據《管子注》“雖有小封”證明有本作“平隰之封”。再分析下濕曰隰，故言“下澤”，積土曰封，一低一高；又根據“平原之隰，奚有於高？大山之隈，奚有於深？”的同構關係，與“低地中的高處仍不高”之義，證明隰當為封。",
+          "source_paragraph_indexes": [
+            25
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "结论",
+          "text": "後人既改此文“平隰之封”爲“平原之隰”，遂并後《解》而改之，弗思甚矣。此當作“平隰之封，奚有於高”。",
+          "source_paragraph_indexes": [
+            26
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "此當作“平隰之封，奚有於高”。",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 1,
+        "imported_at": "2026-05-06T17:17:37"
+      }
+    },
+    {
+      "case_title": "譕臣",
+      "source_work": "读书杂志",
+      "target_work": "管子",
+      "target_text": "譕臣者，可以遠舉",
+      "problem": "原文“譕臣者，可以遠舉”，尹注以“譕臣”為可通之詞，王引之疑“臣”為“巨”之誤。",
+      "claim": "“臣”當作“巨”，原文應為“譕巨”；“譕巨”指謀及天下之大計",
+      "method_tags": [
+        "校勘",
+        "书证",
+        "声训"
+      ],
+      "terms": [
+        {
+          "term": "譕",
+          "term_type": "字",
+          "relation_type": "通假",
+          "related_term": "謨",
+          "note": "《集韻》曰：謨，古作譕。",
+          "source_paragraph_indexes": [
+            41
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "臣",
+          "term_type": "字",
+          "relation_type": "误字",
+          "related_term": "巨",
+          "note": "字形相似而誤",
+          "source_paragraph_indexes": [
+            42
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "巨",
+          "term_type": "字",
+          "relation_type": "同义",
+          "related_term": "大",
+          "note": "巨，大也。",
+          "source_paragraph_indexes": [
+            43
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "集韻",
+          "quote": "謨，古作譕。",
+          "role": "证明“譕”通“謨”",
+          "source_paragraph_indexes": [
+            48
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "爾雅",
+          "quote": "謨，謀也。",
+          "role": "证明“謨”意为谋",
+          "source_paragraph_indexes": [
+            49
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "管子·形勢解",
+          "quote": "明主之慮事也，爲天下計者，謂之譕臣。",
+          "role": "证明“譕臣”应为“譕巨”，且“巨”释为“天下”",
+          "source_paragraph_indexes": [
+            50
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "发疑",
+          "text": "原文“譕臣者，可以遠舉”，尹注以“譕臣”為可通之詞。王引之疑“臣”為“巨”之誤。",
+          "source_paragraph_indexes": [
+            58
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "立论",
+          "text": "“臣”當作“巨”，“譕巨”意為謀及天下之大計。",
+          "source_paragraph_indexes": [
+            59
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "《集韻》曰：“謨，古作譕。”《爾雅》曰：“謨，謀也。”“臣”當作“巨”，字形相似而誤。巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。且“巨”與“舉”爲韻，“憂”與“道”爲韻。",
+          "source_paragraph_indexes": [
+            60
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释理",
+          "text": "字形上，“臣”與“巨”形近易訛。文義上，“譕臣”無法解釋為“爲天下計”；“譕巨”則與《形勢解》“爲天下計”對應。音韻上，“巨”與“舉”同在鱼部，符合古詩韻例；“臣”字失韻。",
+          "source_paragraph_indexes": [
+            61,
+            62,
+            63
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "结论",
+          "text": "原文當作“譕巨”，尹注錯誤。",
+          "source_paragraph_indexes": [
+            65
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "原文當作“譕巨”，尹注錯誤。",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 2,
+        "imported_at": "2026-05-06T17:17:37"
+      }
+    }
+  ],
+  "database_ingestion": {
+    "imported": true,
+    "database": "D:\\26大创\\04-项目文献\\D-标注\\json\\annotation_db\\annotation_results.db",
+    "imported_at": "2026-05-06T17:17:37"
+  }
+}

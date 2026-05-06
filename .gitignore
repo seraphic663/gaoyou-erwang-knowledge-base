@@ -16,6 +16,8 @@ note/
 ~$*.docx
 **/cloudflared.exe
 *.db-journal
+03-项目网站/data/visit-count.json
+04-项目文献/D-标注/json/.env
 
 # ---- Generated database intermediates ----
 02-数据库/parsed_data.py

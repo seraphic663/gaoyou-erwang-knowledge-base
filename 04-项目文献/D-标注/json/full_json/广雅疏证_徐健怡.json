@@ -1,0 +1,6242 @@
+{
+  "schema_version": "annotation_docx_full_json_v1",
+  "source_file": {
+    "name": "广雅疏证_徐健怡.docx",
+    "path": "D-标注\\广雅疏证_徐健怡.docx",
+    "size_bytes": 28734,
+    "modified_time": "2026-04-18T10:30:37"
+  },
+  "document_stats": {
+    "paragraph_count": 190,
+    "nonempty_paragraph_count": 137,
+    "table_count": 0,
+    "comment_count": 9,
+    "anchored_comment_count": 9,
+    "annotation_block_count": 12,
+    "footnote_count": 0,
+    "endnote_count": 0,
+    "paragraph_text_length": 4516,
+    "comment_text_length": 73
+  },
+  "doc_type": "term_group_blocks",
+  "paragraphs": [
+    {
+      "index": 1,
+      "style": "Normal",
+      "text": "P24",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "P24",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 2,
+      "style": "Normal",
+      "text": "虔1、畏2、賓3、齋4、亟5、憼6、景 懍7、力甚反 浚8、三閏 悛9、此緣反 誠10、信11、高12、尊13，敬也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "虔",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "1",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、畏",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "2",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、賓",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "3",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、齋",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "4",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、亟",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "5",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、憼",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "6",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "景 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文楷体"
+        },
+        {
+          "text": "懍",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "7",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "力甚反 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文楷体"
+        },
+        {
+          "text": "浚",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "8",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "三閏 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文楷体"
+        },
+        {
+          "text": "悛",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "9",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "此緣反 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文楷体"
+        },
+        {
+          "text": "誠",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "10",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、信",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "11",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "高",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "12",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "、尊",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "13",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，敬也。",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "华文中宋"
+        }
+      ],
+      "comment_ids": [
+        "0"
+      ]
+    },
+    {
+      "index": 3,
+      "style": "Normal",
+      "text": "①虔者，《商頌·殷武》傳雲：‘虔，敬也。’《大雅·韓奕》雲：‘虔共爾位。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "虔者，《商頌·殷武》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "傳",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "雲：‘虔，敬也。’《大雅·韓奕》雲：‘虔共爾位。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 4,
+      "style": "Normal",
+      "text": "②畏者，《大學》雲：‘之其所畏敬而辟焉。’《表記》雲：‘大人之器威敬。’‘威’與‘畏’通。[鄭注《曲禮》雲：‘心服曰畏。’《孟子•公孫醜篇》雲：‘吾先子之所畏也。’]",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "②",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "畏者，《大學》雲：‘之其所畏敬而辟焉。’《表記》雲：‘大人之器威敬。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘威’與‘畏’通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "[",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "鄭注《曲禮》雲：‘心服曰畏。’《孟子•公孫醜篇》雲：‘吾先子之所畏也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "]",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": [
+        "1"
+      ]
+    },
+    {
+      "index": 5,
+      "style": "Normal",
+      "text": "③賓者，《説文》：‘賓，所敬也。’《周官·鄕大夫》‘以禮禮賓之’鄭衆注雲：‘賓，敬也。’《禮運》‘山川所以儐鬼神也’，《釋文》‘儐，皇音賓，敬也。’‘儐’與‘賓’通。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "③",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "賓者，《説文》：‘賓，所敬也。’《周官·鄕大夫》‘以禮禮賓之’鄭衆注雲：‘賓，敬也。’《禮運》‘山川所以儐鬼神也’，《釋文》‘儐，皇音賓，敬也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘儐’與‘賓’通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 6,
+      "style": "Normal",
+      "text": "④齋者，《召南·采蘋篇》‘有齊季女’，《毛傳》雲：‘齊，敬也。’‘齊’與‘齋’通。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "④",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "齋者，《召南·采蘋篇》‘有齊季女’，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "《",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "毛傳",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "雲：‘齊，敬也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘齊’與‘齋’通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 7,
+      "style": "Normal",
+      "text": "⑤亟者，《說文》：‘敬，肅也。從攴苟。’‘苟，自急敕也。從羊省，從包省，從口，口猶慎言也。從羊，與義、善、美同意。’《玉篇》：‘苟，居力切，亦作亟。’《說文》：‘㥛，謹重皃。’[漢《成陽靈臺碑》雲：‘齊革精誠。’]‘苟’、‘亟’、[‘革’]、‘㥛’並同義。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "亟者，《說文》：‘敬，肅也。從攴苟。’‘苟，自急敕也。從羊省，從包省，從口，口猶慎言也。從羊，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "與義、善、美同意。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "’《玉篇》：‘苟，居力切，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "亦作亟",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。’《說文》：‘㥛，謹重皃。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "[",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "漢《成陽靈臺碑》雲：‘齊革精誠。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "]",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘苟’、‘亟’、",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "[‘革’]",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "、",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘㥛’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "並同義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 8,
+      "style": "Normal",
+      "text": "⑥憼者，《説文》：‘憼，敬也。’《大雅·常武》箋雲：‘敬之言警也。’‘敬’‘警’‘憼’聲近而義同。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑥",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "憼者，《説文》：‘憼，敬也。’《大雅·常武》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "箋",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "雲：‘",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "敬",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "之言",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "警也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。’‘敬’‘警’‘憼’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "聲近而義同",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": [
+        "2"
+      ]
+    },
+    {
+      "index": 9,
+      "style": "Normal",
+      "text": "⑦-⑧懍、浚者，《方言》：‘稟、浚，敬也。秦晉之間曰稟，齊曰浚，吳楚之閒自敬曰稟。’‘稟’與‘懍’通。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑦-⑧",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "懍、浚者，《方言》：‘稟、浚，敬也。秦晉之間曰稟，齊曰浚，吳楚之閒自敬曰稟。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘稟’與‘懍’通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 10,
+      "style": "Normal",
+      "text": "⑨悛者，《説文》：‘恮，謹也。’‘恮’與‘悛’通，‘悛’亦‘浚’也。《論語·鄕黨篇》‘恂恂如也，似不能言者’王肅注雲：‘恂恂，溫恭之貌。’《史記·李將軍傳》雲：‘悛悛如鄙人，口不能道辭。’並聲近而義同。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑨",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "悛者，《説文》：‘恮，謹也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘恮’與‘悛’通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘悛’亦‘浚’也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。《論語·鄕黨篇》‘恂恂如也，似不能言者’王肅注雲：‘恂恂，溫恭之貌。’《史記·李將軍傳》雲：‘悛悛如鄙人，口不能道辭。’並",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "聲近而義同",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 11,
+      "style": "Normal",
+      "text": "⑩-11誠、信者，《祭統》雲：‘誠信之謂盡，盡之謂敬。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑩-11",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "誠、信者，《祭統》雲：‘誠信",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "之謂",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "盡，盡",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "之謂",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "敬。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 12,
+      "style": "Normal",
+      "text": "【補正】",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "【補正】",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": [
+        "3"
+      ]
+    },
+    {
+      "index": 13,
+      "style": "Normal",
+      "text": "‘畏者’下補：鄭注《曲禮》雲：‘心服曰畏。’《孟子•公孫醜篇》雲：‘吾先子之所畏也。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "‘畏者",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "’下補",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "：鄭注《曲禮》雲：‘心服曰畏。’《孟子",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "•",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "微软雅黑"
+        },
+        {
+          "text": "公孫醜篇》雲：‘吾先子之所畏也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 14,
+      "style": "Normal",
+      "text": "‘謹重皃’下補：漢《成陽靈臺碑》雲：‘齊革精誠。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "‘謹重皃",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "下",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "補",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "：漢《成陽靈臺碑》雲：‘齊革精誠。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 15,
+      "style": "Normal",
+      "text": "‘苟亟’下補‘革’字。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "‘苟亟’下",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "補‘",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "革",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "字",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 16,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 17,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 18,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 19,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 20,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 21,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 22,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 23,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 24,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 25,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 26,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 27,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 28,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 29,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 30,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 31,
+      "style": "Normal",
+      "text": "考據對象",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據對象",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 32,
+      "style": "Normal",
+      "text": "虔、畏、賓、齋、亟、憼、景 懍、力甚反 浚、三閏 悛、此緣反 誠、信、高、尊",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "虔、畏、賓、齋、亟、憼、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "景 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "懍、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "力甚反 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "浚、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "三閏 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "悛、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "此緣反 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "誠、信、高、尊",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 33,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 34,
+      "style": "Normal",
+      "text": "引用書證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "引用書證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 35,
+      "style": "Normal",
+      "text": "《詩經・商頌・殷武》傳：「虔，敬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《詩經・商頌・殷武》傳：「虔，敬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 36,
+      "style": "Normal",
+      "text": "《詩經・大雅・韓奕》：「虔共爾位。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《詩經・大雅・韓奕》：「虔共爾位。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 37,
+      "style": "Normal",
+      "text": "《禮記・大學》：「之其所畏敬而辟焉。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《禮記・大學》：「之其所畏敬而辟焉。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 38,
+      "style": "Normal",
+      "text": "《禮記・表記》：「大人之器威敬。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《禮記・表記》：「大人之器威敬。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 39,
+      "style": "Normal",
+      "text": "鄭注《禮記・曲禮》：「心服曰畏。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "鄭注《禮記・曲禮》：「心服曰畏。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 40,
+      "style": "Normal",
+      "text": "《孟子・公孫丑》：「吾先子之所畏也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《孟子・公孫丑》：「吾先子之所畏也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 41,
+      "style": "Normal",
+      "text": "《說文解字》：「賓，所敬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「賓，所敬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 42,
+      "style": "Normal",
+      "text": "《周官・鄕大夫》鄭衆注：「賓，敬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《周官・",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "鄕",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "大夫》鄭衆注：「賓，敬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 43,
+      "style": "Normal",
+      "text": "《禮記・禮運》：「山川所以儐鬼神也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《禮記・禮運》：「山川所以儐鬼神也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 44,
+      "style": "Normal",
+      "text": "《經典釋文》：「儐，皇音賓，敬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《經典釋文》：「儐，皇音賓，敬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 45,
+      "style": "Normal",
+      "text": "《詩經・召南・采蘋》：「有齊季女」毛傳：「齊，敬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《詩經・召南・采蘋》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "「有齊季女」毛傳：「齊，敬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 46,
+      "style": "Normal",
+      "text": "《說文解字》：「敬，肅也。從攴苟。」「苟，自急敕也。從羊省，從包省，從口，口猶慎言也。從羊，與義、善、美同意。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「敬，肅也。從攴苟。」「苟，自急敕也。從羊省，從包省，從口，口猶慎言也。從羊，與義、善、美同意。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 47,
+      "style": "Normal",
+      "text": "《玉篇》：「苟，居力切，亦作亟。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《玉篇》：「苟，居力切，亦作亟。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 48,
+      "style": "Normal",
+      "text": "《說文解字》：「㥛，謹重皃。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「㥛，謹重皃。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 49,
+      "style": "Normal",
+      "text": "漢《成陽靈臺碑》：「齊革精誠。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "漢《成陽靈臺碑》：「齊革精誠。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 50,
+      "style": "Normal",
+      "text": "《說文解字》：「憼，敬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「憼，敬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 51,
+      "style": "Normal",
+      "text": "《詩經・大雅・常武》箋：「敬之言警也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《詩經・大雅・常武》箋：「敬之言警也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 52,
+      "style": "Normal",
+      "text": "《方言》：「稟、浚，敬也。秦晉之間曰稟，齊曰浚，吳楚之閒自敬曰稟。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《方言》：「稟、浚，敬也。秦晉之間曰稟，齊曰浚，吳楚之閒自敬曰稟。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 53,
+      "style": "Normal",
+      "text": "《說文解字》：「恮，謹也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「恮，謹也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 54,
+      "style": "Normal",
+      "text": "《論語・鄉黨》：「恂恂如也，似不能言者」王肅注：「恂恂，溫恭之貌。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《論語・鄉黨》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "「",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "恂恂如也，似不能言者",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "」王肅注：「恂恂，溫恭之貌。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 55,
+      "style": "Normal",
+      "text": "《史記・李將軍列傳》：「悛悛如鄙人，口不能道辭。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《史記・李將軍列傳》：「悛悛如鄙人，口不能道辭。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 56,
+      "style": "Normal",
+      "text": "《禮記・祭統》：「誠信之謂盡，盡之謂敬。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《禮記・祭統》：「誠信之謂盡，盡之謂敬。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 57,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 58,
+      "style": "Normal",
+      "text": "考據用語",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據用",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        },
+        {
+          "text": "語",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 59,
+      "style": "Normal",
+      "text": "  X與X通、X亦作X、XXX並同義、XXX聲近而義同、X之謂X",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "  X與X通、X亦作X、XXX並同義、XXX聲近而義同、X之謂X",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 60,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 61,
+      "style": "Normal",
+      "text": "字詞關係",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "字詞關係",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 62,
+      "style": "Normal",
+      "text": "通假字：威↔畏 賓↔儐 齊↔齋 稟↔懍 恮↔悛",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "通假字：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "威↔畏",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": " ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "賓↔儐",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": " ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "齊↔齋",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": " ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "稟↔懍",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": " ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "恮↔悛",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 63,
+      "style": "Normal",
+      "text": "聲近義同：敬↔警↔憼；悛↔恂↔浚",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "聲近義同：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "敬↔警↔憼",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "悛↔恂↔浚",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 64,
+      "style": "Normal",
+      "text": "同義字：苟↔亟↔革↔㥛；",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "同義字：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "苟↔亟↔革↔㥛",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 65,
+      "style": "Normal",
+      "text": "義理關聯：誠↔信↔盡↔敬",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "義理關聯：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "誠↔信↔",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "盡",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "↔敬",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 66,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 67,
+      "style": "Normal",
+      "text": "考據過程",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據過程",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 68,
+      "style": "Normal",
+      "text": "開篇確立考據目標",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "開篇確立考據目標",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 69,
+      "style": "Normal",
+      "text": " 明確所列13字均訓為“敬”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": " 明確所列13字均訓為“敬”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 70,
+      "style": "Normal",
+      "text": "逐字論證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "逐字論證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 71,
+      "style": "Normal",
+      "text": "①虔：引書證直訓（《詩經・商頌・殷武》毛傳，輔之以《詩經・大雅・韓奕》“虔共爾位” 經文用例，驗證 “虔” 在經典中表恭敬的用法。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "①",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "虔",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引書證直訓（《詩經・商頌・殷武》毛傳，輔之以",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "《詩經・大雅・韓奕》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "“虔共爾位” 經文用例，驗證 “虔” 在經典中表恭敬的用法",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 72,
+      "style": "Normal",
+      "text": "②畏：引《大學》《表記》經文，提出 “威與畏通”（通假關係）。補鄭注 “心服曰畏” 與《孟子》用例，明確 “畏” 是內心臣服的恭敬",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "②畏",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引《大學》《表記》經文，提出 “威與畏通”（通假關係）。補鄭注 “心服曰畏” 與《孟子》用例，明確 “畏” 是內心臣服的恭敬",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 73,
+      "style": "Normal",
+      "text": "③賓：引《說文》直訓 “賓，所敬也”，從字源確立敬義；引鄭眾注 “賓，敬也”，以經注佐證；引《禮運》“儐鬼神” 及《釋文》注 “儐，敬也”，證 “儐與賓通”，進行通假互證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "③賓",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引《說文》直訓 “賓，所敬也”，從字源確立敬義；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引鄭眾注 “賓，敬也”，以經注佐證；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《禮運》“儐鬼神” 及《釋文》注 “儐，敬也”，證 “儐與賓通”，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "進行",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "通假互證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 74,
+      "style": "Normal",
+      "text": "④齋：引《詩經・召南・采蘋》毛傳，提出 “齊與齋通”，因 “齊” 表肅敬，故 “齋”亦訓為敬，以通假完成義證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "④齋",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "《詩經・召南・采蘋》毛傳",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "，提出 “齊與齋通”，因 “齊” 表肅敬，故 “齋”亦訓為敬，以通假完成義證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 75,
+      "style": "Normal",
+      "text": "⑤亟：從《說文》“敬，肅也。從攴苟” 溯源，證苟有“敬”義；引《玉篇》“苟，亦作亟”，證 “亟” 與 “苟” 同；引《說文》“㥛，謹重皃”，證 “㥛” 亦表敬；補《成陽靈臺碑》，確定苟、亟、革、㥛並同義，均含敬義。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑤亟",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：從《說文》“敬，肅也。從攴苟” 溯源，證苟有“敬”義；引《玉篇》“苟，亦作亟”，證 “亟” 與 “苟” 同；引《說文》“㥛，謹重皃”，證 “㥛” 亦表敬；補《成陽靈臺碑》，確定苟、亟、革、㥛並同義，均含敬義。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 76,
+      "style": "Normal",
+      "text": "⑥憼：《說文》直訓 “憼，敬也”，確立核心義；引鄭箋 “敬之言警也”，提出 “敬、警、憼聲近而義同”，以音義通轉完成佐證。【字書直證 + 聲近義同】",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑥憼",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：《說文》直訓 “憼，敬也”，確立核心義；引鄭箋 “敬之言警也”，提出 “敬、警、憼聲近而義同”，以音義通轉完成佐證。【字書直證 + 聲近義同】",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 77,
+      "style": "Normal",
+      "text": "⑦-⑧懍、浚：引《方言》證“稟、浚”有“敬”義；稟↔懍為通假關係",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑦-⑧懍、浚",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引《方言》證“稟、浚”有“敬”義；",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "稟↔懍",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "為通假關係",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 78,
+      "style": "Normal",
+      "text": "⑨悛：引《說文》“恮，謹也”，證 “恮與悛通”，“悛” 即謹敬；提出 “悛亦浚也”，與前文 “浚” 互證；引《論語》“恂恂”、《史記》“悛悛”，均為溫恭恭敬之貌，證三字聲近而義同。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑨",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "悛",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》“恮，謹也”，證 “恮與悛通”，“悛” 即謹敬；提出 “悛亦浚也”，與前文 “浚” 互證；引《論語》“恂恂”、《史記》“悛悛”，均為溫恭恭敬之貌，證三字",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "聲",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "近而",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "同。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 79,
+      "style": "Normal",
+      "text": "⑩-11誠、信：“誠信”連問互證，引《祭統》證誠↔信↔盡↔敬內在義關聯",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "⑩-11",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "誠、信",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：“誠信”連問互證，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《祭統》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "誠↔信↔",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "盡",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "↔敬",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "內在義關聯",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 80,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 81,
+      "style": "Normal",
+      "text": "整體考據總結",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "整體考據總結",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 82,
+      "style": "Normal",
+      "text": "   通過經傳注疏、小學專書、方言、碑刻、史書等材料，結合通假、聲近義同、同義互證等考據，逐一證明這些字詞均包含 “恭敬、謹肅、尊崇” 義，厘清字詞間的音義關聯，構建 “敬” 義字詞系統。完整考據邏輯可歸納為“立訓→取證→釋理→互證→補證”。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "   通過經傳注疏、小學專書、方言、碑刻、史書等材料，結合通假、聲近義同、同義互證等考據，逐一證明這些字詞均包含 “恭敬、謹肅、尊崇” 義，厘清字詞間的音義關聯，構建 “敬” 義字詞系統。完整考據邏輯可歸納為“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "立訓→取證→釋理→互證→補",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 83,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 84,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 85,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 86,
+      "style": "Normal",
+      "text": "P31",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "P31",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 87,
+      "style": "Normal",
+      "text": "痂1、加 瘃2、陟録 疥3、瘙4、素刀 㿃5、丁世 瘍6、陽 癬7、四淺 㿋8、到 㿕9、鹽傷10、㿓11、苦夾[？]、工浹 胗12、軫 㾦13、普迴 㾺14，馬嫁 創也。初良",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "痂",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "1",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "加 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "瘃",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "2",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "陟録 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "疥",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "3",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "、瘙",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "4",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "素刀 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "㿃",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "5",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "丁世 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "瘍",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "6",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "陽 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "癬",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "7",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "四淺 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "㿋",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "8",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "到 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "㿕",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "9",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "鹽",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "傷",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "10",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿓",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "11",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "苦夾",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "[？]",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、工浹 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "胗",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "12",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "軫 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "㾦",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "13",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "普迴 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "㾺",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "14",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "，",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "馬嫁 ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "創也",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "初良",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        }
+      ],
+      "comment_ids": [
+        "4"
+      ]
+    },
+    {
+      "index": 88,
+      "style": "Normal",
+      "text": "1痂者，《說文》：‘痂，乾瘍也。’《急就篇》‘痂疕疥癘癡聾盲’顔師古注雲：‘痂，創上甲也。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "1",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "痂者，《說文》：‘痂，乾瘍也。’《急就篇》‘痂疕疥癘癡聾盲’顔師古注雲：‘痂，創上甲也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 89,
+      "style": "Normal",
+      "text": "2瘃者，《説文》：‘瘃，中寒腫覈也。’《漢書·趙充國傳》‘將軍士寒手足皸瘃’文穎注雲：‘瘃，寒創也。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "2",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "瘃者，《説文》：‘瘃，中寒腫覈也。’《漢書·趙充國傳》‘將軍士寒手足皸瘃’文穎注雲：‘瘃，寒創也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 90,
+      "style": "Normal",
+      "text": "3-4疥、瘙者，《說文》：‘疥，搔也。’《周官·疾醫》雲：‘夏時有癢疥疾。’《衆經音義》卷十五引《倉頡篇》雲：‘瘙，疥也。’《管子·地員篇》雲：‘五沃之土，其人堅勁，寡有疥騷。’《春秋繁露·五行順逆篇》雲：‘民病疥搔。’《後漢書·鮮卑傳》雲：‘夫邊垂之患手足之蚧搔。’並與‘疥瘙’同。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "3-4",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "疥、瘙者，《說文》：‘疥，搔也。’《周官·疾醫》雲：‘夏時有癢疥疾。’《衆經音義》卷十五引《倉頡篇》雲：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘瘙，疥也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "《管子·地員篇》雲：‘五沃之土，其人堅勁，寡有疥騷。’《春秋繁露·五行順逆篇》雲：‘民病疥搔。’《後漢書·鮮卑傳》雲：‘夫邊垂之患手足之蚧搔。’並",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "與‘疥瘙’同",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": [
+        "5",
+        "6"
+      ]
+    },
+    {
+      "index": 91,
+      "style": "Normal",
+      "text": "5㿃者，《玉篇》：‘㿃，牛頭瘡也。’‘瘡’與‘創’同。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "5",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿃者，《玉篇》：‘㿃，牛頭瘡也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘瘡’與‘創’同",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 92,
+      "style": "Normal",
+      "text": "6瘍者，《說文》：‘瘍，頭創也。’案《曲禮》雲：‘身有瘍則浴。’襄十九年《左傳》雲：‘生瘍於頭。’《爾雅》雲：‘骭瘍爲微。’則創在頭身四肢皆謂之瘍矣。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "6",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "瘍者，《說文》：‘瘍，頭創也。’案《曲禮》雲：‘身有瘍則浴。’襄十九年《左傳》雲：‘生瘍於頭。’《爾雅》雲：‘骭瘍爲微。’則創在頭身四肢皆謂之瘍矣。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 93,
+      "style": "Normal",
+      "text": "7癬者，《説文》：‘癬，乾瘍也。’《吳語》‘譬諸疾疥癬也’，《史記·越世家》作‘㿅’同。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "7",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "癬者，《説文》：‘癬，乾瘍也。’《吳語》‘譬諸疾疥癬也’，《史記·越世家》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "作‘㿅’同",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": [
+        "7"
+      ]
+    },
+    {
+      "index": 94,
+      "style": "Normal",
+      "text": "8㿋者，《衆經音義》卷十四引《通俗文》雲：‘皮起曰㿋。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "8",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿋者，《衆經音義》卷十四引《通俗文》雲：‘皮起曰㿋。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 95,
+      "style": "Normal",
+      "text": "10傷者，《月令》‘命理瞻傷察創’鄭注雲：‘創之淺者曰傷。’此對文也，散文則‘創’亦謂之‘傷’，故《說文》雲：‘傷，創也。’僖二十二年《左傳》‘君子不重傷’，文十一年《穀梁傳》作‘不重創’，其義一也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "10",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "傷者，《月令》‘命理瞻傷察創’鄭注雲：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "‘創之淺者曰傷。’此對文也，散文則‘創’亦謂之‘傷’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，故《說文》雲：‘傷，創也。’僖二十二年《左傳》‘君子不重傷’，文十一年《穀梁傳》作‘不重創’，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "其義一也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": [
+        "8"
+      ]
+    },
+    {
+      "index": 96,
+      "style": "Normal",
+      "text": "11㿓者，《玉篇》：‘㿓，羊蹄閒㿓疾也。’字通作‘挾’，《齊民要術》有‘治羊挾蹄方’。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "11",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿓者，《玉篇》：‘㿓，羊蹄閒㿓疾也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "字通作‘挾’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "，《齊民要術》有‘治羊挾蹄方’。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 97,
+      "style": "Normal",
+      "text": "12胗者。《說文》：‘胗，脣瘍也。籒文作疹。’宋玉《風賦》雲：‘中脣爲胗。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "12",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "胗者。《說文》：‘胗，脣瘍也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "籒文",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "作疹。’宋玉《風賦》雲：‘中脣爲胗。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 98,
+      "style": "Normal",
+      "text": "13㾦者，《廣雅·釋言》：‘㾦，痂也。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "13",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㾦者，《廣雅·釋言》：‘㾦，痂也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 99,
+      "style": "Normal",
+      "text": "14㾺者，《說文》：‘㾺，蝕創也。’",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "14",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㾺者，《說文》：‘㾺，蝕創也。’",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 100,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 101,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 102,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 103,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 104,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 105,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 106,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 107,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 108,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 109,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 110,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 111,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 112,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 113,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 114,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 115,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 116,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 117,
+      "style": "Normal",
+      "text": "考據對象",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據對象",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 118,
+      "style": "Normal",
+      "text": "痂、瘃、疥、瘙、㿃、瘍、癬、㿋、㿕、傷、㿓、胗、㾦、㾺",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "痂、瘃、疥、瘙、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "㿃、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "瘍、癬、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿋、㿕、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "傷、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿓",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "楷体"
+        },
+        {
+          "text": "胗、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㾦",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "、",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        },
+        {
+          "text": "㾺",
+          "bold": false,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体-方正超大字符集"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 119,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 120,
+      "style": "Normal",
+      "text": "引用書證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "引用書證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 121,
+      "style": "Normal",
+      "text": "《說文解字》：「痂，乾瘍也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「痂，乾瘍也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 122,
+      "style": "Normal",
+      "text": "《急就篇》：「痂疕疥癘癡聾盲」；顏師古注：「痂，創上甲也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《急就篇》：「痂疕疥癘癡聾盲」；顏師古注：「痂，創上甲也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 123,
+      "style": "Normal",
+      "text": "《說文解字》：「瘃，中寒腫覈也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「瘃，中寒腫覈也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 124,
+      "style": "Normal",
+      "text": "《漢書・趙充國傳》：「將軍士寒手足皸瘃」；文穎注：「瘃，寒創也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《漢書・趙充國傳》：「將軍士寒手足皸瘃」；文穎注：「瘃，寒創也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 125,
+      "style": "Normal",
+      "text": "《說文解字》：「疥，搔也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「疥，搔也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 126,
+      "style": "Normal",
+      "text": "《周官・疾醫》：「夏時有癢疥疾。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《周官・疾醫》：「夏時有癢疥疾。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 127,
+      "style": "Normal",
+      "text": "《衆經音義》卷十五引《倉頡篇》：「瘙，疥也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《衆經音義》卷十五引《倉頡篇》：「瘙，疥也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 128,
+      "style": "Normal",
+      "text": "《管子・地員篇》：「五沃之土，其人堅勁，寡有疥騷。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《管子・地員篇》：「五沃之土，其人堅勁，寡有疥騷。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 129,
+      "style": "Normal",
+      "text": "《春秋繁露・五行順逆篇》：「民病疥搔。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《春秋繁露・五行順逆篇》：「民病疥搔。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 130,
+      "style": "Normal",
+      "text": "《後漢書・鮮卑傳》：「夫邊垂之患手足之蚧搔。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《後漢書・鮮卑傳》：「夫邊垂之患手足之蚧搔。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 131,
+      "style": "Normal",
+      "text": "《玉篇》：「㿃，牛頭瘡也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《玉篇》：「㿃，牛頭瘡也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 132,
+      "style": "Normal",
+      "text": "《說文解字》：「瘍，頭創也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「瘍，頭創也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 133,
+      "style": "Normal",
+      "text": "《禮記・曲禮》：「身有瘍則浴。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《禮記・曲禮》：「身有瘍則浴。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 134,
+      "style": "Normal",
+      "text": "《左傳》襄公十九年：「生瘍於頭。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《左傳》襄公十九年：「生瘍於頭。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 135,
+      "style": "Normal",
+      "text": "《爾雅》：「骭瘍爲微。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《爾雅》：「骭瘍爲微。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 136,
+      "style": "Normal",
+      "text": "《說文解字》：「癬，乾瘍也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「癬，乾瘍也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 137,
+      "style": "Normal",
+      "text": "《吳語》：「譬諸疾疥癬也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《吳語》：「譬諸疾疥癬也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 138,
+      "style": "Normal",
+      "text": "《史記・越世家》：「㿅」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《史記・越世家》：「㿅」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 139,
+      "style": "Normal",
+      "text": "《衆經音義》卷十四引《通俗文》：「皮起曰㿋。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《衆經音義》卷十四引《通俗文》：「皮起曰㿋。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 140,
+      "style": "Normal",
+      "text": "《禮記・月令》：「命理瞻傷察創」；鄭玄注：「創之淺者曰傷。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《禮記・月令》：「命理瞻傷察創」；鄭玄注：「創之淺者曰傷。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 141,
+      "style": "Normal",
+      "text": "《說文解字》：「傷，創也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「傷，創也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 142,
+      "style": "Normal",
+      "text": "《左傳》僖公二十二年：「君子不重傷。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《左傳》僖公二十二年：「君子不重傷。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 143,
+      "style": "Normal",
+      "text": "《穀梁傳》文公十一年：「不重創。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《穀梁傳》文公十一年：「不重創。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 144,
+      "style": "Normal",
+      "text": "《玉篇》：「㿓，羊蹄閒㿓疾也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《玉篇》：「㿓，羊蹄閒㿓疾也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 145,
+      "style": "Normal",
+      "text": "《齊民要術》：「治羊挾蹄方。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《齊民要術》：「治羊挾蹄方。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 146,
+      "style": "Normal",
+      "text": "《說文解字》：「胗，脣瘍也。籒文作疹。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「胗，脣瘍也。籒文作疹。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 147,
+      "style": "Normal",
+      "text": "宋玉《風賦》：「中脣爲胗。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "宋玉《風賦》：「中脣爲胗。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 148,
+      "style": "Normal",
+      "text": "《廣雅・釋言》：「㾦，痂也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《廣雅・釋言》：「㾦，痂也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 149,
+      "style": "Normal",
+      "text": "《說文解字》：「㾺，蝕創也。」",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《說文解字》：「㾺，蝕創也。」",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 150,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 151,
+      "style": "Normal",
+      "text": "引用書證的特徵總結",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "引用書證的特徵總結",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 152,
+      "style": "Normal",
+      "text": "①類別：以小學專書為根本，作為訓釋的第一依據；以經典文獻實際用例佐證；以其他文獻為旁證，補充特殊用法、異文、方言義等",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "①類別：以小學專書為根本，作為訓釋的第一依據；以經典文獻實際用例佐證；以其他文獻為旁證，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "補充特殊用法、異文、方言義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "等",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 153,
+      "style": "Normal",
+      "text": "②順序：小學專書 → 經典文獻 → 其他文獻【先本後用，先正後俗】",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "②順序：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "小學專書 → 經典文獻 → 其他文獻",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "【",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "先本後用，先正後俗",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "】",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 154,
+      "style": "Normal",
+      "text": "③頻率：《說文》高頻出現，《玉篇》《眾經音義》和經典文獻次之；其他材料僅作旁證，低頻出現",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "③頻率：《說文》高頻出現，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "《玉篇》《眾經音義》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "和經典文獻次之；其他材料僅作旁證，低頻出現",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 155,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 156,
+      "style": "Normal",
+      "text": "考據用語",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據用",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        },
+        {
+          "text": "語",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 157,
+      "style": "Normal",
+      "text": "與X同；作X同；X謂之X；字通作X；（對文散文）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "與X同；作X同；X謂之X；字通作X；（對文散文）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 158,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 159,
+      "style": "Normal",
+      "text": "字詞關係",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "字詞關係",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 160,
+      "style": "Normal",
+      "text": "同義",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "同義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 161,
+      "style": "Normal",
+      "text": "通假：瘡↔創  㿓↔挾",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "通假：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "瘡↔創",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "  ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿓↔挾",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 162,
+      "style": "Normal",
+      "text": "異文通用：疥與瘙、騷、蚧   癬↔㿅",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "異文通用：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "疥與瘙、騷、蚧",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "   ",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "癬↔㿅",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 163,
+      "style": "Normal",
+      "text": "異體字：胗↔疹",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "異體字：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "胗↔疹",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 164,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 165,
+      "style": "Normal",
+      "text": "考據過程",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據過程",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 166,
+      "style": "Normal",
+      "text": "開篇確立考據目標",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "開篇確立考據目標",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 167,
+      "style": "Normal",
+      "text": " 明確所列14字均有“創”義",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": " 明確所列14字均有“創”義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 168,
+      "style": "Normal",
+      "text": "逐字論證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "逐字論證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 169,
+      "style": "Normal",
+      "text": "1痂：引《說文》直訓 “痂，乾瘍也”，從字源界定痂為乾燥的瘡瘍，歸屬 “創” 義——引《急就篇》顏師古注，明確痂是創傷表面形成的硬殼，坐實與 “創” 的同義關係。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "1",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "痂",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引《說文》直訓 “痂，乾瘍也”，從字源界定痂為乾燥的瘡瘍，歸屬 “創” 義——引《急就篇》顏師古注，明確痂是創傷表面形成的硬殼，坐實與 “創” 的同義關係。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 170,
+      "style": "Normal",
+      "text": "2瘃：引《說文》釋 “瘃，中寒腫覈也”，點明瘃的成因與形態——引《漢書》文穎注 “瘃，寒創也”，直接將瘃訓為寒瘡，明確其屬 “創” 的特指義。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "2",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "瘃",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：引《說文》釋 “瘃，中寒腫覈也”，點明瘃的成因與形態——引《漢書》文穎注 “瘃，寒創也”，直接將瘃訓為寒瘡，明確其屬 “創” 的特指義。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 171,
+      "style": "Normal",
+      "text": "3-4疥、瘙：引《說文》“疥，搔也”，點明疥是瘙癢性皮膚瘡瘍——引《周官》“夏時有癢疥疾”，以經典用例佐證疥為瘡疾——引《眾經音義》載《倉頡篇》“瘙，疥也”，直接與 “疥” 同義互證——列舉《管子》《春秋繁露》《後漢書》中 “疥騷”“疥搔”“蚧搔” ，證明諸字通用，均指疥瘡，屬 “創” 義。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "3-4",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "疥、瘙",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》“疥，搔也”，點明疥是瘙癢性皮膚瘡瘍",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《周官》“夏時有癢疥疾”，以經典用例佐證疥為瘡疾",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《眾經音義》載《倉頡篇》“瘙，疥也”，直接與 “疥” 同義互證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "列舉《管子》《春秋繁露》《後漢書》中 “疥騷”“疥搔”“蚧搔” ，證明諸字通用，均指疥瘡，屬 “創” 義。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 172,
+      "style": "Normal",
+      "text": "5㿃：引《玉篇》“㿃，牛頭瘡也”——點明 “瘡與創同”，以通假關係直接將㿃歸為 “創” 義",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "5",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿃",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《玉篇》“㿃，牛頭瘡也”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "點明 “瘡與創同”，以通假關係直接將㿃歸為 “創” 義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 173,
+      "style": "Normal",
+      "text": "6瘍：引《說文》“瘍，頭創也”，訓瘍為頭部創傷——引《曲禮》《左傳》《爾雅》用例，證瘍為創的泛稱",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "6",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "瘍",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》“瘍，頭創也”，訓瘍為頭部創傷",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《曲禮》《左傳》《爾雅》用例，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "瘍為創的泛稱",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 174,
+      "style": "Normal",
+      "text": "7癬：引《說文》“癬，乾瘍也”，與 “痂” 同屬乾燥性瘡瘍，歸 “創” 義——引《吳語》“疥癬” 與《史記》“㿅” 異文，證明癬、㿅通用，與 “創” 同義",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "7",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "癬",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》“癬，乾瘍也”，與 “痂” 同屬乾燥性瘡瘍，歸 “創” 義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《吳語》“疥癬” 與《史記》“㿅” 異文，證明癬、㿅通用，與 “創” 同義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 175,
+      "style": "Normal",
+      "text": "8㿋：引《通俗文》直訓，界定㿋為皮膚表層翹起的創傷",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "8",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿋",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《通俗文》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "直訓，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "界定㿋為皮膚表層翹起的創傷",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 176,
+      "style": "Normal",
+      "text": "10傷：引《月令》鄭注，辨析對文（創深曰創，淺曰傷）；散文（創、傷互通）——引《說文》直訓 “傷，創也”，明確同義關係——引《左傳》“不重傷” 與《穀梁傳》“不重創” 異文，證明二字同義，故傷訓為創",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "10",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "傷",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《月令》鄭注，辨析對文",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "（",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "創深曰創，淺曰傷",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "；散文",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "（",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "創、傷互通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "）——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》直訓 “傷，創也”，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "明確",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "同義關係",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《左傳》“不重傷” 與《穀梁傳》“不重創” 異文，證明二字同義，故傷訓為創",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 177,
+      "style": "Normal",
+      "text": "11㿓：引《玉篇》界定㿓為羊蹄間的瘡疾——點明 “字通作‘挾’”——引《齊民要術》證明㿓、挾通用，均指牲畜蹄部創傷",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "11",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㿓",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《玉篇》界定㿓為羊蹄間的瘡疾",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "點明 “字通作‘挾’”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《齊民要術》證明㿓、挾通用，均指牲畜蹄部創傷",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 178,
+      "style": "Normal",
+      "text": "12胗：引《說文》明確胗、疹異體——引宋玉《風賦》經典用例佐證胗為唇部創傷",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "12",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "胗",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》明確胗、疹異體",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "——",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引宋玉《風賦》經典用例佐證胗為唇部創傷",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 179,
+      "style": "Normal",
+      "text": "13㾦：引《廣雅・釋言》同義遞訓，證㾦↔痂↔創三字同義",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "13",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㾦",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《廣雅・釋言》同義遞訓",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㾦↔痂↔創三字同義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 180,
+      "style": "Normal",
+      "text": "14㾺：引《說文》直接界定㾺為侵蝕性的瘡瘍，屬 “創” 的特指義",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "14",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "㾺",
+          "bold": true,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "引《說文》直接界定㾺為侵蝕性的瘡瘍",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "屬 “創” 的特指義",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 181,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 182,
+      "style": "Normal",
+      "text": "6、整體考據總結",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "6、整體考據總結",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "黑体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 183,
+      "style": "Normal",
+      "text": " 以字書直證為基礎，以經典文獻用例進行佐證，結合通假、對文散文、同義遞訓等，逐一證明這些字詞均包含 “創” 義。以同義字為核心，輔以通假字、異體字等厘清字詞間的音義關聯，構建 “創” 義字詞系統。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": " 以字書直證為基",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "礎",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        },
+        {
+          "text": "，以經典文獻用例進行佐證，結合通假、對文散文、同義遞訓等，逐一證明這些字詞均包含 “創” 義。以同義字為核心，輔以通假字、異體字等厘清字詞間的音義關聯，構建 “創” 義字詞系統。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": "宋体"
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 184,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 185,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 186,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 187,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 188,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 189,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 190,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    }
+  ],
+  "tables": [],
+  "comments": [
+    {
+      "id": "0",
+      "author": "WPS_1664095437",
+      "date": "2026-04-15T21:02:12Z",
+      "text": "無訓釋",
+      "anchor_text": "高12、尊13",
+      "paragraph_indexes": [
+        2
+      ]
+    },
+    {
+      "id": "1",
+      "author": "WPS_1664095437",
+      "date": "2026-04-15T21:18:31Z",
+      "text": "“與……通”訓釋假借字或同源字",
+      "anchor_text": "‘威’與‘畏’通",
+      "paragraph_indexes": [
+        4
+      ]
+    },
+    {
+      "id": "2",
+      "author": "WPS_1664095437",
+      "date": "2026-04-15T21:16:59Z",
+      "text": "解釋字用，A可以用作B。解釋通假或同源",
+      "anchor_text": "敬之言警也",
+      "paragraph_indexes": [
+        8
+      ]
+    },
+    {
+      "id": "3",
+      "author": "WPS_1664095437",
+      "date": "2026-04-15T22:17:17Z",
+      "text": "補充完善考據",
+      "anchor_text": "【補正】",
+      "paragraph_indexes": [
+        12
+      ]
+    },
+    {
+      "id": "4",
+      "author": "WPS_1664095437",
+      "date": "2026-04-15T22:19:09Z",
+      "text": "無訓釋",
+      "anchor_text": "㿕",
+      "paragraph_indexes": [
+        87
+      ]
+    },
+    {
+      "id": "5",
+      "author": "WPS_1664095437",
+      "date": "2026-04-16T10:24:22Z",
+      "text": "同義互證",
+      "anchor_text": "‘瘙，疥也。’",
+      "paragraph_indexes": [
+        90
+      ]
+    },
+    {
+      "id": "6",
+      "author": "WPS_1664095437",
+      "date": "2026-04-16T10:25:01Z",
+      "text": "與……同",
+      "anchor_text": "與‘疥瘙’同",
+      "paragraph_indexes": [
+        90
+      ]
+    },
+    {
+      "id": "7",
+      "author": "WPS_1664095437",
+      "date": "2026-04-16T10:32:20Z",
+      "text": "癬↔㿅 通用",
+      "anchor_text": "作‘㿅’同",
+      "paragraph_indexes": [
+        93
+      ]
+    },
+    {
+      "id": "8",
+      "author": "WPS_1664095437",
+      "date": "2026-04-16T10:35:41Z",
+      "text": "傷與創為對文異義、散文同義",
+      "anchor_text": "‘創之淺者曰傷。’此對文也，散文則‘創’亦謂之‘傷’",
+      "paragraph_indexes": [
+        95
+      ]
+    }
+  ],
+  "notes": {
+    "footnotes": [],
+    "endnotes": []
+  },
+  "annotation_blocks": [
+    {
+      "label": "考据对象",
+      "start_paragraph": 31,
+      "end_paragraph": 33,
+      "items": [
+        "虔、畏、賓、齋、亟、憼、景 懍、力甚反 浚、三閏 悛、此緣反 誠、信、高、尊"
+      ]
+    },
+    {
+      "label": "引用书证",
+      "start_paragraph": 34,
+      "end_paragraph": 57,
+      "items": [
+        "《詩經・商頌・殷武》傳：「虔，敬也。」",
+        "《詩經・大雅・韓奕》：「虔共爾位。」",
+        "《禮記・大學》：「之其所畏敬而辟焉。」",
+        "《禮記・表記》：「大人之器威敬。」",
+        "鄭注《禮記・曲禮》：「心服曰畏。」",
+        "《孟子・公孫丑》：「吾先子之所畏也。」",
+        "《說文解字》：「賓，所敬也。」",
+        "《周官・鄕大夫》鄭衆注：「賓，敬也。」",
+        "《禮記・禮運》：「山川所以儐鬼神也。」",
+        "《經典釋文》：「儐，皇音賓，敬也。」",
+        "《詩經・召南・采蘋》：「有齊季女」毛傳：「齊，敬也。」",
+        "《說文解字》：「敬，肅也。從攴苟。」「苟，自急敕也。從羊省，從包省，從口，口猶慎言也。從羊，與義、善、美同意。」",
+        "《玉篇》：「苟，居力切，亦作亟。」",
+        "《說文解字》：「㥛，謹重皃。」",
+        "漢《成陽靈臺碑》：「齊革精誠。」",
+        "《說文解字》：「憼，敬也。」",
+        "《詩經・大雅・常武》箋：「敬之言警也。」",
+        "《方言》：「稟、浚，敬也。秦晉之間曰稟，齊曰浚，吳楚之閒自敬曰稟。」",
+        "《說文解字》：「恮，謹也。」",
+        "《論語・鄉黨》：「恂恂如也，似不能言者」王肅注：「恂恂，溫恭之貌。」",
+        "《史記・李將軍列傳》：「悛悛如鄙人，口不能道辭。」",
+        "《禮記・祭統》：「誠信之謂盡，盡之謂敬。」"
+      ]
+    },
+    {
+      "label": "考据用语",
+      "start_paragraph": 58,
+      "end_paragraph": 60,
+      "items": [
+        "  X與X通、X亦作X、XXX並同義、XXX聲近而義同、X之謂X"
+      ]
+    },
+    {
+      "label": "字词关系",
+      "start_paragraph": 61,
+      "end_paragraph": 66,
+      "items": [
+        "通假字：威↔畏 賓↔儐 齊↔齋 稟↔懍 恮↔悛",
+        "聲近義同：敬↔警↔憼；悛↔恂↔浚",
+        "同義字：苟↔亟↔革↔㥛；",
+        "義理關聯：誠↔信↔盡↔敬"
+      ]
+    },
+    {
+      "label": "考据过程",
+      "start_paragraph": 67,
+      "end_paragraph": 80,
+      "items": [
+        "開篇確立考據目標",
+        " 明確所列13字均訓為“敬”",
+        "逐字論證",
+        "①虔：引書證直訓（《詩經・商頌・殷武》毛傳，輔之以《詩經・大雅・韓奕》“虔共爾位” 經文用例，驗證 “虔” 在經典中表恭敬的用法。",
+        "②畏：引《大學》《表記》經文，提出 “威與畏通”（通假關係）。補鄭注 “心服曰畏” 與《孟子》用例，明確 “畏” 是內心臣服的恭敬",
+        "③賓：引《說文》直訓 “賓，所敬也”，從字源確立敬義；引鄭眾注 “賓，敬也”，以經注佐證；引《禮運》“儐鬼神” 及《釋文》注 “儐，敬也”，證 “儐與賓通”，進行通假互證",
+        "④齋：引《詩經・召南・采蘋》毛傳，提出 “齊與齋通”，因 “齊” 表肅敬，故 “齋”亦訓為敬，以通假完成義證",
+        "⑤亟：從《說文》“敬，肅也。從攴苟” 溯源，證苟有“敬”義；引《玉篇》“苟，亦作亟”，證 “亟” 與 “苟” 同；引《說文》“㥛，謹重皃”，證 “㥛” 亦表敬；補《成陽靈臺碑》，確定苟、亟、革、㥛並同義，均含敬義。",
+        "⑥憼：《說文》直訓 “憼，敬也”，確立核心義；引鄭箋 “敬之言警也”，提出 “敬、警、憼聲近而義同”，以音義通轉完成佐證。【字書直證 + 聲近義同】",
+        "⑦-⑧懍、浚：引《方言》證“稟、浚”有“敬”義；稟↔懍為通假關係",
+        "⑨悛：引《說文》“恮，謹也”，證 “恮與悛通”，“悛” 即謹敬；提出 “悛亦浚也”，與前文 “浚” 互證；引《論語》“恂恂”、《史記》“悛悛”，均為溫恭恭敬之貌，證三字聲近而義同。",
+        "⑩-11誠、信：“誠信”連問互證，引《祭統》證誠↔信↔盡↔敬內在義關聯"
+      ]
+    },
+    {
+      "label": "整体考据总结",
+      "start_paragraph": 81,
+      "end_paragraph": 116,
+      "items": [
+        "   通過經傳注疏、小學專書、方言、碑刻、史書等材料，結合通假、聲近義同、同義互證等考據，逐一證明這些字詞均包含 “恭敬、謹肅、尊崇” 義，厘清字詞間的音義關聯，構建 “敬” 義字詞系統。完整考據邏輯可歸納為“立訓→取證→釋理→互證→補證”。",
+        "P31",
+        "痂1、加 瘃2、陟録 疥3、瘙4、素刀 㿃5、丁世 瘍6、陽 癬7、四淺 㿋8、到 㿕9、鹽傷10、㿓11、苦夾[？]、工浹 胗12、軫 㾦13、普迴 㾺14，馬嫁 創也。初良",
+        "1痂者，《說文》：‘痂，乾瘍也。’《急就篇》‘痂疕疥癘癡聾盲’顔師古注雲：‘痂，創上甲也。’",
+        "2瘃者，《説文》：‘瘃，中寒腫覈也。’《漢書·趙充國傳》‘將軍士寒手足皸瘃’文穎注雲：‘瘃，寒創也。’",
+        "3-4疥、瘙者，《說文》：‘疥，搔也。’《周官·疾醫》雲：‘夏時有癢疥疾。’《衆經音義》卷十五引《倉頡篇》雲：‘瘙，疥也。’《管子·地員篇》雲：‘五沃之土，其人堅勁，寡有疥騷。’《春秋繁露·五行順逆篇》雲：‘民病疥搔。’《後漢書·鮮卑傳》雲：‘夫邊垂之患手足之蚧搔。’並與‘疥瘙’同。",
+        "5㿃者，《玉篇》：‘㿃，牛頭瘡也。’‘瘡’與‘創’同。",
+        "6瘍者，《說文》：‘瘍，頭創也。’案《曲禮》雲：‘身有瘍則浴。’襄十九年《左傳》雲：‘生瘍於頭。’《爾雅》雲：‘骭瘍爲微。’則創在頭身四肢皆謂之瘍矣。",
+        "7癬者，《説文》：‘癬，乾瘍也。’《吳語》‘譬諸疾疥癬也’，《史記·越世家》作‘㿅’同。",
+        "8㿋者，《衆經音義》卷十四引《通俗文》雲：‘皮起曰㿋。’",
+        "10傷者，《月令》‘命理瞻傷察創’鄭注雲：‘創之淺者曰傷。’此對文也，散文則‘創’亦謂之‘傷’，故《說文》雲：‘傷，創也。’僖二十二年《左傳》‘君子不重傷’，文十一年《穀梁傳》作‘不重創’，其義一也。",
+        "11㿓者，《玉篇》：‘㿓，羊蹄閒㿓疾也。’字通作‘挾’，《齊民要術》有‘治羊挾蹄方’。",
+        "12胗者。《說文》：‘胗，脣瘍也。籒文作疹。’宋玉《風賦》雲：‘中脣爲胗。’",
+        "13㾦者，《廣雅·釋言》：‘㾦，痂也。’",
+        "14㾺者，《說文》：‘㾺，蝕創也。’"
+      ]
+    },
+    {
+      "label": "考据对象",
+      "start_paragraph": 117,
+      "end_paragraph": 119,
+      "items": [
+        "痂、瘃、疥、瘙、㿃、瘍、癬、㿋、㿕、傷、㿓、胗、㾦、㾺"
+      ]
+    },
+    {
+      "label": "引用书证",
+      "start_paragraph": 120,
+      "end_paragraph": 150,
+      "items": [
+        "《說文解字》：「痂，乾瘍也。」",
+        "《急就篇》：「痂疕疥癘癡聾盲」；顏師古注：「痂，創上甲也。」",
+        "《說文解字》：「瘃，中寒腫覈也。」",
+        "《漢書・趙充國傳》：「將軍士寒手足皸瘃」；文穎注：「瘃，寒創也。」",
+        "《說文解字》：「疥，搔也。」",
+        "《周官・疾醫》：「夏時有癢疥疾。」",
+        "《衆經音義》卷十五引《倉頡篇》：「瘙，疥也。」",
+        "《管子・地員篇》：「五沃之土，其人堅勁，寡有疥騷。」",
+        "《春秋繁露・五行順逆篇》：「民病疥搔。」",
+        "《後漢書・鮮卑傳》：「夫邊垂之患手足之蚧搔。」",
+        "《玉篇》：「㿃，牛頭瘡也。」",
+        "《說文解字》：「瘍，頭創也。」",
+        "《禮記・曲禮》：「身有瘍則浴。」",
+        "《左傳》襄公十九年：「生瘍於頭。」",
+        "《爾雅》：「骭瘍爲微。」",
+        "《說文解字》：「癬，乾瘍也。」",
+        "《吳語》：「譬諸疾疥癬也。」",
+        "《史記・越世家》：「㿅」",
+        "《衆經音義》卷十四引《通俗文》：「皮起曰㿋。」",
+        "《禮記・月令》：「命理瞻傷察創」；鄭玄注：「創之淺者曰傷。」",
+        "《說文解字》：「傷，創也。」",
+        "《左傳》僖公二十二年：「君子不重傷。」",
+        "《穀梁傳》文公十一年：「不重創。」",
+        "《玉篇》：「㿓，羊蹄閒㿓疾也。」",
+        "《齊民要術》：「治羊挾蹄方。」",
+        "《說文解字》：「胗，脣瘍也。籒文作疹。」",
+        "宋玉《風賦》：「中脣爲胗。」",
+        "《廣雅・釋言》：「㾦，痂也。」",
+        "《說文解字》：「㾺，蝕創也。」"
+      ]
+    },
+    {
+      "label": "引用书证的特征总结",
+      "start_paragraph": 151,
+      "end_paragraph": 155,
+      "items": [
+        "①類別：以小學專書為根本，作為訓釋的第一依據；以經典文獻實際用例佐證；以其他文獻為旁證，補充特殊用法、異文、方言義等",
+        "②順序：小學專書 → 經典文獻 → 其他文獻【先本後用，先正後俗】",
+        "③頻率：《說文》高頻出現，《玉篇》《眾經音義》和經典文獻次之；其他材料僅作旁證，低頻出現"
+      ]
+    },
+    {
+      "label": "考据用语",
+      "start_paragraph": 156,
+      "end_paragraph": 158,
+      "items": [
+        "與X同；作X同；X謂之X；字通作X；（對文散文）"
+      ]
+    },
+    {
+      "label": "字词关系",
+      "start_paragraph": 159,
+      "end_paragraph": 164,
+      "items": [
+        "同義",
+        "通假：瘡↔創  㿓↔挾",
+        "異文通用：疥與瘙、騷、蚧   癬↔㿅",
+        "異體字：胗↔疹"
+      ]
+    },
+    {
+      "label": "考据过程",
+      "start_paragraph": 165,
+      "end_paragraph": 183,
+      "items": [
+        "開篇確立考據目標",
+        " 明確所列14字均有“創”義",
+        "逐字論證",
+        "1痂：引《說文》直訓 “痂，乾瘍也”，從字源界定痂為乾燥的瘡瘍，歸屬 “創” 義——引《急就篇》顏師古注，明確痂是創傷表面形成的硬殼，坐實與 “創” 的同義關係。",
+        "2瘃：引《說文》釋 “瘃，中寒腫覈也”，點明瘃的成因與形態——引《漢書》文穎注 “瘃，寒創也”，直接將瘃訓為寒瘡，明確其屬 “創” 的特指義。",
+        "3-4疥、瘙：引《說文》“疥，搔也”，點明疥是瘙癢性皮膚瘡瘍——引《周官》“夏時有癢疥疾”，以經典用例佐證疥為瘡疾——引《眾經音義》載《倉頡篇》“瘙，疥也”，直接與 “疥” 同義互證——列舉《管子》《春秋繁露》《後漢書》中 “疥騷”“疥搔”“蚧搔” ，證明諸字通用，均指疥瘡，屬 “創” 義。",
+        "5㿃：引《玉篇》“㿃，牛頭瘡也”——點明 “瘡與創同”，以通假關係直接將㿃歸為 “創” 義",
+        "6瘍：引《說文》“瘍，頭創也”，訓瘍為頭部創傷——引《曲禮》《左傳》《爾雅》用例，證瘍為創的泛稱",
+        "7癬：引《說文》“癬，乾瘍也”，與 “痂” 同屬乾燥性瘡瘍，歸 “創” 義——引《吳語》“疥癬” 與《史記》“㿅” 異文，證明癬、㿅通用，與 “創” 同義",
+        "8㿋：引《通俗文》直訓，界定㿋為皮膚表層翹起的創傷",
+        "10傷：引《月令》鄭注，辨析對文（創深曰創，淺曰傷）；散文（創、傷互通）——引《說文》直訓 “傷，創也”，明確同義關係——引《左傳》“不重傷” 與《穀梁傳》“不重創” 異文，證明二字同義，故傷訓為創",
+        "11㿓：引《玉篇》界定㿓為羊蹄間的瘡疾——點明 “字通作‘挾’”——引《齊民要術》證明㿓、挾通用，均指牲畜蹄部創傷",
+        "12胗：引《說文》明確胗、疹異體——引宋玉《風賦》經典用例佐證胗為唇部創傷",
+        "13㾦：引《廣雅・釋言》同義遞訓，證㾦↔痂↔創三字同義",
+        "14㾺：引《說文》直接界定㾺為侵蝕性的瘡瘍，屬 “創” 的特指義",
+        "6、整體考據總結",
+        " 以字書直證為基礎，以經典文獻用例進行佐證，結合通假、對文散文、同義遞訓等，逐一證明這些字詞均包含 “創” 義。以同義字為核心，輔以通假字、異體字等厘清字詞間的音義關聯，構建 “創” 義字詞系統。"
+      ]
+    }
+  ],
+  "package_inventory": [
+    {
+      "name": "[Content_Types].xml",
+      "size": 1838,
+      "compressed_size": 399,
+      "crc": "686ac0b3"
+    },
+    {
+      "name": "_rels/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "_rels/.rels",
+      "size": 737,
+      "compressed_size": 253,
+      "crc": "1f222201"
+    },
+    {
+      "name": "docProps/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "docProps/app.xml",
+      "size": 634,
+      "compressed_size": 360,
+      "crc": "50da67a8"
+    },
+    {
+      "name": "docProps/core.xml",
+      "size": 616,
+      "compressed_size": 348,
+      "crc": "5bafe51f"
+    },
+    {
+      "name": "docProps/custom.xml",
+      "size": 750,
+      "compressed_size": 404,
+      "crc": "8cc58770"
+    },
+    {
+      "name": "word/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/_rels/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/_rels/document.xml.rels",
+      "size": 1192,
+      "compressed_size": 315,
+      "crc": "e41969a3"
+    },
+    {
+      "name": "word/comments.xml",
+      "size": 5778,
+      "compressed_size": 1201,
+      "crc": "2fb01107"
+    },
+    {
+      "name": "word/commentsExtended.xml",
+      "size": 1749,
+      "compressed_size": 507,
+      "crc": "0e1e9ab0"
+    },
+    {
+      "name": "word/document.xml",
+      "size": 163832,
+      "compressed_size": 14811,
+      "crc": "518b7989"
+    },
+    {
+      "name": "word/fontTable.xml",
+      "size": 4688,
+      "compressed_size": 1048,
+      "crc": "0df8012f"
+    },
+    {
+      "name": "word/numbering.xml",
+      "size": 4666,
+      "compressed_size": 962,
+      "crc": "c20fccc8"
+    },
+    {
+      "name": "word/people.xml",
+      "size": 1406,
+      "compressed_size": 478,
+      "crc": "35e83d7c"
+    },
+    {
+      "name": "word/settings.xml",
+      "size": 2841,
+      "compressed_size": 1155,
+      "crc": "3de21ba6"
+    },
+    {
+      "name": "word/styles.xml",
+      "size": 26971,
+      "compressed_size": 2775,
+      "crc": "e9834a97"
+    },
+    {
+      "name": "word/theme/",
+      "size": 0,
+      "compressed_size": 0,
+      "crc": "00000000"
+    },
+    {
+      "name": "word/theme/theme1.xml",
+      "size": 6331,
+      "compressed_size": 1546,
+      "crc": "f21ab5dd"
+    }
+  ],
+  "checksums": {
+    "source_docx_sha256": "812779b7b59f263997ff566ada5ac0741574f2325641f1875164f776b6f12970",
+    "paragraph_text_sha256": "a6dc04e80279c9947d341f70af6d9bc2cd2c6dc1b7a2222393c8f7e2c7a86d89",
+    "comment_text_sha256": "5b5ac60ef8f649dffc92496b76ebae0e610b06a853ccb03d7a2c2d1abb6ea2fb"
+  },
+  "controlled_vocabularies": {
+    "method_tags": [
+      "义证",
+      "书证",
+      "句义解释",
+      "同义互证",
+      "声训",
+      "对文散文",
+      "异体",
+      "异文",
+      "形证",
+      "校勘",
+      "补正",
+      "训释",
+      "语法证据",
+      "通假"
+    ],
+    "relation_types": [
+      "",
+      "古今字",
+      "同义",
+      "声近义同",
+      "对文异义",
+      "异体",
+      "异文",
+      "当作",
+      "散文同义",
+      "误字",
+      "递训",
+      "通假"
+    ],
+    "evidence_types": [
+      "义证",
+      "书证",
+      "声训",
+      "异文",
+      "形证",
+      "语法证据"
+    ],
+    "step_types": [
+      "反驳",
+      "发疑",
+      "取证",
+      "立论",
+      "结论",
+      "补证",
+      "释理",
+      "释词"
+    ],
+    "certainty": [
+      "确定",
+      "可疑",
+      "待核"
+    ],
+    "status": [
+      "草稿",
+      "已校对",
+      "已审核"
+    ]
+  }
+}

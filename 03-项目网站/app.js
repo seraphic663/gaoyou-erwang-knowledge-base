@@ -8,6 +8,7 @@ const dbStatus = document.querySelector('#dbStatus');
 const dbStats = document.querySelector('#dbStats');
 const schemaGrid = document.querySelector('#schemaGrid');
 const searchSummary = document.querySelector('#searchSummary');
+const visitCounter = document.querySelector('#visitCounter');
 
 let searchTimer = null;
 
@@ -339,6 +340,24 @@ async function searchContent(query) {
   renderCases(data.cases || {}, data.query || '');
 }
 
+async function updateVisitCounter() {
+  if (!visitCounter) return;
+
+  const hasCounted = sessionStorage.getItem('gaoyouVisitCounted') === '1';
+  const response = await fetch('/api/visits', { method: hasCounted ? 'GET' : 'POST' });
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+
+  const payload = await response.json();
+  const countTarget = visitCounter.querySelector('span');
+  if (countTarget) {
+    countTarget.textContent = String(payload.count ?? 0);
+  }
+  visitCounter.hidden = false;
+  sessionStorage.setItem('gaoyouVisitCounted', '1');
+}
+
 async function init() {
   try {
     await loadBootstrap();
@@ -408,5 +427,9 @@ if (searchQuick) {
     });
   });
 }
+
+updateVisitCounter().catch((error) => {
+  console.error(error);
+});
 
 init();

@@ -1,0 +1,63 @@
+{
+  "cases": [
+    {
+      "case_title": "平原之隰",
+      "source_work": "《管子·形勢第二》",
+      "target_work": "《管子》",
+      "target_text": "平原之隰，奚有於高",
+      "problem": "今本原文为“平原之隰，奚有於高”，但“隰”与后《解》“虽有小封”矛盾，且与“大山之隈”同构不协。",
+      "claim": "原文当为“平隰之封，奚有於高”，后《解》亦当改作“平隰之封”。",
+      "method_tags": ["校勘", "书证"],
+      "terms": [
+        {
+          "term": "原",
+          "term_type": "异文",
+          "relation_type": "误字",
+          "related_term": "隰",
+          "note": "当为“隰”字",
+          "source_paragraph_indexes": [5, 15],
+          "source_comment_ids": []
+        },
+        {
+          "term": "隰",
+          "term_type": "异文",
+          "relation_type": "误字",
+          "related_term": "封",
+          "note": "当为“封”字",
+          "source_paragraph_indexes": [5, 15],
+          "source_comment_ids": []
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "《管子注》",
+          "quote": "言平隰之澤，雖有小封，不成於高。",
+          "role": "正误",
+          "term": "平隰之封",
+          "source_paragraph_indexes": [17],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "发疑",
+          "text": "發疑：今本正文作“平原之隰，奚有於高”，今本後《解》：“所謂平原者，下澤也，雖有小封，不得爲高”，“隰”與“封”矛盾。",
+          "source_paragraph_indexes": [22],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "立论",
+          "text": "預設：此當作“平隰之封，奚有於高”。",
+          "source_paragraph_indexes": [23],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "取證：尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。下濕曰隰，故言“下澤”。積土曰封，故言“雖有小封，不得爲高”。",
+          "source_paragraph_indexes": [24],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释理",
+          "text": "釋理：根據《管子注》“雖有小封”證明有本作“平隰之封”。再分析下濕曰隰，故言“下澤”，積土曰封，一低一高；又根據“平原之隰，奚有於

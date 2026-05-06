@@ -1,0 +1,1099 @@
+{
+  "cases": [
+    {
+      "case_title": "虔、畏、賓、齋、亟、憼、景 懍、浚、悛、誠、信、高、尊，敬也",
+      "source_work": "广雅疏证",
+      "target_work": "广雅",
+      "target_text": "敬也",
+      "problem": "这些字词为何均训为敬？",
+      "claim": "这些字词均包含恭敬、谨肃之义，通过通假、声近义同、同义互证等方法可以证明其共同训为敬。",
+      "method_tags": [
+        "书证",
+        "训释",
+        "通假",
+        "声训",
+        "同义互证",
+        "义证",
+        "补正"
+      ],
+      "terms": [
+        {
+          "term": "威",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "畏",
+          "note": "威与畏通",
+          "source_paragraph_indexes": [
+            4
+          ],
+          "source_comment_ids": [
+            "1"
+          ]
+        },
+        {
+          "term": "宾",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "儐",
+          "note": "宾与儐通",
+          "source_paragraph_indexes": [
+            5
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "齐",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "齋",
+          "note": "齐与斋通",
+          "source_paragraph_indexes": [
+            6
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "稟",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "懍",
+          "note": "稟与懍通",
+          "source_paragraph_indexes": [
+            9
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "恮",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "悛",
+          "note": "恮与悛通",
+          "source_paragraph_indexes": [
+            10
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "敬",
+          "term_type": "",
+          "relation_type": "声近义同",
+          "related_term": "警",
+          "note": "敬、警、憼声近义同",
+          "source_paragraph_indexes": [
+            8
+          ],
+          "source_comment_ids": [
+            "2"
+          ]
+        },
+        {
+          "term": "敬",
+          "term_type": "",
+          "relation_type": "声近义同",
+          "related_term": "憼",
+          "note": "敬、警、憼声近义同",
+          "source_paragraph_indexes": [
+            8
+          ],
+          "source_comment_ids": [
+            "2"
+          ]
+        },
+        {
+          "term": "悛",
+          "term_type": "",
+          "relation_type": "声近义同",
+          "related_term": "恂",
+          "note": "悛、恂、浚声近义同",
+          "source_paragraph_indexes": [
+            10
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "悛",
+          "term_type": "",
+          "relation_type": "声近义同",
+          "related_term": "浚",
+          "note": "悛、恂、浚声近义同",
+          "source_paragraph_indexes": [
+            10
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "苟",
+          "term_type": "",
+          "relation_type": "同义",
+          "related_term": "亟",
+          "note": "苟、亟、革、㥛并同义",
+          "source_paragraph_indexes": [
+            7
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "苟",
+          "term_type": "",
+          "relation_type": "同义",
+          "related_term": "革",
+          "note": "苟、亟、革、㥛并同义",
+          "source_paragraph_indexes": [
+            7
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "苟",
+          "term_type": "",
+          "relation_type": "同义",
+          "related_term": "㥛",
+          "note": "苟、亟、革、㥛并同义",
+          "source_paragraph_indexes": [
+            7
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "诚",
+          "term_type": "",
+          "relation_type": "同义",
+          "related_term": "信",
+          "note": "诚、信、尽、敬义理关联",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "诚",
+          "term_type": "",
+          "relation_type": "同义",
+          "related_term": "尽",
+          "note": "诚、信、尽、敬义理关联",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "诚",
+          "term_type": "",
+          "relation_type": "同义",
+          "related_term": "敬",
+          "note": "诚、信、尽、敬义理关联",
+          "source_paragraph_indexes": [
+            11
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "诗经·商颂·殷武",
+          "quote": "虔，敬也。",
+          "role": "直训",
+          "term": "虔",
+          "source_paragraph_indexes": [
+            35
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "诗经·大雅·韩奕",
+          "quote": "虔共尔位。",
+          "role": "佐证",
+          "term": "虔",
+          "source_paragraph_indexes": [
+            36
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·大学",
+          "quote": "之其所畏敬而辟焉。",
+          "role": "佐证",
+          "term": "畏",
+          "source_paragraph_indexes": [
+            37
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·表记",
+          "quote": "大人之器威敬。",
+          "role": "佐证",
+          "term": "威",
+          "source_paragraph_indexes": [
+            38
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·曲礼",
+          "quote": "心服曰畏。",
+          "role": "释义",
+          "term": "畏",
+          "source_paragraph_indexes": [
+            39
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "孟子·公孙丑",
+          "quote": "吾先子之所畏也。",
+          "role": "佐证",
+          "term": "畏",
+          "source_paragraph_indexes": [
+            40
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "宾，所敬也。",
+          "role": "直训",
+          "term": "宾",
+          "source_paragraph_indexes": [
+            41
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "周官·乡大夫",
+          "quote": "宾，敬也。",
+          "role": "佐证",
+          "term": "宾",
+          "source_paragraph_indexes": [
+            42
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·礼运",
+          "quote": "山川所以儐鬼神也。",
+          "role": "佐证",
+          "term": "儐",
+          "source_paragraph_indexes": [
+            43
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "经典释文",
+          "quote": "儐，皇音宾，敬也。",
+          "role": "释义",
+          "term": "儐",
+          "source_paragraph_indexes": [
+            44
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "诗经·召南·采蘋",
+          "quote": "有齐季女；齐，敬也。",
+          "role": "直训",
+          "term": "齐",
+          "source_paragraph_indexes": [
+            45
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "敬，肃也。从攴苟。苟，自急敕也。从羊省，从包省，从口，口犹慎言也。从羊，与义、善、美同意。",
+          "role": "字源",
+          "term": "苟",
+          "source_paragraph_indexes": [
+            46
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "玉篇",
+          "quote": "苟，居力切，亦作亟。",
+          "role": "佐证",
+          "term": "苟",
+          "source_paragraph_indexes": [
+            47
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "㥛，谨重皃。",
+          "role": "佐证",
+          "term": "㥛",
+          "source_paragraph_indexes": [
+            48
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "汉成阳灵台碑",
+          "quote": "齐革精诚。",
+          "role": "佐证",
+          "term": "革",
+          "source_paragraph_indexes": [
+            49
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "憼，敬也。",
+          "role": "直训",
+          "term": "憼",
+          "source_paragraph_indexes": [
+            50
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "诗经·大雅·常武",
+          "quote": "敬之言警也。",
+          "role": "释义",
+          "term": "敬",
+          "source_paragraph_indexes": [
+            51
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "方言",
+          "quote": "稟、浚，敬也。秦晋之间曰稟，齐曰浚，吴楚之閒自敬曰稟。",
+          "role": "佐证",
+          "term": "稟",
+          "source_paragraph_indexes": [
+            52
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "恮，谨也。",
+          "role": "直训",
+          "term": "恮",
+          "source_paragraph_indexes": [
+            53
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "论语·乡党",
+          "quote": "恂恂如也，似不能言者；王肃注：恂恂，温恭之貌。",
+          "role": "释义",
+          "term": "恂",
+          "source_paragraph_indexes": [
+            54
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "史记·李将军列传",
+          "quote": "悛悛如鄙人，口不能道辞。",
+          "role": "佐证",
+          "term": "悛",
+          "source_paragraph_indexes": [
+            55
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·祭统",
+          "quote": "诚信之谓尽，尽之谓敬。",
+          "role": "义理",
+          "term": "诚",
+          "source_paragraph_indexes": [
+            56
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "明确所列13字均训为“敬”。",
+          "source_paragraph_indexes": [
+            68,
+            69
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "①虔：引《殷武》传直训，辅以《韩奕》用例。",
+          "source_paragraph_indexes": [
+            71
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "②畏：引《大学》《表记》，提出威与畏通。补郑注、《孟子》用例。",
+          "source_paragraph_indexes": [
+            72
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "③宾：引《说文》直训，引郑众注，引《礼运》儐鬼神及《释文》证儐与宾通。",
+          "source_paragraph_indexes": [
+            73
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "④斋：引《采蘋》毛传，提出齐与斋通。",
+          "source_paragraph_indexes": [
+            74
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "⑤亟：从《说文》敬字溯源，引《玉篇》苟亦作亟，引《说文》㥛，补《成阳灵台碑》，证苟、亟、革、㥛同义。",
+          "source_paragraph_indexes": [
+            75
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "⑥憼：《说文》直训，引郑笺“敬之言警”，声近义同。",
+          "source_paragraph_indexes": [
+            76
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "⑦-⑧懍、浚：引《方言》证稟、浚有敬义，稟与懍通。",
+          "source_paragraph_indexes": [
+            77
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "⑨悛：引《说文》恮，证恮与悛通；又悛亦浚也，引《论语》《史记》证声近义同。",
+          "source_paragraph_indexes": [
+            78
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "⑩-11诚、信：引《祭统》证诚、信、尽、敬义理关联。",
+          "source_paragraph_indexes": [
+            79
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "结论",
+          "text": "通过经传注疏、小学专书、方言、碑刻等材料，结合通假、声近义同、同义互证等，逐一证明这些字词均含恭敬义，构建敬义字词系统。",
+          "source_paragraph_indexes": [
+            82
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "通过经传注疏、小学专书、方言、碑刻、史书等材料，结合通假、声近义同、同义互证等考据方法，逐一证明这些字词均包含“恭敬、谨肃、尊崇”义，厘清字词间的音义关联，构建了“敬”义字词系统。",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 16,
+        "imported_at": "2026-05-06T17:26:51"
+      }
+    },
+    {
+      "case_title": "痂、瘃、疥、瘙、㿃、瘍、癬、㿋、㿕、傷、㿓、胗、㾦、㾺，創也",
+      "source_work": "广雅疏证",
+      "target_work": "广雅",
+      "target_text": "創也",
+      "problem": "这些字词为何均训为创？",
+      "claim": "这些字词均包含创伤、疮疡之义，通过字书直训、经典佐证、通假、异文、对文散文等可以证明。",
+      "method_tags": [
+        "书证",
+        "训释",
+        "通假",
+        "异文",
+        "同义互证",
+        "对文散文",
+        "义证"
+      ],
+      "terms": [
+        {
+          "term": "瘡",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "創",
+          "note": "瘡与创同",
+          "source_paragraph_indexes": [
+            91
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "㿓",
+          "term_type": "",
+          "relation_type": "通假",
+          "related_term": "挾",
+          "note": "字通作挾",
+          "source_paragraph_indexes": [
+            96
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "疥",
+          "term_type": "",
+          "relation_type": "异文",
+          "related_term": "瘙",
+          "note": "并与之同",
+          "source_paragraph_indexes": [
+            90
+          ],
+          "source_comment_ids": [
+            "6"
+          ]
+        },
+        {
+          "term": "疥",
+          "term_type": "",
+          "relation_type": "异文",
+          "related_term": "騷",
+          "note": "字通",
+          "source_paragraph_indexes": [
+            90
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "疥",
+          "term_type": "",
+          "relation_type": "异文",
+          "related_term": "蚧",
+          "note": "字通",
+          "source_paragraph_indexes": [
+            90
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "癬",
+          "term_type": "",
+          "relation_type": "异文",
+          "related_term": "㿅",
+          "note": "作㿅同",
+          "source_paragraph_indexes": [
+            93
+          ],
+          "source_comment_ids": [
+            "7"
+          ]
+        },
+        {
+          "term": "胗",
+          "term_type": "",
+          "relation_type": "异体",
+          "related_term": "疹",
+          "note": "籒文作疹",
+          "source_paragraph_indexes": [
+            97
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "term": "傷",
+          "term_type": "",
+          "relation_type": "对文异义",
+          "related_term": "創",
+          "note": "对文则创深曰创，浅曰伤；散文则创亦谓之伤",
+          "source_paragraph_indexes": [
+            95
+          ],
+          "source_comment_ids": [
+            "8"
+          ]
+        }
+      ],
+      "evidences": [
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "痂，乾瘍也。",
+          "role": "直训",
+          "term": "痂",
+          "source_paragraph_indexes": [
+            121
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "急就篇",
+          "quote": "痂疕疥癘癡聾盲；痂，創上甲也。",
+          "role": "释义",
+          "term": "痂",
+          "source_paragraph_indexes": [
+            122
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "瘃，中寒腫覈也。",
+          "role": "直训",
+          "term": "瘃",
+          "source_paragraph_indexes": [
+            123
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "汉书·赵充国传",
+          "quote": "将军士寒手足皸瘃；瘃，寒創也。",
+          "role": "释义",
+          "term": "瘃",
+          "source_paragraph_indexes": [
+            124
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "疥，搔也。",
+          "role": "直训",
+          "term": "疥",
+          "source_paragraph_indexes": [
+            125
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "周官·疾医",
+          "quote": "夏時有癢疥疾。",
+          "role": "佐证",
+          "term": "疥",
+          "source_paragraph_indexes": [
+            126
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "众经音义引仓颉篇",
+          "quote": "瘙，疥也。",
+          "role": "同义",
+          "term": "瘙",
+          "source_paragraph_indexes": [
+            127
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "管子·地员",
+          "quote": "五沃之土，其人堅勁，寡有疥騷。",
+          "role": "异文",
+          "term": "疥",
+          "source_paragraph_indexes": [
+            128
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "春秋繁露·五行顺逆",
+          "quote": "民病疥搔。",
+          "role": "异文",
+          "term": "疥",
+          "source_paragraph_indexes": [
+            129
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "后汉书·鲜卑传",
+          "quote": "夫邊垂之患手足之蚧搔。",
+          "role": "异文",
+          "term": "疥",
+          "source_paragraph_indexes": [
+            130
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "玉篇",
+          "quote": "㿃，牛頭瘡也。",
+          "role": "直训",
+          "term": "㿃",
+          "source_paragraph_indexes": [
+            131
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "瘍，頭創也。",
+          "role": "直训",
+          "term": "瘍",
+          "source_paragraph_indexes": [
+            132
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·曲礼",
+          "quote": "身有瘍則浴。",
+          "role": "佐证",
+          "term": "瘍",
+          "source_paragraph_indexes": [
+            133
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "左传襄十九年",
+          "quote": "生瘍於頭。",
+          "role": "佐证",
+          "term": "瘍",
+          "source_paragraph_indexes": [
+            134
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "尔雅",
+          "quote": "骭瘍爲微。",
+          "role": "佐证",
+          "term": "瘍",
+          "source_paragraph_indexes": [
+            135
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "癬，乾瘍也。",
+          "role": "直训",
+          "term": "癬",
+          "source_paragraph_indexes": [
+            136
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "吴语",
+          "quote": "譬諸疾疥癬也。",
+          "role": "佐证",
+          "term": "癬",
+          "source_paragraph_indexes": [
+            137
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "史记·越世家",
+          "quote": "㿅",
+          "role": "异文",
+          "term": "㿅",
+          "source_paragraph_indexes": [
+            138
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "众经音义引通俗文",
+          "quote": "皮起曰㿋。",
+          "role": "直训",
+          "term": "㿋",
+          "source_paragraph_indexes": [
+            139
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "礼记·月令",
+          "quote": "命理瞻傷察創；創之淺者曰傷。",
+          "role": "对文",
+          "term": "傷",
+          "source_paragraph_indexes": [
+            140
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "傷，創也。",
+          "role": "直训",
+          "term": "傷",
+          "source_paragraph_indexes": [
+            141
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "左传僖二十二年",
+          "quote": "君子不重傷。",
+          "role": "异文",
+          "term": "傷",
+          "source_paragraph_indexes": [
+            142
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "穀梁传文十一年",
+          "quote": "不重創。",
+          "role": "异文",
+          "term": "創",
+          "source_paragraph_indexes": [
+            143
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "玉篇",
+          "quote": "㿓，羊蹄閒㿓疾也。",
+          "role": "直训",
+          "term": "㿓",
+          "source_paragraph_indexes": [
+            144
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "齐民要术",
+          "quote": "治羊挾蹄方。",
+          "role": "佐证",
+          "term": "挾",
+          "source_paragraph_indexes": [
+            145
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "胗，脣瘍也。籒文作疹。",
+          "role": "直训",
+          "term": "胗",
+          "source_paragraph_indexes": [
+            146
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "宋玉风赋",
+          "quote": "中脣爲胗。",
+          "role": "佐证",
+          "term": "胗",
+          "source_paragraph_indexes": [
+            147
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "广雅·释言",
+          "quote": "㾦，痂也。",
+          "role": "递训",
+          "term": "㾦",
+          "source_paragraph_indexes": [
+            148
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "evidence_type": "书证",
+          "work": "说文解字",
+          "quote": "㾺，蝕創也。",
+          "role": "直训",
+          "term": "㾺",
+          "source_paragraph_indexes": [
+            149
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "process_steps": [
+        {
+          "step_type": "立论",
+          "text": "明确所列14字均有“创”义。",
+          "source_paragraph_indexes": [
+            166,
+            167
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "1痂：引《说文》直训，引《急就篇》师古注。",
+          "source_paragraph_indexes": [
+            169
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "取证",
+          "text": "2瘃：引《说文》及《汉书》文颖注。",
+          "source_paragraph_indexes": [
+            170
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "3-4疥、瘙：引《说文》《周官》《仓颉篇》及诸经异文，证与疥瘙同。",
+          "source_paragraph_indexes": [
+            171
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "5㿃：引《玉篇》，疮与创同。",
+          "source_paragraph_indexes": [
+            172
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "6疡：引《说文》，引《曲礼》《左传》《尔雅》证疡为创泛称。",
+          "source_paragraph_indexes": [
+            173
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "7癣：引《说文》，引《吴语》《史记》异文。",
+          "source_paragraph_indexes": [
+            174
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "8㿋：引《通俗文》直训。",
+          "source_paragraph_indexes": [
+            175
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "10伤：引《月令》郑注对文，引《说文》直训，引《左传》《穀梁》异文证同义。",
+          "source_paragraph_indexes": [
+            176
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "11㿓：引《玉篇》，字通作挾，引《齐民要术》。",
+          "source_paragraph_indexes": [
+            177
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "12胗：引《说文》，引宋玉《风赋》佐证。",
+          "source_paragraph_indexes": [
+            178
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "13㾦：引《广雅·释言》递训。",
+          "source_paragraph_indexes": [
+            179
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "释词",
+          "text": "14㾺：引《说文》直训。",
+          "source_paragraph_indexes": [
+            180
+          ],
+          "source_comment_ids": []
+        },
+        {
+          "step_type": "结论",
+          "text": "以字书直证为基础，经典文例佐证，结合通假、对文散文、同义递训等，逐一证明这些字词均包含“创”义，构建创义字词系统。",
+          "source_paragraph_indexes": [
+            183
+          ],
+          "source_comment_ids": []
+        }
+      ],
+      "conclusion": "以字书直证为基础，以经典文献用例进行佐证，结合通假、对文散文、同义递训等，逐一证明这些字词均包含“创”义。以同义字为核心，辅以通假字、异体字等厘清字词间的音义关联，构建“创”义字词系统。",
+      "certainty": "确定",
+      "status": "草稿",
+      "database_ingestion": {
+        "imported": true,
+        "annotation_case_id": 17,
+        "imported_at": "2026-05-06T17:26:51"
+      }
+    }
+  ],
+  "database_ingestion": {
+    "imported": true,
+    "database": "D:\\26大创\\04-项目文献\\D-标注\\json\\annotation_db\\annotation_results.db",
+    "imported_at": "2026-05-06T17:26:51"
+  }
+}

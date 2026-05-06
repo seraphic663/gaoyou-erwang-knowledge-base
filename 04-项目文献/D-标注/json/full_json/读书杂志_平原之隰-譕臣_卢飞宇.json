@@ -1,0 +1,2090 @@
+{
+  "schema_version": "annotation_docx_full_json_v1",
+  "source_file": {
+    "name": "读书杂志_平原之隰-譕臣_卢飞宇.docx",
+    "path": "D-标注\\读书杂志_平原之隰-譕臣_卢飞宇.docx",
+    "size_bytes": 19255,
+    "modified_time": "2026-04-16T10:27:33"
+  },
+  "document_stats": {
+    "paragraph_count": 66,
+    "nonempty_paragraph_count": 64,
+    "table_count": 0,
+    "comment_count": 0,
+    "anchored_comment_count": 0,
+    "annotation_block_count": 14,
+    "footnote_count": 0,
+    "endnote_count": 0,
+    "paragraph_text_length": 1786,
+    "comment_text_length": 0
+  },
+  "doc_type": "case_blocks",
+  "paragraphs": [
+    {
+      "index": 1,
+      "style": "Normal",
+      "text": "《管子·形勢第二》原文：",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《管子·",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "形勢第二",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "》原文：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 2,
+      "style": "Normal",
+      "text": "平原之隰，奚有於高？大山之隈，奚有於深？訾讆之人，勿與任大。譕臣者可與遠舉，顧憂者可與致道。其計也速，而憂在近者，往而勿召也。舉長者，可遠見也。裁大者，衆之所比也。美人之懷，定服而勿厭也。必得之事不足賴也，必諾之言不足信也。小謹者不大立，訾食者不肥體。有無棄之言者，必參於天地也。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "平原之隰，奚有於高？大山之隈，奚有於深？訾讆之人，勿與任大。譕臣者可與遠舉，顧憂者可與致道。其計也速，而憂在近者，往而勿召也。舉長者，可遠見也。裁大者，衆之所比也。美人之懷，定服而勿厭也。必得之事不足賴也，必諾之言不足信也。小謹者不大立，訾食者不肥體。有無棄之言者，必參於天地也。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 3,
+      "style": "Normal",
+      "text": "一、平原之隰",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "一、",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "平原之隰",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 4,
+      "style": "Normal",
+      "text": "平原之隰，奚有於高。後《解》云：“所謂平原者，下澤也，雖有小封，不得爲高，故曰‘平原之隰，奚有於高’。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "平原之隰，奚有於高。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "後《解》云：“所謂平原者，下澤也，雖有小封，不得爲高，故曰‘平原之隰，奚有於高’。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 5,
+      "style": "Normal",
+      "text": "【念孫案】此當作“平隰之封，奚有於高”，後《解》當作“所謂平隰者，下澤也。雖有小封，不得爲高，故曰‘平隰之封，奚有於高’”。尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。下濕曰隰，故言“下澤”。積土曰封，故言“雖有小封，不得爲高”。後人既改此文“平隰之封”爲“平原之隰”，遂并後《解》而改之，弗思甚矣。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "【念孫案】此當作“平隰之封，奚有於高”，後《解》當作“所謂平隰者，下澤也。雖有小封，不得爲高，故曰‘平隰之封，奚有於高’”。尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。下濕曰隰，故言“下澤”。積土曰封，故言“雖有小封，不得爲高”。後人既改此文“平隰之封”爲“平原之隰”，遂并後《解》而改之，弗思甚矣。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 6,
+      "style": "List Paragraph",
+      "text": "考據對象",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據對象",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 7,
+      "style": "List Paragraph",
+      "text": "《管子·形勢第二》“平原之隰”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《管子·",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "形勢第二",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "》“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "平原之隰",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 8,
+      "style": "List Paragraph",
+      "text": "反駁對象",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "反駁對象",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 9,
+      "style": "List Paragraph",
+      "text": "今本正文“平原之隰，奚有於高”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "今本正文“平原之隰，奚有於高”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 10,
+      "style": "List Paragraph",
+      "text": "《形勢解》“所謂平原者，下澤也，雖有小封，不得爲高，故曰‘平原之隰，奚有於高’。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "形勢解》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“所謂平原者，下澤也，雖有小封，不得爲高，故曰‘平原之隰，奚有於高’。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 11,
+      "style": "List Paragraph",
+      "text": "論點",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "論點",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 12,
+      "style": "List Paragraph",
+      "text": "原文當作“平隰之封，奚有於高”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "原文當作“平隰之封，奚有於高”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 13,
+      "style": "List Paragraph",
+      "text": "《形勢解》當作“所謂平隰者，下澤也。雖有小封，不得爲高，故曰‘平隰之封，奚有於高’”。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "形勢",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "解》當作“所謂平隰者，下澤也。雖有小封，不得爲高，故曰‘平隰之封，奚有於高’”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 14,
+      "style": "List Paragraph",
+      "text": "字詞關係",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "字詞關係",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 15,
+      "style": "List Paragraph",
+      "text": "原譌为隰，隰譌为封",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "原譌为隰，隰譌为封",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 16,
+      "style": "List Paragraph",
+      "text": "引用書證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "引用書證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 17,
+      "style": "List Paragraph",
+      "text": "尹知章《管子注》“言平隰之澤，雖有小封，不成於高。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "尹知章",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "《管子注》“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "言平隰之澤，雖有小封，不成於高。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 18,
+      "style": "List Paragraph",
+      "text": "運用術語",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "運用術語",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 19,
+      "style": "List Paragraph",
+      "text": "當作",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "當作",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 20,
+      "style": "List Paragraph",
+      "text": "明證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "明證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 21,
+      "style": "List Paragraph",
+      "text": "考據過程",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據過程",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 22,
+      "style": "List Paragraph",
+      "text": "發疑：今本正文作“平原之隰，奚有於高”，今本後《解》：“所謂平原者，下澤也，雖有小封，不得爲高”，“隰”與“封”矛盾。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "發疑：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "今本正文作“平原之隰，奚有於高”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "今本後《解》：“所謂平原者，下澤也，雖有小封，不得爲高",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”，“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "隰",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”與“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "封",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”矛盾。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 23,
+      "style": "List Paragraph",
+      "text": "預設：此當作“平隰之封，奚有於高”。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "預設：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "此當作“平隰之封，奚有於高”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 24,
+      "style": "List Paragraph",
+      "text": "取證：尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。下濕曰隰，故言“下澤”。積土曰封，故言“雖有小封，不得爲高”。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "取證：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。下濕曰隰，故言“下澤”。積土曰封，故言“雖有小封，不得爲高”。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 25,
+      "style": "List Paragraph",
+      "text": "釋理：根據《管子注》“雖有小封”證明有本作“平隰之封”。再分析下濕曰隰，故言“下澤”，積土曰封，一低一高；又根據“平原之隰，奚有於高？大山之隈，奚有於深？”的同構關係，與“低地中的高處仍不高”之義，證明隰當為封。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "釋理：根據《管子注》“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "雖有小封",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”證明有本作“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "平隰之封",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”。再分析",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "下濕曰隰，故言",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“下澤”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "積土曰封",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，一低一高；又根據“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "平原之隰，奚有於高？大山之隈，奚有於深？",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”的同構關係，與“低地中的高處仍不高”之義，證明",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "隰",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "當為封。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 26,
+      "style": "List Paragraph",
+      "text": "結論：後人既改此文“平隰之封”爲“平原之隰”，遂并後《解》而改之，弗思甚矣。此當作“平隰之封，奚有於高”。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "結論：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "後人既改此文“平隰之封”爲“平原之隰”，遂并後《解》而改之，弗思甚矣。此當作“平隰之封，奚有於高”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 27,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    },
+    {
+      "index": 28,
+      "style": "Normal",
+      "text": "二、譕臣（字形相似而误，应为谋巨，义为为天下计者；韵）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "二、",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "譕臣",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "（字形相似而误，应为谋巨，义为为天下计者；韵）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 29,
+      "style": "Normal",
+      "text": "譕臣者，可以遠舉。顧憂者，可與致道。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "譕",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "臣",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "者，可以遠",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "舉",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。顧",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "憂",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "者，可與致",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "道",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 30,
+      "style": "Normal",
+      "text": "【引之曰】“譕”與“謨”同。《集韻》曰：“謨，古作譕。”《爾雅》曰：“謨，謀也。”“臣”當作“巨”，字形相似而誤。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "【引之曰】“譕”與“謨”同。《集韻》曰：“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "謨，古作譕",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。”《爾雅》曰：“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "謨，謀也",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。”“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "臣”當作“巨”",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "字形相似而誤",
+          "bold": null,
+          "italic": null,
+          "underline": true,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 31,
+      "style": "Normal",
+      "text": "巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 32,
+      "style": "Normal",
+      "text": "且“巨”與“舉”爲韻，“憂”與“道”爲韻。二字古音同在幽部。若作“臣”字，則又失其韻矣。尹注非。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "且“巨”與“舉”爲韻，“憂”與“道”爲韻。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "二字古音同在幽部",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "。若作“臣”字，則又失其韻矣。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "尹注非。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 33,
+      "style": "List Paragraph",
+      "text": "考據對象",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據對象",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 34,
+      "style": "List Paragraph",
+      "text": "《管子·形勢第二》“譕臣者，可以遠舉”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《管子·",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "形勢第二",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "》“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "譕臣者，可以遠",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "舉",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 35,
+      "style": "List Paragraph",
+      "text": "反駁對象",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "反駁對象",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 36,
+      "style": "List Paragraph",
+      "text": "今本正文“譕臣”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "今本正文“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "譕",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "臣",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 37,
+      "style": "List Paragraph",
+      "text": "《形勢解》：“明主之慮事也，爲天下計者，謂之譕臣。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《形勢解》",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“明主之慮事也，爲天下計者，謂之譕臣。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 38,
+      "style": "List Paragraph",
+      "text": "論點",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "論點",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 39,
+      "style": "List Paragraph",
+      "text": "“臣”當作“巨”，原文應為“譕巨”；“譕巨”指謀及天下之大計",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "“臣”當作“巨”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "原文應為“譕巨”；“譕巨”指謀及天下之大計",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 40,
+      "style": "List Paragraph",
+      "text": "字詞關係",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "字詞關係",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 41,
+      "style": "List Paragraph",
+      "text": "譕：通“謨”，謀也（《爾雅》：“謨，謀也”）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "譕：通“謨”，謀也（《爾雅》：“謨，謀也”）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 42,
+      "style": "List Paragraph",
+      "text": "臣：因字形相似（“臣”與“巨”形近）而誤，當作“巨”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "臣：因字形相似（“臣”與“巨”形近）而誤，當作“巨”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 43,
+      "style": "List Paragraph",
+      "text": "巨：大也",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "巨：大也",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 44,
+      "style": "List Paragraph",
+      "text": "譕巨：謀及天下之大，而非一家一國之謀",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "譕巨：謀及天下之大，而非一家一國之謀",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 45,
+      "style": "List Paragraph",
+      "text": "韻：“巨”與“舉”為韻（魚部）；“憂”與“道”為韻（幽部）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "韻：“巨”與“舉”為韻",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "（魚部）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "；“憂”與“道”為韻（幽部）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 46,
+      "style": "List Paragraph",
+      "text": "引用書證",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "引用書證",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 47,
+      "style": "List Paragraph",
+      "text": "《管子注》尹知章“言平隰之澤，雖有小封，不成於高。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《管子注》尹知章“",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "言平隰之澤，雖有小封，不成於高。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 48,
+      "style": "List Paragraph",
+      "text": "《集韻》：“謨，古作譕。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《集韻》：“謨，古作譕。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 49,
+      "style": "List Paragraph",
+      "text": "《爾雅》：“謨，謀也。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《爾雅》：“謨，謀也。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 50,
+      "style": "List Paragraph",
+      "text": "《管子·形勢解》：“明主之慮事也，爲天下計者，謂之譕臣。”",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "《管子·形勢解》：“明主之慮事也，爲天下計者，謂之譕臣。”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 51,
+      "style": "List Paragraph",
+      "text": "運用術語",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "運用術語",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 52,
+      "style": "List Paragraph",
+      "text": "當作（校勘術語）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "當作（校勘術語）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 53,
+      "style": "List Paragraph",
+      "text": "字形相似而誤",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "字形相似而誤",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 54,
+      "style": "List Paragraph",
+      "text": "不可通",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "不可通",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 55,
+      "style": "List Paragraph",
+      "text": "失其韻",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "失其韻",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 56,
+      "style": "List Paragraph",
+      "text": "非（尹注非）",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "非（尹注非）",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 57,
+      "style": "List Paragraph",
+      "text": "考據過程",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "考據過程",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 58,
+      "style": "List Paragraph",
+      "text": "發疑：原文“譕臣者，可以遠舉”，尹注以“譕臣”為可通之詞。王引之疑“臣”為“巨”之誤。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "發疑：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "原文“譕臣者，可以遠舉”，尹注以“譕臣”為可通之詞。王引之疑“臣”為“巨”之誤。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 59,
+      "style": "List Paragraph",
+      "text": "預設：“臣”當作“巨”，“譕巨”意為謀及天下之大計。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "預設：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "“臣”當作“巨”，“譕巨”意為謀及天下之大計。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 60,
+      "style": "List Paragraph",
+      "text": "取證：《集韻》曰：“謨，古作譕。”《爾雅》曰：“謨，謀也。”“臣”當作“巨”，字形相似而誤。巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。且“巨”與“舉”爲韻，“憂”與“道”爲韻。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "取證：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "《集韻》曰：“謨，古作譕。”《爾雅》曰：“謨，謀也。”“臣”當作“巨”，字形相似而誤。巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。且“巨”與“舉”爲韻，“憂”與“道”爲韻。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 61,
+      "style": "List Paragraph",
+      "text": "釋理：",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "釋理：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 62,
+      "style": "List Paragraph",
+      "text": "字形上，“臣”與“巨”形近易訛。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "字形上，“臣”與“巨”形近易訛。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 63,
+      "style": "List Paragraph",
+      "text": "文義上，“譕臣”無法解釋為“爲天下計”；“譕巨”則與《形勢解》“爲天下計”對應。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "文義上，“譕臣”無法解釋為“爲天下計”；“譕巨”則與《形勢解》“爲天下計”對應。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 64,
+      "style": "List Paragraph",
+      "text": "音韻上，“巨”與“舉”同在鱼部，符合古詩韻例；“臣”字失韻。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "音韻上，“巨”與“舉”",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "同在鱼部",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "，符合古詩韻例；“臣”字失韻。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 65,
+      "style": "List Paragraph",
+      "text": "結論：原文當作“譕巨”，尹注錯誤。",
+      "is_empty": false,
+      "runs": [
+        {
+          "text": "結論：",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        },
+        {
+          "text": "原文當作“譕巨”，尹注錯誤。",
+          "bold": null,
+          "italic": null,
+          "underline": null,
+          "style": "Default Paragraph Font",
+          "font_name": null
+        }
+      ],
+      "comment_ids": []
+    },
+    {
+      "index": 66,
+      "style": "Normal",
+      "text": "",
+      "is_empty": true,
+      "runs": [],
+      "comment_ids": []
+    }
+  ],
+  "tables": [],
+  "comments": [],
+  "notes": {
+    "footnotes": [],
+    "endnotes": []
+  },
+  "annotation_blocks": [
+    {
+      "label": "考据对象",
+      "start_paragraph": 6,
+      "end_paragraph": 7,
+      "items": [
+        "《管子·形勢第二》“平原之隰”"
+      ]
+    },
+    {
+      "label": "反驳对象",
+      "start_paragraph": 8,
+      "end_paragraph": 10,
+      "items": [
+        "今本正文“平原之隰，奚有於高”",
+        "《形勢解》“所謂平原者，下澤也，雖有小封，不得爲高，故曰‘平原之隰，奚有於高’。”"
+      ]
+    },
+    {
+      "label": "论点",
+      "start_paragraph": 11,
+      "end_paragraph": 13,
+      "items": [
+        "原文當作“平隰之封，奚有於高”",
+        "《形勢解》當作“所謂平隰者，下澤也。雖有小封，不得爲高，故曰‘平隰之封，奚有於高’”。"
+      ]
+    },
+    {
+      "label": "字词关系",
+      "start_paragraph": 14,
+      "end_paragraph": 15,
+      "items": [
+        "原譌为隰，隰譌为封"
+      ]
+    },
+    {
+      "label": "引用书证",
+      "start_paragraph": 16,
+      "end_paragraph": 17,
+      "items": [
+        "尹知章《管子注》“言平隰之澤，雖有小封，不成於高。”"
+      ]
+    },
+    {
+      "label": "考据用语",
+      "start_paragraph": 18,
+      "end_paragraph": 20,
+      "items": [
+        "當作",
+        "明證"
+      ]
+    },
+    {
+      "label": "考据过程",
+      "start_paragraph": 21,
+      "end_paragraph": 32,
+      "items": [
+        "發疑：今本正文作“平原之隰，奚有於高”，今本後《解》：“所謂平原者，下澤也，雖有小封，不得爲高”，“隰”與“封”矛盾。",
+        "預設：此當作“平隰之封，奚有於高”。",
+        "取證：尹注云：“言平隰之澤，雖有小封，不成於高。”是其明證也。下濕曰隰，故言“下澤”。積土曰封，故言“雖有小封，不得爲高”。",
+        "釋理：根據《管子注》“雖有小封”證明有本作“平隰之封”。再分析下濕曰隰，故言“下澤”，積土曰封，一低一高；又根據“平原之隰，奚有於高？大山之隈，奚有於深？”的同構關係，與“低地中的高處仍不高”之義，證明隰當為封。",
+        "結論：後人既改此文“平隰之封”爲“平原之隰”，遂并後《解》而改之，弗思甚矣。此當作“平隰之封，奚有於高”。",
+        "二、譕臣（字形相似而误，应为谋巨，义为为天下计者；韵）",
+        "譕臣者，可以遠舉。顧憂者，可與致道。",
+        "【引之曰】“譕”與“謨”同。《集韻》曰：“謨，古作譕。”《爾雅》曰：“謨，謀也。”“臣”當作“巨”，字形相似而誤。",
+        "巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。",
+        "且“巨”與“舉”爲韻，“憂”與“道”爲韻。二字古音同在幽部。若作“臣”字，則又失其韻矣。尹注非。"
+      ]
+    },
+    {
+      "label": "考据对象",
+      "start_paragraph": 33,
+      "end_paragraph": 34,
+      "items": [
+        "《管子·形勢第二》“譕臣者，可以遠舉”"
+      ]
+    },
+    {
+      "label": "反驳对象",
+      "start_paragraph": 35,
+      "end_paragraph": 37,
+      "items": [
+        "今本正文“譕臣”",
+        "《形勢解》：“明主之慮事也，爲天下計者，謂之譕臣。”"
+      ]
+    },
+    {
+      "label": "论点",
+      "start_paragraph": 38,
+      "end_paragraph": 39,
+      "items": [
+        "“臣”當作“巨”，原文應為“譕巨”；“譕巨”指謀及天下之大計"
+      ]
+    },
+    {
+      "label": "字词关系",
+      "start_paragraph": 40,
+      "end_paragraph": 45,
+      "items": [
+        "譕：通“謨”，謀也（《爾雅》：“謨，謀也”）",
+        "臣：因字形相似（“臣”與“巨”形近）而誤，當作“巨”",
+        "巨：大也",
+        "譕巨：謀及天下之大，而非一家一國之謀",
+        "韻：“巨”與“舉”為韻（魚部）；“憂”與“道”為韻（幽部）"
+      ]
+    },
+    {
+      "label": "引用书证",
+      "start_paragraph": 46,
+      "end_paragraph": 50,
+      "items": [
+        "《管子注》尹知章“言平隰之澤，雖有小封，不成於高。”",
+        "《集韻》：“謨，古作譕。”",
+        "《爾雅》：“謨，謀也。”",
+        "《管子·形勢解》：“明主之慮事也，爲天下計者，謂之譕臣。”"
+      ]
+    },
+    {
+      "label": "考据用语",
+      "start_paragraph": 51,
+      "end_paragraph": 56,
+      "items": [
+        "當作（校勘術語）",
+        "字形相似而誤",
+        "不可通",
+        "失其韻",
+        "非（尹注非）"
+      ]
+    },
+    {
+      "label": "考据过程",
+      "start_paragraph": 57,
+      "end_paragraph": 65,
+      "items": [
+        "發疑：原文“譕臣者，可以遠舉”，尹注以“譕臣”為可通之詞。王引之疑“臣”為“巨”之誤。",
+        "預設：“臣”當作“巨”，“譕巨”意為謀及天下之大計。",
+        "取證：《集韻》曰：“謨，古作譕。”《爾雅》曰：“謨，謀也。”“臣”當作“巨”，字形相似而誤。巨，大也。“譕巨”者，謀及天下之大，而非一家一國之謀也。《形勢解》曰：“明主之慮事也，爲天下計者，謂之譕臣。”“臣”亦當作“巨”。曰“慮”、曰“計”，釋“譕”字也。曰“天下”，則釋“巨”字也。若作“譕臣”，則其義不可通矣。且“巨”與“舉”爲韻，“憂”與“道”爲韻。",
+        "釋理：",
+        "字形上，“臣”與“巨”形近易訛。",
+        "文義上，“譕臣”無法解釋為“爲天下計”；“譕巨”則與《形勢解》“爲天下計”對應。",
+        "音韻上，“巨”與“舉”同在鱼部，符合古詩韻例；“臣”字失韻。",
+        "結論：原文當作“譕巨”，尹注錯誤。"
+      ]
+    }
+  ],
+  "package_inventory": [
+    {
+      "name": "[Content_Types].xml",
+      "size": 1445,
+      "compressed_size": 358,
+      "crc": "576f9132"
+    },
+    {
+      "name": "_rels/.rels",
+      "size": 590,
+      "compressed_size": 239,
+      "crc": "b71a911e"
+    },
+    {
+      "name": "docProps/app.xml",
+      "size": 719,
+      "compressed_size": 378,
+      "crc": "9ba61172"
+    },
+    {
+      "name": "docProps/core.xml",
+      "size": 747,
+      "compressed_size": 386,
+      "crc": "f2154dfb"
+    },
+    {
+      "name": "word/_rels/document.xml.rels",
+      "size": 950,
+      "compressed_size": 261,
+      "crc": "1d8bbeb3"
+    },
+    {
+      "name": "word/document.xml",
+      "size": 34675,
+      "compressed_size": 3670,
+      "crc": "de1b7c95"
+    },
+    {
+      "name": "word/fontTable.xml",
+      "size": 2960,
+      "compressed_size": 725,
+      "crc": "47a29eed"
+    },
+    {
+      "name": "word/numbering.xml",
+      "size": 40763,
+      "compressed_size": 2333,
+      "crc": "26b653b3"
+    },
+    {
+      "name": "word/settings.xml",
+      "size": 3753,
+      "compressed_size": 1300,
+      "crc": "c11038b4"
+    },
+    {
+      "name": "word/styles.xml",
+      "size": 42609,
+      "compressed_size": 4274,
+      "crc": "5aa4a77e"
+    },
+    {
+      "name": "word/theme/theme1.xml",
+      "size": 8398,
+      "compressed_size": 1764,
+      "crc": "533be260"
+    },
+    {
+      "name": "word/webSettings.xml",
+      "size": 1069,
+      "compressed_size": 367,
+      "crc": "48fade26"
+    }
+  ],
+  "checksums": {
+    "source_docx_sha256": "3f56400ec0fa294dc3d75f20e0b64f479f7af5bd32594d65ce84362d071226dd",
+    "paragraph_text_sha256": "b40f72b487defa7333d26712657d42370276b13a153b2902f0c244d5982288a7",
+    "comment_text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "controlled_vocabularies": {
+    "method_tags": [
+      "义证",
+      "书证",
+      "句义解释",
+      "同义互证",
+      "声训",
+      "对文散文",
+      "异体",
+      "异文",
+      "形证",
+      "校勘",
+      "补正",
+      "训释",
+      "语法证据",
+      "通假"
+    ],
+    "relation_types": [
+      "",
+      "古今字",
+      "同义",
+      "声近义同",
+      "对文异义",
+      "异体",
+      "异文",
+      "当作",
+      "散文同义",
+      "误字",
+      "递训",
+      "通假"
+    ],
+    "evidence_types": [
+      "义证",
+      "书证",
+      "声训",
+      "异文",
+      "形证",
+      "语法证据"
+    ],
+    "step_types": [
+      "反驳",
+      "发疑",
+      "取证",
+      "立论",
+      "结论",
+      "补证",
+      "释理",
+      "释词"
+    ],
+    "certainty": [
+      "确定",
+      "可疑",
+      "待核"
+    ],
+    "status": [
+      "草稿",
+      "已校对",
+      "已审核"
+    ]
+  }
+}
