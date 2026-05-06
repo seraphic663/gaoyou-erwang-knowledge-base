@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "sync:sqlite": "python scripts/sqlite_bridge.py export"
+    "sync:sqlite": "python scripts/sqlite_bridge.py export",
+    "sync:annotation": "python scripts/annotation_bridge.py export"
   },
   "license": "UNLICENSED"
 }

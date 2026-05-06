@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node 03-项目网站/server.js",
     "start:web": "npm --prefix 03-项目网站 start",
-    "sync:sqlite": "python 03-项目网站/scripts/sqlite_bridge.py export"
+    "sync:sqlite": "python 03-项目网站/scripts/sqlite_bridge.py export",
+    "sync:annotation": "python 03-项目网站/scripts/annotation_bridge.py export"
   }
 }

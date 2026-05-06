@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>人工标注灰度库 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="annotation">
+    <header class="subhero annotation-hero">
+      <nav class="nav">
+        <div class="brand">高邮二王考据过程知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">返回首页</a>
+          <a href="./database.html?view=cases">主数据库</a>
+          <a href="./knowledge.html">训诂知识</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">灰度入口 · 人工标注库</p>
+        <h1>人工标注灰度库</h1>
+        <p class="hero-copy">
+          这里展示 `D-标注/json/annotation_db` 的人工标注与 AI 整理结果。数据更接近原始工作稿，暂不混入主数据库。
+        </p>
+        <div id="annotationHeroMeta" class="hero-panel"></div>
+      </div>
+    </header>
+
+    <main class="section annotation-page">
+      <p id="annotationStatus" class="db-status">正在读取人工标注库...</p>
+
+      <section class="card annotation-toolbar">
+        <div class="head-line">
+          <div>
+            <p class="section-kicker">灰度检索</p>
+            <h2>按案例、方法、原文或标注内容查</h2>
+          </div>
+        </div>
+        <div class="browser-search-grid">
+          <label class="toolbar-field">
+            <span>关键词</span>
+            <input id="annotationSearchInput" type="text" placeholder="如 平原之隰 / 误字 / 集韻 / 发疑" />
+          </label>
+          <label class="toolbar-field">
+            <span>来源文档</span>
+            <select id="annotationDocumentSelect"></select>
+          </label>
+          <label class="toolbar-field">
+            <span>方法标签</span>
+            <select id="annotationMethodSelect"></select>
+          </label>
+        </div>
+        <div class="toolbar-actions">
+          <button id="annotationSearchButton" class="page-link toolbar-button" type="button">执行检索</button>
+          <button id="annotationResetButton" class="search-clear toolbar-button" type="button">重置</button>
+        </div>
+      </section>
+
+      <div id="annotationSummary" class="search-summary"></div>
+      <div id="annotationList" class="annotation-list"></div>
+    </main>
+
+    <footer class="footer">
+      <p>人工标注灰度库 · 与主数据库并行，不直接混库</p>
+    </footer>
+
+    <script src="./annotation.js"></script>
+  </body>
+</html>

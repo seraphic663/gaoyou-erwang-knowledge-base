@@ -23,6 +23,17 @@
   -> 03-项目网站/
 ```
 
+人工标注灰度库另走一条并行链路：
+
+```text
+04-项目文献/D-标注/json/annotation_db/annotation_results.db
+  -> 03-项目网站/scripts/annotation_bridge.py
+  -> 03-项目网站/data/annotation-snapshot.json
+  -> 03-项目网站/annotation.html
+```
+
+这条链路只展示人工标注和 AI 整理结果，不混入 `02-数据库` 主库。
+
 网站前台统一表述为“一个专题数据库，多种浏览视角”。字词、案例、证据、著作和文本片段不是多套数据库，而是同一 SQLite 主库的不同入口。
 
 ## 目录结构
@@ -62,6 +73,7 @@ http://localhost:3000/api/bootstrap
 python 02-数据库/bulk_importer.py --dry-run
 python 02-数据库/bulk_importer.py
 npm run sync:sqlite
+npm run sync:annotation
 ```
 
 维护顺序：

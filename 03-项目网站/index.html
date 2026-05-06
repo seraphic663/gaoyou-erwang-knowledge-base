@@ -15,6 +15,7 @@
           <a href="#case-walkthrough">封面个案</a>
           <a href="./knowledge.html">训诂知识</a>
           <a href="./database.html?view=terms">数据库</a>
+          <a href="./annotation.html">人工标注库</a>
         </div>
       </nav>
 
@@ -112,7 +113,10 @@
             <p class="section-kicker">数据库</p>
             <h2>当前库藏</h2>
           </div>
-          <a class="page-link" href="./database.html?view=schema">查看数据库结构</a>
+          <div class="head-actions">
+            <a class="page-link" href="./database.html?view=schema">查看数据库结构</a>
+            <a class="page-link page-link-muted" href="./annotation.html">进入人工标注灰度库</a>
+          </div>
         </div>
         <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
         <div id="dbStats" class="stats-grid"></div>
@@ -191,6 +195,7 @@
           <div class="search-bar">
             <input id="searchInput" type="text" placeholder="输入字词、方法词或片段：如 周 / 通假 / 古文" />
             <a class="detail-link" href="./database.html">进入数据库查询</a>
+            <a class="detail-link detail-link-muted" href="./annotation.html">看人工标注库</a>
             <button id="clearSearch" class="search-clear" type="button">清空</button>
           </div>
           <p class="compact-note">首页只给少量预览；完整结果和筛选功能放在数据库页。</p>

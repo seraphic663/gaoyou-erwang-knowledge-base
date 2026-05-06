@@ -263,6 +263,19 @@ h1 {
   box-shadow: 0 10px 24px rgba(71, 46, 20, 0.08);
 }
 
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.page-link-muted,
+.detail-link-muted {
+  color: var(--jade);
+  background: linear-gradient(180deg, rgba(239, 235, 224, 0.96), rgba(225, 220, 207, 0.92));
+}
+
 select {
   width: 100%;
   padding: 12px 14px;
@@ -1263,6 +1276,139 @@ h2 {
 
 .inline-tag-link {
   text-decoration: none;
+}
+
+.annotation-hero {
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 243, 222, 0.12), transparent 20%),
+    radial-gradient(circle at 82% 24%, rgba(92, 102, 82, 0.18), transparent 24%),
+    linear-gradient(135deg, #2f3029, #565844 60%, #776f59);
+}
+
+.annotation-page {
+  display: grid;
+  gap: 18px;
+}
+
+.annotation-toolbar {
+  border-left: 4px solid rgba(92, 102, 82, 0.5);
+}
+
+.annotation-list {
+  display: grid;
+  gap: 18px;
+}
+
+.annotation-card {
+  display: grid;
+  gap: 14px;
+  border-color: rgba(92, 102, 82, 0.26);
+  background:
+    linear-gradient(180deg, rgba(251, 247, 238, 0.9), rgba(240, 235, 223, 0.84)),
+    var(--card);
+}
+
+.annotation-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.annotation-card h3 {
+  margin: 4px 0 0;
+}
+
+.annotation-raw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.annotation-raw-grid p {
+  margin: 0;
+  display: grid;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(92, 102, 82, 0.08);
+}
+
+.annotation-raw-grid strong {
+  color: var(--jade);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.annotation-fold {
+  margin-top: 2px;
+  background: rgba(251, 247, 238, 0.68);
+}
+
+.annotation-fold-body {
+  display: grid;
+  gap: 18px;
+}
+
+.annotation-fold-body h4 {
+  margin: 0 0 8px;
+}
+
+.annotation-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.annotation-chip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(92, 102, 82, 0.1);
+  border: 1px solid rgba(92, 102, 82, 0.18);
+}
+
+.annotation-chip em {
+  font-style: normal;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.annotation-quote {
+  margin: 10px 0;
+  padding: 12px 14px;
+  border-left: 3px solid rgba(92, 102, 82, 0.46);
+  background: rgba(255, 250, 240, 0.62);
+  border-radius: 0 16px 16px 0;
+}
+
+.annotation-quote p {
+  margin: 0 0 6px;
+}
+
+.annotation-quote footer {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.annotation-step-list {
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.annotation-step-list li {
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(84, 58, 30, 0.06);
+}
+
+.annotation-step-list strong {
+  display: block;
+  color: var(--accent-deep);
+  margin-bottom: 4px;
 }
 
 .case-card::before {
