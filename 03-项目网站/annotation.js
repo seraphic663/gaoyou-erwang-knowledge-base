@@ -60,13 +60,26 @@ function renderAiSources(sources = {}) {
 }
 
 function parseAiAnswer(answer) {
-  const text = String(answer || '').trim().replace(/^```json\s*|\s*```$/g, '');
-  try {
-    const parsed = JSON.parse(text);
-    if (parsed && typeof parsed === 'object') return parsed;
-  } catch {
-    return null;
+  const text = String(answer || '')
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/i, '');
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  const candidates = [
+    text,
+    start >= 0 && end > start ? text.slice(start, end + 1) : '',
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch {
+      continue;
+    }
   }
+
   return null;
 }
 
@@ -83,8 +96,8 @@ function renderAiSection(title, content) {
   `;
 }
 
-function renderAiAnswer(answer) {
-  const structured = parseAiAnswer(answer);
+function renderAiAnswer(answer, structuredAnswer = null) {
+  const structured = structuredAnswer || parseAiAnswer(answer);
   if (!structured) {
     return `<pre>${escapeHtml(answer || '未返回内容')}</pre>`;
   }
@@ -127,7 +140,7 @@ async function runAnnotationAi() {
 
     annotationAiResult.innerHTML = `
       ${renderAiSources(payload.sources)}
-      ${renderAiAnswer(payload.answer)}
+      ${renderAiAnswer(payload.answer, payload.structuredAnswer)}
     `;
   } catch (error) {
     annotationAiResult.innerHTML = `<p class="compact-note">AI 接口不可用：${escapeHtml(error.message)}</p>`;

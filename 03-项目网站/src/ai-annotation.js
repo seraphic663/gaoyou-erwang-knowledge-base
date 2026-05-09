@@ -139,9 +139,34 @@ function buildPrompt(question, annotationCases, mainCases) {
   ].join('\n');
 }
 
+function parseModelJson(value) {
+  const text = String(value || '')
+    .trim()
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/i, '');
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  const candidates = [
+    text,
+    start >= 0 && end > start ? text.slice(start, end + 1) : '',
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (parsed && typeof parsed === 'object') return parsed;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
+
 async function requestDeepSeek(config, prompt, apiKey) {
   const requestBody = {
     model: config.DEEPSEEK_MODEL,
+    response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: '你重视证据边界，必须区分数据库材料与AI推断。' },
       { role: 'user', content: prompt },
@@ -193,6 +218,7 @@ async function callDeepSeek(config, prompt) {
         payload: {
           ok: true,
           answer: payload.choices?.[0]?.message?.content || '',
+          structuredAnswer: parseModelJson(payload.choices?.[0]?.message?.content),
           model: payload.model || config.DEEPSEEK_MODEL,
           keySlot: index === 0 ? 'analysis' : 'parse-fallback',
         },
