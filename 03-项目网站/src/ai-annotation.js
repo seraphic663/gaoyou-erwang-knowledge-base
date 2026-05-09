@@ -127,7 +127,9 @@ function buildPrompt(question, annotationCases, mainCases) {
     '优先使用“人工标注灰度库”；不足时再使用“主数据库补充”。',
     '不要把父案例的全部方法无差别套到单个字词；必须区分“材料明确支持”和“仍需人工核对”。',
     '只返回 JSON，不要 Markdown，不要代码块。字段必须为：judgment, evidences, draft, reviewNotes。',
-    'judgment 为字符串；evidences、draft、reviewNotes 均为字符串数组。每项保持简洁。',
+    'judgment 为字符串，须直接回答能否成立及理由边界。',
+    'evidences、draft、reviewNotes 均为字符串数组；证据充分但不冗长，优先列出与用户问题直接相关的书证、步骤和方法。',
+    '如果材料只来自父案例，必须说明“父案例支持”与“单字词仍需核对”的差别。',
     '',
     `用户问题：${question}`,
     '',
@@ -138,20 +140,25 @@ function buildPrompt(question, annotationCases, mainCases) {
 }
 
 async function requestDeepSeek(config, prompt, apiKey) {
+  const requestBody = {
+    model: config.DEEPSEEK_MODEL,
+    messages: [
+      { role: 'system', content: '你重视证据边界，必须区分数据库材料与AI推断。' },
+      { role: 'user', content: prompt },
+    ],
+  };
+
+  if (config.DEEPSEEK_MODEL !== 'deepseek-reasoner') {
+    requestBody.temperature = 0.2;
+  }
+
   const response = await fetch('https://api.deepseek.com/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      model: config.DEEPSEEK_MODEL,
-      temperature: 0.2,
-      messages: [
-        { role: 'system', content: '你重视证据边界，必须区分数据库材料与AI推断。' },
-        { role: 'user', content: prompt },
-      ],
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   const payload = await response.json().catch(() => ({}));
