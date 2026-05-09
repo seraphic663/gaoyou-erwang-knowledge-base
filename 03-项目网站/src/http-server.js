@@ -3,14 +3,45 @@ const http = require('http');
 const path = require('path');
 const url = require('url');
 const config = require('./config');
+const { analyzeWithAnnotationAi } = require('./ai-annotation');
 const { createDataSource } = require('./data-source');
 
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
   });
   res.end(JSON.stringify(payload, null, 2));
+}
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk;
+      if (body.length > 12000) {
+        req.destroy(new Error('Request body too large'));
+      }
+    });
+
+    req.on('end', () => {
+      if (!body.trim()) {
+        resolve({});
+        return;
+      }
+
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        reject(new Error('Invalid JSON body'));
+      }
+    });
+
+    req.on('error', reject);
+  });
 }
 
 function sendFile(res, filePath) {
@@ -104,8 +135,12 @@ function resolveStaticFile(requestPath) {
 function createServer() {
   const dataSource = createDataSource(config);
 
-  function handleApi(req, res, parsedUrl) {
+  async function handleApi(req, res, parsedUrl) {
     try {
+      if (req.method === 'OPTIONS') {
+        return sendJson(res, 204, {});
+      }
+
       if (parsedUrl.pathname === '/api/health') {
         return sendJson(res, 200, dataSource.getHealth());
       }
@@ -165,6 +200,16 @@ function createServer() {
 
       if (parsedUrl.pathname === '/api/terms') {
         return sendJson(res, 200, dataSource.getTerms());
+      }
+
+      if (parsedUrl.pathname === '/api/ai/annotation') {
+        if (req.method !== 'POST') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+
+        const body = await readJsonBody(req);
+        const result = await analyzeWithAnnotationAi(config, dataSource, body.question || body.text || '');
+        return sendJson(res, result.status, result.payload);
       }
 
       return sendJson(res, 404, { ok: false, message: 'API not found' });

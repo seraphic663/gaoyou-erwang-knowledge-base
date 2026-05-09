@@ -7,6 +7,10 @@ const annotationSearchButton = document.querySelector('#annotationSearchButton')
 const annotationResetButton = document.querySelector('#annotationResetButton');
 const annotationSummary = document.querySelector('#annotationSummary');
 const annotationList = document.querySelector('#annotationList');
+const annotationAiInput = document.querySelector('#annotationAiInput');
+const annotationAiButton = document.querySelector('#annotationAiButton');
+const annotationAiClearButton = document.querySelector('#annotationAiClearButton');
+const annotationAiResult = document.querySelector('#annotationAiResult');
 
 const state = {
   snapshot: null,
@@ -42,6 +46,94 @@ async function loadSnapshot() {
     throw new Error(`annotation-snapshot.json 读取失败：${response.status}`);
   }
   return response.json();
+}
+
+function renderAiSources(sources = {}) {
+  const annotationCount = sources.annotation?.length || 0;
+  const mainCount = sources.main?.length || 0;
+  return `
+    <div class="annotation-ai-sources">
+      <span class="summary-pill">人工库 ${escapeHtml(annotationCount)} 条</span>
+      <span class="summary-pill muted">主库补充 ${escapeHtml(mainCount)} 条</span>
+    </div>
+  `;
+}
+
+function parseAiAnswer(answer) {
+  const text = String(answer || '').trim().replace(/^```json\s*|\s*```$/g, '');
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === 'object') return parsed;
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function renderAiSection(title, content) {
+  const items = Array.isArray(content) ? content.filter(Boolean) : [content].filter(Boolean);
+  if (!items.length) return '';
+  return `
+    <section class="annotation-ai-section">
+      <h3>${escapeHtml(title)}</h3>
+      ${items.length === 1
+        ? `<p>${escapeHtml(items[0])}</p>`
+        : `<ol>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`}
+    </section>
+  `;
+}
+
+function renderAiAnswer(answer) {
+  const structured = parseAiAnswer(answer);
+  if (!structured) {
+    return `<pre>${escapeHtml(answer || '未返回内容')}</pre>`;
+  }
+
+  return `
+    <div class="annotation-ai-report">
+      ${renderAiSection('判断', structured.judgment)}
+      ${renderAiSection('可用证据', structured.evidences)}
+      ${renderAiSection('解析草案', structured.draft)}
+      ${renderAiSection('仍需人工核对处', structured.reviewNotes)}
+    </div>
+  `;
+}
+
+async function runAnnotationAi() {
+  const question = annotationAiInput?.value.trim() || '';
+  if (!question) {
+    annotationAiResult.innerHTML = '<p class="compact-note">请输入需要解析的内容。</p>';
+    return;
+  }
+
+  annotationAiButton.disabled = true;
+  annotationAiResult.innerHTML = '<p class="compact-note">正在检索人工库并调用 AI...</p>';
+
+  try {
+    const response = await fetch('/api/ai/annotation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+    const payload = await response.json();
+
+    if (!payload.ok) {
+      annotationAiResult.innerHTML = `
+        <p class="compact-note">${escapeHtml(payload.message || 'AI 解析失败')}</p>
+        ${renderAiSources(payload.sources)}
+      `;
+      return;
+    }
+
+    annotationAiResult.innerHTML = `
+      ${renderAiSources(payload.sources)}
+      ${renderAiAnswer(payload.answer)}
+    `;
+  } catch (error) {
+    annotationAiResult.innerHTML = `<p class="compact-note">AI 接口不可用：${escapeHtml(error.message)}</p>`;
+  } finally {
+    annotationAiButton.disabled = false;
+  }
 }
 
 function renderHero() {
@@ -106,6 +198,103 @@ function filterCases() {
   });
 }
 
+function isTermGroupCase(item) {
+  return item.source_document?.doc_type === 'term_group_blocks';
+}
+
+function cleanSubcaseTitle(value) {
+  return String(value || '')
+    .replace(/^[\s\d①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳\-－—~～至、.．]+/, '')
+    .replace(/\s+/g, '')
+    .trim();
+}
+
+function extractSubcaseTerms(title) {
+  return cleanSubcaseTitle(title)
+    .split(/[、，,\/／]/)
+    .map((term) => term.trim())
+    .filter(Boolean);
+}
+
+function evidenceMatchesTerms(evidence, terms) {
+  if (!terms.length) return false;
+  const haystack = [
+    evidence.term,
+    evidence.quote,
+    evidence.work,
+    evidence.role,
+  ].join(' ');
+
+  return terms.some((term) => term && haystack.includes(term));
+}
+
+function buildSubcases(item) {
+  if (!isTermGroupCase(item)) return [];
+
+  const evidences = item.evidences || [];
+  return (item.process_steps || [])
+    .filter((step) => !['立论', '结论'].includes(step.step_type))
+    .map((step, index) => {
+      const [rawTitle, ...rest] = String(step.text || '').split('：');
+      const title = cleanSubcaseTitle(rawTitle || `子单元 ${index + 1}`);
+      const terms = extractSubcaseTerms(rawTitle);
+      const description = rest.join('：').trim() || step.text || '';
+      const matchedEvidences = evidences.filter((evidence) => evidenceMatchesTerms(evidence, terms));
+
+      return {
+        title,
+        terms,
+        description,
+        stepType: step.step_type || '释词',
+        evidences: matchedEvidences,
+      };
+    });
+}
+
+function renderSubcases(item) {
+  const subcases = buildSubcases(item);
+  if (!subcases.length) return '';
+
+  return `
+    <section class="annotation-subcase-panel">
+      <div class="annotation-subcase-head">
+        <div>
+          <p class="section-kicker">父案例下的子单元</p>
+          <h4>按现有过程步骤拆出的词群论证</h4>
+        </div>
+        <span class="summary-pill">${escapeHtml(subcases.length)} 个子单元</span>
+      </div>
+      <div class="annotation-subcase-grid">
+        ${subcases.map((subcase) => `
+          <details class="annotation-subcase">
+            <summary>
+              <span>
+                <em>${escapeHtml(subcase.stepType)}</em>
+                <strong>${escapeHtml(subcase.title || '未命名子单元')}</strong>
+              </span>
+              <small>${escapeHtml(subcase.evidences.length)} 条关联证据</small>
+            </summary>
+            <div class="annotation-subcase-body">
+              <p>${escapeHtml(subcase.description || '暂无说明')}</p>
+              <div class="annotation-chip-list">
+                ${subcase.terms.length ? subcase.terms.map((term) => `<span class="annotation-chip">${escapeHtml(term)}</span>`).join('') : '<span class="compact-note">未抽出字词</span>'}
+              </div>
+              <div class="annotation-subcase-evidence">
+                ${subcase.evidences.length ? subcase.evidences.slice(0, 4).map((evidence) => `
+                  <blockquote class="annotation-quote compact">
+                    <p>${escapeHtml(evidence.quote || '未录引文')}</p>
+                    <footer>${escapeHtml(evidence.work || '未标注来源')} · ${escapeHtml(evidence.role || evidence.evidence_type || '')}</footer>
+                  </blockquote>
+                `).join('') : '<p class="compact-note">当前快照未能按字词自动匹配证据，仍可在“原始标注结构”中查看全部证据。</p>'}
+              </div>
+            </div>
+          </details>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
 function renderCase(item) {
   const docName = item.source_document?.source_file_name || '未标注文档';
   const terms = item.terms || [];
@@ -120,6 +309,7 @@ function renderCase(item) {
           <h3>${escapeHtml(item.case_title || '未题名案例')}</h3>
         </div>
         <div class="case-tags">
+          ${isTermGroupCase(item) ? '<span class="tag strong">父案例</span>' : ''}
           ${(item.method_tags || ['未标注方法']).map((tag) => `<span class="tag">${escapeHtml(tag)}</span>`).join('')}
           <span class="tag muted">${escapeHtml(item.certainty || '待核')}</span>
         </div>
@@ -132,6 +322,8 @@ function renderCase(item) {
       </div>
 
       <p class="case-summary">${escapeHtml(summarizeText(item.problem || item.claim || item.conclusion, 180))}</p>
+
+      ${renderSubcases(item)}
 
       <details class="fold-card annotation-fold">
         <summary>展开原始标注结构</summary>
@@ -234,6 +426,13 @@ annotationSearchInput?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     annotationSearchButton.click();
   }
+});
+
+annotationAiButton?.addEventListener('click', runAnnotationAi);
+
+annotationAiClearButton?.addEventListener('click', () => {
+  annotationAiInput.value = '';
+  annotationAiResult.textContent = '尚未解析。';
 });
 
 init();

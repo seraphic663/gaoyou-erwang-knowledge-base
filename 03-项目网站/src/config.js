@@ -3,7 +3,24 @@ const path = require('path');
 
 const ROOT_DIR = path.resolve(__dirname, '..');
 const WORKSPACE_ROOT = path.resolve(ROOT_DIR, '..');
+loadEnvFile(path.join(WORKSPACE_ROOT, '.env'));
+loadEnvFile(path.join(ROOT_DIR, '.env'));
 const PORT = Number(process.env.PORT || 3000);
+
+function loadEnvFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+
+  const lines = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '').split(/\r?\n/);
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) return;
+
+    const match = /^([A-Za-z_][A-Za-z0-9_]*)=(.*)$/.exec(trimmed);
+    if (!match || process.env[match[1]]) return;
+
+    process.env[match[1]] = match[2].replace(/^["']|["']$/g, '');
+  });
+}
 
 function resolveWebDir() {
   if (fs.existsSync(path.join(ROOT_DIR, 'index.html'))) {
@@ -67,6 +84,10 @@ module.exports = {
   SOURCE_MODE: resolveSourceMode(),
   DEMO_DB_FILE: path.join(DATA_DIR, 'demo-db.json'),
   SQLITE_SNAPSHOT_FILE: path.join(DATA_DIR, 'sqlite-snapshot.json'),
+  ANNOTATION_SNAPSHOT_FILE: path.join(DATA_DIR, 'annotation-snapshot.json'),
   SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'dictionary.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
+  DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
+  DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
+  DEEPSEEK_MODEL: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
 };

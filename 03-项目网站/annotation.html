@@ -30,6 +30,25 @@
     <main class="section annotation-page">
       <p id="annotationStatus" class="db-status">正在读取人工标注库...</p>
 
+      <section class="card annotation-ai-card">
+        <div class="head-line">
+          <div>
+            <p class="section-kicker">实验功能 · 不进首页</p>
+            <h2>AI 辅助释证台</h2>
+          </div>
+        </div>
+        <p class="compact-note">优先调用人工标注灰度库；人工库材料不足时，再用主数据库补充。输出只作释证草案。</p>
+        <label class="toolbar-field annotation-ai-field">
+          <span>输入字词、句子或问题</span>
+          <textarea id="annotationAiInput" rows="4" placeholder="如：畏为什么可以训为敬？或粘贴一段待解析材料"></textarea>
+        </label>
+        <div class="toolbar-actions">
+          <button id="annotationAiButton" class="page-link toolbar-button" type="button">调用 AI 解析</button>
+          <button id="annotationAiClearButton" class="search-clear toolbar-button" type="button">清空</button>
+        </div>
+        <div id="annotationAiResult" class="annotation-ai-result">尚未解析。</div>
+      </section>
+
       <section class="card annotation-toolbar">
         <div class="head-line">
           <div>

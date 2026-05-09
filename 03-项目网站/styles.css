@@ -1294,6 +1294,91 @@ h2 {
   border-left: 4px solid rgba(92, 102, 82, 0.5);
 }
 
+.annotation-ai-card {
+  display: grid;
+  gap: 14px;
+  border-left: 4px solid rgba(84, 58, 30, 0.32);
+  background:
+    radial-gradient(circle at 92% 0%, rgba(92, 102, 82, 0.12), transparent 24%),
+    rgba(255, 252, 246, 0.92);
+}
+
+.annotation-ai-field textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 110px;
+  padding: 12px 14px;
+  border: 1px solid rgba(84, 58, 30, 0.16);
+  border-radius: 16px;
+  background: rgba(253, 249, 240, 0.94);
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.7;
+}
+
+.annotation-ai-field textarea:focus {
+  outline: none;
+  border-color: rgba(92, 102, 82, 0.42);
+  box-shadow: 0 0 0 4px rgba(92, 102, 82, 0.08);
+}
+
+.annotation-ai-result {
+  min-height: 54px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px dashed rgba(84, 58, 30, 0.18);
+  background: rgba(251, 247, 238, 0.68);
+  color: var(--muted);
+}
+
+.annotation-ai-result pre {
+  margin: 12px 0 0;
+  white-space: pre-wrap;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.78;
+}
+
+.annotation-ai-report {
+  display: grid;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.annotation-ai-section {
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 252, 246, 0.72);
+  border: 1px solid rgba(84, 58, 30, 0.1);
+}
+
+.annotation-ai-section h3 {
+  margin: 0 0 8px;
+  color: var(--accent-deep);
+  font-size: 18px;
+}
+
+.annotation-ai-section p,
+.annotation-ai-section ol {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.78;
+}
+
+.annotation-ai-section ol {
+  padding-left: 22px;
+}
+
+.annotation-ai-section li + li {
+  margin-top: 6px;
+}
+
+.annotation-ai-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .annotation-list {
   display: grid;
   gap: 18px;
@@ -1409,6 +1494,106 @@ h2 {
   display: block;
   color: var(--accent-deep);
   margin-bottom: 4px;
+}
+
+.annotation-subcase-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(92, 102, 82, 0.22);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(92, 102, 82, 0.08), rgba(255, 248, 238, 0.72)),
+    rgba(251, 247, 238, 0.74);
+}
+
+.annotation-subcase-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.annotation-subcase-head h4 {
+  margin: 4px 0 0;
+}
+
+.annotation-subcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
+}
+
+.annotation-subcase {
+  border: 1px solid rgba(84, 58, 30, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 252, 246, 0.82);
+  box-shadow: 0 14px 32px rgba(56, 42, 25, 0.08);
+  overflow: hidden;
+}
+
+.annotation-subcase summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+}
+
+.annotation-subcase summary::-webkit-details-marker {
+  display: none;
+}
+
+.annotation-subcase summary span {
+  display: grid;
+  gap: 4px;
+}
+
+.annotation-subcase summary em {
+  font-style: normal;
+  color: var(--jade);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.annotation-subcase summary strong {
+  color: var(--ink);
+  line-height: 1.45;
+}
+
+.annotation-subcase summary small {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.annotation-subcase-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 14px 14px;
+}
+
+.annotation-subcase-body > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.annotation-subcase-evidence {
+  display: grid;
+  gap: 8px;
+}
+
+.annotation-quote.compact {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(84, 58, 30, 0.045);
+}
+
+.tag.strong {
+  color: var(--jade);
+  border-color: rgba(92, 102, 82, 0.28);
+  background: rgba(92, 102, 82, 0.1);
 }
 
 .case-card::before {
@@ -1961,5 +2146,9 @@ h2 {
     min-width: 88px;
     min-height: 88px;
     font-size: 44px;
+  }
+
+  .annotation-subcase-head {
+    flex-direction: column;
   }
 }
