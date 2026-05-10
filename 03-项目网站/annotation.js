@@ -85,19 +85,26 @@ function parseAiAnswer(answer) {
 
 function renderAiSection(title, content) {
   const items = Array.isArray(content) ? content.filter(Boolean) : [content].filter(Boolean);
-  if (!items.length) return '';
+  const safeItems = items.length ? items : ['本栏本次未返回内容，需人工补写或重新解析。'];
   return `
     <section class="annotation-ai-section">
       <h3>${escapeHtml(title)}</h3>
-      ${items.length === 1
-        ? `<p>${escapeHtml(items[0])}</p>`
-        : `<ol>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`}
+      ${safeItems.length === 1
+        ? `<p>${escapeHtml(safeItems[0])}</p>`
+        : `<ol>${safeItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`}
     </section>
   `;
 }
 
 function renderAiAnswer(answer, structuredAnswer = null) {
-  const structured = structuredAnswer || parseAiAnswer(answer);
+  const parsed = structuredAnswer || parseAiAnswer(answer);
+  const structured = parsed ? {
+    judgment: parsed.judgment || '本次模型未返回明确判断，需人工依据下列材料补写。',
+    evidences: parsed.evidences || ['本次模型未返回可用证据条目，需回到人工标注库核对。'],
+    draft: parsed.draft || ['本次模型未返回解析草案，需人工按“立论—取证—释理—结论”补写。'],
+    reviewNotes: parsed.reviewNotes || ['本次模型未返回核对事项，需人工复核原文、证据方向与案例粒度。'],
+  } : null;
+
   if (!structured) {
     return `<pre>${escapeHtml(answer || '未返回内容')}</pre>`;
   }
