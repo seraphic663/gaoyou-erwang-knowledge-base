@@ -1,15 +1,6 @@
 const knowledgeNav = document.querySelector('#knowledgeNav');
 const knowledgeMain = document.querySelector('#knowledgeMain');
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
 const KNOWLEDGE_SECTIONS = [
   {
     id: 'exegesis',

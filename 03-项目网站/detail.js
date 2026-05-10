@@ -5,53 +5,9 @@ const detailMeta = document.querySelector('#detailMeta');
 const detailStatus = document.querySelector('#detailStatus');
 const detailMain = document.querySelector('#detailMain');
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function requestJson(path) {
-  return fetch(path).then((response) => {
-    if (!response.ok) {
-      throw new Error(`Request failed: ${response.status}`);
-    }
-    return response.json();
-  });
-}
-
-function summarizeText(value, maxLength = 180) {
-  const text = String(value || '').replace(/\s+/g, ' ').trim();
-  if (!text) {
-    return '';
-  }
-  if (text.length <= maxLength) {
-    return text;
-  }
-  return `${text.slice(0, maxLength - 1)}…`;
-}
-
-function splitItems(items, visibleCount) {
-  return {
-    visible: items.slice(0, visibleCount),
-    hidden: items.slice(visibleCount),
-  };
-}
-
 function getRequiredId() {
   const params = new URLSearchParams(window.location.search);
   return params.get('id') || '';
-}
-
-function buildTermHref(id) {
-  return `./term.html?id=${encodeURIComponent(String(id))}`;
-}
-
-function buildCaseHref(id) {
-  return `./case.html?id=${encodeURIComponent(String(id))}`;
 }
 
 function renderMetaCards(items) {

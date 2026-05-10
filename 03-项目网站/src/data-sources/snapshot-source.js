@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const {
   buildBrowserBootstrap,
   buildBrowserResult,
@@ -10,38 +11,68 @@ const {
   buildSchema,
   buildTermPayload,
   buildTermsPayload,
+  parseJsonArray,
   searchCases,
 } = require('./shared');
 
-class SQLiteSnapshotSource {
-  constructor(config) {
-    this.snapshotFile = config.SQLITE_SNAPSHOT_FILE;
-    this.dbFile = config.SQLITE_DB_FILE;
+class SnapshotSource {
+  constructor(snapshotFile, label, { createIfMissing = false } = {}) {
+    this.snapshotFile = snapshotFile;
+    this.label = label;
+    this.createIfMissing = createIfMissing;
   }
 
   loadSnapshot() {
     if (!fs.existsSync(this.snapshotFile)) {
-      throw new Error(`SQLite snapshot not found: ${this.snapshotFile}`);
+      if (this.createIfMissing) {
+        const snapshot = this._emptySnapshot();
+        fs.mkdirSync(path.dirname(this.snapshotFile), { recursive: true });
+        fs.writeFileSync(this.snapshotFile, JSON.stringify(snapshot, null, 2), 'utf8');
+        return snapshot;
+      }
+      throw new Error(`Snapshot not found: ${this.snapshotFile}`);
     }
 
     try {
       const raw = fs.readFileSync(this.snapshotFile, 'utf8');
-      const snapshot = JSON.parse(raw.replace(/^\uFEFF/, ''));
-      snapshot.source = 'sqlite';
-      snapshot.sourceLabel = snapshot.sourceLabel || 'SQLite 实库快照';
+      const snapshot = JSON.parse(raw.replace(/^﻿/, ''));
+      snapshot.sourceLabel = this.label;
       return snapshot;
     } catch (error) {
-      throw new Error(`Invalid SQLite snapshot: ${error.message}`);
+      if (!this.createIfMissing) {
+        throw new Error(`Invalid snapshot: ${error.message}`);
+      }
+
+      const brokenFile = `${this.snapshotFile}.broken.${Date.now()}`;
+      if (fs.existsSync(this.snapshotFile)) {
+        fs.copyFileSync(this.snapshotFile, brokenFile);
+      }
+
+      const snapshot = this._emptySnapshot();
+      fs.writeFileSync(this.snapshotFile, JSON.stringify(snapshot, null, 2), 'utf8');
+      return snapshot;
     }
+  }
+
+  _emptySnapshot() {
+    return {
+      schemaVersion: 3,
+      source: 'demo',
+      sourceLabel: this.label,
+      tables: {
+        works: [],
+        passages: [],
+        terms: [],
+        cases: [],
+        evidences: [],
+      },
+    };
   }
 
   getHealth() {
     const context = buildContext(this.loadSnapshot());
     return buildHealth(context, {
       snapshotFile: this.snapshotFile,
-      dbFile: this.dbFile,
-      snapshotExists: fs.existsSync(this.snapshotFile),
-      dbExists: fs.existsSync(this.dbFile),
       time: new Date().toISOString(),
     });
   }
@@ -83,4 +114,4 @@ class SQLiteSnapshotSource {
   }
 }
 
-module.exports = { SQLiteSnapshotSource };
+module.exports = { SnapshotSource };

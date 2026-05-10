@@ -19,21 +19,6 @@ const state = {
   method: 'all',
 };
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function summarizeText(value, maxLength = 120) {
-  const text = String(value || '').replace(/\s+/g, ' ').trim();
-  if (!text) return '';
-  return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1)}…`;
-}
-
 function includesText(values, query) {
   if (!query) return true;
   const needle = query.toLowerCase();

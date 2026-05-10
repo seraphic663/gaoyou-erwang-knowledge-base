@@ -1,9 +1,5 @@
 const { STORE_DEFINITIONS } = require('../store-definitions');
 
-function safeArray(value) {
-  return Array.isArray(value) ? value : [];
-}
-
 function parseJsonArray(value) {
   if (Array.isArray(value)) {
     return value;
@@ -70,7 +66,7 @@ function buildCaseDisplay(title, sectionTitle, volumeTitle) {
 
 function buildCounts(snapshot) {
   return Object.fromEntries(
-    Object.entries(snapshot.tables || {}).map(([name, records]) => [name, safeArray(records).length]),
+    Object.entries(snapshot.tables || {}).map(([name, records]) => [name, parseJsonArray(records).length]),
   );
 }
 
@@ -90,11 +86,11 @@ function buildLocation(passage) {
 }
 
 function buildContext(snapshot) {
-  const works = safeArray(snapshot.tables?.works);
-  const passages = safeArray(snapshot.tables?.passages);
-  const terms = safeArray(snapshot.tables?.terms);
-  const cases = safeArray(snapshot.tables?.cases);
-  const evidences = safeArray(snapshot.tables?.evidences);
+  const works = parseJsonArray(snapshot.tables?.works);
+  const passages = parseJsonArray(snapshot.tables?.passages);
+  const terms = parseJsonArray(snapshot.tables?.terms);
+  const cases = parseJsonArray(snapshot.tables?.cases);
+  const evidences = parseJsonArray(snapshot.tables?.evidences);
 
   const workMap = new Map(works.map((item) => [item.id, item]));
   const passageMap = new Map(passages.map((item) => [item.id, item]));
@@ -303,7 +299,7 @@ function buildTermDetail(context, termId) {
     .map((caseId) => context.caseMap.get(caseId))
     .filter(Boolean)
     .map((item) => enrichCase(context, item));
-  const evidences = safeArray(context.snapshot.tables?.evidences)
+  const evidences = parseJsonArray(context.snapshot.tables?.evidences)
     .filter((item) => item.term_id === normalizedId)
     .map((item) => enrichEvidence(context, item));
   const relatedWorks = [...new Set(evidences.map((item) => item.workTitle).filter(Boolean))];
