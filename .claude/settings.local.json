@@ -7,7 +7,16 @@
       "Bash(node -e \"require\\('./03-项目网站/src/data-source.js'\\); console.log\\('data-source.js OK'\\)\")",
       "Bash(node -e \"require\\('./03-项目网站/src/http-server.js'\\); console.log\\('http-server.js OK'\\)\")",
       "Bash(node -e \"const fs = require\\('fs'\\); const files = ['utils.js', 'app.js', 'browser.js', 'detail.js', 'knowledge.js', 'annotation.js']; files.forEach\\(f => { try { new Function\\(fs.readFileSync\\(f, 'utf8'\\)\\); console.log\\(f + ' syntax OK'\\); } catch\\(e\\) { console.log\\(f + ' ERROR: ' + e.message\\); } }\\);\")",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(Get-ChildItem -Recurse -File \"D:\\\\26大创\\\\02-数据库\")",
+      "Bash(Select-Object FullName)",
+      "PowerShell(Get-ChildItem -Recurse -File \"D:\\\\26大创\\\\02-数据库\" | ForEach-Object { $_.FullName.Replace\\(\"D:\\\\26大创\\\\02-数据库\\\\\", \"\"\\) })",
+      "PowerShell(Move-Item *)",
+      "PowerShell(Copy-Item *)",
+      "Bash(node -e \"const http = require\\('http'\\); const server = require\\('./server.js'\\); const req = http.request\\({hostname:'127.0.0.1',port:3000,path:'/api/health',method:'GET'}, res => { let d=''; res.on\\('data',c=>d+=c\\); res.on\\('end',\\(\\)=>{ console.log\\(d\\); process.exit\\(0\\); }\\); }\\); req.on\\('error', e => { console.log\\('ERROR:', e.message\\); process.exit\\(1\\); }\\); req.end\\(\\); setTimeout\\(\\(\\)=>{process.exit\\(1\\)}, 8000\\);\")",
+      "Bash(node server.js)",
+      "Bash(curl -s http://127.0.0.1:3000/api/health)",
+      "Bash(kill %1)"
     ]
   }
 }
