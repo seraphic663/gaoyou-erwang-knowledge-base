@@ -3,7 +3,6 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package.json ./
-COPY server.js ./
 COPY 03-项目网站 ./03-项目网站
 
 ENV NODE_ENV=production
