@@ -6,7 +6,8 @@
       "Bash(node -e \"require\\('./03-项目网站/src/data-sources/shared.js'\\); console.log\\('shared.js OK'\\)\")",
       "Bash(node -e \"require\\('./03-项目网站/src/data-source.js'\\); console.log\\('data-source.js OK'\\)\")",
       "Bash(node -e \"require\\('./03-项目网站/src/http-server.js'\\); console.log\\('http-server.js OK'\\)\")",
-      "Bash(node -e \"const fs = require\\('fs'\\); const files = ['utils.js', 'app.js', 'browser.js', 'detail.js', 'knowledge.js', 'annotation.js']; files.forEach\\(f => { try { new Function\\(fs.readFileSync\\(f, 'utf8'\\)\\); console.log\\(f + ' syntax OK'\\); } catch\\(e\\) { console.log\\(f + ' ERROR: ' + e.message\\); } }\\);\")"
+      "Bash(node -e \"const fs = require\\('fs'\\); const files = ['utils.js', 'app.js', 'browser.js', 'detail.js', 'knowledge.js', 'annotation.js']; files.forEach\\(f => { try { new Function\\(fs.readFileSync\\(f, 'utf8'\\)\\); console.log\\(f + ' syntax OK'\\); } catch\\(e\\) { console.log\\(f + ' ERROR: ' + e.message\\); } }\\);\")",
+      "Bash(python *)"
     ]
   }
 }
