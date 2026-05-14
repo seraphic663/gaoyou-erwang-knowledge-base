@@ -3,46 +3,45 @@
 sqlite_bridge.py
 
 将 02-数据库/data/dictionary.db 规范化为网站后端可直接消费的五表快照。
+使用 02-数据库/lib/ 共享工具层。
 """
 
 from __future__ import annotations
 
 import json
-import sqlite3
 import sys
 from pathlib import Path
 
-
+# 将 02-数据库/ 加入 sys.path，以便导入 lib/
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(WORKSPACE_ROOT / "02-数据库"))
+
+from lib.connection import connect, fetch_all
+from lib.snapshot import write_json
+
 DB_FILE = WORKSPACE_ROOT / "02-数据库" / "data" / "dictionary.db"
 SNAPSHOT_FILE = WORKSPACE_ROOT / "03-项目网站" / "data" / "sqlite-snapshot.json"
-
-
-def to_dicts(rows: list[sqlite3.Row]) -> list[dict]:
-    return [dict(row) for row in rows]
 
 
 def load_snapshot() -> dict:
     if not DB_FILE.exists():
         raise FileNotFoundError(f"SQLite database not found: {DB_FILE}")
 
-    conn = sqlite3.connect(str(DB_FILE))
-    conn.row_factory = sqlite3.Row
-
+    conn = connect(DB_FILE)
     try:
         snapshot = {
             "schemaVersion": 3,
             "source": "sqlite",
             "sourceLabel": "SQLite 实库",
             "meta": {
-                "dbFile": str(DB_FILE),
+                "dbFile": str(DB_FILE.relative_to(WORKSPACE_ROOT)),
             },
             "tables": {
-                "works": to_dicts(conn.execute("SELECT * FROM works ORDER BY id").fetchall()),
-                "passages": to_dicts(conn.execute("SELECT * FROM passages ORDER BY id").fetchall()),
-                "terms": to_dicts(conn.execute("SELECT * FROM terms ORDER BY id").fetchall()),
-                "cases": to_dicts(conn.execute("SELECT * FROM cases ORDER BY id").fetchall()),
-                "evidences": to_dicts(conn.execute("SELECT * FROM evidences ORDER BY id").fetchall()),
+                "works": fetch_all(conn, "SELECT * FROM works ORDER BY id"),
+                "passages": fetch_all(conn, "SELECT * FROM passages ORDER BY id"),
+                "terms": fetch_all(conn, "SELECT * FROM terms ORDER BY id"),
+                "cases": fetch_all(conn, "SELECT * FROM cases ORDER BY id"),
+                "evidences": fetch_all(conn, "SELECT * FROM evidences ORDER BY id"),
             },
         }
     finally:
@@ -67,11 +66,7 @@ def main() -> int:
             return 0
 
         if command == "export":
-            SNAPSHOT_FILE.parent.mkdir(parents=True, exist_ok=True)
-            SNAPSHOT_FILE.write_text(
-                json.dumps(snapshot, ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
+            write_json(SNAPSHOT_FILE, snapshot)
             print(
                 json.dumps(
                     {

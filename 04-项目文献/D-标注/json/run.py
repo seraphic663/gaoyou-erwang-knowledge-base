@@ -4,8 +4,9 @@ One file only:
 
 1. DOCX -> full_json/*.json
 2. optional DeepSeek normalization -> ai_json/*.json
+3. 写入独立标注库 02-数据库/data/annotations.db
 
-This script never writes the database.
+This script never touches dictionary.db.
 """
 
 from __future__ import annotations
@@ -31,11 +32,11 @@ from docx import Document
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 SOURCE_DIR = SCRIPT_DIR.parent
+WORKSPACE_ROOT = SCRIPT_DIR.parent.parent.parent.parent
 FULL_JSON_DIR = SCRIPT_DIR / "full_json"
 AI_JSON_DIR = SCRIPT_DIR / "ai_json"
 AI_FAILED_DIR = SCRIPT_DIR / "ai_json_failed"
-ANNOTATION_DB_DIR = SCRIPT_DIR / "annotation_db"
-ANNOTATION_DB_FILE = ANNOTATION_DB_DIR / "annotation_results.db"
+ANNOTATION_DB_FILE = WORKSPACE_ROOT / "02-数据库" / "data" / "annotations.db"
 DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
 DEFAULT_MODEL = "deepseek-v4-flash"
 CURRENT_MAX_TOKENS = 8192
@@ -254,13 +255,13 @@ def api_key_fingerprint() -> str:
 
 
 def init_annotation_db() -> None:
-    ANNOTATION_DB_DIR.mkdir(exist_ok=True)
-    with sqlite3.connect(str(ANNOTATION_DB_FILE), isolation_level=None) as conn:
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA synchronous=NORMAL")
-        conn.executescript(ANNOTATION_SCHEMA)
-        conn.execute("INSERT OR REPLACE INTO meta(key, value) VALUES(?, ?)", ("schema_version", "annotation_db_v1"))
-        conn.execute("INSERT OR REPLACE INTO meta(key, value) VALUES(?, ?)", ("purpose", "人工标注与 AI 整理结果暂存库，不与 02-数据库 主库混用"))
+    """创建标注库并初始化 schema（委托到 02-数据库/annotation/importer.py）。"""
+    # 将 02-数据库/ 加入 sys.path，让 annotation/importer.py 能 import lib
+    db_root = str(WORKSPACE_ROOT / "02-数据库")
+    if db_root not in sys.path:
+        sys.path.insert(0, db_root)
+    from annotation.importer import init_db
+    init_db(ANNOTATION_DB_FILE)
 
 
 def qname(tag: str) -> str:

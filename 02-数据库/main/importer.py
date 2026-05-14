@@ -1,20 +1,26 @@
 # -*- coding: utf-8 -*-
 """
-bulk_importer.py — 直接解析 source.txt 并批量导入 SQLite
+main/importer.py — 解析 source.txt 并批量导入 SQLite 主库
 用法：
-  python bulk_importer.py          # 完整导入（重建数据库）
-  python bulk_importer.py --dry-run  # 仅打印统计，不写入
+  python -m 02-数据库.main.importer          # 完整导入（重建数据库）
+  python -m 02-数据库.main.importer --dry-run  # 仅打印统计，不写入
+  或：
+  python 02-数据库/main/importer.py
 """
 import sys, json, re, argparse
+from pathlib import Path
+
+# 确保 02-数据库/ 在 sys.path 中，以便导入 lib/
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 try:
     sys.stdout.reconfigure(encoding='utf-8')
 except Exception:
     pass
 
-# ── DB ────────────────────────────────────────────────────────────────
 import database
 import parser as source_parser
+from lib.connection import connect, fetch_all
 
 
 def _build_import_payload():

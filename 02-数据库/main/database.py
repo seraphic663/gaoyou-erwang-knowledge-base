@@ -21,7 +21,7 @@ import os
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
-DB_PATH = Path(__file__).parent / "data" / "dictionary.db"
+DB_PATH = Path(__file__).parent.parent / "data" / "dictionary.db"
 DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 _connection: Optional[sqlite3.Connection] = None

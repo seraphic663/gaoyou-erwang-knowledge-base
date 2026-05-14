@@ -6,7 +6,7 @@
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
-- 人工标注灰度库：展示 `D-标注/json/annotation_db` 的人工标注与 AI 整理结果，作为主库之外的工作稿入口。
+- 人工标注灰度库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿入口。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
 - 知识页：解释训诂术语，辅助阅读，不构成独立数据库。
@@ -60,7 +60,7 @@ npm run sync:sqlite
 另有一个独立的人工标注灰度库：
 
 ```text
-04-项目文献/D-标注/json/annotation_db/annotation_results.db
+02-数据库/data/annotations.db
   -> 03-项目网站/scripts/annotation_bridge.py
   -> 03-项目网站/data/annotation-snapshot.json
   -> 03-项目网站/annotation.html

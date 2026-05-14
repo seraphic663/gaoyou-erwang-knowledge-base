@@ -1,41 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-Export the independent human annotation SQLite database to a website snapshot.
+annotation_bridge.py
 
-This is intentionally separate from the main dictionary database. It exposes
-rawer, review-stage annotation records without mixing them into dictionary.db.
+将 02-数据库/data/annotations.db 导出为网站 JSON 快照。
+使用 02-数据库/lib/ 共享工具层。
+独立于主库桥接脚本，专用于人工标注灰度库。
 """
 import argparse
 import json
-import sqlite3
+import sys
 from pathlib import Path
 
-
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-ANNOTATION_DB_FILE = WORKSPACE_ROOT / "04-项目文献" / "D-标注" / "json" / "annotation_db" / "annotation_results.db"
+sys.path.insert(0, str(WORKSPACE_ROOT / "02-数据库"))
+
+from lib.connection import connect, fetch_all
+from lib.snapshot import write_json, loads_json
+
+ANNOTATION_DB_FILE = WORKSPACE_ROOT / "02-数据库" / "data" / "annotations.db"
 SNAPSHOT_FILE = WORKSPACE_ROOT / "03-项目网站" / "data" / "annotation-snapshot.json"
-
-
-def loads_json(value, fallback):
-    if not value:
-        return fallback
-    try:
-        return json.loads(value)
-    except Exception:
-        return fallback
-
-
-def fetch_all(conn, sql, params=()):
-    conn.row_factory = sqlite3.Row
-    return [dict(row) for row in conn.execute(sql, params).fetchall()]
 
 
 def build_snapshot(db_file):
     if not db_file.exists():
         raise FileNotFoundError(f"Annotation database not found: {db_file}")
 
-    conn = sqlite3.connect(db_file)
-    conn.row_factory = sqlite3.Row
+    conn = connect(db_file)
 
     meta = {row["key"]: row["value"] for row in fetch_all(conn, "SELECT key, value FROM meta")}
     documents = fetch_all(conn, "SELECT * FROM source_documents ORDER BY id")
@@ -88,7 +78,7 @@ def build_snapshot(db_file):
         "schemaVersion": "annotation_snapshot_v1",
         "source": "annotation_db",
         "sourceLabel": "人工标注灰度库",
-        "description": "来自 D-标注/json/annotation_db 的人工标注与 AI 整理结果暂存库，不混入 02-数据库 主库。",
+        "description": "人工标注与 AI 整理结果暂存库，独立于主库，位于 02-数据库/data/annotations.db。",
         "dbFile": str(db_file.relative_to(WORKSPACE_ROOT)),
         "meta": meta,
         "counts": {
@@ -107,8 +97,7 @@ def build_snapshot(db_file):
 
 def export_snapshot(db_file=ANNOTATION_DB_FILE, output_file=SNAPSHOT_FILE):
     snapshot = build_snapshot(db_file)
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    output_file.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2), encoding="utf-8")
+    write_json(output_file, snapshot)
     return snapshot
 
 

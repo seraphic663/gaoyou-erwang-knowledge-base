@@ -14,9 +14,9 @@
 ## 当前主链路
 
 ```text
-02-数据库/source.txt
-  -> 02-数据库/parser.py
-  -> 02-数据库/bulk_importer.py
+02-数据库/main/source.txt
+  -> 02-数据库/main/parser.py
+  -> 02-数据库/main/importer.py
   -> 02-数据库/data/dictionary.db
   -> 03-项目网站/scripts/sqlite_bridge.py
   -> 03-项目网站/data/sqlite-snapshot.json
@@ -26,21 +26,23 @@
 人工标注灰度库另走一条并行链路：
 
 ```text
-04-项目文献/D-标注/json/annotation_db/annotation_results.db
+04-项目文献/D-标注/ 的 DOCX 文件
+  -> run.py
+  -> 02-数据库/data/annotations.db
   -> 03-项目网站/scripts/annotation_bridge.py
   -> 03-项目网站/data/annotation-snapshot.json
   -> 03-项目网站/annotation.html
 ```
 
-这条链路只展示人工标注和 AI 整理结果，不混入 `02-数据库` 主库。
+这条链路只展示人工标注和 AI 整理结果，不混入 `dictionary.db` 主库。
 
-网站前台统一表述为“一个专题数据库，多种浏览视角”。字词、案例、证据、著作和文本片段不是多套数据库，而是同一 SQLite 主库的不同入口。
+两个数据库放在同一目录 `02-数据库/data/` 下，共享 `02-数据库/lib/` 工具层。架构为：一个数据目录，两条独立管线，一套共享工具。网站前台统一表述为”一个专题数据库，多种浏览视角”。
 
 ## 目录结构
 
 ```text
 01-项目资料/      申报、通知、附件等项目管理材料
-02-数据库/        原始语料、解析脚本、入库脚本、SQLite 主库
+02-数据库/        数据库目录：lib/ 共享工具、main/ 主库管线、annotation/ 标注库管线、data/ 两个 SQLite 库
 03-项目网站/      网站页面、前端脚本、Node 服务、网站数据快照
 04-项目文献/      原典、一级资料、二级资料、当前阅读和标注稿
 05-组会谈话/      组会记录、讨论纪要、设计来源
@@ -70,22 +72,23 @@ http://localhost:3000/api/bootstrap
 ## 常用维护命令
 
 ```bash
-python 02-数据库/bulk_importer.py --dry-run
-python 02-数据库/bulk_importer.py
+python 02-数据库/main/importer.py --dry-run
+python 02-数据库/main/importer.py
 npm run sync:sqlite
 npm run sync:annotation
 ```
 
 维护顺序：
 
-1. 改原始语料或解析规则后，先运行 `bulk_importer.py --dry-run`。
-2. 确认统计正常后运行 `bulk_importer.py` 重建 SQLite。
+1. 改原始语料或解析规则后，先运行 `importer.py --dry-run`。
+2. 确认统计正常后运行 `importer.py` 重建 SQLite。
 3. 数据库变化后运行 `npm run sync:sqlite` 更新网站快照。
 4. 网站展示口径变化后，只更新必要 README 和短更新记录，不写流水账。
 
 ## 仓库维护原则
 
-- 保留可重建链路：`source.txt`、`parser.py`、`bulk_importer.py`、`database.py`、`dictionary.db`、`sqlite-snapshot.json`。
+- 保留可重建链路：`source.txt`、`parser.py`、`importer.py`、`database.py`、`dictionary.db`、`sqlite-snapshot.json`。
+- 数据库架构：两个独立 SQLite（`dictionary.db` / `annotations.db`）放在 `02-数据库/data/` 下，共享 `02-数据库/lib/` 工具层。
 - 不再提交生成型中间文件，例如 `parsed_data.py`、空库、SQLite journal。
 - 大体量文献资料建议迁出 Git 或使用 Git LFS；仓库内优先保留清单、摘录和标注成果。
-- `02-数据库` 中的 Python 脚本重新计入 GitHub 语言统计；它们体量很小，保留可解释数据库可重建性。
+- `02-数据库` 中的 Python 脚本（`lib/`、`main/`、`annotation/`）重新计入 GitHub 语言统计；它们体量很小，保留可解释数据库可重建性。

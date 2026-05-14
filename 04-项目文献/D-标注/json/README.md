@@ -11,18 +11,18 @@ run.py
 ```text
 full_json/  DOCX 完整转换 JSON
 ai_json/    DeepSeek 整理后的 JSON
-annotation_db/ 独立人工标注 SQLite
+annotation_db/ 旧标注库目录（已迁移到 02-数据库/data/annotations.db）
 ```
 
-不写数据库。
+不写主库。
 
-这里的“不写数据库”指不碰 `02-数据库/data/dictionary.db` 主库。`run.py` 会自动创建一个独立的空库：
+这里的”不写数据库”指不碰 `02-数据库/data/dictionary.db` 主库。`run.py` 会自动创建独立的标注库：
 
 ```text
-04-项目文献/D-标注/json/annotation_db/annotation_results.db
+02-数据库/data/annotations.db
 ```
 
-它只用于以后暂存人工标注和 AI 整理结果，和原数据库不冲突。
+它只用于暂存人工标注和 AI 整理结果，和原数据库不冲突。数据库操作委托到 `02-数据库/annotation/importer.py`。
 
 ## 1. DOCX 转完整 JSON
 
@@ -94,7 +94,7 @@ python 04-项目文献/D-标注/json/run.py --api --import-ai
 {
   "database_ingestion": {
     "imported": true,
-    "database": "annotation_db/annotation_results.db",
+    "database": "02-数据库/data/annotations.db",
     "imported_at": "..."
   }
 }
@@ -149,4 +149,4 @@ python 04-项目文献/D-标注/json/run.py --init-db
 - 脚本会自动校验 `full_json` 的段落数、批注数、文本长度和 checksum。
 - 脚本会校验 `ai_json` 的枚举字段。
 - DeepSeek 只接收瘦身后的字段，不发送完整 package 清单。
-- 暂时不碰 `02-数据库`。
+- 写入 `02-数据库/data/annotations.db`，不与主库 `dictionary.db` 混用。

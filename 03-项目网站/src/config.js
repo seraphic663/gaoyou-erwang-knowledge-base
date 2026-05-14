@@ -86,6 +86,7 @@ module.exports = {
   SQLITE_SNAPSHOT_FILE: path.join(DATA_DIR, 'sqlite-snapshot.json'),
   ANNOTATION_SNAPSHOT_FILE: path.join(DATA_DIR, 'annotation-snapshot.json'),
   SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'dictionary.db'),
+  ANNOTATION_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'annotations.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
   DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',

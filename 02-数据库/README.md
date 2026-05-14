@@ -1,106 +1,124 @@
 # 数据库目录说明
 
-`02-数据库` 负责原始语料整理、结构化解析、SQLite 入库和后续同步到网站。当前主库是 `data/dictionary.db`，结构以 `database.py` 为准。
+`02-数据库` 是项目的数据层，包含两个独立 SQLite 数据库、各自的生成管线，以及共享工具层。
 
-## 当前数据链路
+## 目录结构
 
 ```text
-source.txt
-  -> parser.py
-  -> bulk_importer.py
+02-数据库/
+  ├── lib/                       共享 SQLite 工具（连接、查询、快照导出）
+  │   ├── __init__.py
+  │   ├── connection.py
+  │   └── snapshot.py
+  ├── main/                      主库管线（《广雅疏证》语料 → dictionary.db）
+  │   ├── source.txt             原始语料输入
+  │   ├── parser.py              解析脚本
+  │   ├── schema.sql             主库 DDL（参考）
+  │   ├── database.py            主库 CRUD 接口
+  │   └── importer.py            批量导入编排（原 bulk_importer.py）
+  ├── annotation/                标注库管线（DOCX 标注 → annotations.db）
+  │   ├── schema.sql             标注库 DDL（参考）
+  │   └── importer.py            标注库建表与查询接口
+  ├── data/                      两个 SQLite 数据库产物
+  │   ├── dictionary.db          主库（已校对，面向公众）
+  │   └── annotations.db         标注库（草稿/待核，内部研究用）
+  └── README.md
+```
+
+## 两个数据库的关系
+
+| | dictionary.db（主库） | annotations.db（标注库） |
+|---|---|---|
+| 数据来源 | 《广雅疏证》source.txt，机器解析 | DOCX 人工标注 + DeepSeek 规范化 |
+| 数据量 | 3,385 词条 · 815 案例 · 7,120 证据 | 44 词条 · 17 案例 · 121 证据 |
+| 成熟度 | 已校对/已审核 | 草稿/待核 |
+| 重建策略 | 全量重建（从 source.txt） | 增量追加（从 run.py） |
+| 网站入口 | 首页、database.html、term.html、case.html | annotation.html + AI 释证台 |
+| 核心表 | works, passages, terms, cases, evidences | source_documents, annotation_cases, annotation_terms, annotation_evidences, annotation_process_steps |
+
+两个库物理独立，架构统一：共享 `lib/` 工具层，产物统一放在 `data/`。
+
+## 主库数据链路
+
+```text
+main/source.txt
+  -> main/parser.py
+  -> main/importer.py
   -> data/dictionary.db
   -> ../03-项目网站/scripts/sqlite_bridge.py
   -> ../03-项目网站/data/sqlite-snapshot.json
 ```
 
-`bulk_importer.py` 已直接调用 `parser.py` 的解析结果，不再依赖 `parsed_data.py`。`parsed_data.py` 属于生成型中间文件，不应再提交进仓库。
-
-## 文件职责
-
-| 文件 | 职责 | 是否维护入口 |
-| --- | --- | --- |
-| `source.txt` | 原始语料输入 | 是 |
-| `parser.py` | 解析原始语料，生成结构化记录 | 是 |
-| `bulk_importer.py` | 批量导入 SQLite | 是 |
-| `database.py` | 建表、索引、写入接口、查询接口 | 是 |
-| `data/dictionary.db` | 当前 SQLite 主库 | 产物，不建议手工改 |
-| `README.md` | 数据库维护说明 | 是 |
-
-## 数据库结构
-
-当前数据库以五张主表组织：
-
-| 表 | 含义 |
-| --- | --- |
-| `works` | 著作来源表，保存被引用或讨论的典籍、著作信息 |
-| `passages` | 文本片段表，保存可定位的原文或论述片段 |
-| `terms` | 词条表，保存字、词、术语等检索对象 |
-| `cases` | 考据案例表，保存完整考据单元 |
-| `evidences` | 证据表，保存支撑案例结论的具体证据 |
-
-全文检索表：
+## 标注库数据链路
 
 ```text
-terms_fts
-passages_fts
-evidences_fts
+../04-项目文献/D-标注/ 的 DOCX 文件
+  -> ../04-项目文献/D-标注/json/run.py
+  -> data/annotations.db
+  -> ../03-项目网站/scripts/annotation_bridge.py
+  -> ../03-项目网站/data/annotation-snapshot.json
 ```
-
-关系口径：
-
-```text
-works -> passages -> cases -> evidences
-terms <-> cases
-terms -> evidences
-```
-
-`terms` 是检索核心；`cases` 是考据单元；`evidences` 是证据层；`works` 和 `passages` 提供出处和文本定位。
 
 ## 常用命令
 
 在仓库根目录运行：
 
 ```bash
-python 02-数据库/bulk_importer.py --dry-run
-python 02-数据库/bulk_importer.py
+# 主库
+python 02-数据库/main/importer.py --dry-run
+python 02-数据库/main/importer.py
 npm run sync:sqlite
+
+# 标注库（需先 cd 到 run.py 目录）
+cd 04-项目文献/D-标注/json
+python run.py --api --import-ai
+cd ../../..
+npm run sync:annotation
 ```
 
 说明：
 
 - `--dry-run` 只解析和统计，不写入数据库。
-- 正式运行 `bulk_importer.py` 会重建或更新 `data/dictionary.db`。
-- `npm run sync:sqlite` 会把 SQLite 导出为网站读取的 `sqlite-snapshot.json`。
+- 正式运行 `importer.py` 会重建或更新 `data/dictionary.db`。
+- `npm run sync:sqlite` 把主库导出为网站 JSON 快照。
+- `npm run sync:annotation` 把标注库导出为网站 JSON 快照。
 
 ## 维护场景
 
-### 只增加数据
+### 只增加主库数据
 
-1. 修改 `source.txt`。
-2. 运行 `bulk_importer.py --dry-run`。
+1. 修改 `main/source.txt`。
+2. 运行 `importer.py --dry-run`。
 3. 确认 works、terms、cases、evidences 统计正常。
-4. 运行 `bulk_importer.py`。
+4. 运行 `importer.py`。
 5. 运行 `npm run sync:sqlite`。
 
-### 修改解析规则
+### 修改主库解析规则
 
-1. 修改 `parser.py`。
+1. 修改 `main/parser.py`。
 2. 用 `--dry-run` 检查解析统计。
-3. 如导入字段受影响，同步修改 `bulk_importer.py`。
+3. 如导入字段受影响，同步修改 `main/importer.py` 和 `main/database.py`。
 4. 正式导入并同步网站快照。
 
 ### 修改数据库结构
 
-至少检查四处：
+至少检查五处：
 
 ```text
-database.py
-bulk_importer.py
-../03-项目网站/scripts/sqlite_bridge.py
-../03-项目网站/src/store-definitions.js
+main/database.py        — Schema DDL、CRUD 函数
+main/schema.sql         — DDL 参考文件
+../../03-项目网站/scripts/sqlite_bridge.py
+../../03-项目网站/src/store-definitions.js
+../../03-项目网站/src/data-sources/shared.js
 ```
 
 如果网站页面直接消费新字段，还要同步检查 `app.js`、`browser.js`、`detail.js`。
+
+### 增加标注数据
+
+1. 将标注后的 DOCX 放入 `04-项目文献/D-标注/`。
+2. 在 `D-标注/json/` 下运行 `python run.py --api --import-ai`。
+3. 在仓库根目录运行 `npm run sync:annotation`。
 
 ## 不应提交的内容
 
@@ -110,12 +128,14 @@ data/dictionary.empty.db
 data/*.db-journal
 __pycache__/
 *.pyc
+~$*.docx
 ```
 
-这些文件要么是自动生成中间文件，要么是缓存和临时文件。它们不会提高可维护性，只会放大仓库并干扰 GitHub 语言统计。
+这些文件要么是自动生成中间文件，要么是缓存和临时文件。
 
 ## 当前扩展优先级
 
 1. 补实 `passages`，让著作、原文片段、案例、证据链条更完整。
 2. 规范 `terms` 与 `cases` 的多对多关系，后续可考虑独立关联表。
-3. 再考虑版本层、关系层或知识图谱层。
+3. 标注库中审核通过的案例，考虑迁移到主库（作为新的 source 渠道）。
+4. 再考虑版本层、关系层或知识图谱层。

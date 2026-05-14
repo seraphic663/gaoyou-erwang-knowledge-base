@@ -2,8 +2,8 @@
   "schemaVersion": "annotation_snapshot_v1",
   "source": "annotation_db",
   "sourceLabel": "人工标注灰度库",
-  "description": "来自 D-标注/json/annotation_db 的人工标注与 AI 整理结果暂存库，不混入 02-数据库 主库。",
-  "dbFile": "04-项目文献\\D-标注\\json\\annotation_db\\annotation_results.db",
+  "description": "人工标注与 AI 整理结果暂存库，独立于主库，位于 02-数据库/data/annotations.db。",
+  "dbFile": "02-数据库\\data\\annotations.db",
   "meta": {
     "schema_version": "annotation_db_v1",
     "purpose": "人工标注与 AI 整理结果暂存库，不与 02-数据库 主库混用"
