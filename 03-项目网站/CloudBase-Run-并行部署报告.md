@@ -1,35 +1,35 @@
 # CloudBase Run 并行部署报告
 
-更新时间：2026-05-05
+更新时间：2026-05-14
 
 ## 1. 当前目标
 
-本轮目标是让项目在保留 Railway 的同时，新增一条腾讯云中文站 `CloudBase Run` 部署路径。
+本轮目标是让项目在保留 Railway 的同时，维护一条腾讯云中文站 `CloudBase Run` 备用部署路径。两条线上路径都使用根目录 `Dockerfile` 构建容器，避免不同平台维护两套构建逻辑。
 
 约束如下：
 
 - GitHub 仓库保持公开
-- Railway 暂时继续保留
-- CloudBase Run 先使用默认域名
+- Railway 继续作为主展示地址
+- CloudBase Run 作为备用展示地址，先使用默认域名
 - 优先省事和稳定
 - 接受冷启动
 - 不改网站页面内容、接口逻辑和数据库结构
 
 ## 2. 已完成的仓库配置
 
-本轮新增两个根目录部署文件：
+当前保留两个根目录部署文件：
 
 - `Dockerfile`
 - `.dockerignore`
 
-现有 Railway 配置未改：
+Railway 配置已经明确为 Dockerfile 构建：
 
-- `railway.toml` 保持不变
-- 根目录 `package.json` 的 `npm start` 保持不变
+- `railway.toml` 中 `builder = "DOCKERFILE"`
+- 根目录 `package.json` 的 `npm start` 仍是统一启动入口
 
 这意味着当前仓库同时支持两条部署入口：
 
-- Railway：继续读取 `railway.toml`，执行 `npm start`
+- Railway：读取 `railway.toml`，用根目录 `Dockerfile` 构建容器，执行 `npm start`
 - CloudBase Run：读取根目录 `Dockerfile`，构建容器后执行 `npm start`
 
 ## 3. Dockerfile 配置说明
@@ -42,7 +42,6 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package.json ./
-COPY server.js ./
 COPY 03-项目网站 ./03-项目网站
 
 ENV NODE_ENV=production
@@ -60,7 +59,8 @@ CMD ["npm", "start"]
 关键点：
 
 - 使用 `node:18-alpine`，满足项目 `Node.js >= 18` 要求
-- 只复制运行网站需要的根目录入口和 `03-项目网站`
+- 只复制运行网站需要的根目录 `package.json` 和 `03-项目网站`
+- 根目录没有 `server.js`，服务入口由根 `package.json` 调用 `03-项目网站/server.js`
 - 显式设置 `DATA_SOURCE=sqlite`，强制读取 `sqlite-snapshot.json`
 - 暴露 `3000` 端口，对应本项目默认端口
 - 用 `/api/health` 做容器健康检查
@@ -211,6 +211,7 @@ CloudBase Run 使用 Dockerfile 构建时，若出现部署失败，优先检查
 - Dockerfile 是否在仓库根目录
 - CloudBase 构建目录是否为根目录
 - 服务端口是否填 `3000`
+- Dockerfile 不应复制根目录 `server.js`
 - `03-项目网站/data/sqlite-snapshot.json` 是否已提交到 GitHub
 - 健康检查路径是否为 `/api/health`
 
