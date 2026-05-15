@@ -1,6 +1,6 @@
 # CloudBase Run 并行部署报告
 
-更新时间：2026-05-14
+更新时间：2026-05-15
 
 ## 1. 当前目标
 
@@ -140,7 +140,7 @@ http://127.0.0.1:3000/api/health
 
 - `ok: true`
 - `source: sqlite`
-- `sourceLabel: SQLite 实库`
+- `sourceLabel: SQLite 实库快照`
 
 ## 7. 部署后验证清单
 

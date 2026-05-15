@@ -18,8 +18,11 @@ note/
 .env
 03-项目网站/.env
 *.db-journal
+*.db-wal
+*.db-shm
 03-项目网站/data/visit-count.json
 04-项目文献/D-标注/json/.env
+04-项目文献/D-标注/json/annotation_db/
 
 # ---- Generated database intermediates ----
 02-数据库/parsed_data.py

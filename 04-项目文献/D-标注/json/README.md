@@ -6,13 +6,20 @@
 run.py
 ```
 
-两个结果目录：
+主要结果目录：
 
 ```text
 full_json/  DOCX 完整转换 JSON
 ai_json/    DeepSeek 整理后的 JSON
-annotation_db/ 旧标注库目录（已迁移到 02-数据库/data/annotations.db）
 ```
+
+辅助目录：
+
+```text
+ai_json_failed/  DeepSeek 调用失败时保存的原始响应
+```
+
+旧的 `annotation_db/` 不再保留。人工标注数据库统一放在 `02-数据库/data/annotations.db`，与主库 `dictionary.db` 相邻，但由 `02-数据库/annotation/` 独立管理。
 
 不写主库。
 
@@ -142,7 +149,7 @@ $env:DEEPSEEK_API_KEY = "sk-..."
 python 04-项目文献/D-标注/json/run.py --init-db
 ```
 
-当前只建表，不导入内容。后面等 `ai_json/` 稳定后，再加一个明确的导入开关，不会自动混入主库。
+`--init-db` 只建表，不导入内容。导入必须显式使用 `--import-ai`，不会自动混入主库。
 
 ## 说明
 

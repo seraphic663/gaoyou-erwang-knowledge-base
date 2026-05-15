@@ -15,7 +15,19 @@
           <a href="#case-walkthrough">封面个案</a>
           <a href="./knowledge.html">训诂知识</a>
           <a href="./database.html?view=terms">数据库</a>
-          <a href="./annotation.html">人工标注库</a>
+          <div class="experiment-menu">
+            <a class="experiment-trigger" href="./annotation.html">实验性功能</a>
+            <div class="experiment-panel" aria-label="实验性功能">
+              <a href="./annotation.html">
+                <span>人工标注库</span>
+                <small>浏览人工标注结构化数据</small>
+              </a>
+              <a href="./ai-annotation.html">
+                <span>AI 释证</span>
+                <small>调用模型并核看引用材料</small>
+              </a>
+            </div>
+          </div>
         </div>
       </nav>
 
@@ -115,7 +127,19 @@
           </div>
           <div class="head-actions">
             <a class="page-link" href="./database.html?view=schema">查看数据库结构</a>
-            <a class="page-link page-link-muted" href="./annotation.html">进入人工标注灰度库</a>
+            <div class="experiment-menu experiment-menu-light">
+              <a class="page-link page-link-muted experiment-trigger" href="./annotation.html">实验性功能</a>
+              <div class="experiment-panel" aria-label="实验性功能">
+                <a href="./annotation.html">
+                  <span>人工标注库</span>
+                  <small>纯数据库浏览</small>
+                </a>
+                <a href="./ai-annotation.html">
+                  <span>AI 释证</span>
+                  <small>释证草案与引用展开</small>
+                </a>
+              </div>
+            </div>
           </div>
         </div>
         <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
@@ -195,7 +219,19 @@
           <div class="search-bar">
             <input id="searchInput" type="text" placeholder="输入字词、方法词或片段：如 周 / 通假 / 古文" />
             <a class="detail-link" href="./database.html">进入数据库查询</a>
-            <a class="detail-link detail-link-muted" href="./annotation.html">看人工标注库</a>
+            <div class="experiment-menu experiment-menu-light">
+              <a class="detail-link detail-link-muted experiment-trigger" href="./annotation.html">实验性功能</a>
+              <div class="experiment-panel" aria-label="实验性功能">
+                <a href="./annotation.html">
+                  <span>人工标注库</span>
+                  <small>筛选人工标注数据</small>
+                </a>
+                <a href="./ai-annotation.html">
+                  <span>AI 释证</span>
+                  <small>引用材料逐级展开</small>
+                </a>
+              </div>
+            </div>
             <button id="clearSearch" class="search-clear" type="button">清空</button>
           </div>
           <p class="compact-note">首页只给少量预览；完整结果和筛选功能放在数据库页。</p>

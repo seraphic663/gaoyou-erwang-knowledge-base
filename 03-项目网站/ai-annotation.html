@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI 释证 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="annotation-ai">
+    <header class="subhero annotation-hero ai-annotation-hero">
+      <nav class="nav">
+        <div class="brand">高邮二王考据过程知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">返回首页</a>
+          <a href="./annotation.html">人工标注库</a>
+          <a href="./database.html?view=cases">主数据库</a>
+          <a href="./knowledge.html">训诂知识</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">实验性功能 · AI 释证</p>
+        <h1>AI 释证</h1>
+        <p class="hero-copy">
+          优先使用人工标注库，必要时引用主数据库补充。AI 输出只作释证草案；引用材料默认收起，可逐级展开核对。
+        </p>
+      </div>
+    </header>
+
+    <main class="section annotation-page">
+      <section class="card annotation-ai-card">
+        <div class="head-line">
+          <div>
+            <p class="section-kicker">释证台</p>
+            <h2>输入字词、句子或问题</h2>
+          </div>
+          <a class="page-link page-link-muted" href="./annotation.html">打开人工标注库</a>
+        </div>
+        <p class="compact-note">引用内容默认完全隐藏。生成后可先展开核心引用列表，再逐条展开完整材料，或一次全部展开。</p>
+        <label class="toolbar-field annotation-ai-field">
+          <span>待释证内容</span>
+          <textarea id="annotationAiInput" rows="5" placeholder="如：畏为什么可以训为敬？或粘贴一段待解析材料"></textarea>
+        </label>
+        <div class="toolbar-actions">
+          <button id="annotationAiButton" class="page-link toolbar-button" type="button">调用 AI 解析</button>
+          <button id="annotationAiClearButton" class="search-clear toolbar-button" type="button">清空</button>
+        </div>
+        <div id="annotationAiResult" class="annotation-ai-result">尚未解析。</div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>AI 释证 · 引用人工标注库与主数据库材料，结果需人工复核</p>
+    </footer>
+
+    <script src="./utils.js"></script>
+    <script src="./ai-annotation.js"></script>
+  </body>
+</html>

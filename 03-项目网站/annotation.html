@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>人工标注灰度库 · 高邮二王考据过程知识库</title>
+    <title>人工标注库 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body data-page="annotation">
@@ -13,15 +13,16 @@
         <div class="nav-links">
           <a href="./index.html">返回首页</a>
           <a href="./database.html?view=cases">主数据库</a>
+          <a href="./ai-annotation.html">AI 释证</a>
           <a href="./knowledge.html">训诂知识</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">灰度入口 · 人工标注库</p>
-        <h1>人工标注灰度库</h1>
+        <p class="badge">实验性功能 · 人工标注库</p>
+        <h1>人工标注库</h1>
         <p class="hero-copy">
-          这里展示人工标注与 AI 整理结果（`02-数据库/data/annotations.db`）。数据更接近原始工作稿，暂不混入主数据库。
+          这里只浏览人工标注与 AI 整理后的结构化数据（`02-数据库/data/annotations.db`）。它与主数据库相邻但不融合，不在本页调用 AI。
         </p>
         <div id="annotationHeroMeta" class="hero-panel"></div>
       </div>
@@ -29,25 +30,6 @@
 
     <main class="section annotation-page">
       <p id="annotationStatus" class="db-status">正在读取人工标注库...</p>
-
-      <section class="card annotation-ai-card">
-        <div class="head-line">
-          <div>
-            <p class="section-kicker">实验功能 · 不进首页</p>
-            <h2>AI 辅助释证台</h2>
-          </div>
-        </div>
-        <p class="compact-note">优先调用人工标注灰度库；人工库材料不足时，再用主数据库补充。输出只作释证草案。</p>
-        <label class="toolbar-field annotation-ai-field">
-          <span>输入字词、句子或问题</span>
-          <textarea id="annotationAiInput" rows="4" placeholder="如：畏为什么可以训为敬？或粘贴一段待解析材料"></textarea>
-        </label>
-        <div class="toolbar-actions">
-          <button id="annotationAiButton" class="page-link toolbar-button" type="button">调用 AI 解析</button>
-          <button id="annotationAiClearButton" class="search-clear toolbar-button" type="button">清空</button>
-        </div>
-        <div id="annotationAiResult" class="annotation-ai-result">尚未解析。</div>
-      </section>
 
       <section class="card annotation-toolbar">
         <div class="head-line">

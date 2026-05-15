@@ -148,6 +148,96 @@ body::before {
   transform: scaleX(1);
 }
 
+.experiment-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.experiment-trigger {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+
+.experiment-trigger::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-right: 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 4px rgba(211, 179, 143, 0.16);
+}
+
+.experiment-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  width: min(360px, calc(100vw - 32px));
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid rgba(84, 58, 30, 0.18);
+  border-radius: 8px;
+  background: rgba(253, 249, 240, 0.98);
+  box-shadow: 0 20px 48px rgba(44, 28, 14, 0.18);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top right;
+  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+}
+
+.experiment-menu:hover .experiment-panel,
+.experiment-menu:focus-within .experiment-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.experiment-panel a {
+  display: grid;
+  gap: 4px;
+  min-height: 82px;
+  padding: 12px;
+  border: 1px solid rgba(84, 58, 30, 0.14);
+  border-radius: 8px;
+  color: var(--ink);
+  background: rgba(255, 252, 246, 0.78);
+  text-decoration: none;
+  letter-spacing: 0;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.experiment-panel a::after {
+  display: none;
+}
+
+.experiment-panel a:hover {
+  transform: translateY(-2px);
+  border-color: rgba(165, 77, 42, 0.32);
+  background: rgba(250, 241, 224, 0.94);
+}
+
+.experiment-panel span {
+  font-weight: 700;
+  color: var(--pri-2);
+}
+
+.experiment-panel small {
+  color: var(--sub);
+  line-height: 1.45;
+}
+
+.experiment-menu-light .experiment-panel {
+  left: 0;
+  right: auto;
+  transform-origin: top left;
+}
+
 .hero-content {
   max-width: 1100px;
   margin: 16px auto 0;
@@ -1379,6 +1469,90 @@ h2 {
   gap: 8px;
 }
 
+.ai-reference-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid rgba(84, 58, 30, 0.14);
+  border-radius: 8px;
+  background: rgba(253, 249, 240, 0.7);
+}
+
+.ai-reference-head,
+.ai-reference-core {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ai-reference-head h3,
+.ai-reference-core h4 {
+  margin: 4px 0 0;
+}
+
+.ai-reference-list {
+  display: grid;
+  gap: 10px;
+  animation: fade-rise 180ms ease both;
+}
+
+.ai-reference-actions {
+  justify-content: flex-start;
+}
+
+.ai-reference-item {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(92, 102, 82, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 252, 246, 0.78);
+}
+
+.ai-reference-excerpt {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+.ai-reference-full {
+  display: grid;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(84, 58, 30, 0.18);
+  animation: fade-rise 160ms ease both;
+}
+
+.ai-reference-full[hidden],
+.ai-reference-list[hidden] {
+  display: none;
+}
+
+.ai-reference-block {
+  display: grid;
+  gap: 5px;
+}
+
+.ai-reference-block strong {
+  color: var(--jade);
+  font-size: 13px;
+}
+
+.ai-reference-block p {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.75;
+}
+
+.ai-reference-toggle {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  background: transparent;
+}
+
 .annotation-list {
   display: grid;
   gap: 18px;
@@ -2073,6 +2247,18 @@ h2 {
     align-items: flex-start;
   }
 
+  .experiment-menu,
+  .experiment-trigger {
+    width: 100%;
+  }
+
+  .experiment-panel,
+  .experiment-menu-light .experiment-panel {
+    left: 0;
+    right: auto;
+    grid-template-columns: 1fr;
+  }
+
   .ghost-link {
     margin-left: 0;
   }
@@ -2136,6 +2322,11 @@ h2 {
   .summary-row {
     flex-direction: column;
     gap: 12px;
+  }
+
+  .ai-reference-head,
+  .ai-reference-core {
+    flex-direction: column;
   }
 
   .detail-focus-top {

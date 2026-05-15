@@ -79,6 +79,8 @@ function pickRelevantEvidences(item, query) {
   return (matched.length ? matched : evidences).slice(0, 8).map((evidence) => ({
     work: evidence.work || '',
     quote: compact(evidence.quote, 220),
+    quoteCore: compact(evidence.quote, 120),
+    quoteFull: evidence.quote || '',
     role: evidence.role || evidence.evidence_type || '',
   }));
 }
@@ -88,7 +90,10 @@ function pickRelevantSteps(item, query) {
   return (item.process_steps || [])
     .filter((step) => textMatchesQuery([step.step_type, step.text], tokens))
     .slice(0, 5)
-    .map((step) => compact(`${step.step_type || '步骤'}：${step.text}`, 240));
+    .map((step) => ({
+      core: compact(`${step.step_type || '步骤'}：${step.text}`, 160),
+      full: `${step.step_type || '步骤'}：${step.text || ''}`,
+    }));
 }
 
 function pickAnnotationCases(snapshot, query) {
@@ -102,6 +107,8 @@ function pickAnnotationCases(snapshot, query) {
       document: item.source_document?.source_file_name || '未标注文档',
       sourceWork: item.source_work || '',
       claim: compact(item.claim || item.problem || item.conclusion, 360),
+      claimCore: compact(item.claim || item.problem || item.conclusion, 140),
+      claimFull: item.claim || item.problem || item.conclusion || '',
       methods: item.method_tags || [],
       relevantSteps: pickRelevantSteps(item, query),
       evidences: pickRelevantEvidences(item, query),

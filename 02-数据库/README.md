@@ -30,10 +30,10 @@
 | | dictionary.db（主库） | annotations.db（标注库） |
 |---|---|---|
 | 数据来源 | 《广雅疏证》source.txt，机器解析 | DOCX 人工标注 + DeepSeek 规范化 |
-| 数据量 | 3,385 词条 · 815 案例 · 7,120 证据 | 44 词条 · 17 案例 · 121 证据 |
+| 数据量 | 49 著作 · 3,385 词条 · 815 案例 · 7,120 证据 | 3 文档 · 44 词条 · 17 案例 · 121 证据 · 64 过程步骤 |
 | 成熟度 | 已校对/已审核 | 草稿/待核 |
 | 重建策略 | 全量重建（从 source.txt） | 增量追加（从 run.py） |
-| 网站入口 | 首页、database.html、term.html、case.html | annotation.html + AI 释证台 |
+| 网站入口 | 首页、database.html、term.html、case.html | annotation.html（人工库浏览）+ ai-annotation.html（AI 释证） |
 | 核心表 | works, passages, terms, cases, evidences | source_documents, annotation_cases, annotation_terms, annotation_evidences, annotation_process_steps |
 
 两个库物理独立，架构统一：共享 `lib/` 工具层，产物统一放在 `data/`。

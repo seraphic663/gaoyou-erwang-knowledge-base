@@ -6,7 +6,8 @@
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
-- 人工标注灰度库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿入口。
+- 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
+- AI 释证：调用 `/api/ai/annotation`，优先引用人工标注库，必要时用主数据库补充；引用材料默认收起，逐级展开核对。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
 - 知识页：解释训诂术语，辅助阅读，不构成独立数据库。
@@ -36,6 +37,7 @@ http://localhost:3000
 ```text
 /api/health
 /api/bootstrap
+/api/browser/bootstrap
 /api/search?q=始
 ```
 
@@ -64,9 +66,10 @@ npm run sync:sqlite
   -> 03-项目网站/scripts/annotation_bridge.py
   -> 03-项目网站/data/annotation-snapshot.json
   -> 03-项目网站/annotation.html
+  -> 03-项目网站/ai-annotation.html
 ```
 
-它只展示人工标注和 AI 整理结果，不混入主数据库。更新该库后运行：
+它不混入主数据库。`annotation.html` 只做人工库数据库浏览，`ai-annotation.html` 承接 AI 释证。更新该库后运行：
 
 ```bash
 npm run sync:annotation
@@ -78,13 +81,15 @@ npm run sync:annotation
 03-项目网站/
 ├─ index.html              首页
 ├─ database.html           统一数据库浏览页
-├─ annotation.html         人工标注灰度库
+├─ annotation.html         人工标注库数据库页
+├─ ai-annotation.html      AI 释证页
 ├─ term.html               字词详情页
 ├─ case.html               案例详情页
 ├─ knowledge.html          术语说明页
 ├─ app.js                  首页渲染逻辑
 ├─ browser.js              数据库页浏览、检索、分页
 ├─ annotation.js           人工标注库前端浏览
+├─ ai-annotation.js        AI 释证前端交互
 ├─ detail.js               字词和案例详情页渲染
 ├─ knowledge.js            术语说明页内容
 ├─ styles.css              全站样式
@@ -102,17 +107,21 @@ npm run sync:annotation
 - `GET /api/health`：服务健康和数据源状态。
 - `GET /api/bootstrap`：首页初始化数据、统计和示例。
 - `GET /api/schema`：数据库结构和记录数。
+- `GET /api/browser/bootstrap`：数据库浏览页初始化数据。
+- `GET /api/browser?view=...`：数据库浏览页分页、筛选和检索。
 - `GET /api/search?q=关键词`：统一检索字词和案例。
 - `GET /api/terms`：词条列表。
 - `GET /api/cases?q=关键词`：案例列表或案例检索。
 - `GET /api/term?id=编号`：字词详情。
 - `GET /api/case?id=编号`：案例详情。
+- `GET/POST /api/visits`：首页访问计数，运行时写入 `data/visit-count.json`；该文件已忽略，不入仓。
+- `POST /api/ai/annotation`：AI 释证接口，需要配置 DeepSeek API key。
 
 ## 维护规则
 
 1. 改 SQLite 数据后，必须重新执行 `npm run sync:sqlite`。
 2. 改人工标注库后，必须重新执行 `npm run sync:annotation`。
 3. 改数据库字段后，同时检查 `src/store-definitions.js`、`scripts/sqlite_bridge.py` 和前端渲染脚本。
-4. 改首页或详情页数据库表述时，保持“同一数据库，不同视角”的口径；人工标注库只叫灰度库，不叫主库。
+4. 改首页或详情页数据库表述时，保持“同一数据库，不同视角”的口径；人工标注库是实验性功能，不叫主库。
 5. `data/sqlite-snapshot.json` 和 `data/annotation-snapshot.json` 都是导出产物，不要手工改。
 6. `更新记录.md` 只记录结构、数据链路和展示口径变化，不写日常流水账。

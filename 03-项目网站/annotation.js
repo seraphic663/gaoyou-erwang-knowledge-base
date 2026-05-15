@@ -7,10 +7,6 @@ const annotationSearchButton = document.querySelector('#annotationSearchButton')
 const annotationResetButton = document.querySelector('#annotationResetButton');
 const annotationSummary = document.querySelector('#annotationSummary');
 const annotationList = document.querySelector('#annotationList');
-const annotationAiInput = document.querySelector('#annotationAiInput');
-const annotationAiButton = document.querySelector('#annotationAiButton');
-const annotationAiClearButton = document.querySelector('#annotationAiClearButton');
-const annotationAiResult = document.querySelector('#annotationAiResult');
 
 const state = {
   snapshot: null,
@@ -31,114 +27,6 @@ async function loadSnapshot() {
     throw new Error(`annotation-snapshot.json 读取失败：${response.status}`);
   }
   return response.json();
-}
-
-function renderAiSources(sources = {}) {
-  const annotationCount = sources.annotation?.length || 0;
-  const mainCount = sources.main?.length || 0;
-  return `
-    <div class="annotation-ai-sources">
-      <span class="summary-pill">人工库 ${escapeHtml(annotationCount)} 条</span>
-      <span class="summary-pill muted">主库补充 ${escapeHtml(mainCount)} 条</span>
-    </div>
-  `;
-}
-
-function parseAiAnswer(answer) {
-  const text = String(answer || '')
-    .trim()
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/i, '');
-  const start = text.indexOf('{');
-  const end = text.lastIndexOf('}');
-  const candidates = [
-    text,
-    start >= 0 && end > start ? text.slice(start, end + 1) : '',
-  ].filter(Boolean);
-
-  for (const candidate of candidates) {
-    try {
-      const parsed = JSON.parse(candidate);
-      if (parsed && typeof parsed === 'object') return parsed;
-    } catch {
-      continue;
-    }
-  }
-
-  return null;
-}
-
-function renderAiSection(title, content) {
-  const items = Array.isArray(content) ? content.filter(Boolean) : [content].filter(Boolean);
-  const safeItems = items.length ? items : ['本栏本次未返回内容，需人工补写或重新解析。'];
-  return `
-    <section class="annotation-ai-section">
-      <h3>${escapeHtml(title)}</h3>
-      ${safeItems.length === 1
-        ? `<p>${escapeHtml(safeItems[0])}</p>`
-        : `<ol>${safeItems.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ol>`}
-    </section>
-  `;
-}
-
-function renderAiAnswer(answer, structuredAnswer = null) {
-  const parsed = structuredAnswer || parseAiAnswer(answer);
-  const structured = parsed ? {
-    judgment: parsed.judgment || '本次模型未返回明确判断，需人工依据下列材料补写。',
-    evidences: parsed.evidences || ['本次模型未返回可用证据条目，需回到人工标注库核对。'],
-    draft: parsed.draft || ['本次模型未返回解析草案，需人工按“立论—取证—释理—结论”补写。'],
-    reviewNotes: parsed.reviewNotes || ['本次模型未返回核对事项，需人工复核原文、证据方向与案例粒度。'],
-  } : null;
-
-  if (!structured) {
-    return `<pre>${escapeHtml(answer || '未返回内容')}</pre>`;
-  }
-
-  return `
-    <div class="annotation-ai-report">
-      ${renderAiSection('判断', structured.judgment)}
-      ${renderAiSection('可用证据', structured.evidences)}
-      ${renderAiSection('解析草案', structured.draft)}
-      ${renderAiSection('仍需人工核对处', structured.reviewNotes)}
-    </div>
-  `;
-}
-
-async function runAnnotationAi() {
-  const question = annotationAiInput?.value.trim() || '';
-  if (!question) {
-    annotationAiResult.innerHTML = '<p class="compact-note">请输入需要解析的内容。</p>';
-    return;
-  }
-
-  annotationAiButton.disabled = true;
-  annotationAiResult.innerHTML = '<p class="compact-note">正在检索人工库并调用 AI...</p>';
-
-  try {
-    const response = await fetch('/api/ai/annotation', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
-    });
-    const payload = await response.json();
-
-    if (!payload.ok) {
-      annotationAiResult.innerHTML = `
-        <p class="compact-note">${escapeHtml(payload.message || 'AI 解析失败')}</p>
-        ${renderAiSources(payload.sources)}
-      `;
-      return;
-    }
-
-    annotationAiResult.innerHTML = `
-      ${renderAiSources(payload.sources)}
-      ${renderAiAnswer(payload.answer, payload.structuredAnswer)}
-    `;
-  } catch (error) {
-    annotationAiResult.innerHTML = `<p class="compact-note">AI 接口不可用：${escapeHtml(error.message)}</p>`;
-  } finally {
-    annotationAiButton.disabled = false;
-  }
 }
 
 function renderHero() {
@@ -431,13 +319,6 @@ annotationSearchInput?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     annotationSearchButton.click();
   }
-});
-
-annotationAiButton?.addEventListener('click', runAnnotationAi);
-
-annotationAiClearButton?.addEventListener('click', () => {
-  annotationAiInput.value = '';
-  annotationAiResult.textContent = '尚未解析。';
 });
 
 init();
