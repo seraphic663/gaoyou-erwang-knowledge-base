@@ -73,33 +73,6 @@ function sendFile(res, filePath) {
   }
 }
 
-function getVisitCountFile() {
-  return path.join(config.DATA_DIR, 'visit-count.json');
-}
-
-function readVisitCount() {
-  try {
-    const raw = fs.readFileSync(getVisitCountFile(), 'utf8');
-    const payload = JSON.parse(raw);
-    return Number(payload.count) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function writeVisitCount(count) {
-  fs.mkdirSync(config.DATA_DIR, { recursive: true });
-  fs.writeFileSync(getVisitCountFile(), JSON.stringify({ count }, null, 2));
-}
-
-function getVisitPayload(shouldIncrement) {
-  const nextCount = readVisitCount() + (shouldIncrement ? 1 : 0);
-  if (shouldIncrement) {
-    writeVisitCount(nextCount);
-  }
-  return { ok: true, count: nextCount };
-}
-
 function safeResolve(baseDir, requestPath) {
   const decoded = decodeURIComponent(requestPath || '/');
   const cleaned = decoded.replace(/^\/+/, '');
@@ -143,10 +116,6 @@ function createServer() {
 
       if (parsedUrl.pathname === '/api/health') {
         return sendJson(res, 200, dataSource.getHealth());
-      }
-
-      if (parsedUrl.pathname === '/api/visits') {
-        return sendJson(res, 200, getVisitPayload(req.method === 'POST'));
       }
 
       if (parsedUrl.pathname === '/api/bootstrap') {

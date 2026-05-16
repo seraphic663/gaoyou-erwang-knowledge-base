@@ -90,5 +90,5 @@ module.exports = {
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
   DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
-  DEEPSEEK_MODEL: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+  DEEPSEEK_MODEL: 'deepseek-v4-pro',
 };

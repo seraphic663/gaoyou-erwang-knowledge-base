@@ -7,7 +7,7 @@
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
-- AI 释证：调用 `/api/ai/annotation`，优先引用人工标注库，必要时用主数据库补充；引用材料默认收起，逐级展开核对。
+- AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
 - 知识页：解释训诂术语，辅助阅读，不构成独立数据库。
@@ -114,8 +114,9 @@ npm run sync:annotation
 - `GET /api/cases?q=关键词`：案例列表或案例检索。
 - `GET /api/term?id=编号`：字词详情。
 - `GET /api/case?id=编号`：案例详情。
-- `GET/POST /api/visits`：首页访问计数，运行时写入 `data/visit-count.json`；该文件已忽略，不入仓。
-- `POST /api/ai/annotation`：AI 释证接口，需要配置 DeepSeek API key。
+- `POST /api/ai/annotation`：AI 释证接口，固定使用 `deepseek-v4-pro`，需要配置 DeepSeek API key。
+
+AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 条人工标注案例；若人工库命中不足 3 条，再补充最多 4 条主数据库案例。服务端把这些材料和系统提示一次性发送给 DeepSeek，不保留对话记忆。
 
 ## 维护规则
 
