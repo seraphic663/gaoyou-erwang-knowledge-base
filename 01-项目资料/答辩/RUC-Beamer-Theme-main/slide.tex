@@ -1,0 +1,426 @@
+% !TEX program = xelatex
+\documentclass[aspectratio=169]{beamer}
+\usepackage{ctex, hyperref}
+\usepackage[T1]{fontenc}
+\usepackage{latexsym,amsmath,xcolor,multicol,booktabs,tabularx}
+\usepackage{graphicx,tikz}
+\usepackage{RenminUniv}
+
+\graphicspath{{pic/}{../../../03-项目网站/media/}}
+
+\author{赵梓名（组长）、廖展慧、卢飞宇、李汶灿、徐健怡}
+\title{高邮二王考据过程知识库构建及应用}
+\subtitle{高邮二王考据过程知识库构建及应用}
+\institute{高瓴人工智能学院 / 信息学院 / 明德书院 / 文学院}
+\date{2026年5月}
+
+\definecolor{rucRed}{RGB}{151,31,48}
+\definecolor{softRed}{RGB}{250,238,240}
+\definecolor{deepGray}{RGB}{55,55,55}
+\definecolor{mutedGray}{RGB}{105,105,105}
+
+\newcommand{\key}[1]{\textcolor{rucRed}{\textbf{#1}}}
+\newcommand{\hint}[1]{{\scriptsize\textcolor{mutedGray}{#1}}}
+\newcommand{\pill}[1]{%
+  \tikz[baseline=(X.base)] \node[draw=rucRed!40, fill=softRed, rounded corners=2pt, inner xsep=4pt, inner ysep=1.5pt] (X) {\scriptsize #1};%
+}
+\newcommand{\numstat}[2]{%
+  \begin{minipage}{0.22\linewidth}
+    \centering
+    {\Huge\textcolor{rucRed}{\textbf{#1}}}\\[-1mm]
+    {\small #2}
+  \end{minipage}
+}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamerfont{frametitle}{size=\large}
+\setbeamertemplate{background}{\includegraphics[width=\paperwidth,height=\paperheight]{pic/background.pdf}}
+
+\begin{document}
+
+\kaishu
+
+\begin{frame}
+    \titlepage
+    \vspace{-0.45cm}
+    \begin{figure}[htpb]
+        \centering
+        \includegraphics[width=0.26\linewidth]{pic/Renmin_Univ_Logo.eps}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{汇报结构}
+    \tableofcontents[sectionstyle=show,subsectionstyle=show/shaded/hide,subsubsectionstyle=show/shaded/hide]
+\end{frame}
+
+\section{问题与对象}
+
+\begin{frame}{从“查得到”到“看得懂”}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \begin{block}{现有平台}
+            \begin{itemize}
+                \item 影像浏览、全文检索、条目定位
+                \item 解决“材料在哪里”的问题
+                \item 更偏向对象知识和文本入口
+            \end{itemize}
+        \end{block}
+        \column{0.48\textwidth}
+        \begin{block}{我们的切入点}
+            \begin{itemize}
+                \item 一条考据怎样成立
+                \item 证据如何组织，旧说如何裁断
+                \item 保存方法知识和过程性知识
+            \end{itemize}
+        \end{block}
+    \end{columns}
+    \vspace{0.25cm}
+    \begin{center}
+        \Large \key{不是再做一个古籍入口，而是复原判断链条。}
+    \end{center}
+\end{frame}
+
+\begin{frame}{为什么是高邮二王}
+    \begin{itemize}
+        \item 高邮王念孙、王引之是乾嘉学派代表人物，“王氏四种”集中呈现清代考据学成熟方法。
+        \item 材料边界清楚：《广雅疏证》《经义述闻》《经传释词》《读书杂志》适合一年周期集中推进。
+        \item 方法类型集中：讹字、通假、因声求义、联绵词、虚词释读、句法辨析等反复出现。
+        \item 适合跨学科表达：传统小学、文献学问题可以转化为结构化数据、检索界面和 AI 辅助流程。
+    \end{itemize}
+    \vspace{0.2cm}
+    \begin{center}
+        \pill{清代考据} \quad \pill{训诂学} \quad \pill{经学解释} \quad \pill{数字人文}
+    \end{center}
+\end{frame}
+
+\begin{frame}{古典人文学术与现代数智技术的融合}
+    \begin{columns}[T]
+        \column{0.31\textwidth}
+        \begin{exampleblock}{古典人文学术}
+            文献细读、出处核验、训诂判断、效度辨析。
+        \end{exampleblock}
+        \column{0.31\textwidth}
+        \begin{exampleblock}{数据组织}
+            字段设计、SQLite、快照导出、前端检索。
+        \end{exampleblock}
+        \column{0.31\textwidth}
+        \begin{exampleblock}{智能辅助}
+            相似案例召回、证据匹配、结构草稿、人工复核。
+        \end{exampleblock}
+    \end{columns}
+    \vspace{0.45cm}
+    \begin{block}{答辩重点}
+        校勘学、训诂学等古典人文学术不是单独讲一套术语，而是作为数据建模和人工复核的规则；现代数智技术也不是包装层，而是让研究过程可展示、可复核、可扩展。
+    \end{block}
+\end{frame}
+
+\section{学术框架}
+
+\begin{frame}{一条考据的结构（据《训诂学原理》）}
+    \begin{center}
+        \begin{tikzpicture}[>=latex, node distance=1.65cm]
+            \tikzstyle{flowbox}=[rectangle, rounded corners=2pt, draw=rucRed, fill=softRed, minimum width=1.55cm, minimum height=0.68cm, align=center]
+            \node[flowbox] (a) {发疑};
+            \node[flowbox, right of=a] (b) {预设};
+            \node[flowbox, right of=b] (c) {取证};
+            \node[flowbox, right of=c] (d) {释理};
+            \node[flowbox, right of=d] (e) {结论};
+            \node[flowbox, right of=e] (f) {类推};
+            \foreach \x/\y in {a/b,b/c,c/d,d/e,e/f}
+              \draw[->, thick, rucRed] (\x) -- (\y);
+        \end{tikzpicture}
+    \end{center}
+    \vspace{0.25cm}
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item 发疑：旧注分歧、字义不通、语境不合。
+            \item 预设：<>
+            \item 取证：书证、声训、义证、形证、异文、语法证据。
+        \end{itemize}
+        \column{0.45\textwidth}
+        \begin{itemize}
+            \item 释理：说明证据为何能推出结论。
+            \item 结论：确证、倾向性假说、待核。
+            \item 类推：<>
+        \end{itemize}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{训诂学内容怎样进入系统}
+    \begin{table}[h]
+        \centering
+        \small
+        \begin{tabularx}{0.95\textwidth}{>{\bfseries}l X}
+            \toprule
+            学术概念 & 系统中的落点 \\
+            \midrule
+            声训、通假 & 进入方法标签、证据类型和核对事项 \\
+            形训、义训 & 进入释理说明和结论边界 \\
+            词义训释 / 文意训释 & 帮助区分稳定义项与具体语境解释 \\
+            望文生训 & 作为旧说裁断、反证说明和风险提示 \\
+            形音义互求 & 作为同类案例比较的基本观察框架 \\
+            \bottomrule
+        \end{tabularx}
+    \end{table}
+    \vspace{0.2cm}
+    \begin{center}
+        \key{训诂学不是装饰性背景，而是判断“数据是否可信”的规则。}
+    \end{center}
+\end{frame}
+
+\begin{frame}{代表案例：“造舟于河”}
+    \begin{block}{争点}
+        《经义述闻·左传下》讨论“造舟于河”：这里的“造”应训为\key{比次}，还是训为\key{至}？
+    \end{block}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \begin{itemize}
+            \item 《正义》承认“比舟为梁”，却转训“造”为“至”。
+            \item 王念孙提出：“造之言曹也，相比次之名也。”
+            \item 问题被收束为可证的训释命题。
+        \end{itemize}
+        \column{0.48\textwidth}
+        \begin{itemize}
+            \item “造、次一声之转”。
+            \item “䔏”有副、次之义。
+            \item 薛综注《东京赋》“以舟相比次为桥”可作旁证。
+        \end{itemize}
+    \end{columns}
+    \vspace{0.2cm}
+    \begin{center}
+        \pill{发疑} \quad \pill{立说} \quad \pill{取证} \quad \pill{释理} \quad \pill{裁断旧说}
+    \end{center}
+\end{frame}
+
+\begin{frame}{流程图：把个案转化为可复核结构}
+    \begin{center}
+        \includegraphics[height=0.68\textheight]{step.png}
+    \end{center}
+    \vspace{-0.05cm}
+    \begin{center}
+        \hint{图示来自当前网站首页流程图，用于说明“发疑—设问—取证—释理—结论”的组织方式。}
+    \end{center}
+\end{frame}
+
+\section{数据库与网站}
+
+\begin{frame}{五类对象承接考据过程}
+    \begin{table}[h]
+        \centering
+        \small
+        \begin{tabularx}{\textwidth}{>{\bfseries}l X X}
+            \toprule
+            对象 & 保存内容 & 展示作用 \\
+            \midrule
+            著作 & 二王著作、经典、工具书来源 & 保证出处可追溯 \\
+            条目 & 原文、引文、二王论述片段 & 支持后续精细定位 \\
+            词目 & 字、词、术语和义项摘要 & 提供检索入口 \\
+            案例 & 问题、方法、过程、结论、状态 & 保存考据主体 \\
+            证据 & 书证、声训、义证、异文等 & 支撑复核与比较 \\
+            \bottomrule
+        \end{tabularx}
+    \end{table}
+    \begin{center}
+        \key{词条是入口，案例是中心，证据和出处保证可复核。}
+    \end{center}
+\end{frame}
+
+\begin{frame}{当前数据基础}
+    \vspace{0.25cm}
+    \begin{center}
+        \numstat{49}{著作来源}
+        \numstat{3385}{词条}
+        \numstat{815}{案例}
+        \numstat{7120}{证据}
+    \end{center}
+    \vspace{0.6cm}
+    \begin{block}{人工标注灰度库}
+        当前另有 3 个标注文档、17 条案例、44 个词条、121 条证据、64 个过程步骤。主库用于展示相对稳定成果；标注库用于保存工作稿、AI 整理与人工复核材料。
+    \end{block}
+\end{frame}
+
+\begin{frame}{两条数据管线}
+    \begin{columns}[T]
+        \column{0.49\textwidth}
+        \begin{exampleblock}{主库管线}
+            \centering
+            \texttt{source.txt}\\
+            $\downarrow$\\
+            \texttt{parser.py / importer.py}\\
+            $\downarrow$\\
+            \texttt{dictionary.db}\\
+            $\downarrow$\\
+            \texttt{sqlite-snapshot.json}\\
+            $\downarrow$\\
+            网站展示
+        \end{exampleblock}
+        \column{0.49\textwidth}
+        \begin{exampleblock}{标注库管线}
+            \centering
+            DOCX 人工标注\\
+            $\downarrow$\\
+            JSON / AI 规范化\\
+            $\downarrow$\\
+            \texttt{annotations.db}\\
+            $\downarrow$\\
+            \texttt{annotation-snapshot.json}\\
+            $\downarrow$\\
+            人工库 / AI释证
+        \end{exampleblock}
+    \end{columns}
+    \vspace{0.25cm}
+    \begin{center}
+        \key{成熟成果与研究工作稿分离，避免把待核材料混入主库。}
+    \end{center}
+\end{frame}
+
+\begin{frame}{网站页面：多种材料形态共同展示}
+    \begin{columns}[T]
+        \column{0.52\textwidth}
+        \begin{itemize}
+            \item 首页：用“造舟于河”讲清一条考据。
+            \item 数据库页：字词、案例、书证、结构四种视角。
+            \item 详情页：展开证据链和出处。
+            \item 术语页：辅助理解训诂概念。
+            \item 人工标注库：展示 DOCX 标注转出的结构化成果。
+            \item AI 释证：输出草案，同时展开引用材料。
+        \end{itemize}
+        \column{0.42\textwidth}
+        \begin{center}
+            \includegraphics[width=\linewidth]{step.png}
+        \end{center}
+    \end{columns}
+    \vspace{0.1cm}
+    \begin{center}
+        \small \url{https://gaoyou-demo1.up.railway.app/}
+    \end{center}
+\end{frame}
+
+\section{多模态与泛化}
+
+\begin{frame}{这里的“多模态”是什么意思}
+    \begin{block}{不是只做文本检索}
+        本项目同时处理多种材料形态，并让它们在同一条案例中互相指向。
+    \end{block}
+    \begin{columns}[T]
+        \column{0.33\textwidth}
+        \begin{exampleblock}{文本}
+            原典、引文、二王论述、现代整理说明。
+        \end{exampleblock}
+        \column{0.33\textwidth}
+        \begin{exampleblock}{结构}
+            字段、表关系、证据类型、过程步骤。
+        \end{exampleblock}
+        \column{0.33\textwidth}
+        \begin{exampleblock}{界面}
+            流程图、数据库页、详情页、引用展开、AI 草案。
+        \end{exampleblock}
+    \end{columns}
+    \vspace{0.25cm}
+    \begin{center}
+        \pill{原文} \quad \pill{批注} \quad \pill{JSON} \quad \pill{SQLite} \quad \pill{网页} \quad \pill{AI 输出}
+    \end{center}
+\end{frame}
+
+\begin{frame}{AI 的位置：可核对的辅助}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \begin{block}{可以辅助}
+            \begin{itemize}
+                \item 相似案例召回
+                \item 证据片段匹配
+                \item “立论—取证—释理—结论”草稿
+                \item 提醒人工复核点
+            \end{itemize}
+        \end{block}
+        \column{0.48\textwidth}
+        \begin{block}{不能替代}
+            \begin{itemize}
+                \item 原文与版本核对
+                \item 通假方向判断
+                \item 词义与文意区分
+                \item 最终学术结论
+            \end{itemize}
+        \end{block}
+    \end{columns}
+    \vspace{0.25cm}
+    \begin{center}
+        \key{AI 不做裁判，只做可追溯材料上的助手。}
+    \end{center}
+\end{frame}
+
+\begin{frame}{泛化能力}
+    \begin{block}{可迁移的不是页面，而是方法}
+        只要研究对象具有“疑点—证据—论证—结论”的结构，就可以迁移这套整理框架。
+    \end{block}
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item 段玉裁《说文解字注》知识整理
+            \item 清代考据笔记与校勘札记
+            \item 经传注疏争议条目
+        \end{itemize}
+        \column{0.45\textwidth}
+        \begin{itemize}
+            \item 其他专书训释材料
+            \item 课堂阅读训练平台
+            \item 人机协作标注流程
+        \end{itemize}
+    \end{columns}
+    \vspace{0.25cm}
+    \begin{center}
+        \pill{案例粒度} \quad \pill{证据类型} \quad \pill{过程标注} \quad \pill{人工复核}
+    \end{center}
+\end{frame}
+
+\section{计划与成果}
+
+\begin{frame}{阶段计划}
+    \begin{table}[h]
+        \centering
+        \small
+        \begin{tabularx}{\textwidth}{>{\bfseries}l X X}
+            \toprule
+            阶段 & 任务 & 产出 \\
+            \midrule
+            A & 统一底本、出处、案例模板和术语口径 & 字段规范、首批案例清单 \\
+            B & 完成基础录入、检索、词条页和案例页闭环 & 基础检索原型 \\
+            C & 扩充精校案例，比较典型疑难处理路径 & 不少于 60 条代表性案例 \\
+            D & 探索 AI 辅助召回、证据匹配和草稿生成 & AI 辅助分析说明 \\
+            \bottomrule
+        \end{tabularx}
+    \end{table}
+\end{frame}
+
+\begin{frame}{预期成果}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \begin{block}{项目交付}
+            \begin{itemize}
+                \item 不少于 60 条代表性二王案例精校整理
+                \item 《二王考据案例标注规范》
+                \item 可演示的案例检索原型
+            \end{itemize}
+        \end{block}
+        \column{0.48\textwidth}
+        \begin{block}{研究产出}
+            \begin{itemize}
+                \item 典型疑难处理路径整理说明
+                \item AI 辅助分析实验说明
+                \item 阶段性研究报告或论文初稿
+            \end{itemize}
+        \end{block}
+    \end{columns}
+\end{frame}
+
+\begin{frame}{总结}
+    \begin{center}
+        {\Large 本项目不是再做一个古籍检索入口。}\\[0.45cm]
+        {\Large 它尝试证明：}\\[0.45cm]
+        {\LARGE \key{传统考据过程可以被结构化、复核化、平台化。}}\\[0.55cm]
+        \pill{学术可追溯} \quad \pill{数据可扩展} \quad \pill{方法可泛化}
+    \end{center}
+\end{frame}
+
+\end{document}
