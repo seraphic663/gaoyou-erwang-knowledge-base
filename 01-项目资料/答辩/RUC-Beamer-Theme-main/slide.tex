@@ -10,7 +10,7 @@
 
 \author{赵梓名（组长）、廖展慧、卢飞宇、李汶灿、徐健怡}
 \title{高邮二王考据过程知识库构建及应用}
-\subtitle{高邮二王考据过程知识库构建及应用}
+\subtitle{从训诂考据到可复核的数字人文工作流}
 \institute{高瓴人工智能学院 / 信息学院 / 明德书院 / 文学院}
 \date{2026年5月}
 
@@ -40,6 +40,7 @@
 
 \kaishu
 
+% PDF P1
 \begin{frame}
     \titlepage
     \vspace{-0.45cm}
@@ -49,20 +50,37 @@
     \end{figure}
 \end{frame}
 
+% PDF P2
 \begin{frame}{汇报结构}
     \tableofcontents[sectionstyle=show,subsectionstyle=show/shaded/hide,subsubsectionstyle=show/shaded/hide]
 \end{frame}
 
+% PDF P3：章节页
 \section{问题与对象}
 
+% PDF P4
+\begin{frame}{研究对象}
+    \begin{itemize}
+        \item 高邮二王：王念孙、王引之，清代乾嘉学派代表人物
+        \item 材料边界清楚：《经义述闻》《读书杂志》《经传释词》《广雅疏证》，适合一年周期集中推进
+        \item 方法类型集中：异文切入、校读一体、注重辞例、深挖语境、因声求义等反复出现
+        \item 跨学科表达：传统小学（训诂学）、文献学（校勘学）问题可以转化为结构化数据、检索界面和AI辅助流程
+    \end{itemize}
+    \vspace{0.2cm}
+    \begin{center}
+        \pill{清代考据} \quad \pill{训诂学} \quad \pill{经学解释} \quad \pill{数字人文}
+    \end{center}
+\end{frame}
+
+% PDF P5
 \begin{frame}{从“查得到”到“看得懂”}
     \begin{columns}[T]
         \column{0.48\textwidth}
         \begin{block}{现有平台}
             \begin{itemize}
                 \item 影像浏览、全文检索、条目定位
-                \item 解决“材料在哪里”的问题
-                \item 更偏向对象知识和文本入口
+                \item 能解决“材料在哪里”的问题
+                \item 但更偏向简单的文本入口
             \end{itemize}
         \end{block}
         \column{0.48\textwidth}
@@ -76,23 +94,11 @@
     \end{columns}
     \vspace{0.25cm}
     \begin{center}
-        \Large \key{不是再做一个古籍入口，而是复原判断链条。}
+        \Large \key{不是要再做一个古籍入口，而是复原判断链条。}
     \end{center}
 \end{frame}
 
-\begin{frame}{为什么是高邮二王}
-    \begin{itemize}
-        \item 高邮王念孙、王引之是乾嘉学派代表人物，“王氏四种”集中呈现清代考据学成熟方法。
-        \item 材料边界清楚：《广雅疏证》《经义述闻》《经传释词》《读书杂志》适合一年周期集中推进。
-        \item 方法类型集中：讹字、通假、因声求义、联绵词、虚词释读、句法辨析等反复出现。
-        \item 适合跨学科表达：传统小学、文献学问题可以转化为结构化数据、检索界面和 AI 辅助流程。
-    \end{itemize}
-    \vspace{0.2cm}
-    \begin{center}
-        \pill{清代考据} \quad \pill{训诂学} \quad \pill{经学解释} \quad \pill{数字人文}
-    \end{center}
-\end{frame}
-
+% PDF P6
 \begin{frame}{古典人文学术与现代数智技术的融合}
     \begin{columns}[T]
         \column{0.31\textwidth}
@@ -105,48 +111,56 @@
         \end{exampleblock}
         \column{0.31\textwidth}
         \begin{exampleblock}{智能辅助}
-            相似案例召回、证据匹配、结构草稿、人工复核。
+            人工库相关案例检索、案例内证据筛选、AI 释证草案、引用展开核对。
         \end{exampleblock}
     \end{columns}
     \vspace{0.45cm}
-    \begin{block}{答辩重点}
-        校勘学、训诂学等古典人文学术不是单独讲一套术语，而是作为数据建模和人工复核的规则；现代数智技术也不是包装层，而是让研究过程可展示、可复核、可扩展。
+    \begin{block}{如何融合？}
+        使校勘学、训诂学等古典人文学术，作为数据建模和人工复核的规则；\\
+        使数据库与 AI 等现代数智技术，让人文研究过程可展示、可复核、可扩展。
     \end{block}
 \end{frame}
 
+% PDF P7：章节页
 \section{学术框架}
 
-\begin{frame}{一条考据的结构（据《训诂学原理》）}
+% PDF P8
+\begin{frame}{考据结构流程图}
     \begin{center}
-        \begin{tikzpicture}[>=latex, node distance=1.65cm]
-            \tikzstyle{flowbox}=[rectangle, rounded corners=2pt, draw=rucRed, fill=softRed, minimum width=1.55cm, minimum height=0.68cm, align=center]
-            \node[flowbox] (a) {发疑};
-            \node[flowbox, right of=a] (b) {预设};
-            \node[flowbox, right of=b] (c) {取证};
-            \node[flowbox, right of=c] (d) {释理};
-            \node[flowbox, right of=d] (e) {结论};
-            \node[flowbox, right of=e] (f) {类推};
-            \foreach \x/\y in {a/b,b/c,c/d,d/e,e/f}
-              \draw[->, thick, rucRed] (\x) -- (\y);
-        \end{tikzpicture}
+        \includegraphics[height=0.68\textheight]{step.png}
     \end{center}
-    \vspace{0.25cm}
-    \begin{columns}[T]
-        \column{0.5\textwidth}
-        \begin{itemize}
-            \item 发疑：旧注分歧、字义不通、语境不合。
-            \item 预设：<>
-            \item 取证：书证、声训、义证、形证、异文、语法证据。
-        \end{itemize}
-        \column{0.45\textwidth}
-        \begin{itemize}
-            \item 释理：说明证据为何能推出结论。
-            \item 结论：确证、倾向性假说、待核。
-            \item 类推：<>
-        \end{itemize}
-    \end{columns}
+    \vspace{-0.05cm}
+    \begin{center}
+        \hint{据王宁《训诂学原理（增补本）》第 248 页整理，用于说明考据过程的基本环节。}
+    \end{center}
 \end{frame}
 
+% PDF P9
+\begin{frame}{代表案例：“造舟于河”}
+    \begin{block}{《经义述闻·左传下》}
+        讨论“造舟于河”：这里的“造”应训为\key{比次}，还是训为\key{至}？
+    \end{block}
+    \begin{columns}[T]
+        \column{0.48\textwidth}
+        \begin{itemize}
+            \item 《正义》承认“比舟为梁”，却转训“造”为“至”。
+            \item 王念孙提出：“造之言曹也，相比次之名也。”
+            \item 问题被收束为可证的训释命题。
+        \end{itemize}
+        \column{0.48\textwidth}
+        \begin{itemize}
+            \item “造、次一声之转”。
+            \item “䔏”有副、次之义。
+            \item 薛综注《东京赋》“以舟相比次为桥”可作旁证。
+        \end{itemize}
+    \end{columns}
+    \vspace{0.2cm}
+    \begin{center}
+        \pill{发疑} \quad \pill{设问} \quad \pill{取证} \quad \pill{释理} \quad \pill{结论}
+    \end{center}
+\end{frame}
+
+% PDF P10
 \begin{frame}{训诂学内容怎样进入系统}
     \begin{table}[h]
         \centering
@@ -169,43 +183,11 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{代表案例：“造舟于河”}
-    \begin{block}{争点}
-        《经义述闻·左传下》讨论“造舟于河”：这里的“造”应训为\key{比次}，还是训为\key{至}？
-    \end{block}
-    \begin{columns}[T]
-        \column{0.48\textwidth}
-        \begin{itemize}
-            \item 《正义》承认“比舟为梁”，却转训“造”为“至”。
-            \item 王念孙提出：“造之言曹也，相比次之名也。”
-            \item 问题被收束为可证的训释命题。
-        \end{itemize}
-        \column{0.48\textwidth}
-        \begin{itemize}
-            \item “造、次一声之转”。
-            \item “䔏”有副、次之义。
-            \item 薛综注《东京赋》“以舟相比次为桥”可作旁证。
-        \end{itemize}
-    \end{columns}
-    \vspace{0.2cm}
-    \begin{center}
-        \pill{发疑} \quad \pill{立说} \quad \pill{取证} \quad \pill{释理} \quad \pill{裁断旧说}
-    \end{center}
-\end{frame}
-
-\begin{frame}{流程图：把个案转化为可复核结构}
-    \begin{center}
-        \includegraphics[height=0.68\textheight]{step.png}
-    \end{center}
-    \vspace{-0.05cm}
-    \begin{center}
-        \hint{图示来自当前网站首页流程图，用于说明“发疑—设问—取证—释理—结论”的组织方式。}
-    \end{center}
-\end{frame}
-
+% PDF P11：章节页
 \section{数据库与网站}
 
-\begin{frame}{五类对象承接考据过程}
+% PDF P12
+\begin{frame}{承接考据过程：五种基本数据类型}
     \begin{table}[h]
         \centering
         \small
@@ -215,32 +197,36 @@
             \midrule
             著作 & 二王著作、经典、工具书来源 & 保证出处可追溯 \\
             条目 & 原文、引文、二王论述片段 & 支持后续精细定位 \\
-            词目 & 字、词、术语和义项摘要 & 提供检索入口 \\
-            案例 & 问题、方法、过程、结论、状态 & 保存考据主体 \\
+            案例 & 类型、构成、方法、结论、状态 & 保存考据主体 \\
             证据 & 书证、声训、义证、异文等 & 支撑复核与比较 \\
+            词目 & 字、词、术语 & 提供检索入口 \\
             \bottomrule
         \end{tabularx}
     \end{table}
     \begin{center}
-        \key{词条是入口，案例是中心，证据和出处保证可复核。}
+        \key{词目是入口，案例是中心，证据和出处保证可复核。}
     \end{center}
 \end{frame}
 
+% PDF P13
 \begin{frame}{当前数据基础}
     \vspace{0.25cm}
     \begin{center}
         \numstat{49}{著作来源}
-        \numstat{3385}{词条}
+        \numstat{3385}{词目}
         \numstat{815}{案例}
         \numstat{7120}{证据}
     \end{center}
     \vspace{0.6cm}
     \begin{block}{人工标注灰度库}
-        当前另有 3 个标注文档、17 条案例、44 个词条、121 条证据、64 个过程步骤。主库用于展示相对稳定成果；标注库用于保存工作稿、AI 整理与人工复核材料。
+        当前另有 3 个标注文档、17 条案例、44 个词目、121 条证据、64 个过程步骤。\\
+        主库先完成词目、案例、证据闭环，条目层后续补实；\\
+        标注库保存工作稿、AI 整理与人工复核材料。
     \end{block}
 \end{frame}
 
-\begin{frame}{两条数据管线}
+% PDF P14
+\begin{frame}{两条数据库建立路线}
     \begin{columns}[T]
         \column{0.49\textwidth}
         \begin{exampleblock}{主库管线}
@@ -271,16 +257,17 @@
     \end{columns}
     \vspace{0.25cm}
     \begin{center}
-        \key{成熟成果与研究工作稿分离，避免把待核材料混入主库。}
+        \key{成熟成果与研究工作稿分离；人工标注—AI草案—人工复核—规则迭代形成闭环。}
     \end{center}
 \end{frame}
 
+% PDF P15
 \begin{frame}{网站页面：多种材料形态共同展示}
     \begin{columns}[T]
         \column{0.52\textwidth}
         \begin{itemize}
             \item 首页：用“造舟于河”讲清一条考据。
-            \item 数据库页：字词、案例、书证、结构四种视角。
+            \item 数据库页：字词、案例、书证、结构四种视角，串联不同考据。
             \item 详情页：展开证据链和出处。
             \item 术语页：辅助理解训诂概念。
             \item 人工标注库：展示 DOCX 标注转出的结构化成果。
@@ -297,16 +284,17 @@
     \end{center}
 \end{frame}
 
-\section{多模态与泛化}
+% PDF P16：章节页
+\section{泛化与应用前景}
 
-\begin{frame}{这里的“多模态”是什么意思}
-    \begin{block}{不是只做文本检索}
-        本项目同时处理多种材料形态，并让它们在同一条案例中互相指向。
+% PDF P17
+\begin{frame}{如何泛化？}
+    \begin{block}{同时处理多种材料形态，并且使之互相关联}
     \end{block}
     \begin{columns}[T]
         \column{0.33\textwidth}
         \begin{exampleblock}{文本}
-            原典、引文、二王论述、现代整理说明。
+            原典、引文、二王论述。
         \end{exampleblock}
         \column{0.33\textwidth}
         \begin{exampleblock}{结构}
@@ -323,6 +311,32 @@
     \end{center}
 \end{frame}
 
+% PDF P18
+\begin{frame}{泛化能力}
+    \begin{block}{可迁移的不是页面，而是方法}
+        只要研究对象具有“疑点—证据—论证—结论”的结构，就可以迁移这套整理框架。
+    \end{block}
+    \begin{columns}[T]
+        \column{0.5\textwidth}
+        \begin{itemize}
+            \item 段玉裁《说文解字注》知识整理
+            \item 清代考据笔记与校勘札记
+            \item 经传注疏争议条目
+        \end{itemize}
+        \column{0.45\textwidth}
+        \begin{itemize}
+            \item 其他专书训释材料
+            \item 课堂阅读训练平台
+            \item 人机协作标注流程
+        \end{itemize}
+    \end{columns}
+    \vspace{0.25cm}
+    \begin{center}
+        \pill{案例粒度} \quad \pill{证据类型} \quad \pill{过程标注} \quad \pill{人工复核}
+    \end{center}
+\end{frame}
+
+% PDF P19
 \begin{frame}{AI 的位置：可核对的辅助}
     \begin{columns}[T]
         \column{0.48\textwidth}
@@ -350,73 +364,37 @@
     \end{center}
 \end{frame}
 
-\begin{frame}{泛化能力}
-    \begin{block}{可迁移的不是页面，而是方法}
-        只要研究对象具有“疑点—证据—论证—结论”的结构，就可以迁移这套整理框架。
-    \end{block}
-    \begin{columns}[T]
-        \column{0.5\textwidth}
-        \begin{itemize}
-            \item 段玉裁《说文解字注》知识整理
-            \item 清代考据笔记与校勘札记
-            \item 经传注疏争议条目
-        \end{itemize}
-        \column{0.45\textwidth}
-        \begin{itemize}
-            \item 其他专书训释材料
-            \item 课堂阅读训练平台
-            \item 人机协作标注流程
-        \end{itemize}
-    \end{columns}
-    \vspace{0.25cm}
-    \begin{center}
-        \pill{案例粒度} \quad \pill{证据类型} \quad \pill{过程标注} \quad \pill{人工复核}
-    \end{center}
-\end{frame}
-
+% PDF P20：章节页
 \section{计划与成果}
 
-\begin{frame}{阶段计划}
+% PDF P21
+\begin{frame}{阶段计划与预期成果}
+    \small
     \begin{table}[h]
         \centering
-        \small
+        \setlength{\tabcolsep}{4pt}
+        \renewcommand{\arraystretch}{1.08}
         \begin{tabularx}{\textwidth}{>{\bfseries}l X X}
             \toprule
-            阶段 & 任务 & 产出 \\
+            阶段 & 推进重点 & 交付成果 \\
             \midrule
             A & 统一底本、出处、案例模板和术语口径 & 字段规范、首批案例清单 \\
-            B & 完成基础录入、检索、词条页和案例页闭环 & 基础检索原型 \\
-            C & 扩充精校案例，比较典型疑难处理路径 & 不少于 60 条代表性案例 \\
-            D & 探索 AI 辅助召回、证据匹配和草稿生成 & AI 辅助分析说明 \\
+            B & 建立词目、案例、证据的检索闭环 & 可视化、可检索的数据平台 \\
+            C & 扩充精校精选案例，比较典型疑难处理路径 & 不少于 500 条案例；考据教学资源 \\
+            D & 探索 AI 辅助召回、证据匹配和草稿生成 & 人机协作标注流程；AI 辅助分析说明 \\
             \bottomrule
         \end{tabularx}
     \end{table}
+    \vspace{0.25cm}
+    \begin{block}{最终形成}
+        《高邮二王考据案例标注规范》、可复用数据库路线、典型疑难处理路径整理说明，以及《高邮二王考据研究》读书报告或研究论文。
+    \end{block}
 \end{frame}
 
-\begin{frame}{预期成果}
-    \begin{columns}[T]
-        \column{0.48\textwidth}
-        \begin{block}{项目交付}
-            \begin{itemize}
-                \item 不少于 60 条代表性二王案例精校整理
-                \item 《二王考据案例标注规范》
-                \item 可演示的案例检索原型
-            \end{itemize}
-        \end{block}
-        \column{0.48\textwidth}
-        \begin{block}{研究产出}
-            \begin{itemize}
-                \item 典型疑难处理路径整理说明
-                \item AI 辅助分析实验说明
-                \item 阶段性研究报告或论文初稿
-            \end{itemize}
-        \end{block}
-    \end{columns}
-\end{frame}
-
+% PDF P22
 \begin{frame}{总结}
     \begin{center}
-        {\Large 本项目不是再做一个古籍检索入口。}\\[0.45cm]
+        {\Large 本项目不是要再做一个古籍检索入口。}\\[0.45cm]
         {\Large 它尝试证明：}\\[0.45cm]
         {\LARGE \key{传统考据过程可以被结构化、复核化、平台化。}}\\[0.55cm]
         \pill{学术可追溯} \quad \pill{数据可扩展} \quad \pill{方法可泛化}

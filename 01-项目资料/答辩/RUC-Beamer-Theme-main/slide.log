@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (MiKTeX 26.5) (preloaded format=xelatex 2026.5.16)  17 MAY 2026 11:39
+This is XeTeX, Version 3.141592653-2.6-0.999998 (MiKTeX 26.5) (preloaded format=xelatex 2026.5.16)  17 MAY 2026 15:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1668,19 +1668,19 @@ Package fontspec Info:
 (fontspec)             - 'normal' (m/n) with NFSS spec.:
 (fontspec)             <->"KaiTi/OT:script=hani;language=dflt;"
 
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
-Invalid UTF-8 byte or sequence at line 50 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
+Invalid UTF-8 byte or sequence at line 51 replaced by U+FFFD.
 File: pic/Renmin_Univ_Logo.eps Graphic file (type eps)
 <pic/Renmin_Univ_Logo.eps>
 File: pic/background.pdf Graphic file (type pdf)
@@ -1699,37 +1699,37 @@ File: pic/background.pdf Graphic file (type pdf)
  [3
 
 ]
-LaTeX Font Info:    Trying to load font information for U+msa on input line 81.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 73.
 
 
 (C:\Users\31572\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 81.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 73.
 
 
 (C:\Users\31572\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 81.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 73.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 81.
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 73.
 LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <6> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 81.
-
-
-LaTeX Font Warning: Font shape `TU/KaiTi(0)/b/n' undefined
-(Font)              using `TU/KaiTi(0)/m/n' instead on input line 81.
-
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 73.
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
+
 [4
 
 ]
+
+LaTeX Font Warning: Font shape `TU/KaiTi(0)/b/n' undefined
+(Font)              using `TU/KaiTi(0)/m/n' instead on input line 99.
+
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
- [5
+[5
 
 ]
 File: pic/background.pdf Graphic file (type pdf)
@@ -1742,6 +1742,8 @@ File: pic/background.pdf Graphic file (type pdf)
  [7
 
 ]
+File: ../../../03-项目网站/media/step.png Graphic file (type bmp)
+<../../../03-项目网站/media/step.png>
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [8
@@ -1756,14 +1758,12 @@ File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [10
 
-]
-File: ../../../03-项目网站/media/step.png Graphic file (type bmp)
-<../../../03-项目网站/media/step.png>
+] (slide.toc)
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [11
 
-] (slide.toc)
+]
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [12
@@ -1772,11 +1772,6 @@ File: pic/background.pdf Graphic file (type pdf)
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [13
-
-]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [14
 
 ]
 
@@ -1795,7 +1790,7 @@ Package fontspec Info:
 (fontspec)             doesn't exist).
 
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
-76.
+62.
 
 (C:\Users\31572\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -1813,7 +1808,7 @@ Package fontspec Info:
 
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
- [15
+ [14
 
 ]
 File: ../../../03-项目网站/media/step.png Graphic file (type bmp)
@@ -1821,9 +1816,14 @@ File: ../../../03-项目网站/media/step.png Graphic file (type bmp)
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
 
-[16
+[15
 
 ] (slide.toc)
+File: pic/background.pdf Graphic file (type pdf)
+<use pic/background.pdf>
+ [16
+
+]
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [17
@@ -1838,12 +1838,12 @@ File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [19
 
-]
+] (slide.toc)
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [20
 
-] (slide.toc)
+]
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [21
@@ -1852,16 +1852,6 @@ File: pic/background.pdf Graphic file (type pdf)
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [22
-
-]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [23
-
-]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [24
 
 ]
 \tf@nav=\write6
@@ -1883,15 +1873,15 @@ L3 programming layer <2022/07/14>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `slide.out' has not changed.
-(rerunfilecheck)             Checksum: AA27EF085E563E3EAB9F8C989CBD3947;423.
+(rerunfilecheck)             Checksum: 2A857752E0008F2A4B5C34C492A38D34;431.
  ) 
 Here is how much of TeX's memory you used:
- 31045 strings out of 402807
- 700649 string characters out of 5445135
- 1116954 words of memory out of 5000000
- 59325 multiletter control sequences out of 15000+600000
+ 31091 strings out of 402807
+ 706752 string characters out of 5445135
+ 1112327 words of memory out of 5000000
+ 59371 multiletter control sequences out of 15000+600000
  698839 words of font info for 135 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
  128i,20n,123p,447b,905s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on slide.pdf (24 pages).
+Output written on slide.pdf (22 pages).
