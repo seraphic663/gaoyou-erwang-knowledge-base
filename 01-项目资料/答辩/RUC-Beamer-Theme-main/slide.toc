@@ -1,5 +1,5 @@
 \beamer@sectionintoc {1}{问题与对象}{3}{0}{1}
-\beamer@sectionintoc {2}{学术框架}{7}{0}{2}
-\beamer@sectionintoc {3}{数据库与网站}{11}{0}{3}
-\beamer@sectionintoc {4}{泛化与应用前景}{16}{0}{4}
+\beamer@sectionintoc {2}{学术框架}{8}{0}{2}
+\beamer@sectionintoc {3}{数据库与网站}{12}{0}{3}
+\beamer@sectionintoc {4}{泛化与应用前景}{17}{0}{4}
 \beamer@sectionintoc {5}{计划与成果}{20}{0}{5}
