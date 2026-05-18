@@ -2,6 +2,19 @@
 .DS_Store
 Thumbs.db
 .vscode/*.log
+.claude/
+.vscode/
+
+# ---- LaTeX generated files ----
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
 
 # ---- Python / Node cache (if any) ----
 __pycache__/
