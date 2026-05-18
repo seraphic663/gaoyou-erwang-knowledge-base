@@ -1,4 +1,0 @@
-\beamer@sectionintoc {1}{立项依据}{3}{0}{1}
-\beamer@sectionintoc {2}{研究方案}{6}{0}{2}
-\beamer@sectionintoc {3}{研究创新}{13}{0}{3}
-\beamer@sectionintoc {4}{项目规划和预期成果}{17}{0}{4}
