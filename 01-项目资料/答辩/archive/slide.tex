@@ -59,7 +59,7 @@
 \section{立项依据}
 
 % PDF P4
-\begin{frame}{高邮二王与王氏四种}
+\begin{frame}{高邮二王与“王氏四种”}
     \footnotesize
     \vspace{-0.35cm}
 
@@ -125,30 +125,39 @@
 \end{frame}
 
 % PDF P4
-\begin{frame}{立项依据与切入点}
-    \small
+\begin{frame}{研究对象}
+    \begin{itemize}
+        \item 高邮二王：王念孙、王引之，清代乾嘉学派代表人物
+        \item 材料边界清楚：《经义述闻》《读书杂志》《经传释词》《广雅疏证》，适合一年周期集中推进
+        \item 方法类型集中：异文切入、校读一体、注重辞例、深挖语境、因声求义等反复出现
+        \item 跨学科表达：传统小学（训诂学）、文献学（校勘学）问题可以转化为结构化数据、检索界面和AI辅助流程
+    \end{itemize}
+    \vspace{0.2cm}
+    \begin{center}
+        \pill{清代考据} \quad \pill{训诂学} \quad \pill{经学解释} \quad \pill{数字人文}
+    \end{center}
+\end{frame}
+
+% PDF P5
+\begin{frame}{从“查得到”到“看得懂”}
     \begin{columns}[T]
         \column{0.48\textwidth}
-        \begin{block}{研究对象明确}
+        \begin{block}{现有平台}
             \begin{itemize}
-                \item 范围明确：核心材料集中在王氏四种。
-                \item 方法稳定：异文、校读、辞例、语境、因声求义等方法反复出现。
-                \item 可结构化：材料核对、证据组织和判断步骤，可转为可保存、可检索、可复核的结构。
+                \item 影像浏览、全文检索、条目定位
+                \item 能解决“材料在哪里”的问题
+                \item 但更偏向简单的文本入口
             \end{itemize}
         \end{block}
         \column{0.48\textwidth}
-        \begin{block}{切入点独特}
+        \begin{block}{我们的切入点}
             \begin{itemize}
-                \item 现有平台侧重影像浏览、全文检索、条目定位，解决“材料在哪里”的问题。
-                \item 但它更偏向简单的文本入口，难以呈现考据过程。
-                \item 我们关注一条考据怎样成立，证据如何组织，并记录过程性方法知识。
+                \item 一条考据怎样成立
+                \item 证据如何组织，旧说如何裁断
+                \item 保存方法知识和过程性知识
             \end{itemize}
         \end{block}
     \end{columns}
-    \vspace{0.18cm}
-    \begin{center}
-        \key{从“材料在哪里”推进到“一条考据怎样成立”}
-    \end{center}
 \end{frame}
 
 % PDF P7：章节页
@@ -177,18 +186,41 @@
     {
     \renewcommand{\arraystretch}{1.20}
     \begin{tabularx}{\textwidth}{>{\bfseries\arraybackslash}p{0.08\textwidth} X}
-        发疑 & 李巡、孙炎以“比”释“造舟”，孔颖达转训“造”为“至”，形成歧说。\\
-        设问 & 王氏所要确认的是：“造”在此是否本有“比次”义。\\
-        取证 & 以“造之言曹”“造、次一声之转”为音义证据；并举“薳氏之造”“属车之造”等书证。\\
-        释理 & 以声求义，并用“副倅”“属车”“造舟”诸例互证，使字义、句义、文意相安。\\
-        结论 & 李巡、孙炎所说“比舟”正切“造”义；转训为“至”“作”“诣”“成”皆属望文生训。\\
-        类推 & 此例争点明确、证据层次清楚，适合展示“考据过程如何被结构化”。\\
+        发疑 & 李巡、孙炎以“比”训“造”，孔颖达以“至”训“造”，解释上有歧义。\\
+        设问 & 王引之转述王念孙意见，支持“造”训“比次”，关键在于寻找“比次”之证。\\
+        取证 & “造”与“曹”相通，又与“次”相通；“次”有“贰”义，即“并列”之义。\\
+        释理 & 以形索义、因声求义，并以“䔏”为副卒、属车等旁证比较互证。\\
+        结论 & 李巡、孙炎皆言比舟，正释“造”字之义；孔颖达转训为“至”不当。\\
+        类推 & 此例结构完整，可作为“发疑—设问—取证—释理—结论—类推”的典型考据。\\
     \end{tabularx}
     }
 \end{frame}
 
+% PDF P10
+\begin{frame}{训诂学内容入库}
+    \begin{center}
+        \small\textbf{训诂术语的层级落点}
+    \end{center}
+    \vspace{-0.24cm}
+    \begin{table}[h]
+        \centering
+        \small
+        \begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.15\textwidth} p{0.25\textwidth} X}
+            \toprule
+            层级 & 术语 & 系统中的落点 \\
+            \midrule
+            训释对象 & 文意训释 / 词义训释 & 区分句意判断与字词训释，避免把语境解释误作稳定义项 \\
+            具体方法 & 形训、声训、义训 & 进入方法标签、释理说明和证据类型 \\
+            声音路径 & 因声求义、通假 & 处理音近、字通与异文问题，形成核对事项 \\
+            互证原则 & 形音义互求 & 作为同类案例比较和证据互证的观察框架 \\
+            风险提示 & 望文生训 & 用于旧说裁断、反证说明和人工复核提醒 \\
+            \bottomrule
+        \end{tabularx}
+    \end{table}
+\end{frame}
+
 % PDF P12
-\begin{frame}{从考据过程到数据类型}
+\begin{frame}{承接考据结构}
     \begin{center}
         \small\textbf{五种基本数据类型}
     \end{center}
@@ -209,64 +241,48 @@
         \end{tabularx}
     \end{table}
     \begin{center}
-        \key{词目是入口，案例是中心，证据和出处保证可复核}
+        \key{词目是入口，案例是中心，证据和出处保证可复核。}
     \end{center}
-\end{frame}
-
-% PDF P10
-\begin{frame}{训诂学内容入库}
-    \begin{center}
-        \small\textbf{训诂术语的层级落点}
-    \end{center}
-    \vspace{-0.24cm}
-    \begin{table}[h]
-        \centering
-        \small
-        \begin{tabularx}{0.96\textwidth}{>{\bfseries}p{0.15\textwidth} p{0.25\textwidth} X}
-            \toprule
-            层级 & 术语 & 系统中的落点 \\
-            \midrule
-            训释对象 & 文意训释 / 词义训释 & 区分句意判断与字词训释，避免把语境解释误作稳定义项 \\
-            具体方法 & 形训、声训、义训 & 进入方法标签、释理说明和证据类型 \\
-            声音路径 & 因声求义、通假 & 处理音近、字通与异文问题，形成核对事项 \\
-            互证原则 & 形音义互求 & 作为同类案例比较和证据互证的观察框架 \\
-            误释风险 & 望文生训 & 用于旧说裁断、反证说明和人工复核提醒 \\
-            \bottomrule
-        \end{tabularx}
-    \end{table}
 \end{frame}
 
 % PDF P14
 \begin{frame}{两条数据库搭建路线}
     \begin{columns}[T]
         \column{0.49\textwidth}
-            \begin{exampleblock}{主数据库}
-                \begin{itemize}
-                    \item 保存较成熟的词目、案例、证据和出处。
-                    \item 面向网站检索、案例详情页和统计展示。
-                    \item 由整理后的结构化数据导出为网站快照。
-                \end{itemize}
-                \vspace{0.12cm}
-                \centering
-                {\scriptsize source.txt / dictionary.db / sqlite-snapshot.json}
-            \end{exampleblock}
+        \begin{exampleblock}{主数据库}
+            \centering
+            \texttt{source.txt}\\
+            $\downarrow$\\
+            \texttt{parser.py / importer.py}\\
+            $\downarrow$\\
+            \texttt{dictionary.db}\\
+            $\downarrow$\\
+            \texttt{sqlite-snapshot.json}\\
+            $\downarrow$\\
+            网站展示
+        \end{exampleblock}
         \column{0.49\textwidth}
-            \begin{exampleblock}{人工标注库}
-                \begin{itemize}
-                    \item 保存工作稿、AI 草案和人工复核材料。
-                    \item 面向标注检查、证据补充和规则迭代。
-                    \item 成熟后再进入主数据库。
-                \end{itemize}
-                \vspace{0.12cm}
-                \centering
-                {\scriptsize DOCX / annotations.db / annotation-snapshot.json}
-            \end{exampleblock}
+        \begin{exampleblock}{人工标注库}
+            \centering
+            DOCX 人工标注\\
+            $\downarrow$\\
+            JSON / AI 规范化\\
+            $\downarrow$\\
+            \texttt{annotations.db}\\
+            $\downarrow$\\
+            \texttt{annotation-snapshot.json}\\
+            $\downarrow$\\
+            人工库 / AI释证
+        \end{exampleblock}
     \end{columns}
     \vspace{0.25cm}
     \begin{center}
-        \key{成熟成果与研究工作稿分离；人工标注—AI草案—人工复核—规则迭代形成闭环}
+        \key{成熟成果与研究工作稿分离；人工标注—AI草案—人工复核—规则迭代形成闭环。}
     \end{center}
 \end{frame}
+
+% PDF P16：章节页
+\section{研究创新}
 
 % PDF P15
 \begin{frame}{网站页面：多种材料形态共同展示}
@@ -284,16 +300,13 @@
         \vspace{-0.2cm}
         \centering
         \hspace{0.3cm}
-            {\includegraphics[width=0.96\linewidth,height=0.74\textheight,keepaspectratio]{homepage.jpg}}
+            {\includegraphics[width=0.96\linewidth,height=0.80\textheight,keepaspectratio]{homepage.jpg}}
     \end{columns}
     \vspace{0.1cm}
     \begin{center}
         \small \url{https://gaoyou-demo1.up.railway.app/}
     \end{center}
 \end{frame}
-
-% PDF P16：章节页
-\section{研究创新}
 
 % PDF P17
 \begin{frame}{古典人文学术与现代数智技术的融合}
@@ -304,7 +317,7 @@
         \end{exampleblock}
         \column{0.31\textwidth}
         \begin{exampleblock}{数据组织}
-            词目、案例、证据、出处、过程步骤的组织与展示。
+            字段设计、SQLite、快照导出、前端检索。
         \end{exampleblock}
         \column{0.31\textwidth}
         \begin{exampleblock}{智能辅助}
@@ -321,7 +334,7 @@
 % PDF P18
 \begin{frame}{泛化能力：从材料到平台}
     \begin{block}{方法迁移}
-        迁移我们的整理流程：把原文、引文和论述转成可复核的结构，再由界面支持检索、阅读和教学。
+        把原文、引文和论述转成可复核的结构，再由界面支持检索、阅读和教学。
     \end{block}
     \begin{columns}[T]
         \column{0.50\textwidth}
@@ -355,7 +368,7 @@
             \begin{itemize}
                 \item 相似案例检索
                 \item 证据片段匹配
-                \item 结构化草稿生成
+                \item “设问—取证—释理—结论”草稿
                 \item 提醒人工复核点
             \end{itemize}
         \end{block}
@@ -365,7 +378,7 @@
                 \item 原文与版本核对
                 \item 通假方向判断
                 \item 词义与文意区分
-                \item 最终学术结论确定
+                \item 最终学术结论
             \end{itemize}
         \end{block}
     \end{columns}
@@ -404,7 +417,7 @@
             \midrule
             A & 统一底本、出处、案例模板和术语口径 & 字段规范、首批案例清单 \\
             B & 建立词目、案例、证据的检索闭环 & 可视化、可检索的数据平台 \\
-            C & 扩充精选案例，完善典型疑难处理路径 & 不少于 00 条精选案例；考据教学文件 \\
+            C & 扩充精选案例，完善典型疑难处理路径 & 不少于 500 条精选案例；考据教学文件 \\
             D & 探索项目方法向其他考据主题迁移 & 泛化应用说明；人机协作标注流程 \\
             \bottomrule
         \end{tabularx}

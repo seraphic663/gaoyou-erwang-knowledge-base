@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999998 (MiKTeX 26.5) (preloaded format=xelatex 2026.5.16)  17 MAY 2026 20:36
+This is XeTeX, Version 3.141592653-2.6-0.999998 (MiKTeX 26.5) (preloaded format=xelatex 2026.5.16)  18 MAY 2026 22:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1739,32 +1739,32 @@ File: pic/background.pdf Graphic file (type pdf)
 [4
 
 ]
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 139.
-LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
-(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 139.
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 152.
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <7> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 152.
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [5
 
-]
+] (slide.toc)
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [6
 
 ]
+File: pic/step.png Graphic file (type bmp)
+<pic/step.png>
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [7
 
-] (slide.toc)
+]
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [8
 
 ]
-File: pic/step.png Graphic file (type bmp)
-<pic/step.png>
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [9
@@ -1775,26 +1775,17 @@ File: pic/background.pdf Graphic file (type pdf)
  [10
 
 ]
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <10.95> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 269.
+LaTeX Font Info:    Font shape `T1/lmss/m/it' in size <8> not available
+(Font)              Font shape `T1/lmss/m/sl' tried instead on input line 269.
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [11
 
-] (slide.toc)
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [12
-
 ]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [13
-
-]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [14
-
-]
+File: pic/homepage.jpg Graphic file (type bmp)
+<pic/homepage.jpg>
 
 Package fontspec Info: 
 (fontspec)             Could not resolve font "FangSong/BI" (it probably
@@ -1810,8 +1801,8 @@ Package fontspec Info:
 (fontspec)             Could not resolve font "FangSong/I" (it probably
 (fontspec)             doesn't exist).
 
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3
-25.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
+93.
 
 (C:\Users\31572\AppData\Local\Programs\MiKTeX\tex/latex/lm\t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -1829,18 +1820,28 @@ Package fontspec Info:
 
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
+ [12
+
+]
+(slide.toc)
+File: pic/background.pdf Graphic file (type pdf)
+<use pic/background.pdf>
+ [13
+
+]
+File: pic/background.pdf Graphic file (type pdf)
+<use pic/background.pdf>
+ [14
+
+]
+File: pic/background.pdf Graphic file (type pdf)
+<use pic/background.pdf>
  [15
 
 ]
-File: pic/homepage.jpg Graphic file (type bmp)
-<pic/homepage.jpg>
-
-Overfull \vbox (3.65775pt too high) detected at line 349
- []
-
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
-[16
+ [16
 
 ] (slide.toc)
 File: pic/background.pdf Graphic file (type pdf)
@@ -1857,20 +1858,10 @@ File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [19
 
-] (slide.toc)
+]
 File: pic/background.pdf Graphic file (type pdf)
 <use pic/background.pdf>
  [20
-
-]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [21
-
-]
-File: pic/background.pdf Graphic file (type pdf)
-<use pic/background.pdf>
- [22
 
 ]
 \tf@nav=\write6
@@ -1892,15 +1883,15 @@ L3 programming layer <2022/07/14>
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
 Package rerunfilecheck Info: File `slide.out' has not changed.
-(rerunfilecheck)             Checksum: 2A857752E0008F2A4B5C34C492A38D34;431.
+(rerunfilecheck)             Checksum: D180529883E99A30BD3CE1DD3EF6AE64;340.
  ) 
 Here is how much of TeX's memory you used:
- 31115 strings out of 402807
- 702591 string characters out of 5445135
- 1110645 words of memory out of 5000000
- 59378 multiletter control sequences out of 15000+600000
+ 31033 strings out of 402807
+ 697885 string characters out of 5445135
+ 1105235 words of memory out of 5000000
+ 59298 multiletter control sequences out of 15000+600000
  700537 words of font info for 144 fonts, out of 8000000 for 9000
  1348 hyphenation exceptions out of 8191
- 128i,20n,123p,447b,905s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 128i,20n,123p,447b,872s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
-Output written on slide.pdf (22 pages).
+Output written on slide.pdf (20 pages).
