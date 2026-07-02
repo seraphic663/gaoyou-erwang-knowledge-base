@@ -24,6 +24,9 @@ node_modules/
 # ---- Personal notes not for repo ----
 note/
 
+# ---- Archive literature (large PDFs, not for repo) ----
+06-归档文献/
+
 # ---- Runtime / backup artifacts ----
 **/*.broken.*
 ~$*.docx
