@@ -32,8 +32,8 @@
   -> 02-数据库/data/annotations.db
   -> 03-项目网站/scripts/annotation_bridge.py
   -> 03-项目网站/data/annotation-snapshot.json
-  -> 03-项目网站/annotation.html
-  -> 03-项目网站/ai-annotation.html
+  -> 03-项目网站/web/annotation.html
+  -> 03-项目网站/web/ai-annotation.html
 ```
 
 这条链路不混入 `dictionary.db` 主库。`annotation.html` 只做人工库数据库浏览，`ai-annotation.html` 调用 AI 释证并引用人工库与主库材料。
@@ -47,14 +47,16 @@
 ```text
 D:\26大创
 ├─ 01-项目资料/        项目管理与答辩材料
-│  ├─ 立项申报书/      申报书 DOCX / PDF
-│  └─ 答辩/            Beamer 源文件、图片、参考文献和生成 PDF
+│  ├─ 立项申报.pdf     立项申报材料
+│  ├─ 立项答辩.pdf     立项答辩材料
+│  └─ 组会谈话/        组会记录、讨论纪要和设计来源
 ├─ 02-数据库/          数据加工与 SQLite 数据层
 │  ├─ main/            主库解析、入库脚本和 schema
 │  ├─ annotation/      人工标注库入库脚本和 schema
 │  ├─ lib/             两条管线共享的连接与快照工具
 │  └─ data/            dictionary.db 与 annotations.db
 ├─ 03-项目网站/        展示网站、API 服务与前端数据快照
+│  ├─ web/             HTML 页面、前端 JS 与 CSS 静态资源
 │  ├─ src/             Node 服务、配置、数据源适配
 │  ├─ scripts/         SQLite 到 JSON 快照的同步脚本
 │  ├─ data/            线上读取的 JSON 快照
@@ -65,8 +67,7 @@ D:\26大创
 │  ├─ B-一级资料/      原始资料与辑本文献
 │  ├─ C-二级资料/      研究论文和参考资料
 │  └─ D-标注/          人工标注 DOCX、JSON 与 AI 释证中间结果
-├─ 05-组会谈话/        组会记录、讨论纪要和设计来源
-└─ 06-归档文献/        大体量归档 PDF；已加入 .gitignore，不进入 Git
+└─ 05-归档文献/        大体量归档 PDF；已加入 .gitignore，不进入 Git
 ```
 
 根目录只保留跨模块配置和总说明：`package.json` 统一提供网站启动与同步命令，`Dockerfile` / `railway.toml` / `.dockerignore` 服务部署，`README.md` 记录当前架构与维护口径。
@@ -75,7 +76,7 @@ D:\26大创
 
 - `02-数据库/` 是本地数据生产区，负责从文本、标注文件重建 SQLite。
 - `03-项目网站/` 是运行区，线上只读取 `03-项目网站/data/` 下的 JSON 快照。
-- `04-项目文献/` 保留仍参与阅读、标注和释证的文献；`06-归档文献/` 只放大体量归档扫描件，不纳入 Git。
+- `04-项目文献/` 保留仍参与阅读、标注和释证的文献；`05-归档文献/` 只放大体量归档扫描件，不纳入 Git。
 - 数据库与网站之间通过 `npm run sync:sqlite`、`npm run sync:annotation` 显式同步，避免网站运行时依赖本地加工目录。
 
 ## 本地运行

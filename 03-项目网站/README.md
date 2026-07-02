@@ -65,8 +65,8 @@ npm run sync:sqlite
 02-数据库/data/annotations.db
   -> 03-项目网站/scripts/annotation_bridge.py
   -> 03-项目网站/data/annotation-snapshot.json
-  -> 03-项目网站/annotation.html
-  -> 03-项目网站/ai-annotation.html
+  -> 03-项目网站/web/annotation.html
+  -> 03-项目网站/web/ai-annotation.html
 ```
 
 它不混入主数据库。`annotation.html` 只做人工库数据库浏览，`ai-annotation.html` 承接 AI 释证。更新该库后运行：
@@ -79,27 +79,25 @@ npm run sync:annotation
 
 ```text
 03-项目网站/
-├─ index.html              首页
-├─ database.html           统一数据库浏览页
-├─ annotation.html         人工标注库数据库页
-├─ ai-annotation.html      AI 释证页
-├─ term.html               字词详情页
-├─ case.html               案例详情页
-├─ knowledge.html          术语说明页
-├─ app.js                  首页渲染逻辑
-├─ browser.js              数据库页浏览、检索、分页
-├─ annotation.js           人工标注库前端浏览
-├─ ai-annotation.js        AI 释证前端交互
-├─ detail.js               字词和案例详情页渲染
-├─ knowledge.js            术语说明页内容
-├─ styles.css              全站样式
-├─ server.js               本目录服务入口
-├─ src/                    Node 服务、数据源、结构定义
-├─ scripts/sqlite_bridge.py SQLite 快照导出脚本
-├─ scripts/annotation_bridge.py 人工标注库快照导出脚本
-├─ data/sqlite-snapshot.json 网站真实数据快照
-├─ data/annotation-snapshot.json 人工标注库灰度快照
-└─ media/step.png          首页流程图
+├─ server.js                       本目录服务入口
+├─ package.json                    本目录运行脚本
+├─ web/                            前端静态页面根目录
+│  ├─ index.html                   首页
+│  ├─ database.html                统一数据库浏览页
+│  ├─ annotation.html              人工标注库数据库页
+│  ├─ ai-annotation.html           AI 释证页
+│  ├─ term.html                    字词详情页
+│  ├─ case.html                    案例详情页
+│  ├─ knowledge.html               术语说明页
+│  └─ assets/
+│     ├─ css/styles.css            全站样式
+│     └─ js/                       前端渲染、检索和交互脚本
+├─ src/                            Node 服务、数据源、结构定义
+├─ scripts/sqlite_bridge.py        SQLite 快照导出脚本
+├─ scripts/annotation_bridge.py    人工标注库快照导出脚本
+├─ data/sqlite-snapshot.json       网站真实数据快照
+├─ data/annotation-snapshot.json   人工标注库灰度快照
+└─ media/step.png                  首页流程图
 ```
 
 ## API

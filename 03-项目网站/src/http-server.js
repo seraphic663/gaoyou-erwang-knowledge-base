@@ -96,6 +96,11 @@ function resolveStaticFile(requestPath) {
     return mediaPath || path.join(config.WEB_DIR, '404.not-found');
   }
 
+  if (requestPath.startsWith('/data/')) {
+    const dataPath = safeResolve(config.DATA_DIR, requestPath.slice('/data/'.length));
+    return dataPath || path.join(config.WEB_DIR, '404.not-found');
+  }
+
   let relativePath = requestPath;
   if (relativePath.startsWith('/web/')) {
     relativePath = relativePath.slice('/web'.length);
