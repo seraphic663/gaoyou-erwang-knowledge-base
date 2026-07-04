@@ -12,7 +12,6 @@ const browserList = document.querySelector('#browserList');
 const browserListSection = document.querySelector('#browserListSection');
 const browserSchemaSection = document.querySelector('#browserSchemaSection');
 const browserSchemaSummary = document.querySelector('#browserSchemaSummary');
-const browserStats = document.querySelector('#browserStats');
 const browserSchemaGrid = document.querySelector('#browserSchemaGrid');
 const browserHeroMeta = document.querySelector('#browserHeroMeta');
 const browserPagination = document.querySelector('#browserPagination');
@@ -92,43 +91,18 @@ function renderHeroMeta() {
     .join('');
 }
 
-function renderStats(counts) {
-  if (!browserStats) return;
-
-  const items = [
-    { label: '著作', value: counts.works ?? 0 },
-    { label: '片段', value: counts.passages ?? 0 },
-    { label: '词条', value: counts.terms ?? 0 },
-    { label: '案例', value: counts.cases ?? 0 },
-    { label: '证据', value: counts.evidences ?? 0 },
-  ];
-
-  browserStats.innerHTML = items
-    .map(
-      (item) => `
-        <div class="stat-card">
-          <div class="value">${item.value}</div>
-          <div class="label">${item.label}</div>
-        </div>
-      `,
-    )
-    .join('');
-}
-
 function renderSchema(stores) {
   if (!browserSchemaGrid) return;
 
   browserSchemaGrid.innerHTML = (stores || [])
     .map(
       (store) => `
-        <article class="card">
-          <h3>${escapeHtml(store.label)}</h3>
-          <p>${escapeHtml(store.purpose)}</p>
-          <div class="schema-meta">
-            ${store.keyFields.map((field) => `<span class="tag muted">${escapeHtml(field)}</span>`).join('')}
-            ${store.indexes.map((field) => `<span class="tag">idx:${escapeHtml(field)}</span>`).join('')}
+        <article class="card schema-card">
+          <div class="schema-card-head">
+            <h3>${escapeHtml(store.label)}</h3>
+            <span>${escapeHtml(String(store.count || 0))}</span>
           </div>
-          <p class="db-status">当前记录：${escapeHtml(String(store.count || 0))} 条</p>
+          <p>${escapeHtml(store.purpose)}</p>
         </article>
       `,
     )
@@ -368,11 +342,7 @@ async function runBrowse() {
     browserSearchInput.disabled = false;
     browserModeSelect.value = state.mode;
     browserSearchInput.value = state.query;
-    if (browserSchemaSummary && state.bootstrap?.counts) {
-      browserSchemaSummary.textContent = `展开数据库结构与统计（著作 ${state.bootstrap.counts.works || 0} / 词条 ${state.bootstrap.counts.terms || 0} / 案例 ${state.bootstrap.counts.cases || 0}）`;
-    }
     renderSummary({ total: (state.bootstrap?.stores || []).length });
-    renderStats(state.bootstrap?.counts || {});
     renderSchema(state.bootstrap?.stores || []);
     syncUrl();
     return;
@@ -383,7 +353,7 @@ async function runBrowse() {
   browserModeSelect.value = state.mode;
   browserSearchInput.value = state.query;
   browserListSection.hidden = false;
-  browserSchemaSection.hidden = true;
+  browserSchemaSection.hidden = false;
   browserHeading.textContent = state.view === 'cases' ? '案例库' : '字词库';
 
   const params = new URLSearchParams({
@@ -416,6 +386,7 @@ async function init() {
   if (browserStatus) {
     browserStatus.textContent = `数据库来源：${bootstrap.sourceLabel}`;
   }
+  renderSchema(bootstrap.stores || []);
   await runBrowse();
 }
 

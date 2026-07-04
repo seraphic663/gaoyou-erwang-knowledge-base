@@ -1,3 +1,65 @@
+(() => {
+  const storageKey = 'gaoyou-theme';
+  const root = document.documentElement;
+
+  function getStoredTheme() {
+    try {
+      return localStorage.getItem(storageKey);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function storeTheme(theme) {
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch (error) {
+      // Ignore storage errors; the button still works for the current page.
+    }
+  }
+
+  function resolveInitialTheme() {
+    const stored = getStoredTheme();
+    if (stored === 'light' || stored === 'dark') return stored;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  function applyTheme(theme) {
+    root.dataset.theme = theme;
+    document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+      const nextTheme = theme === 'dark' ? 'light' : 'dark';
+      button.textContent = theme === 'dark' ? '☀' : '☾';
+      button.setAttribute('aria-label', theme === 'dark' ? '切换到浅色主题' : '切换到深色主题');
+      button.setAttribute('title', theme === 'dark' ? '浅色主题' : '深色主题');
+      button.dataset.nextTheme = nextTheme;
+    });
+  }
+
+  function mountThemeToggle() {
+    document.querySelectorAll('.nav-links').forEach((navLinks) => {
+      if (navLinks.querySelector('[data-theme-toggle]')) return;
+      const button = document.createElement('button');
+      button.className = 'theme-toggle';
+      button.type = 'button';
+      button.dataset.themeToggle = 'true';
+      button.addEventListener('click', () => {
+        const nextTheme = button.dataset.nextTheme === 'dark' ? 'dark' : 'light';
+        storeTheme(nextTheme);
+        applyTheme(nextTheme);
+      });
+      navLinks.appendChild(button);
+    });
+    applyTheme(root.dataset.theme || resolveInitialTheme());
+  }
+
+  applyTheme(resolveInitialTheme());
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountThemeToggle);
+  } else {
+    mountThemeToggle();
+  }
+})();
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll('&', '&amp;')

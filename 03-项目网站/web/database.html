@@ -40,6 +40,25 @@
               <h3>筛选范围</h3>
               <div id="browserFilters" class="sidebar-filter-list"></div>
             </article>
+
+            <article class="card sidebar-card browser-preset-card">
+              <h3>常用预设</h3>
+              <div id="browserPresets" class="fold-body browser-preset-list">
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="entry" data-preset-query="周">查某个字词：周</button>
+                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="通假">查某类术语：通假</button>
+                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="古文">查案例片段：古文</button>
+                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">看数据库结构</button>
+              </div>
+            </article>
+
+            <section id="browserSchemaSection" class="browser-panel">
+              <details class="fold-card browser-schema-fold">
+                <summary id="browserSchemaSummary">查看数据库</summary>
+                <div class="fold-body">
+                  <div id="browserSchemaGrid" class="grid grid-2"></div>
+                </div>
+              </details>
+            </section>
           </aside>
 
           <section class="browser-main">
@@ -71,27 +90,7 @@
               </div>
             </article>
 
-            <details class="fold-card browser-preset-fold">
-              <summary>展开常用预设</summary>
-              <div id="browserPresets" class="fold-body browser-preset-list">
-                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="entry" data-preset-query="周">查某个字词：周</button>
-                <button class="preset-chip" type="button" data-preset-view="terms" data-preset-mode="fulltext" data-preset-query="通假">查某类术语：通假</button>
-                <button class="preset-chip" type="button" data-preset-view="cases" data-preset-mode="fulltext" data-preset-query="古文">查案例片段：古文</button>
-                <button class="preset-chip" type="button" data-preset-view="schema" data-preset-mode="entry" data-preset-query="">看数据库结构</button>
-              </div>
-            </details>
-
             <div id="browserSummary" class="search-summary"></div>
-
-            <section id="browserSchemaSection" class="browser-panel" hidden>
-              <details class="fold-card browser-schema-fold">
-                <summary id="browserSchemaSummary">展开数据库结构与统计</summary>
-                <div class="fold-body">
-                  <div id="browserStats" class="stats-grid"></div>
-                  <div id="browserSchemaGrid" class="grid grid-2"></div>
-                </div>
-              </details>
-            </section>
 
             <section id="browserListSection" class="browser-panel">
               <div id="browserList" class="grid grid-2"></div>
