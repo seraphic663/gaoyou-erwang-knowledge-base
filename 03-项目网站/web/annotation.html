@@ -21,9 +21,6 @@
       <div class="hero-content">
         <p class="badge">实验性功能 · 人工标注库</p>
         <h1>人工标注库</h1>
-        <p class="hero-copy">
-          这里只浏览人工标注与 AI 整理后的结构化数据（`02-数据库/data/annotations.db`）。它与主数据库相邻但不融合，不在本页调用 AI。
-        </p>
         <div id="annotationHeroMeta" class="hero-panel"></div>
       </div>
     </header>
@@ -31,39 +28,57 @@
     <main class="section annotation-page">
       <p id="annotationStatus" class="db-status">正在读取人工标注库...</p>
 
-      <section class="card annotation-toolbar">
-        <div class="head-line">
-          <div>
-            <p class="section-kicker">灰度检索</p>
-            <h2>按案例、方法、原文或标注内容查</h2>
-          </div>
-        </div>
-        <div class="browser-search-grid">
-          <label class="toolbar-field">
-            <span>关键词</span>
-            <input id="annotationSearchInput" type="text" placeholder="如 平原之隰 / 误字 / 集韻 / 发疑" />
-          </label>
-          <label class="toolbar-field">
-            <span>来源文档</span>
-            <select id="annotationDocumentSelect"></select>
-          </label>
-          <label class="toolbar-field">
-            <span>方法标签</span>
-            <select id="annotationMethodSelect"></select>
-          </label>
-        </div>
-        <div class="toolbar-actions">
-          <button id="annotationSearchButton" class="page-link toolbar-button" type="button">执行检索</button>
-          <button id="annotationResetButton" class="search-clear toolbar-button" type="button">重置</button>
-        </div>
-      </section>
+      <div class="annotation-layout">
+        <aside class="annotation-sidebar">
+            <article class="card sidebar-card">
+            <h3>来源文档</h3>
+            <div id="annotationDocumentFilters" class="browser-preset-list annotation-filter-list"></div>
+            </article>
 
-      <div id="annotationSummary" class="search-summary"></div>
-      <div id="annotationList" class="annotation-list"></div>
+            <article class="card sidebar-card">
+            <h3>方法标签</h3>
+            <div id="annotationMethodFilters" class="browser-preset-list annotation-filter-list"></div>
+            </article>
+
+          <article class="card sidebar-card annotation-preset-card">
+            <h3>预设搜索</h3>
+            <div id="annotationPresets" class="browser-preset-list">
+              <button class="preset-chip" type="button" data-annotation-query="平原之隰">平原之隰</button>
+              <button class="preset-chip" type="button" data-annotation-query="误字">误字</button>
+              <button class="preset-chip" type="button" data-annotation-query="集韻">集韻</button>
+              <button class="preset-chip" type="button" data-annotation-query="发疑">发疑</button>
+            </div>
+          </article>
+        </aside>
+
+        <section class="annotation-main">
+          <section class="card annotation-toolbar">
+            <div class="head-line">
+              <div>
+                <p class="section-kicker">检索</p>
+                <h2>人工标注库</h2>
+              </div>
+            </div>
+            <div class="annotation-search-row">
+            <label class="toolbar-field annotation-search-field">
+                <input id="annotationSearchInput" type="text" placeholder="输入案例、方法、原文或标注关键词" />
+            </label>
+
+            <div class="toolbar-actions annotation-search-actions">
+                <button id="annotationSearchButton" class="page-link toolbar-button" type="button">检索</button>
+                <button id="annotationResetButton" class="search-clear toolbar-button" type="button">重置</button>
+            </div>
+            </div>
+          </section>
+
+          <div id="annotationSummary" class="search-summary"></div>
+          <div id="annotationList" class="annotation-list"></div>
+        </section>
+      </div>
     </main>
 
     <footer class="footer">
-      <p>人工标注灰度库 · 与主数据库并行，不直接混库</p>
+      <p>人工标注灰度库 · 与主数据库并行</p>
     </footer>
 
     <script src="./assets/js/utils.js"></script>

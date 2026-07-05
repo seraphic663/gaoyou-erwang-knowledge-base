@@ -1,12 +1,13 @@
 const annotationHeroMeta = document.querySelector('#annotationHeroMeta');
 const annotationStatus = document.querySelector('#annotationStatus');
 const annotationSearchInput = document.querySelector('#annotationSearchInput');
-const annotationDocumentSelect = document.querySelector('#annotationDocumentSelect');
-const annotationMethodSelect = document.querySelector('#annotationMethodSelect');
+const annotationDocumentFilters = document.querySelector('#annotationDocumentFilters');
+const annotationMethodFilters = document.querySelector('#annotationMethodFilters');
 const annotationSearchButton = document.querySelector('#annotationSearchButton');
 const annotationResetButton = document.querySelector('#annotationResetButton');
 const annotationSummary = document.querySelector('#annotationSummary');
 const annotationList = document.querySelector('#annotationList');
+const annotationPresets = document.querySelector('#annotationPresets');
 
 const state = {
   snapshot: null,
@@ -52,14 +53,24 @@ function renderFilters() {
   const documents = Object.keys(state.snapshot.documentCounts || {}).sort();
   const methods = Object.keys(state.snapshot.methodCounts || {}).sort();
 
-  annotationDocumentSelect.innerHTML = [
-    '<option value="all">全部文档</option>',
-    ...documents.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}（${escapeHtml(state.snapshot.documentCounts[name])}）</option>`),
+  annotationDocumentFilters.innerHTML = [
+    `<button class="preset-chip ${state.document === 'all' ? 'active' : ''}" type="button" data-annotation-document="all"><span class="filter-label">全部文档</span></button>`,
+    ...documents.map((name) => `
+      <button class="preset-chip ${state.document === name ? 'active' : ''}" type="button" data-annotation-document="${escapeHtml(name)}">
+        <span class="filter-label">${escapeHtml(name)}</span>
+        <span class="filter-count">${escapeHtml(state.snapshot.documentCounts[name])}</span>
+      </button>
+    `),
   ].join('');
 
-  annotationMethodSelect.innerHTML = [
-    '<option value="all">全部方法</option>',
-    ...methods.map((name) => `<option value="${escapeHtml(name)}">${escapeHtml(name)}（${escapeHtml(state.snapshot.methodCounts[name])}）</option>`),
+  annotationMethodFilters.innerHTML = [
+    `<button class="preset-chip ${state.method === 'all' ? 'active' : ''}" type="button" data-annotation-method="all"><span class="filter-label">全部方法</span></button>`,
+    ...methods.map((name) => `
+      <button class="preset-chip ${state.method === name ? 'active' : ''}" type="button" data-annotation-method="${escapeHtml(name)}">
+        <span class="filter-label">${escapeHtml(name)}</span>
+        <span class="filter-count">${escapeHtml(state.snapshot.methodCounts[name])}</span>
+      </button>
+    `),
   ].join('');
 }
 
@@ -288,7 +299,7 @@ function render() {
 async function init() {
   try {
     state.snapshot = await loadSnapshot();
-    annotationStatus.textContent = `灰度库来源：${state.snapshot.description || state.snapshot.sourceLabel}`;
+    annotationStatus.textContent = '这里只浏览人工标注与 AI 整理后的结构化数据，与主数据库并行。';
     renderHero();
     renderFilters();
     render();
@@ -300,8 +311,6 @@ async function init() {
 
 annotationSearchButton?.addEventListener('click', () => {
   state.query = annotationSearchInput.value.trim();
-  state.document = annotationDocumentSelect.value || 'all';
-  state.method = annotationMethodSelect.value || 'all';
   render();
 });
 
@@ -310,8 +319,16 @@ annotationResetButton?.addEventListener('click', () => {
   state.document = 'all';
   state.method = 'all';
   annotationSearchInput.value = '';
-  annotationDocumentSelect.value = 'all';
-  annotationMethodSelect.value = 'all';
+  renderFilters();
+  render();
+});
+
+annotationPresets?.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-annotation-query]');
+  if (!trigger) return;
+
+  state.query = trigger.getAttribute('data-annotation-query') || '';
+  annotationSearchInput.value = state.query;
   render();
 });
 
@@ -319,6 +336,24 @@ annotationSearchInput?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') {
     annotationSearchButton.click();
   }
+});
+
+annotationDocumentFilters?.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-annotation-document]');
+  if (!trigger) return;
+
+  state.document = trigger.getAttribute('data-annotation-document') || 'all';
+  renderFilters();
+  render();
+});
+
+annotationMethodFilters?.addEventListener('click', (event) => {
+  const trigger = event.target.closest('[data-annotation-method]');
+  if (!trigger) return;
+
+  state.method = trigger.getAttribute('data-annotation-method') || 'all';
+  renderFilters();
+  render();
 });
 
 init();
