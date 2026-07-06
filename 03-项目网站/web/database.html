@@ -32,13 +32,18 @@
         <div class="browser-layout">
           <aside class="browser-sidebar">
             <article class="card sidebar-card">
-              <h3>浏览内容</h3>
+              <h3>数据库类别</h3>
               <div id="browserNav" class="sidebar-nav"></div>
             </article>
 
             <article class="card sidebar-card">
-              <h3>筛选范围</h3>
+              <h3>方法类别</h3>
               <div id="browserFilters" class="sidebar-filter-list"></div>
+            </article>
+
+            <article class="card sidebar-card">
+              <h3>检索类别</h3>
+              <div id="browserModeFilters" class="sidebar-filter-list"></div>
             </article>
 
             <article class="card sidebar-card browser-preset-card">
@@ -70,23 +75,15 @@
                 </div>
               </div>
 
-              <div class="browser-search-grid">
-                <label class="toolbar-field">
-                  <span>关键词</span>
+              <div class="browser-search-row">
+                <label class="toolbar-field browser-search-field">
                   <input id="browserSearchInput" type="text" placeholder="输入词条、义项、正文关键词" />
                 </label>
-                <label class="toolbar-field">
-                  <span>检索范围</span>
-                  <select id="browserModeSelect">
-                    <option value="entry">按字词/标题检索</option>
-                    <option value="fulltext">按正文/引文检索</option>
-                  </select>
-                </label>
-              </div>
 
-              <div class="toolbar-actions">
-                <button id="browserSearchButton" class="page-link toolbar-button" type="button">执行检索</button>
-                <button id="browserResetButton" class="search-clear toolbar-button" type="button">重置</button>
+                <div class="toolbar-actions browser-search-actions">
+                  <button id="browserSearchButton" class="page-link toolbar-button" type="button">检索</button>
+                  <button id="browserResetButton" class="search-clear toolbar-button" type="button">重置</button>
+                </div>
               </div>
             </article>
 
@@ -107,6 +104,7 @@
     </footer>
 
     <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/browser-common.js"></script>
     <script src="./assets/js/browser.js"></script>
   </body>
 </html>

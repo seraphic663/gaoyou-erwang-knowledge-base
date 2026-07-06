@@ -1,9 +1,9 @@
 const browserNav = document.querySelector('#browserNav');
 const browserFilters = document.querySelector('#browserFilters');
+const browserModeFilters = document.querySelector('#browserModeFilters');
 const browserStatus = document.querySelector('#browserStatus');
 const browserHeading = document.querySelector('#browserHeading');
 const browserSearchInput = document.querySelector('#browserSearchInput');
-const browserModeSelect = document.querySelector('#browserModeSelect');
 const browserSearchButton = document.querySelector('#browserSearchButton');
 const browserResetButton = document.querySelector('#browserResetButton');
 const browserSummary = document.querySelector('#browserSummary');
@@ -79,34 +79,11 @@ function renderHeroMeta() {
     { label: '来源', value: state.bootstrap.sourceLabel || '未知' },
   ];
 
-  browserHeroMeta.innerHTML = items
-    .map(
-      (item) => `
-        <div class="hero-panel-item">
-          <span class="hero-kicker">${escapeHtml(item.label)}</span>
-          <strong>${escapeHtml(item.value)}</strong>
-        </div>
-      `,
-    )
-    .join('');
+  BrowserCommon.renderHeroItems(browserHeroMeta, items);
 }
 
 function renderSchema(stores) {
-  if (!browserSchemaGrid) return;
-
-  browserSchemaGrid.innerHTML = (stores || [])
-    .map(
-      (store) => `
-        <article class="card schema-card">
-          <div class="schema-card-head">
-            <h3>${escapeHtml(store.label)}</h3>
-            <span>${escapeHtml(String(store.count || 0))}</span>
-          </div>
-          <p>${escapeHtml(store.purpose)}</p>
-        </article>
-      `,
-    )
-    .join('');
+  BrowserCommon.renderSchemaCards(browserSchemaGrid, stores);
 }
 
 function getCurrentCategories() {
@@ -125,58 +102,46 @@ function renderSidebar() {
   if (!state.bootstrap) return;
 
   const views = state.bootstrap.views || [];
-  browserNav.innerHTML = views
-    .map(
-      (item) => `
-        <button class="sidebar-button${state.view === item.value ? ' active' : ''}" type="button" data-view="${escapeHtml(item.value)}">
-          <span>${escapeHtml(item.label)}</span>
-          <span class="tag muted">${escapeHtml(String(item.count))}</span>
-        </button>
-      `,
-    )
-    .join('') || '<p class="compact-note sidebar-empty">暂无可用浏览类别。</p>';
+  BrowserCommon.renderChoiceButtons(browserNav, views, {
+    activeValue: state.view,
+    className: 'sidebar-button',
+    emptyText: '暂无可用浏览类别。',
+    valueAttribute: 'data-view',
+  });
 
   const categories = getCurrentCategories();
   if (!categories.some((item) => item.value === state.category)) {
     state.category = 'all';
   }
-  browserFilters.innerHTML = categories
-    .map(
-      (item) => `
-        <button class="filter-chip${state.category === item.value ? ' active' : ''}" type="button" data-category="${escapeHtml(item.value)}">
-          ${escapeHtml(item.label)}
-          <span>${escapeHtml(String(item.count))}</span>
-        </button>
-      `,
-    )
-    .join('') || '<p class="compact-note sidebar-empty">当前分类为空。</p>';
+  BrowserCommon.renderChoiceButtons(browserFilters, categories, {
+    activeValue: state.category,
+    className: 'filter-chip',
+    emptyText: '当前分类为空。',
+    valueAttribute: 'data-category',
+  });
+
+  BrowserCommon.renderChoiceButtons(browserModeFilters, [
+    { value: 'entry', label: '条目检索' },
+    { value: 'fulltext', label: '正文检索' },
+  ], {
+    activeValue: state.mode,
+    className: 'filter-chip',
+    valueAttribute: 'data-mode',
+  });
 }
 
 function renderSummary(result) {
   if (!browserSummary) return;
 
   const categoryLabel = getCurrentCategories().find((item) => item.value === state.category)?.label || '全部';
+  const modeLabel = state.mode === 'fulltext' ? '正文检索' : '条目检索';
+  const viewLabel = (state.bootstrap?.views || []).find((item) => item.value === state.view)?.label || '字词库';
 
   browserSummary.innerHTML = `
-    <div class="summary-row">
-      <div class="summary-block">
-        <span class="summary-label">浏览内容</span>
-        <div class="summary-group" aria-label="数据库视图">
-          <button class="summary-pill summary-pill-button${state.view === 'terms' ? ' active' : ''}" type="button" data-summary-view="terms">字词索引</button>
-          <button class="summary-pill summary-pill-button${state.view === 'cases' ? ' active' : ''}" type="button" data-summary-view="cases">案例索引</button>
-          <button class="summary-pill summary-pill-button${state.view === 'schema' ? ' active' : ''}" type="button" data-summary-view="schema">结构总览</button>
-        </div>
-      </div>
-      <div class="summary-block">
-        <span class="summary-label">检索范围</span>
-        <div class="summary-group" aria-label="检索方式">
-          <button class="summary-pill summary-pill-button${state.mode === 'entry' ? ' active' : ''}" type="button" data-summary-mode="entry">条目检索</button>
-          <button class="summary-pill summary-pill-button${state.mode === 'fulltext' ? ' active' : ''}" type="button" data-summary-mode="fulltext">正文检索</button>
-        </div>
-      </div>
-    </div>
     <div class="summary-row summary-row-meta">
-      <span class="summary-pill muted">当前分类：${escapeHtml(categoryLabel)}</span>
+      <span class="summary-pill muted">数据库：${escapeHtml(viewLabel)}</span>
+      <span class="summary-pill muted">方法：${escapeHtml(categoryLabel)}</span>
+      <span class="summary-pill muted">检索：${escapeHtml(modeLabel)}</span>
       <button class="summary-pill summary-pill-button muted" type="button" data-summary-action="result">结果：${escapeHtml(String(result.total || 0))} 条</button>
     </div>
   `;
@@ -245,6 +210,7 @@ function renderTermResults(items) {
               <div class="case-tags">
                 <span class="tag">${escapeHtml(item.termType || '未分类')}</span>
                 <span class="tag muted">${escapeHtml(item.category || '未分类')}</span>
+                <a class="detail-link detail-link-compact" href="${buildTermHref(item.id)}">查看详情</a>
               </div>
               <p class="compact-note">关联案例 ${escapeHtml(String(item.caseCount || 0))} 条</p>
             </div>
@@ -256,9 +222,6 @@ function renderTermResults(items) {
               .slice(0, 2)
               .map((caseItem) => `<a class="term-case-ref" href="${buildCaseHref(caseItem.id)}">${escapeHtml(caseItem.displayTitle)}</a>`)
               .join('')}
-          </div>
-          <div class="term-actions">
-            <a class="detail-link" href="${buildTermHref(item.id)}">查看字词详情</a>
           </div>
         </article>
       `,
@@ -281,6 +244,7 @@ function renderCaseResults(items) {
             <div class="case-tags">
               <span class="tag">${escapeHtml(item.method || '未标注方法')}</span>
               <span class="tag muted">${escapeHtml(item.certainty || '未标注置信度')}</span>
+              <a class="detail-link detail-link-compact" href="${buildCaseHref(item.id)}">查看详情</a>
             </div>
           </div>
           <h3>${escapeHtml(item.displayTitle || item.title)}</h3>
@@ -293,9 +257,6 @@ function renderCaseResults(items) {
           <div class="case-footer">
             <p><strong>证据数量</strong><span>${escapeHtml(String(item.evidenceCount || 0))} 条</span></p>
             <p><strong>状态</strong><span>${escapeHtml(item.status || '未标注')}</span></p>
-          </div>
-          <div class="case-actions">
-            <a class="detail-link" href="${buildCaseHref(item.id)}">查看案例详情</a>
           </div>
         </article>
       `,
@@ -338,9 +299,7 @@ async function runBrowse() {
       browserPagination.hidden = true;
     }
     browserHeading.textContent = '数据库结构';
-    browserModeSelect.disabled = false;
     browserSearchInput.disabled = false;
-    browserModeSelect.value = state.mode;
     browserSearchInput.value = state.query;
     renderSummary({ total: (state.bootstrap?.stores || []).length });
     renderSchema(state.bootstrap?.stores || []);
@@ -348,9 +307,7 @@ async function runBrowse() {
     return;
   }
 
-  browserModeSelect.disabled = false;
   browserSearchInput.disabled = false;
-  browserModeSelect.value = state.mode;
   browserSearchInput.value = state.query;
   browserListSection.hidden = false;
   browserSchemaSection.hidden = false;
@@ -415,9 +372,18 @@ browserFilters?.addEventListener('click', async (event) => {
   await runBrowse();
 });
 
+browserModeFilters?.addEventListener('click', async (event) => {
+  const trigger = event.target.closest('[data-mode]');
+  if (!trigger) return;
+
+  state.mode = trigger.getAttribute('data-mode') === 'fulltext' ? 'fulltext' : 'entry';
+  state.page = 1;
+  renderSidebar();
+  await runBrowse();
+});
+
 browserSearchButton?.addEventListener('click', async () => {
   state.query = browserSearchInput?.value.trim() || '';
-  state.mode = browserModeSelect?.value === 'fulltext' ? 'fulltext' : 'entry';
   state.page = 1;
   prepareSearchFromCurrentView();
   await runBrowse();
@@ -440,35 +406,10 @@ browserPresets?.addEventListener('click', async (event) => {
   if (browserSearchInput) {
     browserSearchInput.value = state.query;
   }
-  if (browserModeSelect) {
-    browserModeSelect.value = state.mode;
-  }
   await runBrowse();
 });
 
 browserSummary?.addEventListener('click', async (event) => {
-  const viewTrigger = event.target.closest('[data-summary-view]');
-  if (viewTrigger) {
-    state.view = viewTrigger.getAttribute('data-summary-view') || 'terms';
-    state.category = 'all';
-    state.page = 1;
-    if (state.view === 'schema') {
-      state.mode = 'entry';
-      state.query = '';
-    }
-    await runBrowse();
-    return;
-  }
-
-  const modeTrigger = event.target.closest('[data-summary-mode]');
-  if (modeTrigger) {
-    state.mode = modeTrigger.getAttribute('data-summary-mode') === 'fulltext' ? 'fulltext' : 'entry';
-    browserModeSelect.value = state.mode;
-    state.page = 1;
-    await runBrowse();
-    return;
-  }
-
   const trigger = event.target.closest('[data-summary-action]');
   if (!trigger) return;
 
@@ -524,7 +465,6 @@ browserPagination?.addEventListener('submit', async (event) => {
 browserSearchInput?.addEventListener('keydown', async (event) => {
   if (event.key !== 'Enter') return;
   state.query = browserSearchInput?.value.trim() || '';
-  state.mode = browserModeSelect?.value === 'fulltext' ? 'fulltext' : 'entry';
   state.page = 1;
   prepareSearchFromCurrentView();
   await runBrowse();

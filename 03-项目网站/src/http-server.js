@@ -4,6 +4,7 @@ const path = require('path');
 const url = require('url');
 const config = require('./config');
 const { analyzeWithAnnotationAi } = require('./ai-annotation');
+const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-browser');
 const { createDataSource } = require('./data-source');
 
 function sendJson(res, statusCode, payload) {
@@ -141,6 +142,20 @@ function createServer() {
           category: parsedUrl.query.category,
           mode: parsedUrl.query.mode,
           query: parsedUrl.query.q || '',
+          page: parsedUrl.query.page,
+          pageSize: parsedUrl.query.pageSize,
+        }));
+      }
+
+      if (parsedUrl.pathname === '/api/annotation/bootstrap') {
+        return sendJson(res, 200, buildAnnotationBootstrap(config));
+      }
+
+      if (parsedUrl.pathname === '/api/annotation') {
+        return sendJson(res, 200, browseAnnotations(config, {
+          query: parsedUrl.query.q || '',
+          document: parsedUrl.query.document,
+          method: parsedUrl.query.method,
           page: parsedUrl.query.page,
           pageSize: parsedUrl.query.pageSize,
         }));

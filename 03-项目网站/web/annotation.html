@@ -28,19 +28,19 @@
     <main class="section annotation-page">
       <p id="annotationStatus" class="db-status">正在读取人工标注库...</p>
 
-      <div class="annotation-layout">
-        <aside class="annotation-sidebar">
-            <article class="card sidebar-card">
+      <div class="browser-layout">
+        <aside class="browser-sidebar annotation-sidebar">
+          <article class="card sidebar-card">
             <h3>来源文档</h3>
-            <div id="annotationDocumentFilters" class="browser-preset-list annotation-filter-list"></div>
-            </article>
+            <div id="annotationDocumentFilters" class="sidebar-filter-list"></div>
+          </article>
 
-            <article class="card sidebar-card">
+          <article class="card sidebar-card">
             <h3>方法标签</h3>
-            <div id="annotationMethodFilters" class="browser-preset-list annotation-filter-list"></div>
-            </article>
+            <div id="annotationMethodFilters" class="sidebar-filter-list"></div>
+          </article>
 
-          <article class="card sidebar-card annotation-preset-card">
+          <article class="card sidebar-card browser-preset-card">
             <h3>预设搜索</h3>
             <div id="annotationPresets" class="browser-preset-list">
               <button class="preset-chip" type="button" data-annotation-query="平原之隰">平原之隰</button>
@@ -51,8 +51,8 @@
           </article>
         </aside>
 
-        <section class="annotation-main">
-          <section class="card annotation-toolbar">
+        <section class="browser-main">
+          <section class="card browser-toolbar annotation-toolbar">
             <div class="head-line">
               <div>
                 <p class="section-kicker">检索</p>
@@ -82,6 +82,7 @@
     </footer>
 
     <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/browser-common.js"></script>
     <script src="./assets/js/annotation.js?v=20260509-ai-json"></script>
   </body>
 </html>

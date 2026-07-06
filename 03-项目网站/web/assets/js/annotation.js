@@ -10,95 +10,45 @@ const annotationList = document.querySelector('#annotationList');
 const annotationPresets = document.querySelector('#annotationPresets');
 
 const state = {
-  snapshot: null,
+  bootstrap: null,
   query: '',
   document: 'all',
   method: 'all',
+  page: 1,
+  pageSize: 50,
 };
 
-function includesText(values, query) {
-  if (!query) return true;
-  const needle = query.toLowerCase();
-  return values.some((value) => String(value || '').toLowerCase().includes(needle));
-}
-
-async function loadSnapshot() {
-  const response = await fetch('./data/annotation-snapshot.json');
+async function requestJson(url) {
+  const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`annotation-snapshot.json 读取失败：${response.status}`);
+    throw new Error(`人工标注库 API 读取失败：${response.status}`);
   }
   return response.json();
 }
 
 function renderHero() {
-  const counts = state.snapshot?.counts || {};
+  const counts = state.bootstrap?.counts || {};
   const items = [
-    { label: '来源', value: state.snapshot?.sourceLabel || '人工标注灰度库' },
+    { label: '来源', value: state.bootstrap?.sourceLabel || '人工标注灰度库' },
     { label: '文档', value: `${counts.documents || 0} 件` },
     { label: '案例', value: `${counts.cases || 0} 条` },
     { label: '证据', value: `${counts.evidences || 0} 条` },
   ];
 
-  annotationHeroMeta.innerHTML = items
-    .map((item) => `
-      <div class="hero-panel-item">
-        <span class="hero-kicker">${escapeHtml(item.label)}</span>
-        <strong>${escapeHtml(item.value)}</strong>
-      </div>
-    `)
-    .join('');
+  BrowserCommon.renderHeroItems(annotationHeroMeta, items);
 }
 
 function renderFilters() {
-  const documents = Object.keys(state.snapshot.documentCounts || {}).sort();
-  const methods = Object.keys(state.snapshot.methodCounts || {}).sort();
+  BrowserCommon.renderChoiceButtons(annotationDocumentFilters, state.bootstrap?.documents || [], {
+    activeValue: state.document,
+    className: 'filter-chip',
+    valueAttribute: 'data-annotation-document',
+  });
 
-  annotationDocumentFilters.innerHTML = [
-    `<button class="preset-chip ${state.document === 'all' ? 'active' : ''}" type="button" data-annotation-document="all"><span class="filter-label">全部文档</span></button>`,
-    ...documents.map((name) => `
-      <button class="preset-chip ${state.document === name ? 'active' : ''}" type="button" data-annotation-document="${escapeHtml(name)}">
-        <span class="filter-label">${escapeHtml(name)}</span>
-        <span class="filter-count">${escapeHtml(state.snapshot.documentCounts[name])}</span>
-      </button>
-    `),
-  ].join('');
-
-  annotationMethodFilters.innerHTML = [
-    `<button class="preset-chip ${state.method === 'all' ? 'active' : ''}" type="button" data-annotation-method="all"><span class="filter-label">全部方法</span></button>`,
-    ...methods.map((name) => `
-      <button class="preset-chip ${state.method === name ? 'active' : ''}" type="button" data-annotation-method="${escapeHtml(name)}">
-        <span class="filter-label">${escapeHtml(name)}</span>
-        <span class="filter-count">${escapeHtml(state.snapshot.methodCounts[name])}</span>
-      </button>
-    `),
-  ].join('');
-}
-
-function caseSearchValues(item) {
-  return [
-    item.case_title,
-    item.source_work,
-    item.target_work,
-    item.target_text,
-    item.problem,
-    item.claim,
-    item.conclusion,
-    item.certainty,
-    item.status,
-    ...(item.method_tags || []),
-    ...(item.terms || []).flatMap((term) => [term.term, term.related_term, term.relation_type, term.note]),
-    ...(item.evidences || []).flatMap((evidence) => [evidence.evidence_type, evidence.work, evidence.quote, evidence.role]),
-    ...(item.process_steps || []).flatMap((step) => [step.step_type, step.text]),
-  ];
-}
-
-function filterCases() {
-  const query = state.query.trim();
-  return (state.snapshot.cases || []).filter((item) => {
-    const docName = item.source_document?.source_file_name || '未标注文档';
-    const methodOk = state.method === 'all' || (item.method_tags || []).includes(state.method);
-    const documentOk = state.document === 'all' || docName === state.document;
-    return methodOk && documentOk && includesText(caseSearchValues(item), query);
+  BrowserCommon.renderChoiceButtons(annotationMethodFilters, state.bootstrap?.methods || [], {
+    activeValue: state.method,
+    className: 'filter-chip',
+    valueAttribute: 'data-annotation-method',
   });
 }
 
@@ -279,12 +229,12 @@ function renderCase(item) {
   `;
 }
 
-function render() {
-  const items = filterCases();
+function render(result) {
+  const items = result.items || [];
 
   annotationSummary.innerHTML = `
     <div class="summary-row summary-row-meta">
-      <span class="summary-pill">结果：${escapeHtml(items.length)} / ${escapeHtml((state.snapshot.cases || []).length)} 条</span>
+      <span class="summary-pill">结果：${escapeHtml(result.total || 0)} / ${escapeHtml(state.bootstrap?.counts?.cases || 0)} 条</span>
       <span class="summary-pill muted">文档：${escapeHtml(state.document === 'all' ? '全部' : state.document)}</span>
       <span class="summary-pill muted">方法：${escapeHtml(state.method === 'all' ? '全部' : state.method)}</span>
       ${state.query ? `<span class="summary-pill muted">关键词：${escapeHtml(state.query)}</span>` : ''}
@@ -296,40 +246,55 @@ function render() {
     : '<article class="card"><h3>暂无匹配的人工标注记录</h3><p>请更换关键词、来源文档或方法标签。</p></article>';
 }
 
+async function runAnnotationBrowse() {
+  const params = new URLSearchParams({
+    q: state.query,
+    document: state.document,
+    method: state.method,
+    page: String(state.page),
+    pageSize: String(state.pageSize),
+  });
+  const result = await requestJson(`/api/annotation?${params.toString()}`);
+  render(result);
+}
+
 async function init() {
   try {
-    state.snapshot = await loadSnapshot();
+    state.bootstrap = await requestJson('/api/annotation/bootstrap');
     annotationStatus.textContent = '这里只浏览人工标注与 AI 整理后的结构化数据，与主数据库并行。';
     renderHero();
     renderFilters();
-    render();
+    await runAnnotationBrowse();
   } catch (error) {
     annotationStatus.textContent = error.message;
     annotationList.innerHTML = '<article class="card"><h3>人工标注库读取失败</h3><p>请先运行 npm run sync:annotation 生成快照。</p></article>';
   }
 }
 
-annotationSearchButton?.addEventListener('click', () => {
+annotationSearchButton?.addEventListener('click', async () => {
   state.query = annotationSearchInput.value.trim();
-  render();
+  state.page = 1;
+  await runAnnotationBrowse();
 });
 
-annotationResetButton?.addEventListener('click', () => {
+annotationResetButton?.addEventListener('click', async () => {
   state.query = '';
   state.document = 'all';
   state.method = 'all';
+  state.page = 1;
   annotationSearchInput.value = '';
   renderFilters();
-  render();
+  await runAnnotationBrowse();
 });
 
-annotationPresets?.addEventListener('click', (event) => {
+annotationPresets?.addEventListener('click', async (event) => {
   const trigger = event.target.closest('[data-annotation-query]');
   if (!trigger) return;
 
   state.query = trigger.getAttribute('data-annotation-query') || '';
+  state.page = 1;
   annotationSearchInput.value = state.query;
-  render();
+  await runAnnotationBrowse();
 });
 
 annotationSearchInput?.addEventListener('keydown', (event) => {
@@ -338,22 +303,24 @@ annotationSearchInput?.addEventListener('keydown', (event) => {
   }
 });
 
-annotationDocumentFilters?.addEventListener('click', (event) => {
+annotationDocumentFilters?.addEventListener('click', async (event) => {
   const trigger = event.target.closest('[data-annotation-document]');
   if (!trigger) return;
 
   state.document = trigger.getAttribute('data-annotation-document') || 'all';
+  state.page = 1;
   renderFilters();
-  render();
+  await runAnnotationBrowse();
 });
 
-annotationMethodFilters?.addEventListener('click', (event) => {
+annotationMethodFilters?.addEventListener('click', async (event) => {
   const trigger = event.target.closest('[data-annotation-method]');
   if (!trigger) return;
 
   state.method = trigger.getAttribute('data-annotation-method') || 'all';
+  state.page = 1;
   renderFilters();
-  render();
+  await runAnnotationBrowse();
 });
 
 init();

@@ -786,8 +786,7 @@ h2 {
   box-shadow: 0 0 0 4px var(--control-focus);
 }
 
-#browserSearchInput,
-#browserModeSelect {
+#browserSearchInput {
   width: 100%;
   padding: 10px 14px;
   border-radius: 999px;
@@ -797,8 +796,7 @@ h2 {
   color: var(--ink);
 }
 
-#browserSearchInput:focus,
-#browserModeSelect:focus {
+#browserSearchInput:focus {
   border-color: color-mix(in srgb, var(--accent) 42%, transparent);
   box-shadow: 0 0 0 4px var(--control-focus);
 }
@@ -1114,11 +1112,6 @@ h2 {
   text-decoration: none;
 }
 
-.term-actions,
-.case-actions {
-  margin-top: 4px;
-}
-
 .detail-link,
 .inline-link {
   color: var(--pri-2);
@@ -1132,6 +1125,13 @@ h2 {
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(107, 74, 44, 0.1);
+}
+
+.detail-link-compact {
+  padding: 5px 10px;
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .detail-layout {
@@ -1303,16 +1303,40 @@ h2 {
   gap: 10px;
 }
 
+.sidebar-button .filter-label,
+.filter-chip .filter-label {
+  min-width: 0;
+  text-align: left;
+}
+
+.sidebar-button .filter-count,
+.filter-chip .filter-count {
+  flex: 0 0 auto;
+  min-width: 32px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sub) 12%, transparent);
+  color: var(--sub);
+  font-weight: 700;
+  text-align: center;
+}
+
 .sidebar-button.active,
 .filter-chip.active {
   border-color: rgba(165, 77, 42, 0.34);
   background: rgba(165, 77, 42, 0.08);
 }
 
+.sidebar-button.active .filter-count,
+.filter-chip.active .filter-count {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent-deep);
+}
+
 .browser-search-grid {
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.8fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .toolbar-field {
@@ -1339,17 +1363,12 @@ h2 {
   min-height: 100%;
 }
 
-.browser-preset-fold {
-  margin-top: -4px;
-}
-
 .browser-preset-list {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
-.browser-sidebar .browser-preset-fold,
 .browser-sidebar .browser-schema-fold {
   margin-top: 0;
 }
@@ -1370,37 +1389,13 @@ h2 {
   font-size: 12px;
 }
 
-.browser-sidebar .stats-grid,
 .browser-sidebar .grid-2 {
   grid-template-columns: 1fr;
 }
 
-.browser-sidebar .stats-grid {
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.browser-sidebar .stat-card,
 .browser-sidebar .schema-card {
   padding: 8px 10px;
   border-radius: 10px;
-}
-
-.browser-sidebar .stat-card {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.browser-sidebar .stat-card .value {
-  order: 2;
-  font-size: 16px;
-  line-height: 1;
-}
-
-.browser-sidebar .stat-card .label {
-  font-size: 12px;
 }
 
 .browser-sidebar .schema-card {
@@ -1578,24 +1573,6 @@ h2 {
   gap: 18px;
 }
 
-.annotation-layout {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: minmax(200px, 200px) minmax(0, 1fr);
-}
-
-.annotation-sidebar,
-.annotation-main {
-  display: grid;
-  gap: 12px;
-  align-content: start;
-}
-
-.annotation-sidebar {
-  position: sticky;
-  top: 20px;
-}
-
 .annotation-sidebar .sidebar-card {
   gap: 8px;
 }
@@ -1604,75 +1581,20 @@ h2 {
   font-size: 18px;
 }
 
-.annotation-sidebar .toolbar-field {
-  gap: 5px;
-}
-
-.annotation-sidebar select {
-  width: 100%;
-  padding: 7px 9px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-.annotation-preset-card .browser-preset-list {
-  display: grid;
-  gap: 6px;
-}
-
-.annotation-filter-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 6px;
-  width: 100%;
-}
-
-.annotation-filter-list .preset-chip,
-.annotation-preset-card .preset-chip {
-  width: 100%;
-  border-radius: 10px;
-  padding: 6px 9px;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  line-height: 1.35;
-  white-space: normal;
-}
-
-.annotation-filter-list .filter-label {
-  min-width: 0;
-  text-align: left;
-}
-
-.annotation-filter-list .filter-count {
-  flex: 0 0 auto;
-  min-width: 32px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--sub) 12%, transparent);
-  color: var(--sub);
-  font-weight: 700;
-  text-align: center;
-}
-
-.annotation-filter-list .preset-chip.active .filter-count {
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-  color: var(--accent-deep);
-}
-
+.browser-search-row,
 .annotation-search-row {
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
+.browser-search-field,
 .annotation-search-field {
   flex: 1;
   min-width: 0;
 }
 
+#browserSearchInput,
 #annotationSearchInput {
   width: 100%;
 }
@@ -2527,8 +2449,6 @@ html[data-theme="dark"] .showcase-shell,
 html[data-theme="dark"] .card,
 html[data-theme="dark"] .fold-card,
 html[data-theme="dark"] .browser-toolbar,
-html[data-theme="dark"] .annotation-document-card,
-html[data-theme="dark"] .annotation-case-card,
 html[data-theme="dark"] .ai-reference-card,
 html[data-theme="dark"] .detail-focus-card,
 html[data-theme="dark"] .knowledge-method-card {
@@ -2550,8 +2470,6 @@ html[data-theme="dark"] .evidence-item,
 html[data-theme="dark"] .quote-card,
 html[data-theme="dark"] .case-step-card,
 html[data-theme="dark"] .knowledge-anchor-chip,
-html[data-theme="dark"] .annotation-document-card,
-html[data-theme="dark"] .annotation-case-card,
 html[data-theme="dark"] .annotation-subcase,
 html[data-theme="dark"] .ai-reference-card,
 html[data-theme="dark"] .ai-evidence-list,
@@ -2578,7 +2496,6 @@ html[data-theme="dark"] .preset-chip,
 html[data-theme="dark"] .filter-chip,
 html[data-theme="dark"] .tag,
 html[data-theme="dark"] .source-chip,
-html[data-theme="dark"] .annotation-tag,
 html[data-theme="dark"] .detail-chip,
 html[data-theme="dark"] .summary-pill,
 html[data-theme="dark"] .match-mark,
@@ -2592,7 +2509,6 @@ html[data-theme="dark"] .db-status,
 html[data-theme="dark"] .compact-note,
 html[data-theme="dark"] .search-summary,
 html[data-theme="dark"] .browser-pagination,
-html[data-theme="dark"] .annotation-meta,
 html[data-theme="dark"] .ai-reference-meta {
   color: var(--muted);
 }
@@ -2717,7 +2633,7 @@ h2 {
 .tag,
 .source-chip,
 .detail-chip,
-.annotation-tag {
+.summary-pill {
   padding: 7px 11px;
   font-size: 13px;
 }
@@ -2813,8 +2729,6 @@ h2 {
 .stats-grid,
 .detail-card-grid,
 .browser-search-grid,
-.annotation-document-grid,
-.annotation-metric-grid,
 .knowledge-grid,
 .case-structure-flow {
   gap: 10px;
@@ -2828,7 +2742,6 @@ h2 {
 .annotation-ai-section,
 .annotation-ai-result,
 .annotation-card,
-.annotation-case-card,
 .ai-reference-card,
 .knowledge-method-card,
 .glossary-card {
@@ -2867,7 +2780,6 @@ textarea,
 select,
 #searchInput,
 #browserSearchInput,
-#browserModeSelect,
 .annotation-ai-field textarea,
 .quick-analyze-input,
 .pagination-jump input {
@@ -2878,7 +2790,6 @@ select,
 
 #searchInput,
 #browserSearchInput,
-#browserModeSelect,
 .search-clear,
 .pagination-button,
 .pagination-jump input {
@@ -2940,15 +2851,11 @@ select,
   font-size: 48px;
 }
 
-.annotation-shell,
-.annotation-case-list,
 .ai-reference-list,
 .knowledge-shell {
   gap: 18px;
 }
 
-.annotation-card-body,
-.annotation-evidence-list,
 .ai-reference-body,
 .case-step-list {
   gap: 6px;
@@ -3074,13 +2981,8 @@ select,
     grid-template-columns: 1fr;
   }
 
-  .browser-sidebar,
-  .annotation-sidebar {
+  .browser-sidebar {
     position: static;
-  }
-
-  .annotation-layout {
-    grid-template-columns: 1fr;
   }
 
   .browser-search-grid {
@@ -3118,15 +3020,18 @@ select,
     flex-direction: column;
   }
 
+  .browser-search-row,
   .annotation-search-row {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .browser-search-actions,
   .annotation-search-actions {
     width: 100%;
   }
 
+  .browser-search-actions .toolbar-button,
   .annotation-search-actions .toolbar-button {
     flex: 1;
   }
