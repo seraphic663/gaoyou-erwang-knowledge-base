@@ -25,7 +25,8 @@ node_modules/
 note/
 
 # ---- Archive literature (large PDFs, not for repo) ----
-05-归档文献/
+05-归档文献/*
+!05-归档文献/README.md
 
 # ---- Runtime / backup artifacts ----
 **/*.broken.*
