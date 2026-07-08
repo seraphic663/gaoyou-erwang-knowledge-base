@@ -1,0 +1,53 @@
+{
+  "schema_version": "annotation_case.v1",
+  "case_id": "",
+  "case_title": "",
+  "submitted_by": "",
+  "reviewed_by": "",
+  "source_work": "",
+  "source_passage_id": null,
+  "source_location": {
+    "work_title": "",
+    "section_title": "",
+    "entry_title": "",
+    "local_ordinal": null,
+    "archive_file_ref": "广雅疏证_徐健怡.docx"
+  },
+  "target_work": "",
+  "target_text": "",
+  "target_location": {
+    "chapter_or_section": "",
+    "raw_location_note": ""
+  },
+  "term_relations": [],
+  "evidences": [],
+  "problem_discovery": "",
+  "research_question": "",
+  "evidence_collection": "",
+  "reasoning": "",
+  "conclusion": "",
+  "method_profile": {
+    "concepts": [],
+    "expressions": []
+  },
+  "machine_result": {
+    "status": "pending",
+    "model": "",
+    "prompt_version": "",
+    "suggestions": [],
+    "confidence": null,
+    "validation": {
+      "quote_check": "unchecked",
+      "schema_check": "unchecked",
+      "enum_check": "unchecked"
+    }
+  },
+  "human_review": {
+    "status": "pending",
+    "reviewed_by": "",
+    "review_result": "",
+    "notes": ""
+  },
+  "created_at": "2026-07-08T12:13:51.087Z",
+  "updated_at": "2026-07-08T12:35:40.612Z"
+}
