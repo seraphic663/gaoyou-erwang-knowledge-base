@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>标注工作台 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+  </head>
+  <body data-page="annotation-workbench">
+    <header class="subhero annotation-hero">
+      <nav class="nav">
+        <div class="brand">高邮二王考据过程知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">返回首页</a>
+          <a href="./annotation.html">人工标注库</a>
+          <a href="./database.html?view=cases">主数据库</a>
+          <a href="./knowledge.html">训诂知识</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">本地填写 · 自动保存 · 导出 JSON</p>
+        <h1>标注工作台</h1>
+        <div class="hero-panel workbench-hero-panel">
+          <span>照着 DOCX 填字段</span>
+          <span>浏览器自动保存草稿</span>
+          <span>导出后走 branch / PR</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="section workbench-page">
+      <section class="workbench-start card">
+        <div>
+          <p class="section-kicker">开始前</p>
+          <h2>先打开自己的 DOCX，再在这里填结构化标注</h2>
+          <p>这个页面不会直接写入数据库。它只保存在你的浏览器里，最后导出 `annotation_case.v1` JSON 文件，提交到自己的分支。</p>
+        </div>
+        <div class="workbench-start-actions">
+          <button id="newDraftButton" class="page-link toolbar-button" type="button">新建空白案例</button>
+          <button id="loadZaozhouButton" class="page-link page-link-muted toolbar-button" type="button">载入“造舟于河”示例</button>
+          <button id="loadPingyuanButton" class="page-link page-link-muted toolbar-button" type="button">载入“平原之隰”示例</button>
+          <label class="page-link page-link-muted toolbar-button file-button">
+            导入已有 JSON
+            <input id="importJsonInput" type="file" accept="application/json,.json" />
+          </label>
+        </div>
+      </section>
+
+      <div class="workbench-layout">
+        <aside class="workbench-sidebar">
+          <article class="card sidebar-card">
+            <h3>草稿筛选</h3>
+            <label class="toolbar-field">
+              <span>关键词</span>
+              <input id="draftSearchInput" type="search" placeholder="标题、原文、结论、证据" />
+            </label>
+            <label class="toolbar-field">
+              <span>来源 DOCX</span>
+              <select id="draftDocFilter"></select>
+            </label>
+            <label class="toolbar-field">
+              <span>问题类型</span>
+              <select id="draftIssueFilter">
+                <option value="all">全部草稿</option>
+                <option value="missing">缺必填</option>
+                <option value="template">有模板标签</option>
+                <option value="quote">证据需核对</option>
+                <option value="ready">可导出</option>
+              </select>
+            </label>
+          </article>
+
+          <article class="card sidebar-card">
+            <div class="head-line compact-head">
+              <div>
+                <p class="section-kicker">本机草稿</p>
+                <h3>案例列表</h3>
+              </div>
+              <span id="draftCountPill" class="summary-pill">0</span>
+            </div>
+            <div id="draftList" class="workbench-draft-list"></div>
+          </article>
+
+          <article class="card sidebar-card">
+            <h3>填写顺序</h3>
+            <ol class="workbench-mini-steps">
+              <li>选 DOCX，填标题和提交者。</li>
+              <li>填被解释的原文、字词关系。</li>
+              <li>从 DOCX 复制证据原文到“材料摘录区”。</li>
+              <li>选中文字，一键加入证据。</li>
+              <li>补结论，导出 JSON。</li>
+            </ol>
+          </article>
+        </aside>
+
+        <section class="workbench-main">
+          <section class="card workbench-quality">
+            <div>
+              <p class="section-kicker">当前草稿</p>
+              <h2 id="currentDraftTitle">未命名案例</h2>
+            </div>
+            <div id="qualitySummary" class="workbench-quality-grid"></div>
+          </section>
+
+          <section class="workbench-editor-grid">
+            <article class="card source-panel">
+              <div class="head-line compact-head">
+                <div>
+                  <p class="section-kicker">材料摘录区</p>
+                  <h3>从 DOCX 复制相关段落</h3>
+                </div>
+                <button id="addSelectedQuoteButton" class="search-clear toolbar-button" type="button">选中文字加入证据</button>
+              </div>
+              <textarea id="sourceExcerptInput" class="source-excerpt-input" placeholder="把 DOCX 中和当前案例有关的原文、批注或上下文复制到这里。这里不导出入库，只用于本地核对 quote。"></textarea>
+              <p class="compact-note">技巧：先粘贴原文，再选中一句证据，点“加入证据”。导出时只导出结构化 JSON，不会把整段 DOCX 粘贴内容带走。</p>
+            </article>
+
+            <article class="card workbench-export-panel">
+              <div>
+                <p class="section-kicker">导出</p>
+                <h3>生成成员提交文件</h3>
+              </div>
+              <div id="exportStatus" class="workbench-export-status"></div>
+              <div class="toolbar-actions">
+                <button id="downloadJsonButton" class="page-link toolbar-button" type="button">下载 JSON</button>
+                <button id="copyJsonButton" class="page-link page-link-muted toolbar-button" type="button">复制 JSON</button>
+              </div>
+              <p class="compact-note">推荐保存到 `04-项目文献/D-标注/json/人工标注/你的名字/`，然后 commit 到自己的分支。</p>
+            </article>
+          </section>
+
+          <form id="workbenchForm" class="workbench-form" autocomplete="off"></form>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>标注工作台只生成本地 JSON · 正式入库仍需 validator 与人工审校</p>
+    </footer>
+
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/annotation-workbench.js"></script>
+  </body>
+</html>

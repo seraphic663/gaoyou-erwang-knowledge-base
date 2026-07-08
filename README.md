@@ -28,6 +28,8 @@
 
 ```text
 04-项目文献/D-标注/ 的 DOCX 文件
+  -> 03-项目网站/web/annotation-workbench.html
+  -> 04-项目文献/D-标注/json/人工标注/ 成员导出的 annotation_case JSON
   -> 04-项目文献/D-标注/json/run.py
   -> 02-数据库/data/annotations.db
   -> 03-项目网站/scripts/annotation_bridge.py
@@ -36,7 +38,7 @@
   -> 03-项目网站/web/ai-annotation.html
 ```
 
-这条链路不混入 `dictionary.db` 主库。`annotation.html` 只做人工库数据库浏览，`ai-annotation.html` 调用 AI 释证并引用人工库与主库材料。
+这条链路不混入 `dictionary.db` 主库。`annotation-workbench.html` 给成员本地填写并导出 JSON，`annotation.html` 只做人工库数据库浏览，`ai-annotation.html` 调用 AI 释证并引用人工库与主库材料。
 
 线上运行只读取 `03-项目网站/data/` 下的两个快照文件；`02-数据库/` 和 `04-项目文献/` 是本地重建数据用的加工区，不进入容器镜像。
 
@@ -71,7 +73,7 @@ D:\26大创
 └─ 05-归档文献/        大体量归档材料；只跟踪 README，正文资料不进入 Git
 ```
 
-根目录只保留跨模块配置和总说明：`package.json` 统一提供网站启动与同步命令，`Dockerfile` / `railway.toml` / `.dockerignore` 服务部署，`README.md` 记录当前架构与维护口径。项目级说明集中放在 `00-项目说明/`，成员协作先看 `00-项目说明/Git协作入门.md`。
+根目录只保留跨模块配置和总说明：`package.json` 统一提供网站启动与同步命令，`Dockerfile` / `railway.toml` / `.dockerignore` 服务部署，`README.md` 记录当前架构与维护口径。项目级说明集中放在 `00-项目说明/`，成员协作先看 `00-项目说明/06-Git协作指南.md`；开始标注前看 `00-项目说明/07-标注工作台使用流程.md`。
 
 ## 核心边界
 
@@ -92,6 +94,12 @@ npm start
 
 ```text
 http://localhost:3000
+```
+
+成员本地标注入口：
+
+```text
+http://localhost:3000/annotation-workbench.html
 ```
 
 常用检查：

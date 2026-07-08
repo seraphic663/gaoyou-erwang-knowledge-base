@@ -7,6 +7,7 @@
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
+- 标注工作台：给成员本地填写 `annotation_case.v1`，自动保存浏览器草稿，导出 JSON 文件后走 branch / PR。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
@@ -85,6 +86,7 @@ npm run sync:annotation
 │  ├─ index.html                   首页
 │  ├─ database.html                统一数据库浏览页
 │  ├─ annotation.html              人工标注库数据库页
+│  ├─ annotation-workbench.html     本地标注工作台，导出 annotation_case JSON
 │  ├─ ai-annotation.html           AI 释证页
 │  ├─ term.html                    字词详情页
 │  ├─ case.html                    案例详情页
