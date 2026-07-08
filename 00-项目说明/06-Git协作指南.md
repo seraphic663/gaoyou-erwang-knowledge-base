@@ -1,3 +1,5 @@
+# Git 协作指南
+
 ## 1. Git 下载与设置
 
 Windows：打开 https://git-scm.com/download/win 下载 Git for Windows，安装时大部分选项保持默认。安装后打开 `Git Bash`。
