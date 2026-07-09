@@ -19,6 +19,7 @@ const MACHINE_STATUSES = ['pending', 'draft', 'approved', 'rejected'];
 
 const elements = {
   newDraftButton: document.querySelector('#newDraftButton'),
+  deleteCurrentDraftButton: document.querySelector('#deleteCurrentDraftButton'),
   loadZaozhouButton: document.querySelector('#loadZaozhouButton'),
   loadPingyuanButton: document.querySelector('#loadPingyuanButton'),
   importJsonInput: document.querySelector('#importJsonInput'),
@@ -383,11 +384,14 @@ function renderDraftList() {
       const title = draft.caseData.case_title || '未命名案例';
       const stateLabel = validation.ready ? '可导出' : `缺 ${validation.missing}`;
       return `
-        <button class="draft-list-item${draft.id === state.currentId ? ' active' : ''}" type="button" data-action="select-draft" data-id="${escapeHtml(draft.id)}">
-          <strong>${escapeHtml(title)}</strong>
-          <span>${escapeHtml(draft.doc_source || '未选 DOCX')}</span>
-          <em class="${validation.ready ? 'ready' : ''}">${escapeHtml(stateLabel)}</em>
-        </button>
+        <div class="draft-list-item${draft.id === state.currentId ? ' active' : ''}">
+          <button class="draft-select-button" type="button" data-action="select-draft" data-id="${escapeHtml(draft.id)}">
+            <strong>${escapeHtml(title)}</strong>
+            <span>${escapeHtml(draft.doc_source || '未选 DOCX')}</span>
+            <em class="${validation.ready ? 'ready' : ''}">${escapeHtml(stateLabel)}</em>
+          </button>
+          <button class="draft-delete-button" type="button" data-action="delete-draft" data-id="${escapeHtml(draft.id)}" title="删除这个案例草稿">删除</button>
+        </div>
       `;
     }).join('')
     : '<p class="compact-note">当前筛选下没有草稿。</p>';
@@ -650,6 +654,24 @@ function setCurrentDraft(id) {
   renderAll();
 }
 
+function deleteDraft(id) {
+  const draft = state.drafts.find((item) => item.id === id);
+  if (!draft) return;
+  const title = draft.caseData.case_title || '未命名案例';
+  const confirmed = window.confirm(`确定删除“${title}”这个本机草稿吗？此操作只删除浏览器里的草稿，不会删除已经导出的 JSON 文件。`);
+  if (!confirmed) return;
+
+  state.drafts = state.drafts.filter((item) => item.id !== id);
+  if (!state.drafts.length) {
+    const blank = createDraft();
+    state.drafts = [blank];
+    state.currentId = blank.id;
+  } else if (state.currentId === id) {
+    state.currentId = state.drafts[0].id;
+  }
+  renderAll();
+}
+
 function addSelectedQuote() {
   const draft = getCurrentDraft();
   if (!draft) return;
@@ -822,6 +844,10 @@ function importJson(file) {
 
 function bindEvents() {
   elements.newDraftButton?.addEventListener('click', () => addDraft(createDraft()));
+  elements.deleteCurrentDraftButton?.addEventListener('click', () => {
+    const draft = getCurrentDraft();
+    if (draft) deleteDraft(draft.id);
+  });
   elements.loadZaozhouButton?.addEventListener('click', () => loadSample('zaozhou'));
   elements.loadPingyuanButton?.addEventListener('click', () => loadSample('pingyuan'));
   elements.addSelectedQuoteButton?.addEventListener('click', addSelectedQuote);
@@ -852,6 +878,8 @@ function bindEvents() {
   elements.draftList?.addEventListener('click', (event) => {
     const trigger = event.target.closest('[data-action="select-draft"]');
     if (trigger) setCurrentDraft(trigger.dataset.id);
+    const deleteTrigger = event.target.closest('[data-action="delete-draft"]');
+    if (deleteTrigger) deleteDraft(deleteTrigger.dataset.id);
   });
 
   elements.sourceExcerptInput?.addEventListener('input', (event) => {
