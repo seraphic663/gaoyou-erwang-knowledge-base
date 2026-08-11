@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import zipfile
 from collections import Counter
@@ -42,6 +43,24 @@ class Paragraph:
     has_drawing: bool
     has_toc_field: bool
     sizes: list[int]
+
+
+@dataclass
+class Comment:
+    comment_id: str
+    author: str
+    date: str
+    anchor: str
+    text: str
+
+
+@dataclass
+class CurrentTask:
+    source: Path
+    output: Path
+    title: str
+    paragraph_limit: int | None = None
+    scope_note: str = ""
 
 
 def qname(name: str) -> str:
@@ -202,6 +221,97 @@ def extract_notes(zf: zipfile.ZipFile, path: str, prefix: str = "") -> dict[str,
         if text:
             notes[prefix + note_id] = text
     return notes
+
+
+def exact_element_text(element: ET.Element) -> str:
+    parts: list[str] = []
+    for child in element.iter():
+        if child.tag == qname("t"):
+            parts.append(child.text or "")
+        elif child.tag == qname("tab"):
+            parts.append("\t")
+        elif child.tag in {qname("br"), qname("cr")}:
+            parts.append("<br>")
+        elif child.tag == qname("footnoteReference"):
+            note_id = attr_val(child, "id")
+            if note_id and not note_id.startswith("-"):
+                parts.append(f"[^{note_id}]")
+        elif child.tag == qname("endnoteReference"):
+            note_id = attr_val(child, "id")
+            if note_id and not note_id.startswith("-"):
+                parts.append(f"[^endnote-{note_id}]")
+    return "".join(parts)
+
+
+def extract_comment_anchors(document: ET.Element) -> dict[str, str]:
+    active: list[str] = []
+    anchor_parts: dict[str, list[str]] = {}
+    for element in document.iter():
+        if element.tag == qname("commentRangeStart"):
+            comment_id = attr_val(element, "id")
+            if comment_id:
+                active.append(comment_id)
+                anchor_parts.setdefault(comment_id, [])
+        elif element.tag == qname("commentRangeEnd"):
+            comment_id = attr_val(element, "id")
+            if comment_id in active:
+                active.remove(comment_id)
+        elif element.tag == qname("t"):
+            for comment_id in active:
+                anchor_parts.setdefault(comment_id, []).append(element.text or "")
+        elif element.tag == qname("tab"):
+            for comment_id in active:
+                anchor_parts.setdefault(comment_id, []).append("\t")
+        elif element.tag in {qname("br"), qname("cr")}:
+            for comment_id in active:
+                anchor_parts.setdefault(comment_id, []).append("<br>")
+    return {comment_id: "".join(parts) for comment_id, parts in anchor_parts.items()}
+
+
+def extract_comments(zf: zipfile.ZipFile, document: ET.Element) -> list[Comment]:
+    comments_root = read_xml(zf, "word/comments.xml")
+    if comments_root is None:
+        return []
+    anchors = extract_comment_anchors(document)
+    comments: list[Comment] = []
+    for element in comments_root.iter(qname("comment")):
+        comment_id = attr_val(element, "id") or ""
+        paragraph_texts = [
+            exact_element_text(paragraph)
+            for paragraph in element.iter(qname("p"))
+        ]
+        comments.append(
+            Comment(
+                comment_id=comment_id,
+                author=attr_val(element, "author") or "",
+                date=attr_val(element, "date") or "",
+                anchor=anchors.get(comment_id, ""),
+                text="\n\n".join(text for text in paragraph_texts if text.strip()),
+            )
+        )
+    return comments
+
+
+def parse_current_docx(path: Path) -> tuple[list[str], dict[str, str], list[Comment], Counter]:
+    stats: Counter = Counter()
+    with zipfile.ZipFile(path) as zf:
+        document = read_xml(zf, "word/document.xml")
+        if document is None:
+            raise ValueError(f"Missing word/document.xml in {path}")
+        paragraphs: list[str] = []
+        for paragraph in document.iter(qname("p")):
+            text = exact_element_text(paragraph)
+            if text.strip():
+                paragraphs.append(text)
+        notes = extract_notes(zf, "word/footnotes.xml")
+        notes.update(extract_notes(zf, "word/endnotes.xml", "endnote-"))
+        comments = extract_comments(zf, document)
+        stats["paragraphs"] = len(paragraphs)
+        stats["notes"] = len(notes)
+        stats["comments"] = len(comments)
+        stats["tables"] = len(list(document.iter(qname("tbl"))))
+        stats["drawings"] = len(list(document.iter(qname("drawing"))))
+    return paragraphs, notes, comments, stats
 
 
 def parse_docx(path: Path) -> tuple[list[Paragraph], dict[str, str], Counter]:
@@ -376,10 +486,109 @@ def convert_file(path: Path, kind: str) -> tuple[Path, Counter]:
     return out_path, stats
 
 
+CURRENT_BODY_START = "<!-- DOCX-BODY-START -->"
+CURRENT_BODY_END = "<!-- DOCX-BODY-END -->"
+
+
+def comment_sort_key(comment: Comment) -> tuple[bool, int | str]:
+    if comment.comment_id.isdigit():
+        return False, int(comment.comment_id)
+    return True, comment.comment_id
+
+
+def render_current_markdown(
+    task: CurrentTask,
+    paragraphs: list[str],
+    notes: dict[str, str],
+    comments: list[Comment],
+) -> str:
+    relative_source = Path(os.path.relpath(task.source, task.output.parent)).as_posix()
+    lines = [
+        f"# {task.title}",
+        "",
+        f"> 归档底本：[{task.source.name}](<{relative_source}>)",
+        "> 本文逐段保留 DOCX 中可复制的正文文字，未做校勘、繁简转换或标点统一；字体、分页、批注位置等版式以归档 DOCX 为准。",
+    ]
+    if task.scope_note:
+        lines.append(f"> 内容范围：{task.scope_note}")
+    lines.extend(["", CURRENT_BODY_START, "", "\n\n".join(paragraphs), "", CURRENT_BODY_END, ""])
+
+    if notes:
+        lines.extend(["## 脚注", ""])
+        for note_id in sorted(notes, key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else x)):
+            lines.extend([f"[^{note_id}]: {notes[note_id]}", ""])
+
+    if comments:
+        lines.extend(["## Word 批注", ""])
+        for comment in sorted(comments, key=comment_sort_key):
+            lines.extend([f"### 批注 {comment.comment_id}", ""])
+            if comment.author:
+                lines.append(f"- 作者：{comment.author}")
+            if comment.date:
+                lines.append(f"- 时间：{comment.date}")
+            if comment.anchor:
+                lines.append(f"- 锚定文字：{comment.anchor.replace(chr(10), '<br>')}")
+            lines.extend(["", comment.text, ""])
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def current_tasks(root: Path) -> list[CurrentTask]:
+    archive_current = root.parent / "05-归档文献" / "04-项目文献" / "0-当前阅读"
+    output_current = root / "0-当前阅读"
+    template_names = [
+        "《广雅疏证》“始也”条.docx",
+        "《广雅疏证》“敬也”.docx",
+        "《经义述闻》终风且暴.docx",
+        "《经传释词》“允”标注.docx",
+        "《读书杂志》平原之隰.docx",
+    ]
+    tasks = [
+        CurrentTask(
+            source=archive_current / "整理标注模版" / name,
+            output=output_current / "整理标注模版" / Path(name).with_suffix(".md").name,
+            title=Path(name).stem,
+        )
+        for name in template_names
+    ]
+    tasks.append(
+        CurrentTask(
+            source=archive_current / "“有杞有堂”“终风且暴”.docx",
+            output=output_current / "《经义述闻》有紀有堂.md",
+            title="《经义述闻》有紀有堂",
+            paragraph_limit=5,
+            scope_note="仅保留原合并文档中独有的“有紀有堂”条；其“終風且暴”条已由整理标注模板的独立 Markdown 完整保存。",
+        )
+    )
+    return tasks
+
+
+def convert_current_task(task: CurrentTask) -> tuple[Path, Counter]:
+    paragraphs, notes, comments, stats = parse_current_docx(task.source)
+    if task.paragraph_limit is not None:
+        paragraphs = paragraphs[: task.paragraph_limit]
+        stats["selected_paragraphs"] = len(paragraphs)
+        if comments or notes:
+            raise ValueError(f"Partial current-reading conversion would drop notes or comments: {task.source}")
+    markdown = render_current_markdown(task, paragraphs, notes, comments)
+    expected_body = "\n\n".join(paragraphs)
+    rendered_body = markdown.split(CURRENT_BODY_START, 1)[1].split(CURRENT_BODY_END, 1)[0].strip("\n")
+    if rendered_body != expected_body:
+        raise ValueError(f"Generated Markdown body differs from DOCX extraction: {task.source}")
+    for comment in comments:
+        if comment.text and comment.text not in markdown:
+            raise ValueError(f"Missing comment {comment.comment_id} in generated Markdown: {task.source}")
+        if comment.anchor and comment.anchor.replace("\n", "<br>") not in markdown:
+            raise ValueError(f"Missing comment anchor {comment.comment_id} in generated Markdown: {task.source}")
+    task.output.parent.mkdir(parents=True, exist_ok=True)
+    task.output.write_text(markdown, encoding="utf-8")
+    stats["output_chars"] = len(markdown)
+    return task.output, stats
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Convert project DOCX sources to Markdown.")
     parser.add_argument("--root", default=".", help="Project literature root. Defaults to current directory.")
-    parser.add_argument("--section", choices=["A", "B", "all"], default="all")
+    parser.add_argument("--section", choices=["A", "B", "current", "all"], default="all")
     args = parser.parse_args()
 
     root = Path(args.root)
@@ -391,7 +600,8 @@ def main() -> int:
         b_dir = root / "B-\u4e00\u7ea7\u8d44\u6599"
         tasks.extend(("B", p) for p in sorted(b_dir.glob("*.docx")) if not p.name.startswith("~$"))
 
-    if not tasks:
+    current = current_tasks(root) if args.section in {"current", "all"} else []
+    if not tasks and not current:
         raise SystemExit("No DOCX files found.")
 
     for kind, path in tasks:
@@ -403,6 +613,16 @@ def main() -> int:
             f"hyperlink_paragraphs={stats['hyperlink_paragraphs']} "
             f"drawing_paragraphs={stats['drawing_paragraphs']} "
             f"drawing_only={stats['drawing_only_paragraphs']}"
+        )
+    for task in current:
+        if not task.source.exists():
+            raise FileNotFoundError(task.source)
+        out_path, stats = convert_current_task(task)
+        print(
+            f"{task.source} -> {out_path} | "
+            f"paragraphs={stats['paragraphs']} selected={stats.get('selected_paragraphs', stats['paragraphs'])} "
+            f"comments={stats['comments']} notes={stats['notes']} "
+            f"tables={stats['tables']} drawings={stats['drawings']}"
         )
     return 0
 
