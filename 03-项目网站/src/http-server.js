@@ -6,6 +6,7 @@ const config = require('./config');
 const { analyzeWithAnnotationAi } = require('./ai-annotation');
 const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-browser');
 const { createDataSource } = require('./data-source');
+const { getV2Acceptance } = require('./v2-acceptance');
 
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
@@ -159,6 +160,32 @@ function createServer() {
           page: parsedUrl.query.page,
           pageSize: parsedUrl.query.pageSize,
         }));
+      }
+
+      if (parsedUrl.pathname === '/api/v2/summary') {
+        if (req.method !== 'GET') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        return sendJson(res, 200, await getV2Acceptance(config, 'summary'));
+      }
+
+      if (parsedUrl.pathname === '/api/v2/cases') {
+        if (req.method !== 'GET') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        return sendJson(res, 200, await getV2Acceptance(config, 'cases'));
+      }
+
+      if (parsedUrl.pathname === '/api/v2/case') {
+        if (req.method !== 'GET') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        const caseId = parsedUrl.query.id || '';
+        const payload = await getV2Acceptance(config, 'case', [caseId]);
+        if (!payload.ok) {
+          return sendJson(res, 404, payload);
+        }
+        return sendJson(res, 200, payload);
       }
 
       if (parsedUrl.pathname === '/api/cases') {

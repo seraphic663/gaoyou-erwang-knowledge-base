@@ -23,7 +23,13 @@
     "source_work": {"type": "string", "minLength": 1},
     "source_passage_id": {"type": ["string", "null"]},
     "source_location": {"type": ["object", "null"]},
-    "target_work": {"type": "string", "minLength": 1},
+    "target_work": {"type": "string"},
+    "target_works": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "target_scope": {"type": ["object", "null"]},
     "target_text": {"type": "string", "minLength": 1},
     "target_location": {"type": ["object", "null"]},
     "term_relations": {
@@ -47,7 +53,7 @@
     },
     "evidences": {
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "items": {
         "type": "object",
         "required": ["quote"],
@@ -62,10 +68,20 @@
           "quote_check": {
             "type": ["string", "null"],
             "enum": ["unchecked", "passed", "failed", "normalized_passed", null]
-          }
+          },
+          "source_resolution": {"type": ["string", "null"]},
+          "cited_work_match_status": {"type": ["string", "null"]},
+          "secondary_citation_passage_id": {"type": ["string", "null"]},
+          "secondary_citation_location": {"type": ["object", "null"]},
+          "annotation_context_check": {"type": ["string", "null"]},
+          "external_source_id": {"type": ["string", "null"]}
         },
         "additionalProperties": true
       }
+    },
+    "evidence_state": {
+      "type": "string",
+      "enum": ["present", "source_no_citation"]
     },
     "problem_discovery": {"type": ["string", "null"]},
     "research_question": {"type": ["string", "null"]},

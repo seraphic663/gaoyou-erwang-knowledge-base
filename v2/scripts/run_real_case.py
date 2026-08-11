@@ -22,7 +22,7 @@ from erwang_v2.legacy_ai_adapter import (
     select_legacy_case,
 )
 from erwang_v2.passage_builder import build_passages
-from erwang_v2.validate_annotation_case import validate_case
+from erwang_v2.validate_annotation_case import classify_machine_status, validate_case
 
 
 DEFAULT_MARKDOWN = PROJECT_ROOT / "04-项目文献/A-原著原典/读书杂志_王念孙.md"
@@ -106,8 +106,9 @@ def run_case(
     errors = validate_case(v2_case, passage_map)
     schema_status, schema_errors = _schema_errors(v2_case)
     all_errors = errors + [f"jsonschema:{error}" for error in schema_errors]
+    machine_status = classify_machine_status(errors, schema_errors)
     v2_case["machine_result"] = {
-        "status": "approved" if not all_errors and schema_status == "passed" else "rejected",
+        "status": machine_status,
         "validator": "erwang_v2.validate_annotation_case",
         "errors": all_errors,
         "jsonschema_status": schema_status,
@@ -125,7 +126,7 @@ def run_case(
         "status": "not_ingested_validation_failed",
         "path": _relative(database_path) if database_path else None,
     }
-    if database_path and not all_errors and schema_status == "passed":
+    if database_path and machine_status in {"approved", "draft"} and schema_status == "passed":
         with open_database(database_path) as connection:
             source_document_id = ingest_passages(
                 connection,
@@ -152,7 +153,7 @@ def run_case(
     return {
         "run_status": (
             "machine_valid_human_pending"
-            if not all_errors and schema_status == "passed"
+            if machine_status in {"approved", "draft"} and schema_status == "passed"
             else "machine_rejected"
         ),
         "workflow": [

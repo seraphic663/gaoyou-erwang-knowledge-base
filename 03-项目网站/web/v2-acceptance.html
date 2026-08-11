@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>V2 工作库验收 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="./assets/css/v2-acceptance.css" />
+  </head>
+  <body>
+    <header class="subhero">
+      <nav class="nav">
+        <div class="brand">高邮二王考据过程知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">专题首页</a>
+          <a href="./database.html">主数据库</a>
+          <a href="./annotation.html">标注库</a>
+          <a href="./v2-acceptance.html">V2 验收</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">V2 / VR · 入库验收</p>
+        <h1>V2 工作库验收</h1>
+        <p class="hero-copy">这里直接读取独立的 V2/VR SQLite 工作库，只读展示入库完整性、来源版本、机器状态、人工状态和证据待办。</p>
+        <div id="v2HeroMeta" class="hero-panel"></div>
+      </div>
+    </header>
+
+    <main class="section v2-page">
+      <p id="v2Status" class="db-status">正在读取 V2 数据库...</p>
+
+      <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
+      <section id="v2Metrics" class="v2-metric-grid"></section>
+
+      <div class="v2-layout">
+        <aside class="v2-sidebar">
+          <section class="card v2-panel">
+            <div class="v2-panel-heading">
+              <div>
+                <p class="section-kicker">验收门</p>
+                <h2>数据库能否交接</h2>
+              </div>
+            </div>
+            <div id="v2Checks" class="v2-check-list"></div>
+          </section>
+
+          <section class="card v2-panel">
+            <div class="v2-panel-heading">
+              <div>
+                <p class="section-kicker">原典登记</p>
+                <h2>Canonical 来源</h2>
+              </div>
+            </div>
+            <div id="v2Sources" class="v2-source-list"></div>
+          </section>
+
+          <section class="card v2-panel v2-note-panel">
+            <p class="section-kicker">验收口径</p>
+            <p>绿色只表示数据库结构和入库边界通过；黄色表示仍需人工或外部原典核验，不会被当作 gold。</p>
+            <p id="v2ReportContext" class="compact-note"></p>
+          </section>
+        </aside>
+
+        <section class="v2-main-column">
+          <section class="card v2-panel">
+            <div class="v2-panel-heading v2-case-heading">
+              <div>
+                <p class="section-kicker">案例队列</p>
+                <h2>17 条入库记录</h2>
+              </div>
+              <span id="v2CaseCount" class="summary-pill"></span>
+            </div>
+
+            <div class="v2-filter-bar">
+              <label class="toolbar-field">
+                <span>检索</span>
+                <input id="v2CaseSearch" type="search" placeholder="案例标题、来源、目标典籍" />
+              </label>
+              <label class="toolbar-field">
+                <span>来源</span>
+                <select id="v2SourceFilter">
+                  <option value="all">全部来源</option>
+                </select>
+              </label>
+              <label class="toolbar-field">
+                <span>机器状态</span>
+                <select id="v2MachineFilter">
+                  <option value="all">全部状态</option>
+                  <option value="draft">machine draft</option>
+                  <option value="rejected">rejected</option>
+                </select>
+              </label>
+            </div>
+
+            <div id="v2CaseTable" class="v2-case-table-wrap"></div>
+          </section>
+
+          <section id="v2CaseDetail" class="card v2-panel v2-case-detail" aria-live="polite">
+            <div class="v2-empty-detail">选择一条案例，查看来源段落、目标范围、证据层级和机器校验结果。</div>
+          </section>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>V2 / VR 工作库 · 只读验收入口 · 不改变机器库与人工库的状态</p>
+    </footer>
+
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/v2-acceptance.js"></script>
+  </body>
+</html>

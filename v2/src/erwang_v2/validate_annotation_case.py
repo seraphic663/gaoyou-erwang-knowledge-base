@@ -29,6 +29,7 @@ RELATION_TYPES = {"训释", "校勘", "字际关系", "虚词用法", "句义解
 MACHINE_STATUSES = {"pending", "draft", "approved", "rejected"}
 HUMAN_STATUSES = {"pending", "approved", "rejected", "uncertain"}
 QUOTE_CHECKS = {"unchecked", "passed", "failed", "normalized_passed"}
+EVIDENCE_STATES = {"present", "source_no_citation"}
 TEMPLATE_MARKERS = ("【必填】", "【建议】", "【选填】")
 
 
@@ -55,7 +56,28 @@ def validate_case(
     for field in REQUIRED_FIELDS:
         value = case.get(field)
         if value is None or value == "" or value == []:
+            if field == "target_work":
+                # A legacy case may not identify a unique object work.  Keep
+                # it as an auditable unresolved case instead of guessing from
+                # the first citation; target_works/target_scope carry the
+                # richer state when it is available.
+                continue
+            if field == "evidences" and case.get("evidence_state") == "source_no_citation":
+                continue
             errors.append(f"missing_required:{field}")
+
+    target_work = case.get("target_work") or ""
+    target_works = case.get("target_works") or []
+    if not target_work and not target_works:
+        errors.append("unresolved_target_work")
+
+    evidence_state = case.get("evidence_state", "present")
+    if evidence_state not in EVIDENCE_STATES:
+        errors.append(f"invalid_evidence_state:{evidence_state}")
+    if evidence_state == "source_no_citation" and case.get("evidences"):
+        errors.append("evidence_state_mismatch:source_no_citation_with_evidence")
+    elif evidence_state == "source_no_citation":
+        errors.append("source_has_no_citation")
 
     for field in PROCESS_FIELDS:
         if field not in case:
@@ -101,6 +123,23 @@ def validate_case(
         errors.append(f"invalid_human_status:{human_status}")
 
     return errors
+
+
+def classify_machine_status(
+    custom_errors: list[str], schema_errors: list[str] | None = None
+) -> str:
+    """Map validation results to machine state without promoting human meaning."""
+
+    schema_errors = schema_errors or []
+    if not custom_errors and not schema_errors:
+        return "approved"
+    soft_prefixes = ("missing_evidence_passage:",)
+    if custom_errors and not schema_errors and all(
+        any(error.startswith(prefix) for prefix in soft_prefixes)
+        for error in custom_errors
+    ):
+        return "draft"
+    return "rejected"
 
 
 def load_passages_jsonl(path: str | Path) -> dict[str, dict[str, Any]]:

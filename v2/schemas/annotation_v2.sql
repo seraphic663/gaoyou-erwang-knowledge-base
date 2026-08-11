@@ -49,7 +49,10 @@ CREATE TABLE IF NOT EXISTS annotation_cases (
     submitted_by TEXT NOT NULL,
     source_work TEXT NOT NULL,
     target_work TEXT NOT NULL,
+    target_works_json TEXT NOT NULL DEFAULT '[]',
+    target_scope_json TEXT NOT NULL DEFAULT '{}',
     target_text TEXT NOT NULL,
+    evidence_state TEXT NOT NULL DEFAULT 'present',
     source_passage_id TEXT,
     origin TEXT NOT NULL,
     lifecycle TEXT NOT NULL CHECK(lifecycle IN ('machine_draft', 'human_review', 'gold', 'rejected')),
@@ -96,6 +99,35 @@ CREATE TABLE IF NOT EXISTS annotation_evidences (
 
 CREATE INDEX IF NOT EXISTS idx_annotation_evidences_passage
     ON annotation_evidences(passage_id);
+
+CREATE TABLE IF NOT EXISTS external_source_registry (
+    external_source_id TEXT PRIMARY KEY,
+    cited_work TEXT NOT NULL,
+    normalized_work TEXT NOT NULL UNIQUE,
+    source_kind TEXT NOT NULL DEFAULT 'external_citation',
+    status TEXT NOT NULL CHECK(status IN ('pending', 'registered', 'verified')),
+    source_file TEXT,
+    source_file_sha256 TEXT,
+    edition TEXT,
+    location_note TEXT,
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS annotation_evidence_external_sources (
+    case_id TEXT NOT NULL,
+    evidence_index INTEGER NOT NULL,
+    external_source_id TEXT NOT NULL,
+    PRIMARY KEY(case_id, evidence_index),
+    FOREIGN KEY(case_id, evidence_index)
+        REFERENCES annotation_evidences(case_id, evidence_index) ON DELETE CASCADE,
+    FOREIGN KEY(external_source_id)
+        REFERENCES external_source_registry(external_source_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_external_source_registry_status
+    ON external_source_registry(status, normalized_work);
 
 CREATE TABLE IF NOT EXISTS annotation_process_steps (
     case_id TEXT NOT NULL,

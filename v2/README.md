@@ -56,7 +56,9 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 - 不自动覆盖原始 Markdown。
 - 机器案例可以在通过校验后进入 V2 统一工作数据库；不能把机器通过结果当作人工审校结果。
 - `annotation_cases` 同时保存机器状态和人工状态；只有 `human_review.status=approved` 的案例才能晋级 gold。
-- `passage_id`、quote、hash、来源位置和状态字段先在小样本上跑通，再接真实全量资料。
+- `passage_id`、quote、hash、来源位置和状态字段先在小样本上跑通，再接真实全量资料；同一 `work_key/source_file` 不允许混入不同 hash。
+- `target_work` 不明确时保留为空，并使用 `target_works`、`target_scope` 记录未决状态；原典明确不引证时使用 `evidence_state=source_no_citation`，不制造占位 evidence。
+- 引文区分 `canonical_source_passage`、`secondary_citation_match`、`external_source_pending`；后两者都不能当作原典核验通过。
 
 ## 运行最小测试
 
@@ -70,7 +72,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 ## 接入真实文件的原则
 
-真实 Markdown 通过路径传入 `passage_builder`；旧 AI JSON 通过 `legacy_ai_adapter` 映射到 V2；校验通过的机器案例进入统一 V2 工作数据库，人工状态保留为 `pending`。原始文件只读，原始 hash 必须进入输出元数据。
+真实 Markdown 通过路径传入 `passage_builder`；旧 AI JSON 通过 `legacy_ai_adapter` 映射到 V2；校验通过的机器案例进入统一 V2 工作数据库，人工状态保留为 `pending`。原始文件只读，原始 hash 必须进入输出元数据。未加载的外部典籍会进入 `external_source_registry`，等待独立底本登记和核验。
 
 真实案例跑通命令：
 
@@ -82,4 +84,4 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
     python v2/scripts/run_batch_migration.py
 
-该命令会把所有旧 AI JSON 作为迁移/回归材料写入同一个 V2 工作库，并生成 `v2/data/real_runs/batch_migration_report.json`。报告区分 `approved`、`draft`、`rejected`，保留人工 `pending`；未加载的外部原典引文只记为 `unchecked`，不会被误报为已核验。
+该命令会把所有旧 AI JSON 作为迁移/回归材料写入同一个 V2 工作库，并生成 `v2/data/real_runs/batch_migration_report.json`。报告区分 `approved`、`draft`、`rejected`，保留人工 `pending`；未加载的外部原典引文只记为 `unchecked`，同时保留 full JSON 上下文命中和王氏正文二次命中，但不会被误报为原典核验通过。

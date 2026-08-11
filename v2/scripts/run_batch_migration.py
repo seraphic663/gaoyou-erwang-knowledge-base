@@ -20,9 +20,11 @@ from erwang_v2.database import database_counts, ingest_case, ingest_passages, op
 from erwang_v2.legacy_ai_adapter import (
     adapt_legacy_case,
     load_legacy_ai_json,
+    normalize_work_name,
 )
 from erwang_v2.passage_builder import build_passages
 from erwang_v2.validate_annotation_case import validate_case
+from erwang_v2.validate_annotation_case import classify_machine_status
 
 
 AI_DIR = PROJECT_ROOT / "04-项目文献/D-标注/json/ai_json"
@@ -136,21 +138,6 @@ def _full_json_context_match(
     return "not_found"
 
 
-def _machine_status(
-    custom_errors: list[str], schema_errors: list[str]
-) -> str:
-    if not custom_errors and not schema_errors:
-        return "approved"
-    soft_prefix = "missing_evidence_passage:"
-    if custom_errors and not schema_errors and all(
-        error.startswith(soft_prefix) for error in custom_errors
-    ):
-        # The case is structurally usable, but at least one cited external
-        # source is not loaded in the current canonical passage corpus.
-        return "draft"
-    return "rejected"
-
-
 def _case_report(
     *,
     ai_path: Path,
@@ -192,17 +179,23 @@ def _case_report(
                 for evidence in v2_case.get("evidences", [])
             )
         ),
+        "cited_work_match_counts": dict(
+            Counter(
+                evidence.get("cited_work_match_status", "unknown")
+                for evidence in v2_case.get("evidences", [])
+            )
+        ),
         "full_json_context_counts": dict(
             Counter(
                 evidence.get("annotation_context_check", "unavailable")
                 for evidence in v2_case.get("evidences", [])
             )
         ),
-        "unlinked_full_json_context_counts": dict(
+        "external_pending_full_json_context_counts": dict(
             Counter(
                 evidence.get("annotation_context_check", "unavailable")
                 for evidence in v2_case.get("evidences", [])
-                if evidence.get("source_resolution") != "canonical_passage"
+                if evidence.get("source_resolution") == "external_source_pending"
             )
         ),
         "custom_validator": "passed" if not custom_errors else "failed",
@@ -305,15 +298,18 @@ def run_batch(
                 if not legacy_case.get("database_ingestion", {}).get("annotation_case_id"):
                     v2_case["case_id"] = _case_id_fallback(ai_path, case_index)
 
-                primary_work = legacy_case.get("source_work", "").strip().strip("《》")
+                primary_work = normalize_work_name(legacy_case.get("source_work", ""))
                 for evidence in v2_case.get("evidences", []):
+                    # The adapter distinguishes a cited-work passage from a
+                    # coincidental match in the Wang commentary.  Keep that
+                    # distinction intact; a secondary citation match is not a
+                    # canonical evidence pass.
                     if evidence.get("passage_id"):
-                        evidence["source_resolution"] = "canonical_passage"
-                    elif evidence.get("source_work") and evidence.get("source_work") != primary_work:
-                        evidence["source_resolution"] = "external_source_unavailable"
-                        # No canonical passage was loaded for this external
-                        # work, so this is not a failed quote check; it is an
-                        # unverified draft citation.
+                        evidence["source_resolution"] = "canonical_source_passage"
+                    elif evidence.get("source_resolution") == "secondary_citation_match":
+                        evidence["quote_check"] = "unchecked"
+                    elif evidence.get("source_work") and normalize_work_name(evidence.get("source_work")) != primary_work:
+                        evidence["source_resolution"] = "external_source_pending"
                         evidence["quote_check"] = "unchecked"
                     else:
                         evidence["source_resolution"] = "primary_source_no_match"
@@ -326,7 +322,7 @@ def run_batch(
                 custom_errors = validate_case(v2_case, passage_map)
                 schema_status, schema_errors = _schema_errors(v2_case)
                 all_errors = custom_errors + [f"jsonschema:{error}" for error in schema_errors]
-                machine_status = _machine_status(custom_errors, schema_errors)
+                machine_status = classify_machine_status(custom_errors, schema_errors)
                 v2_case["machine_result"] = {
                     "status": machine_status,
                     "validator": "erwang_v2.validate_annotation_case",
@@ -420,8 +416,12 @@ def run_batch(
     for item in case_reports:
         quote_counts.update(item["quote_check_counts"])
     context_counts = Counter()
+    resolution_counts = Counter()
+    cited_work_counts = Counter()
     for item in case_reports:
-        context_counts.update(item["unlinked_full_json_context_counts"])
+        context_counts.update(item["external_pending_full_json_context_counts"])
+        resolution_counts.update(item["source_resolution_counts"])
+        cited_work_counts.update(item["cited_work_match_counts"])
     no_evidence_cases = [
         item["case_id"] for item in case_reports if item["evidence_count"] == 0
     ]
@@ -519,10 +519,10 @@ def run_batch(
             {
                 "severity": "high",
                 "confidence": "high",
-                "finding": "存在没有 evidence 的旧 AI 案例；V2 最小 case 要求至少有一条证据。",
+                "finding": "存在原文明确没有 evidence 的旧 AI 案例；不能用猜测或占位引文补齐。",
                 "count": len(no_evidence_cases),
                 "evidence": no_evidence_cases,
-                "remediation": "保留为 rejected/待补证据，不进入 machine_draft 或 gold。",
+                "remediation": "保留为 rejected/source_no_citation，不进入 machine_draft 或 gold；如需补证据必须回到原典重新核查。",
             }
         )
 
@@ -536,7 +536,7 @@ def run_batch(
             "extract_and_audit_candidates",
             "adapt_legacy_cases_to_annotation_case.v1",
             "validate_schema_quote_source_and_hash",
-            "ingest_approved_as_machine_draft_and_failures_as_rejected_audit_records",
+            "ingest_machine_results_as_draft_or_rejected_audit_records",
             "keep_human_review_pending",
         ],
         "inputs": {
@@ -556,6 +556,8 @@ def run_batch(
                 item["human_status"] == "pending" for item in case_reports
             ),
             "quote_check_counts": dict(quote_counts),
+            "evidence_resolution_counts": dict(resolution_counts),
+            "cited_work_match_counts": dict(cited_work_counts),
             "full_json_context_counts": dict(context_counts),
             "no_evidence_case_count": len(no_evidence_cases),
         },

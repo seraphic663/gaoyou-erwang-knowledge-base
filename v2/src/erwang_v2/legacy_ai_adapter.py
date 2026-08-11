@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
+import unicodedata
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -55,6 +57,28 @@ def _sha256(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def normalize_work_name(value: str | None) -> str:
+    """Normalize a work label for comparison without changing its display form."""
+
+    return normalize_for_match(value or "").strip().strip("《》")
+
+
+def _compact_title(value: str | None) -> str:
+    """Remove markup and punctuation for conservative heading comparison."""
+
+    # Pronunciation/variant notes inside <small> are not lexical heading
+    # tokens.  Remove the whole run before comparing a legacy title with a
+    # Markdown heading.
+    text = re.sub(r"<small\b[^>]*>.*?</small>", "", value or "", flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = normalize_for_match(text)
+    return "".join(
+        char
+        for char in text
+        if not unicodedata.category(char).startswith(("P", "Z"))
+    )
+
+
 def _match_in_passage(needle: str, passage: dict[str, Any]) -> dict[str, Any] | None:
     if not needle:
         return None
@@ -92,22 +116,91 @@ def find_passage_matches(
 
 
 def _choose_match(
-    matches: list[dict[str, Any]], preferred_title: str | None = None
+    matches: list[dict[str, Any]],
+    preferred_title: str | None = None,
+    preferred_passage_id: str | None = None,
 ) -> dict[str, Any] | None:
     if not matches:
         return None
 
-    def score(item: dict[str, Any]) -> tuple[int, int, int]:
+    def score(item: dict[str, Any]) -> tuple[int, int, int, int]:
         passage = item["passage"]
         match = item["match"]
+        passage_bonus = int(
+            preferred_passage_id is not None
+            and passage.get("passage_id") == preferred_passage_id
+        )
         title_bonus = int(preferred_title is not None and passage.get("entry_title") == preferred_title)
         exact_bonus = int(match.get("mode") == "exact")
-        # Prefer a title-specific, exact match, then the shorter passage. The
-        # latter avoids selecting a large preceding section when both contain
-        # the same target phrase.
-        return (title_bonus, exact_bonus, -len(passage.get("plain_text", "")))
+        # Prefer an explicit entry hint, then a title-specific exact match, and
+        # only then the shorter passage. Single-character target_text values
+        # are common in 经传释词 and otherwise select unrelated passages.
+        return (
+            passage_bonus,
+            title_bonus,
+            exact_bonus,
+            -len(passage.get("plain_text", "")),
+        )
 
     return max(matches, key=score)
+
+
+def _preferred_source_passage_id(
+    legacy_case: dict[str, Any], passages: list[dict[str, Any]]
+) -> str | None:
+    """Return a source-entry hint when the legacy target text is ambiguous.
+
+    These are source-structure rules, not evidence guesses.  The 13 migrated
+    经传释词 cases all come from the Markdown entry ``以已``; the two Guangya
+    cases identify their entries by the long lexical heading in the legacy
+    case title.  If a future case does not meet the conservative threshold,
+    normal text matching remains in control.
+    """
+
+    source_work = normalize_work_name(legacy_case.get("source_work"))
+    case_title = _compact_title(legacy_case.get("case_title"))
+
+    if source_work == "经传释词":
+        for passage in passages:
+            if _compact_title(passage.get("entry_title")) == "以已":
+                return passage.get("passage_id")
+        return None
+
+    if source_work == "广雅疏证":
+        prefix = case_title[:8]
+        if not prefix:
+            return None
+        for passage in passages:
+            entry_title = _compact_title(passage.get("entry_title"))
+            if entry_title.startswith(prefix):
+                return passage.get("passage_id")
+        # In the extracted Guangya Markdown the first case is in the body of
+        # a passage whose preceding heading is a different lexical item.  A
+        # long, punctuation-free prefix still gives a safe block-level anchor.
+        for passage in passages:
+            if prefix in _compact_title(passage.get("plain_text")):
+                return passage.get("passage_id")
+        return None
+
+    if source_work == "读书杂志":
+        target_prefix = _compact_title(legacy_case.get("target_text"))
+        if target_prefix:
+            for passage in passages:
+                if target_prefix in _compact_title(passage.get("plain_text")):
+                    return passage.get("passage_id")
+
+    return None
+
+
+def _entry_hint_match(passage: dict[str, Any]) -> dict[str, Any]:
+    """Create a location match when an entry heading, not a text substring, is the anchor."""
+
+    return {
+        "mode": "entry_hint",
+        "field": "entry_title",
+        "start_char": None,
+        "end_char": None,
+    }
 
 
 def _location(
@@ -193,10 +286,26 @@ def adapt_legacy_case(
 
     passage_list = list(passages)
     target_text = legacy_case.get("target_text", "")
+    preferred_passage_id = _preferred_source_passage_id(legacy_case, passage_list)
     source_match = _choose_match(
         find_passage_matches(target_text, passage_list),
         preferred_title=legacy_case.get("case_title"),
+        preferred_passage_id=preferred_passage_id,
     )
+    if source_match is None and preferred_passage_id:
+        hinted_passage = next(
+            (
+                passage
+                for passage in passage_list
+                if passage.get("passage_id") == preferred_passage_id
+            ),
+            None,
+        )
+        if hinted_passage is not None:
+            source_match = {
+                "passage": hinted_passage,
+                "match": _entry_hint_match(hinted_passage),
+            }
     source_passage = source_match["passage"] if source_match else None
 
     term_relations: list[dict[str, Any]] = []
@@ -215,18 +324,40 @@ def adapt_legacy_case(
         )
 
     evidences: list[dict[str, Any]] = []
+    primary_work = normalize_work_name(legacy_case.get("source_work"))
     for evidence in legacy_case.get("evidences", []):
         quote = evidence.get("quote", "")
-        match = _choose_match(find_passage_matches(quote, passage_list))
-        passage = match["passage"] if match else None
-        match_data = match["match"] if match else None
+        primary_match = _choose_match(find_passage_matches(quote, passage_list))
+        cited_work = normalize_work_name(evidence.get("work"))
+        same_as_primary = bool(cited_work and cited_work == primary_work)
+        cited_match = primary_match if same_as_primary else None
+        passage = cited_match["passage"] if cited_match else None
+        match_data = cited_match["match"] if cited_match else None
         quote_check = "unchecked"
         if match_data:
             quote_check = (
                 "passed" if match_data["mode"] == "exact" else "normalized_passed"
             )
-        elif quote:
+        elif quote and same_as_primary:
             quote_check = "failed"
+
+        secondary_location = (
+            _location(primary_match["passage"], primary_match["match"])
+            if primary_match and not same_as_primary
+            else None
+        )
+        if cited_match:
+            source_resolution = "canonical_source_passage"
+            cited_work_match_status = "matched"
+        elif same_as_primary:
+            source_resolution = "primary_source_no_match"
+            cited_work_match_status = "not_found"
+        elif primary_match:
+            source_resolution = "secondary_citation_match"
+            cited_work_match_status = "external_source_pending"
+        else:
+            source_resolution = "external_source_pending"
+            cited_work_match_status = "external_source_pending"
         evidences.append(
             {
                 "quote": quote,
@@ -236,6 +367,14 @@ def adapt_legacy_case(
                 "quote_sha256": _sha256(quote) if quote else None,
                 "quote_check": quote_check,
                 "source_location": _location(passage, match_data),
+                "source_resolution": source_resolution,
+                "cited_work_match_status": cited_work_match_status,
+                "secondary_citation_passage_id": (
+                    primary_match["passage"].get("passage_id")
+                    if primary_match and not same_as_primary
+                    else None
+                ),
+                "secondary_citation_location": secondary_location,
                 "legacy_evidence_type": evidence.get("evidence_type"),
                 "legacy_source_paragraph_indexes": evidence.get("source_paragraph_indexes", []),
             }
@@ -257,6 +396,22 @@ def adapt_legacy_case(
     if additional_provenance:
         provenance.update(additional_provenance)
 
+    target_work = legacy_case.get("target_work", "")
+    target_works = [target_work] if target_work else []
+    target_scope = (
+        {
+            "status": "resolved",
+            "target_works": target_works,
+            "resolution_source": "legacy_ai_json",
+        }
+        if target_works
+        else {
+            "status": "unresolved",
+            "target_works": [],
+            "reason": "legacy_target_work_empty",
+        }
+    )
+
     return {
         "schema_version": "annotation_case.v1",
         "case_id": f"legacy-ai:{legacy_case.get('database_ingestion', {}).get('annotation_case_id', case_index)}",
@@ -268,13 +423,16 @@ def adapt_legacy_case(
         "source_location": _location(
             source_passage, source_match["match"] if source_match else None
         ),
-        "target_work": legacy_case.get("target_work", ""),
+        "target_work": target_work,
+        "target_works": target_works,
+        "target_scope": target_scope,
         "target_text": target_text,
         "target_location": _location(
             source_passage, source_match["match"] if source_match else None
         ),
         "term_relations": term_relations,
         "evidences": evidences,
+        "evidence_state": "present" if evidences else "source_no_citation",
         **process_fields,
         "conclusion": conclusion,
         "method_profile": {

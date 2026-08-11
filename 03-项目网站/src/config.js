@@ -88,6 +88,12 @@ module.exports = {
   SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'dictionary.db'),
   ANNOTATION_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'annotations.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
+  V2_DB_FILE: process.env.V2_DB_FILE
+    ? (path.isAbsolute(process.env.V2_DB_FILE)
+      ? process.env.V2_DB_FILE
+      : path.resolve(ROOT_DIR, process.env.V2_DB_FILE))
+    : path.join(WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'annotation_v2.db'),
+  V2_ACCEPTANCE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'v2_acceptance_bridge.py'),
   DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_MODEL: 'deepseek-v4-pro',
