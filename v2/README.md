@@ -77,3 +77,9 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
     python v2/scripts/run_real_case.py
 
 该命令默认读取《读书杂志》真实 Markdown 和现有 AI JSON 的“平原之隰”案例，执行段落定位、引文匹配、旧格式映射、V2 校验、统一数据库机器入库和机器/人工状态分离；它不会把原始文档复制进 V2，也不会写入旧数据库。
+
+批量迁移 3 个旧 AI JSON：
+
+    python v2/scripts/run_batch_migration.py
+
+该命令会把所有旧 AI JSON 作为迁移/回归材料写入同一个 V2 工作库，并生成 `v2/data/real_runs/batch_migration_report.json`。报告区分 `approved`、`draft`、`rejected`，保留人工 `pending`；未加载的外部原典引文只记为 `unchecked`，不会被误报为已核验。
