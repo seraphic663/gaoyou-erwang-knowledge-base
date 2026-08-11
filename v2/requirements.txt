@@ -1,0 +1,4 @@
+# V2 full schema validation and test tooling.
+# The smoke test itself uses only the Python standard library.
+jsonschema>=4.20,<5
+pytest>=8,<9

@@ -1,0 +1,63 @@
+{
+  "schema_version": "annotation_case.v1",
+  "case_id": "fixture_jingyi_0001",
+  "case_title": "造舟于河",
+  "submitted_by": "fixture",
+  "reviewed_by": null,
+  "source_work": "经义述闻",
+  "source_passage_id": "jingyi_shuwen_0001",
+  "target_work": "左传",
+  "target_text": "造舟于河",
+  "term_relations": [
+    {
+      "source_term": "造",
+      "target_term": "相比次",
+      "relation_type": "训释",
+      "relation_subtype": "声转释义",
+      "relation_note": "造、次一声之转"
+    }
+  ],
+  "evidences": [
+    {
+      "quote": "造、次一声之转",
+      "evidence_role": "声训依据",
+      "source_work": "经义述闻",
+      "passage_id": "jingyi_shuwen_0001",
+      "quote_start_char": null,
+      "quote_end_char": null,
+      "quote_sha256": null,
+      "quote_check": "unchecked"
+    }
+  ],
+  "problem_discovery": "旧说对造舟的解释存在分歧。",
+  "research_question": "造是否应训为相比次？",
+  "evidence_collection": "取二王原文中的声转说明为证。",
+  "reasoning": "以声近关系支持训释判断。",
+  "conclusion": "造应训为相比次。",
+  "method_profile": {
+    "concepts": ["声训"],
+    "expressions": [
+      {
+        "quote": "造、次一声之转",
+        "passage_id": "jingyi_shuwen_0001",
+        "mapped_concepts": ["声训"]
+      }
+    ]
+  },
+  "machine_result": {
+    "status": "pending",
+    "model": "",
+    "prompt_version": "",
+    "validation": {
+      "quote_check": "unchecked",
+      "schema_check": "unchecked",
+      "enum_check": "unchecked"
+    }
+  },
+  "human_review": {
+    "status": "pending",
+    "reviewed_by": "",
+    "review_result": "",
+    "notes": ""
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "schema_version": "annotation_case.v1",
+  "case_id": "fixture_dushu_0001",
+  "case_title": "平原之隰",
+  "submitted_by": "fixture",
+  "reviewed_by": null,
+  "source_work": "读书杂志",
+  "source_passage_id": "dushu_zazhi_0001",
+  "target_work": "管子",
+  "target_text": "平原之隰",
+  "term_relations": [
+    {
+      "source_term": "原",
+      "target_term": "隰",
+      "relation_type": "校勘",
+      "relation_subtype": "误字",
+      "relation_note": "示例性校勘关系"
+    }
+  ],
+  "evidences": [
+    {
+      "quote": "言平隰之泽，虽有小封，不成于高。",
+      "evidence_role": "支持校改",
+      "source_work": "读书杂志",
+      "passage_id": "dushu_zazhi_0001",
+      "quote_start_char": null,
+      "quote_end_char": null,
+      "quote_sha256": null,
+      "quote_check": "unchecked"
+    }
+  ],
+  "problem_discovery": "今本文字与注文语义不协。",
+  "research_question": "今本是否应据注文校改？",
+  "evidence_collection": "取注文和上下文为证。",
+  "reasoning": "由注文中的小封反证今本文字。",
+  "conclusion": "本例暂按校勘候选记录，待底本复核。",
+  "method_profile": {
+    "concepts": ["异文校勘", "书证"],
+    "expressions": []
+  },
+  "machine_result": {
+    "status": "pending",
+    "model": "",
+    "prompt_version": "",
+    "validation": {
+      "quote_check": "unchecked",
+      "schema_check": "unchecked",
+      "enum_check": "unchecked"
+    }
+  },
+  "human_review": {
+    "status": "pending",
+    "reviewed_by": "",
+    "review_result": "",
+    "notes": ""
+  }
+}
