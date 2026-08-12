@@ -43,6 +43,19 @@ class V2SmokeTest(unittest.TestCase):
         for case in cases:
             self.assertEqual(validate_case(case, passages), [])
 
+    def test_noncanonical_passage_cannot_be_marked_quote_passed(self) -> None:
+        passages = load_passages_jsonl(V2_ROOT / "data/fixtures/passages.jsonl")
+        case = json.loads(
+            (V2_ROOT / "data/fixtures/cases/造舟于河.annotation.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        evidence = case["evidences"][0]
+        evidence["source_resolution"] = "legacy_derived_passage"
+        evidence["quote_check"] = "passed"
+        errors = validate_case(case, passages)
+        self.assertIn("noncanonical_quote_cannot_pass:0:legacy_derived_passage", errors)
+
 
 if __name__ == "__main__":
     unittest.main()

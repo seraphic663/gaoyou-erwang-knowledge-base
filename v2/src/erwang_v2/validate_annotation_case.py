@@ -70,6 +70,9 @@ def validate_case(
     target_works = case.get("target_works") or []
     if not target_work and not target_works:
         errors.append("unresolved_target_work")
+    target_scope = case.get("target_scope") or {}
+    if target_works and target_scope.get("status") not in {None, "resolved"}:
+        errors.append(f"target_scope_not_resolved:{target_scope.get('status')}")
 
     evidence_state = case.get("evidence_state", "present")
     if evidence_state not in EVIDENCE_STATES:
@@ -106,6 +109,14 @@ def validate_case(
         quote_check = evidence.get("quote_check")
         if quote_check and quote_check not in QUOTE_CHECKS:
             errors.append(f"invalid_quote_check:{index}:{quote_check}")
+        source_resolution = evidence.get("source_resolution")
+        if (
+            quote_check in {"passed", "normalized_passed"}
+            and source_resolution != "canonical_source_passage"
+        ):
+            errors.append(
+                f"noncanonical_quote_cannot_pass:{index}:{source_resolution}"
+            )
         if quote not in plain_text:
             normalized_match = normalize_for_match(quote) in normalize_for_match(plain_text)
             if not (quote_check == "normalized_passed" and normalized_match):
@@ -133,7 +144,18 @@ def classify_machine_status(
     schema_errors = schema_errors or []
     if not custom_errors and not schema_errors:
         return "approved"
-    soft_prefixes = ("missing_evidence_passage:",)
+    # These are review-boundary findings, not malformed records: an external
+    # quote may be retained without a local canonical passage, a target scope
+    # may be candidate-only, and an explicitly no-citation case may need a
+    # human decision. Keep the errors in machine_result, but route the case to
+    # machine_draft/human_pending so the workflow reaches review rather than
+    # stopping at an automated rejection.
+    soft_prefixes = (
+        "missing_evidence_passage:",
+        "target_scope_not_resolved:",
+        "unresolved_target_work",
+        "source_has_no_citation",
+    )
     if custom_errors and not schema_errors and all(
         any(error.startswith(prefix) for prefix in soft_prefixes)
         for error in custom_errors

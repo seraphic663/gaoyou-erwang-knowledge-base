@@ -1,0 +1,21 @@
+{{GJTSJC header
+|彙編=理學
+|典=經籍
+|卷=一百二十六
+|juan=126
+
+|彙編_prev=理學
+|典_prev=經籍
+|卷_prev=一百二十五
+|juan_prev=125
+
+|彙編_next=理學
+|典_next=經籍
+|卷_next=一百二十七
+|juan_next=127
+}}
+__NOEDITSECTION__
+<pages index="Gujin Tushu Jicheng, Volume 567 (1700-1725).djvu" from="66" to="72" />
+
+{{PD-old}}
+{{Machine punctuation|[https://seg.shenshen.wiki/ 古詩文斷句 v2.1]}}

@@ -1,0 +1,21 @@
+{{GJTSJC header
+|彙編=理學
+|典=學行
+|卷=一百七十九
+|juan=179
+
+|彙編_prev=理學
+|典_prev=學行
+|卷_prev=一百七十八
+|juan_prev=178
+
+|彙編_next=理學
+|典_next=學行
+|卷_next=一百八十
+|juan_next=180
+}}
+__NOEDITSECTION__
+<pages index="Gujin Tushu Jicheng, Volume 611 (1700-1725).djvu" from="80" to="84" />
+
+{{PD-old}}
+{{Machine punctuation|[https://seg.shenshen.wiki/ 古詩文斷句 v2.1]}}

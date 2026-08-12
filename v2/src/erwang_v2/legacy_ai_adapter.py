@@ -272,6 +272,63 @@ def _map_process_steps(
     }
 
 
+def _fill_machine_process_fields(
+    fields: dict[str, str | None],
+    legacy_case: dict[str, Any],
+    *,
+    evidence_count: int,
+    source_passage_id: str | None,
+) -> dict[str, str]:
+    """Complete the five workflow fields without inventing a scholarly claim.
+
+    Old AI files use a partially different process vocabulary and often omit a
+    question-shaped field.  These replacements describe what the migration
+    machine did and what remains to be checked; they are deliberately not
+    presented as a new interpretation of the Wang text.
+    """
+
+    case_label = (
+        legacy_case.get("case_title")
+        or legacy_case.get("target_text")
+        or "未命名旧 AI 案例"
+    )
+    statuses: dict[str, str] = {}
+    fallback_values = {
+        "problem_discovery": (
+            f"机器迁移发现：旧 AI 案例“{case_label}”需要将目标字词、原始引文和来源位置"
+            "重新挂接到 annotation_case.v1。"
+        ),
+        "research_question": (
+            f"机器待核问题：案例“{case_label}”的字词关系和引文，能否逐条回到登记的王氏原典 passage"
+            "或已登记的外部底本，并确认目标作品与目标位置？"
+        ),
+        "evidence_collection": (
+            f"机器证据整理：已保留 {evidence_count} 条 quote、旧 full_json 段落索引和当前来源解析状态；"
+            "外部典籍引文仍须独立底本核验。"
+        ),
+        "reasoning": (
+            "机器定位链：旧 AI 字段 → 王氏 Markdown source passage → quote/source_work 匹配 → "
+            "canonical、secondary 或 external pending 状态；未进行语义裁判。"
+        ),
+        "conclusion": (
+            "机器迁移结论：结构化和定位草稿已保存，学术结论、外部版本和目标位置仍待人工审校。"
+        ),
+    }
+    for field, fallback in fallback_values.items():
+        value = fields.get(field)
+        if isinstance(value, str) and value.strip():
+            fields[field] = value.strip()
+            statuses[field] = "source_mapped"
+        else:
+            fields[field] = fallback
+            statuses[field] = "machine_synthesized"
+    if source_passage_id:
+        statuses["source_passage_id"] = "resolved_by_markdown_match"
+    else:
+        statuses["source_passage_id"] = "unresolved_pending_source_match"
+    return statuses
+
+
 def adapt_legacy_case(
     legacy_case: dict[str, Any],
     passages: Iterable[dict[str, Any]],
@@ -386,8 +443,21 @@ def adapt_legacy_case(
     conclusion = legacy_case.get("conclusion") or process_fields["conclusion"]
     if not conclusion:
         conclusion = legacy_case.get("claim", "")
+    process_fields["conclusion"] = conclusion
+    process_field_status = _fill_machine_process_fields(
+        process_fields,
+        legacy_case,
+        evidence_count=len(evidences),
+        source_passage_id=source_passage.get("passage_id") if source_passage else None,
+    )
+    conclusion = process_fields["conclusion"] or "机器迁移结论：待人工审校。"
+    process_text = "\n".join(
+        f"{field}: {process_fields[field]}"
+        for field in ("problem_discovery", "research_question", "evidence_collection", "reasoning", "conclusion")
+    )
 
     provenance = {
+        "source_file": str(legacy_ai_json),
         "source_markdown": str(source_markdown),
         "legacy_ai_json": str(legacy_ai_json),
         "legacy_case_index": case_index,
@@ -434,6 +504,7 @@ def adapt_legacy_case(
         "evidences": evidences,
         "evidence_state": "present" if evidences else "source_no_citation",
         **process_fields,
+        "process_text": process_text,
         "conclusion": conclusion,
         "method_profile": {
             "legacy_method_tags": legacy_case.get("method_tags", []),
@@ -450,10 +521,14 @@ def adapt_legacy_case(
         },
         "_migration": {
             "source_format": "legacy_ai_json",
+            "source_layer": "legacy_ai_json_output",
+            "transformation_kind": "legacy_ai_json_reprocessing",
+            "transformation_description": "旧 AI JSON 经字段、段落、证据和状态边界适配为 annotation_case.v1；不重新证明学术结论。",
             "legacy_problem": legacy_case.get("problem"),
             "legacy_claim": legacy_case.get("claim"),
             "legacy_status": legacy_case.get("status"),
             "legacy_certainty": legacy_case.get("certainty"),
+            "machine_filled_process_fields": process_field_status,
             **process_migration,
             "provenance": provenance,
         },

@@ -1,0 +1,489 @@
+from __future__ import annotations
+
+"""Fetch public external-text candidates without promoting them to canonical.
+
+The script uses the public Wikisource MediaWiki API as a locating aid.  It
+freezes the returned wikitext and revision metadata, but deliberately leaves
+the V2 evidence rows unchecked: a public transcription is not by itself a
+chosen edition or an image-verified canonical passage.
+"""
+
+import argparse
+import hashlib
+import json
+import re
+import sqlite3
+import time
+import unicodedata
+import urllib.parse
+import urllib.request
+from collections import Counter
+from datetime import datetime, timezone
+from html import unescape
+from pathlib import Path
+from typing import Any
+
+
+V2_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = V2_ROOT.parent
+DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
+DEFAULT_OUTPUT = V2_ROOT / "data/external_sources/wikisource"
+DEFAULT_MANIFEST = V2_ROOT / "data/real_runs/external_public_candidate_manifest.json"
+DEFAULT_CANDIDATES = V2_ROOT / "data/real_runs/external_passage_candidates.passage.v1.jsonl"
+API_URL = "https://zh.wikisource.org/w/api.php"
+USER_AGENT = "Erwang-V2-public-source-candidate-fetch/1.0"
+
+
+# Only used to make a conservative cross-script lookup.  It is not a claim
+# that simplified and traditional characters are semantically interchangeable.
+_TRADITIONAL = str.maketrans(
+    "礼记书传说广雅势义乐乱国声风电与为也说文尔东义仪乡射齐鲁经论语诗击鼓邱齐采苹韩奕说苑慎汉将伤创疥癣旧简标识远举顾忧",
+    "禮記書傳說廣雅勢義樂亂國聲風電與為也說文爾東義儀鄉射齊魯經論語詩擊鼓丘齊採蘋韓奕說苑慎漢將傷創疥癬舊簡標識遠舉顧憂",
+)
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _sha256_bytes(value: bytes) -> str:
+    return hashlib.sha256(value).hexdigest()
+
+
+def _sha256_text(value: str) -> str:
+    return _sha256_bytes(value.encode("utf-8"))
+
+
+def _compact(value: str) -> str:
+    value = unicodedata.normalize("NFKC", value or "")
+    return "".join(
+        char
+        for char in value
+        if not unicodedata.category(char).startswith(("P", "Z"))
+        and unicodedata.category(char) != "Cf"
+    )
+
+
+def _variants(value: str) -> list[str]:
+    values = [value, value.translate(_TRADITIONAL)]
+    compact_values = [_compact(item) for item in values]
+    return list(dict.fromkeys(item for item in values + compact_values if item))
+
+
+def _relative(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def _request(params: dict[str, Any]) -> dict[str, Any]:
+    query = urllib.parse.urlencode(
+        {key: value for key, value in params.items() if value is not None}
+    )
+    request = urllib.request.Request(
+        f"{API_URL}?{query}",
+        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=40) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+
+def _search_quote(quote: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    queries = [f'"{quote.replace(chr(34), " ")}"', quote]
+    attempts: list[dict[str, Any]] = []
+    for query in queries:
+        try:
+            data = _request(
+                {
+                    "action": "query",
+                    "list": "search",
+                    "srsearch": query,
+                    "srnamespace": 0,
+                    "srlimit": 10,
+                    "srprop": "snippet|timestamp|wordcount",
+                    "format": "json",
+                }
+            )
+        except Exception as error:  # pragma: no cover - network dependent
+            attempts.append({"query": query, "error": f"{type(error).__name__}:{error}"})
+            continue
+        results = data.get("query", {}).get("search", [])
+        attempts.append({"query": query, "result_count": len(results)})
+        if results:
+            return results, {"attempts": attempts, "selected_query": query}
+        time.sleep(0.15)
+    return [], {"attempts": attempts, "selected_query": None}
+
+
+def _label_tokens(label: str) -> list[str]:
+    clean = str(label or "").strip("《》 ")
+    clean = clean.replace("》", "").replace("《", "")
+    parts = [part for part in re.split(r"[·/、，,；;\s]+", clean) if part]
+    if not parts:
+        return []
+    tokens: list[str] = []
+    for part in parts:
+        for item in (part, part.translate(_TRADITIONAL)):
+            compact = _compact(item)
+            if len(compact) >= 2:
+                tokens.append(compact)
+    return list(dict.fromkeys(tokens))
+
+
+def _title_score(title: str, cited_work: str) -> int:
+    normalized_title = _compact(title.translate(_TRADITIONAL))
+    return sum(1 for token in _label_tokens(cited_work) if token in normalized_title)
+
+
+def _fetch_page(title: str) -> dict[str, Any] | None:
+    try:
+        data = _request(
+            {
+                "action": "query",
+                "prop": "revisions",
+                "titles": title,
+                "rvprop": "content|ids|timestamp",
+                "rvslots": "main",
+                "format": "json",
+                "formatversion": "2",
+            }
+        )
+    except Exception as error:  # pragma: no cover - network dependent
+        return {"title": title, "fetch_error": f"{type(error).__name__}:{error}"}
+    pages = data.get("query", {}).get("pages", [])
+    if not pages:
+        return {"title": title, "page_missing": True}
+    page = pages[0]
+    revisions = page.get("revisions", [])
+    if not revisions:
+        return {
+            "title": title,
+            "pageid": page.get("pageid"),
+            "page_missing": page.get("missing", False),
+            "revision_missing": True,
+        }
+    revision = revisions[0]
+    content = (
+        revision.get("slots", {})
+        .get("main", {})
+        .get("content", "")
+    )
+    return {
+        "title": page.get("title", title),
+        "pageid": page.get("pageid"),
+        "revid": revision.get("revid"),
+        "timestamp": revision.get("timestamp"),
+        "content": content,
+        "content_sha256": _sha256_text(content),
+    }
+
+
+def _raw_match(content: str, quote: str) -> dict[str, Any]:
+    for variant in _variants(quote):
+        start = content.find(variant)
+        if start >= 0:
+            return {
+                "match_mode": "raw_exact" if variant == quote else "raw_variant_exact",
+                "start_char": start,
+                "end_char": start + len(variant),
+                "matched_text": variant,
+            }
+    compact_content = _compact(content)
+    compact_quote = _compact(quote.translate(_TRADITIONAL))
+    if compact_quote and compact_quote in compact_content:
+        return {
+            "match_mode": "compact_match",
+            "start_char": None,
+            "end_char": None,
+            "matched_text": None,
+        }
+    return {
+        "match_mode": "search_only",
+        "start_char": None,
+        "end_char": None,
+        "matched_text": None,
+    }
+
+
+def _snippet(content: str, match: dict[str, Any], quote: str) -> str:
+    start = match.get("start_char")
+    end = match.get("end_char")
+    if isinstance(start, int) and isinstance(end, int):
+        return content[max(0, start - 320) : min(len(content), end + 320)]
+    return quote
+
+
+def _load_evidence_rows(database: Path) -> list[dict[str, Any]]:
+    connection = sqlite3.connect(database)
+    connection.row_factory = sqlite3.Row
+    rows = connection.execute(
+        """
+        SELECT ae.case_id, ae.evidence_index, ae.source_work, ae.quote,
+               es.external_source_id, es.normalized_work
+        FROM annotation_evidences AS ae
+        JOIN annotation_evidence_external_sources AS link
+          ON link.case_id = ae.case_id AND link.evidence_index = ae.evidence_index
+        JOIN external_source_registry AS es
+          ON es.external_source_id = link.external_source_id
+        WHERE json_extract(ae.evidence_json, '$.source_resolution') = 'external_source_pending'
+        ORDER BY ae.case_id, ae.evidence_index
+        """
+    ).fetchall()
+    connection.close()
+    return [dict(row) for row in rows]
+
+
+def _page_filename(page_title: str) -> str:
+    digest = hashlib.sha256(page_title.encode("utf-8")).hexdigest()[:16]
+    safe = re.sub(r"[^0-9A-Za-z一-龥_-]+", "_", page_title).strip("_")[:80]
+    return f"{safe or 'page'}-{digest}.wikitext"
+
+
+def _write_json(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def _write_jsonl(path: Path, values: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for value in values:
+            handle.write(json.dumps(value, ensure_ascii=False, separators=(",", ":")) + "\n")
+
+
+def _register_candidates(
+    database: Path,
+    manifest_relative: str,
+    manifest_sha256: str,
+    entries: list[dict[str, Any]],
+) -> None:
+    """Register a fetched public candidate, never a verified canonical source."""
+
+    by_source: dict[str, list[dict[str, Any]]] = {}
+    for entry in entries:
+        if entry.get("status") != "candidate_found":
+            continue
+        by_source.setdefault(entry["external_source_id"], []).append(entry)
+    connection = sqlite3.connect(database)
+    now = _now()
+    for external_source_id, source_entries in by_source.items():
+        first = source_entries[0]
+        metadata = {
+            "candidate_status": "public_transcription_candidate",
+            "canonical_verified": False,
+            "manifest": manifest_relative,
+            "evidence_count_with_candidate": len(source_entries),
+            "page_titles": sorted(
+                {
+                    candidate["page_title"]
+                    for entry in source_entries
+                    for candidate in entry.get("candidates", [])
+                    if candidate.get("page_title")
+                }
+            ),
+            "version_boundary": "Wikisource page/revision is a locating candidate; edition and image verification remain pending.",
+        }
+        connection.execute(
+            """
+            UPDATE external_source_registry
+            SET status = 'registered', source_file = ?, source_file_sha256 = ?,
+                edition = ?, location_note = ?, metadata_json = ?, updated_at = ?
+            WHERE external_source_id = ?
+            """,
+            (
+                manifest_relative,
+                manifest_sha256,
+                "Wikisource public transcription; edition unresolved",
+                f"{len(source_entries)} quote candidate(s); quote remains unchecked",
+                json.dumps(metadata, ensure_ascii=False, sort_keys=True),
+                now,
+                external_source_id,
+            ),
+        )
+    connection.commit()
+    connection.close()
+
+
+def _reconcile_manifest_hash(manifest_path: Path, database: Path) -> dict[str, Any]:
+    """Repair a previously written manifest without making network requests."""
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest.pop("manifest_sha256", None)
+    _write_json(manifest_path, manifest)
+    manifest_sha256 = _sha256_bytes(manifest_path.read_bytes())
+    manifest_path.with_suffix(manifest_path.suffix + ".sha256").write_text(
+        f"{manifest_sha256}  {manifest_path.name}\n", encoding="utf-8"
+    )
+    connection = sqlite3.connect(database)
+    connection.execute(
+        "UPDATE external_source_registry SET source_file_sha256 = ?, updated_at = ? WHERE source_file = ?",
+        (manifest_sha256, _now(), _relative(manifest_path)),
+    )
+    connection.commit()
+    connection.close()
+    manifest["manifest_sha256"] = manifest_sha256
+    return manifest
+
+
+def run(
+    *,
+    database: Path = DEFAULT_DATABASE,
+    output_dir: Path = DEFAULT_OUTPUT,
+    manifest_path: Path = DEFAULT_MANIFEST,
+    candidates_path: Path = DEFAULT_CANDIDATES,
+    max_results_per_quote: int = 10,
+) -> dict[str, Any]:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    pages_dir = output_dir / "pages"
+    pages_dir.mkdir(parents=True, exist_ok=True)
+    evidence_rows = _load_evidence_rows(database)
+    entries: list[dict[str, Any]] = []
+    page_cache: dict[str, dict[str, Any] | None] = {}
+    page_records: dict[str, dict[str, Any]] = {}
+
+    for row_index, row in enumerate(evidence_rows):
+        quote = row.get("quote") or ""
+        search_results, search_meta = _search_quote(quote)
+        ranked = sorted(
+            search_results[:max_results_per_quote],
+            key=lambda result: (
+                _title_score(result.get("title", ""), row.get("source_work", "")),
+                -len(result.get("title", "")),
+            ),
+            reverse=True,
+        )
+        # A full-text search can return unrelated works containing the same
+        # short phrase.  Do not download or present those pages as candidates
+        # unless the page title contains at least one normalized cited-work
+        # token.  The raw search hits are retained below for audit, but remain
+        # search-only evidence.
+        eligible = [
+            result
+            for result in ranked
+            if _title_score(result.get("title", ""), row.get("source_work", "")) > 0
+        ]
+        candidate_records: list[dict[str, Any]] = []
+        for result in eligible[:max_results_per_quote]:
+            title = result.get("title", "")
+            if not title:
+                continue
+            if title not in page_cache:
+                page_cache[title] = _fetch_page(title)
+                time.sleep(0.15)
+            page = page_cache[title]
+            if not page or not page.get("content"):
+                continue
+            content = page["content"]
+            match = _raw_match(content, quote)
+            page_file = pages_dir / _page_filename(title)
+            if not page_file.exists():
+                page_file.write_text(content, encoding="utf-8")
+            page_record = {
+                "page_title": page.get("title", title),
+                "pageid": page.get("pageid"),
+                "revid": page.get("revid"),
+                "timestamp": page.get("timestamp"),
+                "page_url": "https://zh.wikisource.org/wiki/" + urllib.parse.quote(title, safe="/"),
+                "api_url": API_URL + "?" + urllib.parse.urlencode({"action": "query", "prop": "revisions", "titles": title}),
+                "raw_file": _relative(page_file),
+                "raw_sha256": page.get("content_sha256"),
+            }
+            page_records[title] = page_record
+            candidate_records.append(
+                {
+                    **page_record,
+                    "title_match_score": _title_score(title, row.get("source_work", "")),
+                    "search_snippet": unescape(result.get("snippet", "")),
+                    "search_timestamp": result.get("timestamp"),
+                    **match,
+                    "matched_context": _snippet(content, match, quote),
+                }
+            )
+        found = [item for item in candidate_records if item.get("match_mode") != "search_only"]
+        status = "candidate_found" if found else "search_hit_only" if candidate_records else "no_public_match"
+        entries.append(
+            {
+                "case_id": row["case_id"],
+                "evidence_index": row["evidence_index"],
+                "external_source_id": row["external_source_id"],
+                "cited_work": row["source_work"],
+                "normalized_work": row["normalized_work"],
+                "quote": quote,
+                "status": status,
+                "search": search_meta,
+                "search_hits": [
+                    {
+                        "page_title": result.get("title"),
+                        "title_match_score": _title_score(
+                            result.get("title", ""), row.get("source_work", "")
+                        ),
+                        "search_snippet": unescape(result.get("snippet", "")),
+                    }
+                    for result in ranked[:max_results_per_quote]
+                ],
+                "candidates": candidate_records,
+                "boundary": "public candidate only; not canonical passed",
+            }
+        )
+        if row_index and row_index % 10 == 0:
+            print(f"processed {row_index}/{len(evidence_rows)} external evidence", flush=True)
+
+    manifest = {
+        "schema_version": "external_public_candidate_manifest.v1",
+        "generated_at": _now(),
+        "database": str(database),
+        "api": API_URL,
+        "source_policy": {
+            "source_kind": "public_transcription_candidate",
+            "canonical_status": "not_verified",
+            "quote_check_mutation": "none; all V2 evidence remains unchecked",
+            "version_rule": "Wikisource page/revision metadata is recorded; edition and image-level verification remain pending",
+        },
+        "summary": {
+            "evidence_count": len(entries),
+            "status_counts": dict(Counter(entry["status"] for entry in entries)),
+            "candidate_count": sum(len(entry.get("candidates", [])) for entry in entries),
+            "page_count": len(page_records),
+            "source_count_with_candidate": len(
+                {entry["external_source_id"] for entry in entries if entry["status"] == "candidate_found"}
+            ),
+        },
+        "entries": entries,
+        "pages": sorted(page_records.values(), key=lambda item: item["page_title"]),
+    }
+    _write_json(manifest_path, manifest)
+    _write_jsonl(candidates_path, entries)
+    manifest_sha256 = _sha256_bytes(manifest_path.read_bytes())
+    _register_candidates(database, _relative(manifest_path), manifest_sha256, entries)
+    manifest_path.with_suffix(manifest_path.suffix + ".sha256").write_text(
+        f"{manifest_sha256}  {manifest_path.name}\n", encoding="utf-8"
+    )
+    manifest["manifest_sha256"] = manifest_sha256
+    return manifest
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--database", type=Path, default=DEFAULT_DATABASE)
+    parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument("--candidates", type=Path, default=DEFAULT_CANDIDATES)
+    parser.add_argument("--reconcile-only", action="store_true")
+    args = parser.parse_args()
+    if args.reconcile_only:
+        manifest = _reconcile_manifest_hash(args.manifest, args.database)
+        print(json.dumps({"manifest_sha256": manifest["manifest_sha256"]}, ensure_ascii=False, indent=2))
+        return 0
+    manifest = run(
+        database=args.database,
+        output_dir=args.output_dir,
+        manifest_path=args.manifest,
+        candidates_path=args.candidates,
+    )
+    print(json.dumps(manifest["summary"], ensure_ascii=False, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

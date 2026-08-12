@@ -6,6 +6,7 @@
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
+- V2 数据库：`v2-database.html` 提供直接使用的案例展示界面；`v2-acceptance.html` 提供完整详情、来源链和验收审计界面，二者都只读读取独立的 `v2/data/real_runs/annotation_v2.db`。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
 - 标注工作台：给成员本地填写 `annotation_case.v1`，自动保存浏览器草稿，导出 JSON 文件后走 branch / PR。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
@@ -51,6 +52,8 @@ http://localhost:3000
   -> 03-项目网站/scripts/sqlite_bridge.py
   -> 03-项目网站/data/sqlite-snapshot.json
 ```
+
+这里的主库是旧 `source.txt -> parser.py -> importer.py` 机器解析结果，不是 DeepSeek AI 输出；DeepSeek 规范化材料在独立的 `02-数据库/data/annotations.db` 和 `annotation-snapshot.json` 中。二者目前都通过 V2 适配器进入独立的 V2 工作库，不能混称为人工审核主库。
 
 网站默认优先读取 `data/sqlite-snapshot.json`。如果 SQLite 数据变化，需要在仓库根目录运行：
 

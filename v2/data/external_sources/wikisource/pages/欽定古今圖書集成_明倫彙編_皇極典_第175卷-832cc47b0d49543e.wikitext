@@ -1,0 +1,21 @@
+{{GJTSJC header
+|彙編=明倫
+|典=皇極
+|卷=一百七十五
+|juan=175
+
+|彙編_prev=明倫
+|典_prev=皇極
+|卷_prev=一百七十四
+|juan_prev=174
+
+|彙編_next=明倫
+|典_next=皇極
+|卷_next=一百七十六
+|juan_next=176
+}}
+__NOEDITSECTION__
+<pages index="Gujin Tushu Jicheng, Volume 235 (1700-1725).djvu" from="41" to="50" />
+
+{{PD-old}}
+{{Machine punctuation|[https://seg.shenshen.wiki/ 古詩文斷句 v2.1]}}

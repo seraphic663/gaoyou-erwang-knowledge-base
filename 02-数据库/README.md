@@ -29,9 +29,9 @@
 
 | | dictionary.db（主库） | annotations.db（标注库） |
 |---|---|---|
-| 数据来源 | 《广雅疏证》source.txt，机器解析 | DOCX 人工标注 + DeepSeek 规范化 |
+| 数据来源 | 《广雅疏证》source.txt，旧 parser/importer 机器解析；不是 DeepSeek 输出 | DOCX 抽取 + DeepSeek 规范化 AI 工作稿 |
 | 数据量 | 49 著作 · 3,385 词条 · 815 案例 · 7,120 证据 | 3 文档 · 44 词条 · 17 案例 · 121 证据 · 64 过程步骤 |
-| 成熟度 | 已校对/已审核 | 草稿/待核 |
+| 成熟度 | 旧字段显示 `草稿`/`确定`，但按 V2 只能视为机器结构化材料 | 草稿/待核 |
 | 重建策略 | 全量重建（从 source.txt） | 增量追加（从 run.py） |
 | 网站入口 | 首页、database.html、term.html、case.html | annotation.html（人工库浏览）+ ai-annotation.html（AI 释证） |
 | 核心表 | works, passages, terms, cases, evidences | source_documents, annotation_cases, annotation_terms, annotation_evidences, annotation_process_steps |
@@ -82,6 +82,7 @@ npm run sync:annotation
 - 正式运行 `importer.py` 会重建或更新 `data/dictionary.db`。
 - `npm run sync:sqlite` 把主库导出为网站 JSON 快照。
 - `npm run sync:annotation` 把标注库导出为网站 JSON 快照。
+- 如需进入 V2 工作库，使用 `python v2/scripts/run_legacy_machine_conversion.py` 转换主库机器材料；不得把主库旧字段 `确定` 解释为 V2 人工 gold。
 
 ## 维护场景
 

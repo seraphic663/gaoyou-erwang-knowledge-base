@@ -16,13 +16,20 @@ sys.path.insert(0, str(V2_ROOT / "src"))
 
 from erwang_v2.candidate_auditor import audit_candidates
 from erwang_v2.candidate_extractor import extract_candidates
-from erwang_v2.database import database_counts, ingest_case, ingest_passages, open_database
+from erwang_v2.database import (
+    database_counts,
+    ingest_case,
+    ingest_passages,
+    open_database,
+    register_source_version,
+)
 from erwang_v2.legacy_ai_adapter import (
     adapt_legacy_case,
     load_legacy_ai_json,
     normalize_work_name,
 )
 from erwang_v2.passage_builder import build_passages
+from erwang_v2.target_inference import infer_target_scope
 from erwang_v2.validate_annotation_case import validate_case
 from erwang_v2.validate_annotation_case import classify_machine_status
 
@@ -45,7 +52,57 @@ WORKS = {
         "work_key": "dushu_zazhi",
         "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/读书杂志_王念孙.md",
     },
+    "经义述闻": {
+        "work_key": "jingyi_shuwen",
+        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/经义述闻_王引之.md",
+    },
 }
+
+DUSHU_CANONICAL_SHA256 = (
+    "1460a906825998bf8a4bf3c51d4525fe19b8b79f377fb6d25ccdad4dc698e19e"
+)
+DUSHU_HISTORICAL_SHA256 = (
+    "1534084959961a160ddc93b5d7523ec2565bb01f0c079523f53442ef61fa37b2"
+)
+
+
+def _register_source_version_policy(connection) -> dict[str, Any]:
+    source_file_path = WORKS["读书杂志"]["markdown"].resolve()
+    source_file = str(source_file_path)
+    historical_id = register_source_version(
+        connection,
+        work_key="dushu_zazhi",
+        source_file=source_file,
+        source_file_sha256=DUSHU_HISTORICAL_SHA256,
+        canonical_status="historical_superseded",
+        superseded_by_sha256=DUSHU_CANONICAL_SHA256,
+        reason=(
+            "历史运行遗留 hash；当前活动 canonical Markdown 已固定为 "
+            "1460a906825998bf...，旧版本不进入 active passages。"
+        ),
+        metadata={"legacy_hash_prefix": "1534084959961a16"},
+    )
+    active_id = register_source_version(
+        connection,
+        work_key="dushu_zazhi",
+        source_file=source_file,
+        source_file_sha256=DUSHU_CANONICAL_SHA256,
+        canonical_status="canonical_active",
+        reason=(
+            "当前磁盘上的《读书杂志》Markdown canonical 版本；旧 "
+            "1534084959961a16... 仅作 historical/superseded lineage。"
+        ),
+        metadata={"canonical_hash_prefix": "1460a906825998bf"},
+    )
+    return {
+        "work_key": "dushu_zazhi",
+        "source_file": source_file,
+        "canonical_source_version_id": active_id,
+        "canonical_sha256": DUSHU_CANONICAL_SHA256,
+        "historical_source_version_id": historical_id,
+        "historical_sha256": DUSHU_HISTORICAL_SHA256,
+        "active_hash_policy": "only canonical_active may load dushu_zazhi passages",
+    }
 
 
 def _relative(path: Path) -> str:
@@ -57,6 +114,10 @@ def _relative(path: Path) -> str:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def _schema_errors(case: dict[str, Any]) -> tuple[str, list[str]]:
@@ -109,33 +170,106 @@ def _compact_context_text(value: str) -> str:
     )
 
 
-def _load_full_json_context(path: Path) -> dict[int, str]:
+def _load_full_json_context(path: Path) -> dict[int, dict[str, Any]]:
     if not path.exists():
         return {}
     data = json.loads(path.read_text(encoding="utf-8-sig"))
+    source_file = _relative(path)
+    source_file_sha256 = _sha256(path)
     return {
-        int(paragraph["index"]): paragraph.get("text", "")
+        int(paragraph["index"]): {
+            "text": paragraph.get("text", ""),
+            "paragraph_index": int(paragraph["index"]),
+            "source_file": source_file,
+            "source_file_sha256": source_file_sha256,
+            "source_schema_version": data.get("schema_version"),
+        }
         for paragraph in data.get("paragraphs", [])
         if isinstance(paragraph, dict) and paragraph.get("index") is not None
     }
 
 
+def _compact_context_with_offsets(value: str) -> tuple[str, list[int]]:
+    """Return compact text plus source-character offsets for normalized matches."""
+
+    compact: list[str] = []
+    offsets: list[int] = []
+    for source_index, char in enumerate(value):
+        normalized = unicodedata.normalize("NFKC", char)
+        for normalized_char in normalized:
+            category = unicodedata.category(normalized_char)
+            if category.startswith(("P", "Z")) or category == "Cf":
+                continue
+            compact.append(normalized_char)
+            offsets.append(source_index)
+    return "".join(compact), offsets
+
+
 def _full_json_context_match(
     quote: str,
     paragraph_indexes: list[int],
-    context: dict[int, str],
-) -> str:
+    context: dict[int, dict[str, Any]],
+) -> dict[str, Any]:
+    first_context = next(iter(context.values()), {})
+    result: dict[str, Any] = {
+        "status": "unavailable",
+        "source_file": first_context.get("source_file"),
+        "source_file_sha256": first_context.get("source_file_sha256"),
+        "source_schema_version": first_context.get("source_schema_version"),
+        "paragraph_indexes": list(paragraph_indexes),
+        "matches": [],
+    }
     if not quote or not context:
-        return "unavailable"
-    texts = [context.get(index, "") for index in paragraph_indexes]
-    if any(quote in text for text in texts):
-        return "exact"
+        return result
+
+    for index in paragraph_indexes:
+        paragraph = context.get(index)
+        if not paragraph:
+            continue
+        text = paragraph.get("text", "")
+        start = text.find(quote)
+        if start >= 0:
+            result["status"] = "exact"
+            result["matches"].append(
+                {
+                    "paragraph_index": index,
+                    "match_mode": "exact",
+                    "start_char": start,
+                    "end_char": start + len(quote),
+                    "paragraph_text_sha256": _sha256_text(text),
+                }
+            )
+
+    if result["matches"]:
+        return result
+
     compact_quote = _compact_context_text(quote)
-    if compact_quote and any(
-        compact_quote in _compact_context_text(text) for text in texts
-    ):
-        return "punctuation_normalized"
-    return "not_found"
+    if compact_quote:
+        for index in paragraph_indexes:
+            paragraph = context.get(index)
+            if not paragraph:
+                continue
+            text = paragraph.get("text", "")
+            compact_text, offsets = _compact_context_with_offsets(text)
+            compact_start = compact_text.find(compact_quote)
+            if compact_start < 0:
+                continue
+            compact_end = compact_start + len(compact_quote)
+            start = offsets[compact_start] if offsets else None
+            end = offsets[compact_end - 1] + 1 if offsets else None
+            result["status"] = "punctuation_normalized"
+            result["matches"].append(
+                {
+                    "paragraph_index": index,
+                    "match_mode": "punctuation_normalized",
+                    "start_char": start,
+                    "end_char": end,
+                    "paragraph_text_sha256": _sha256_text(text),
+                }
+            )
+    if not result["matches"]:
+        result["status"] = "not_found"
+    return result
 
 
 def _case_report(
@@ -163,6 +297,9 @@ def _case_report(
         "source_file": _relative(ai_path),
         "case_index": case_index,
         "target_text": legacy_case.get("target_text"),
+        "target_work": v2_case.get("target_work", ""),
+        "target_works": v2_case.get("target_works", []),
+        "target_scope": v2_case.get("target_scope", {}),
         "source_passage_id": v2_case.get("source_passage_id"),
         "source_location": {
             "md_line_start": location.get("md_line_start"),
@@ -224,6 +361,7 @@ def run_batch(
     passage_maps: dict[str, dict[str, dict[str, Any]]] = {}
 
     with open_database(database_path) as connection:
+        canonical_policy = _register_source_version_policy(connection)
         for ai_path in ai_paths:
             container = load_legacy_ai_json(ai_path)
             cases = container.get("cases", [])
@@ -244,6 +382,15 @@ def run_batch(
             config = _source_config(source_work)
             assert config is not None
             markdown_path = config["markdown"]
+            markdown_hash = _sha256(markdown_path)
+            if (
+                config["work_key"] == "dushu_zazhi"
+                and markdown_hash != DUSHU_CANONICAL_SHA256
+            ):
+                raise ValueError(
+                    "dushu_zazhi_canonical_hash_mismatch:"
+                    f"{markdown_hash}:{DUSHU_CANONICAL_SHA256}"
+                )
             full_json_path = FULL_JSON_DIR / ai_path.name
             full_json_context = _load_full_json_context(full_json_path)
             passages = build_passages(markdown_path, config["work_key"])
@@ -261,8 +408,9 @@ def run_batch(
                 {
                     "source_work": source_work,
                     "work_key": config["work_key"],
+                    "source_role": "legacy_ai_migration",
                     "markdown": _relative(markdown_path),
-                    "markdown_sha256": _sha256(markdown_path),
+                    "markdown_sha256": markdown_hash,
                     "ai_json": _relative(ai_path),
                     "ai_json_sha256": _sha256(ai_path),
                     "full_json": _relative(full_json_path),
@@ -279,8 +427,10 @@ def run_batch(
                 provenance = {
                     "source_work": source_work,
                     "work_key": config["work_key"],
-                    "source_markdown_sha256": _sha256(markdown_path),
+                    "source_document_id": source_document_id,
+                    "source_markdown_sha256": markdown_hash,
                     "legacy_ai_json_sha256": _sha256(ai_path),
+                    "source_file_sha256": _sha256(ai_path),
                     "full_json": _relative(full_json_path),
                     "full_json_sha256": _sha256(full_json_path)
                     if full_json_path.exists()
@@ -298,6 +448,13 @@ def run_batch(
                 if not legacy_case.get("database_ingestion", {}).get("annotation_case_id"):
                     v2_case["case_id"] = _case_id_fallback(ai_path, case_index)
 
+                target_inference = None
+                if not v2_case.get("target_work"):
+                    target_inference = infer_target_scope(v2_case)
+                    v2_case["target_works"] = target_inference["target_works"]
+                    v2_case["target_scope"] = target_inference
+                    v2_case["_migration"]["target_work_inference"] = target_inference
+
                 primary_work = normalize_work_name(legacy_case.get("source_work", ""))
                 for evidence in v2_case.get("evidences", []):
                     # The adapter distinguishes a cited-work passage from a
@@ -314,9 +471,11 @@ def run_batch(
                     else:
                         evidence["source_resolution"] = "primary_source_no_match"
                     paragraph_indexes = evidence.get("legacy_source_paragraph_indexes", [])
-                    evidence["annotation_context_check"] = _full_json_context_match(
+                    context_match = _full_json_context_match(
                         evidence.get("quote", ""), paragraph_indexes, full_json_context
                     )
+                    evidence["annotation_context_check"] = context_match["status"]
+                    evidence["annotation_context"] = context_match
                     evidence["annotation_context_paragraph_indexes"] = paragraph_indexes
 
                 custom_errors = validate_case(v2_case, passage_map)
@@ -344,7 +503,7 @@ def run_batch(
                     stored_case = ingest_case(
                         connection,
                         v2_case,
-                        origin="legacy_ai_json",
+                        origin="legacy_ai_json_reprocessing",
                     )
                 except Exception as error:  # pragma: no cover - reported for audit
                     ingest_error = f"{type(error).__name__}:{error}"
@@ -361,6 +520,54 @@ def run_batch(
                         ingest_error=ingest_error,
                     )
                 )
+
+        # The fourth Wang original is a core source even though no legacy AI
+        # JSON is currently attached to it. Keep it in the same passage and
+        # candidate-audit inventory without fabricating annotation cases.
+        loaded_work_keys = set(passage_maps)
+        for source_work, config in WORKS.items():
+            if config["work_key"] in loaded_work_keys:
+                continue
+            markdown_path = config["markdown"]
+            markdown_hash = _sha256(markdown_path)
+            if (
+                config["work_key"] == "dushu_zazhi"
+                and markdown_hash != DUSHU_CANONICAL_SHA256
+            ):
+                raise ValueError(
+                    "dushu_zazhi_canonical_hash_mismatch:"
+                    f"{markdown_hash}:{DUSHU_CANONICAL_SHA256}"
+                )
+            passages = build_passages(markdown_path, config["work_key"])
+            passage_maps[config["work_key"]] = {
+                passage["passage_id"]: passage for passage in passages
+            }
+            candidate_profile = _candidate_profile(passages)
+            source_document_id = ingest_passages(
+                connection,
+                passages,
+                source_kind="markdown_core",
+                metadata={
+                    "source_role": "core_canonical",
+                    "candidate_profile": candidate_profile,
+                },
+            )
+            source_profiles.append(
+                {
+                    "source_work": source_work,
+                    "work_key": config["work_key"],
+                    "source_role": "core_canonical",
+                    "markdown": _relative(markdown_path),
+                    "markdown_sha256": markdown_hash,
+                    "ai_json": None,
+                    "ai_json_sha256": None,
+                    "full_json": None,
+                    "full_json_sha256": None,
+                    "source_document_id": source_document_id,
+                    "candidate_profile": candidate_profile,
+                    "legacy_case_count": 0,
+                }
+            )
 
         connection.commit()
         database_counts_report = database_counts(connection)
@@ -418,10 +625,23 @@ def run_batch(
     context_counts = Counter()
     resolution_counts = Counter()
     cited_work_counts = Counter()
+    target_scope_counts = Counter()
+    target_inference_cases: list[dict[str, Any]] = []
     for item in case_reports:
         context_counts.update(item["external_pending_full_json_context_counts"])
         resolution_counts.update(item["source_resolution_counts"])
         cited_work_counts.update(item["cited_work_match_counts"])
+        target_scope = item.get("target_scope") or {}
+        target_scope_counts.update([target_scope.get("status", "unknown")])
+        if target_scope.get("status") == "machine_inferred":
+            target_inference_cases.append(
+                {
+                    "case_id": item["case_id"],
+                    "case_title": item["case_title"],
+                    "target_works": item.get("target_works", []),
+                    "evidence_indexes": target_scope.get("evidence_indexes", []),
+                }
+            )
     no_evidence_cases = [
         item["case_id"] for item in case_reports if item["evidence_count"] == 0
     ]
@@ -472,6 +692,17 @@ def run_batch(
                 "remediation": "建立外部证据来源登记和 passage 后重新核验；在此之前不得升级为 machine approved 或 gold。",
             }
         )
+    if target_inference_cases:
+        findings.append(
+            {
+                "severity": "medium",
+                "confidence": "high",
+                "finding": "机器根据旧 evidence 的显式 source_work 标签生成 target_works 候选，但未将其视为 resolved。",
+                "count": len(target_inference_cases),
+                "evidence": target_inference_cases,
+                "remediation": "候选值只用于缩小后续核查范围；没有独立目标作品定位时，不得填入 resolved target_work 或升级机器通过。",
+            }
+        )
     if rejected_cases:
         findings.append(
             {
@@ -489,6 +720,29 @@ def run_batch(
                     if item["machine_status"] == "rejected"
                 ],
                 "remediation": "先修复缺失证据、quote 来源或字段，再重新跑入库；不得直接改为 approved。",
+            }
+        )
+    draft_boundary_cases = [
+        item
+        for item in case_reports
+        if item["machine_status"] == "draft" and item["validation_errors"]
+    ]
+    if draft_boundary_cases:
+        findings.append(
+            {
+                "severity": "medium",
+                "confidence": "high",
+                "finding": "部分旧 AI 案例已进入 machine draft，但保留了需要人工审校的外部证据、目标范围或无引文边界。",
+                "count": len(draft_boundary_cases),
+                "evidence": [
+                    {
+                        "case_id": item["case_id"],
+                        "case_title": item["case_title"],
+                        "validation_errors": item["validation_errors"],
+                    }
+                    for item in draft_boundary_cases
+                ],
+                "remediation": "人工审校时确认 target_work/target passage、外部底本和无引文状态；机器不自动升级 quote 或 gold。",
             }
         )
     if quote_counts.get("failed"):
@@ -527,14 +781,16 @@ def run_batch(
         )
 
     report = {
-        "report_version": "v2-batch-migration.v1",
+        "report_version": "v2-batch-migration.v2",
         "run_status": "completed_with_findings" if findings else "completed",
         "workflow": [
             "inventory_legacy_ai_json",
             "map_source_work_to_markdown",
             "build_source_passages",
+            "build_core_source_passages_without_fabricating_cases",
             "extract_and_audit_candidates",
             "adapt_legacy_cases_to_annotation_case.v1",
+            "machine_infer_missing_target_scope_as_candidates",
             "validate_schema_quote_source_and_hash",
             "ingest_machine_results_as_draft_or_rejected_audit_records",
             "keep_human_review_pending",
@@ -543,6 +799,11 @@ def run_batch(
             "ai_directory": _relative(ai_dir),
             "file_count": len(ai_paths),
             "expected_case_count": 17,
+            "core_source_count": sum(
+                profile.get("source_role") == "core_canonical"
+                for profile in source_profiles
+            ),
+            "canonical_source_policy": canonical_policy,
         },
         "summary": {
             "source_file_count": len(source_profiles),
@@ -560,6 +821,8 @@ def run_batch(
             "cited_work_match_counts": dict(cited_work_counts),
             "full_json_context_counts": dict(context_counts),
             "no_evidence_case_count": len(no_evidence_cases),
+            "target_scope_counts": dict(target_scope_counts),
+            "machine_inferred_target_case_count": len(target_inference_cases),
         },
         "source_profiles": source_profiles,
         "database": {

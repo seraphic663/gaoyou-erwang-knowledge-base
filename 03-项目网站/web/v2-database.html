@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>V2 数据库 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="./assets/css/v2-acceptance.css" />
+  </head>
+  <body data-v2-view="display">
+    <header class="subhero">
+      <nav class="nav">
+        <div class="brand">高邮二王考据过程知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">专题首页</a>
+          <a href="./database.html">主数据库</a>
+          <a href="./annotation.html">标注库</a>
+          <a href="./v2-database.html">V2 数据库</a>
+          <a href="./v2-acceptance.html">详细审计</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">V2 / VR · 直接使用</p>
+        <h1>V2 数据库</h1>
+        <p class="hero-copy">面向日常检索和人工审校准备的 V2 数据库展示界面。这里显示案例核心内容和证据摘要；迁移来源、hash、机器校验原文和完整 JSON 保留在详细审计界面。</p>
+        <div id="v2HeroMeta" class="hero-panel"></div>
+      </div>
+    </header>
+
+    <main class="section v2-page v2-display-page">
+      <p id="v2Status" class="db-status">正在读取 V2 数据库...</p>
+      <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
+      <section id="v2Metrics" class="v2-metric-grid"></section>
+
+      <section class="card v2-panel v2-display-queue">
+        <div class="v2-panel-heading v2-case-heading">
+          <div>
+            <p class="section-kicker">案例库</p>
+            <h2>可直接使用的案例列表</h2>
+          </div>
+          <span id="v2CaseCount" class="summary-pill"></span>
+        </div>
+
+        <div class="v2-filter-bar">
+          <label class="toolbar-field">
+            <span>检索</span>
+            <input id="v2CaseSearch" type="search" placeholder="案例标题、王氏著作、目标典籍、词语" />
+          </label>
+          <label class="toolbar-field">
+            <span>来源</span>
+            <select id="v2SourceFilter"><option value="all">全部来源</option></select>
+          </label>
+          <label class="toolbar-field">
+            <span>机器状态</span>
+            <select id="v2MachineFilter">
+              <option value="all">全部状态</option>
+              <option value="draft">machine draft</option>
+              <option value="rejected">rejected</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="v2-queue-toolbar">
+          <label class="toolbar-field v2-page-size-field">
+            <span>每批显示</span>
+            <select id="v2CasePageSize">
+              <option value="20" selected>20 条</option>
+              <option value="50">50 条</option>
+              <option value="100">100 条</option>
+            </select>
+          </label>
+          <div class="v2-pagination" aria-label="案例列表分页">
+            <button id="v2PreviousPage" class="pagination-button" type="button">上一批</button>
+            <span id="v2PageStatus" class="pagination-meta">第 1 / 1 批</span>
+            <button id="v2NextPage" class="pagination-button" type="button">下一批</button>
+          </div>
+        </div>
+
+        <div id="v2CaseTable" class="v2-case-table-wrap"></div>
+        <p class="v2-display-note">点击案例进入详细审计界面。展示界面不隐藏案例的机器/人工状态，但默认不展开迁移元数据和完整证据 JSON。</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>V2 数据库 · 展示界面 · 只读；完整来源链和审计字段见详细审计界面</p>
+    </footer>
+
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/v2-acceptance.js"></script>
+  </body>
+</html>

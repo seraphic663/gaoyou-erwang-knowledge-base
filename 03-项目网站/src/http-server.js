@@ -8,6 +8,8 @@ const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-br
 const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
 
+let v2SummaryCache = null;
+
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -112,6 +114,42 @@ function resolveStaticFile(requestPath) {
   return staticPath || path.join(config.WEB_DIR, '404.not-found');
 }
 
+async function getCachedV2Summary(config) {
+  const stat = fs.statSync(config.V2_DB_FILE);
+  const cacheKey = `${stat.mtimeMs}:${stat.size}`;
+  if (
+    v2SummaryCache
+    && v2SummaryCache.cacheKey === cacheKey
+    && v2SummaryCache.payload
+  ) {
+    return v2SummaryCache.payload;
+  }
+
+  if (v2SummaryCache?.cacheKey === cacheKey && v2SummaryCache.pending) {
+    return v2SummaryCache.pending;
+  }
+
+  const pending = getV2Acceptance(config, 'summary');
+  v2SummaryCache = {
+    cacheKey,
+    expiresAt: 0,
+    pending,
+  };
+  try {
+    const payload = await pending;
+    v2SummaryCache = {
+      cacheKey,
+      payload,
+    };
+    return payload;
+  } catch (error) {
+    if (v2SummaryCache?.pending === pending) {
+      v2SummaryCache = null;
+    }
+    throw error;
+  }
+}
+
 function createServer() {
   const dataSource = createDataSource(config);
 
@@ -166,14 +204,25 @@ function createServer() {
         if (req.method !== 'GET') {
           return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
         }
-        return sendJson(res, 200, await getV2Acceptance(config, 'summary'));
+        return sendJson(res, 200, await getCachedV2Summary(config));
       }
 
       if (parsedUrl.pathname === '/api/v2/cases') {
         if (req.method !== 'GET') {
           return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
         }
-        return sendJson(res, 200, await getV2Acceptance(config, 'cases'));
+        const bridgeArgs = [];
+        const query = parsedUrl.query.q || '';
+        const sourceWork = parsedUrl.query.source_work || '';
+        const machineStatus = parsedUrl.query.machine_status || '';
+        const page = parsedUrl.query.page || '';
+        const pageSize = parsedUrl.query.pageSize || '';
+        if (query) bridgeArgs.push('--query', query);
+        if (sourceWork) bridgeArgs.push('--source-work', sourceWork);
+        if (machineStatus) bridgeArgs.push('--machine-status', machineStatus);
+        if (page) bridgeArgs.push('--page', page);
+        if (pageSize) bridgeArgs.push('--page-size', pageSize);
+        return sendJson(res, 200, await getV2Acceptance(config, 'cases', bridgeArgs));
       }
 
       if (parsedUrl.pathname === '/api/v2/case') {

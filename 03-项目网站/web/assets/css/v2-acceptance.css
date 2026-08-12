@@ -48,6 +48,17 @@
   color: var(--sub);
 }
 
+.v2-metric-details {
+  grid-column: 1 / -1;
+}
+
+.v2-metric-detail-grid {
+  display: grid;
+  gap: 12px;
+  padding: 0 16px 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .v2-layout {
   display: grid;
   gap: 14px;
@@ -91,6 +102,67 @@
   border: 1px solid var(--line);
   border-radius: 13px;
   background: var(--card-soft);
+}
+
+.v2-check summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.v2-check summary::-webkit-details-marker {
+  display: none;
+}
+
+.v2-check summary::after {
+  content: "详情";
+  color: var(--sub);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.v2-check[open] summary::after {
+  content: "收起";
+}
+
+.v2-check-body {
+  display: grid;
+  gap: 3px;
+}
+
+.v2-check-body p {
+  margin: 0;
+  color: var(--sub);
+  font-size: 13px;
+  white-space: pre-wrap;
+}
+
+.v2-check-body strong {
+  display: inline-block;
+  min-width: 76px;
+  margin-right: 5px;
+  color: var(--ink);
+  font-size: 11px;
+}
+
+.v2-check-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.v2-check-status small {
+  color: var(--sub);
+  font-size: 10px;
+}
+
+.v2-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  color: var(--accent-deep);
+  background: rgba(165, 77, 42, 0.1);
+  font-size: 11px;
 }
 
 .v2-check-top,
@@ -197,6 +269,36 @@
   font: inherit;
 }
 
+.v2-queue-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.v2-page-size-field {
+  min-width: 120px;
+}
+
+.v2-page-size-field select {
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--control-bg);
+  color: var(--ink);
+  font: inherit;
+}
+
+.v2-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .v2-case-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -295,6 +397,43 @@
   white-space: pre-wrap;
 }
 
+.v2-passage-fold {
+  min-width: 0;
+}
+
+.v2-passage-fold summary {
+  display: grid;
+  gap: 5px;
+}
+
+.v2-passage-fold-body {
+  display: grid;
+  gap: 6px;
+}
+
+.v2-source-hash-fold summary {
+  padding: 2px 0;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.v2-source-hash-fold summary::after {
+  content: "查看";
+}
+
+.v2-source-hash-fold[open] summary::after {
+  content: "收起";
+}
+
+.v2-source-hash-fold code {
+  display: block;
+  padding-top: 5px;
+}
+
+.v2-evidence-fold {
+  margin-top: 4px;
+}
+
 .v2-detail-label {
   color: var(--sub);
   font-size: 11px;
@@ -329,6 +468,89 @@
 .v2-evidence-card h3 {
   margin: 0;
   font-size: 16px;
+}
+
+.v2-raw-fold,
+.v2-raw-panel {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(78, 54, 31, 0.035);
+}
+
+.v2-raw-fold summary,
+.v2-raw-panel summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 8px 10px;
+  color: var(--sub);
+  font-size: 12px;
+}
+
+.v2-raw-fold summary::-webkit-details-marker,
+.v2-raw-panel summary::-webkit-details-marker {
+  display: none;
+}
+
+.v2-raw-fold summary::after,
+.v2-raw-panel summary::after {
+  content: "展开";
+  float: right;
+}
+
+.v2-raw-fold[open] summary::after,
+.v2-raw-panel[open] summary::after {
+  content: "收起";
+}
+
+.v2-raw-fold pre,
+.v2-raw-panel pre,
+.v2-review-row pre {
+  max-height: 360px;
+  overflow: auto;
+  margin: 0;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--sub);
+  font: 11px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.v2-raw-panel {
+  display: grid;
+  gap: 0;
+}
+
+.v2-term-list {
+  display: grid;
+  gap: 10px;
+}
+
+.v2-term-row,
+.v2-review-row {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card-soft);
+}
+
+.v2-term-row p,
+.v2-review-row p {
+  margin: 0;
+  color: var(--sub);
+  white-space: pre-wrap;
+}
+
+.v2-display-note {
+  margin: 0;
+  color: var(--sub);
+  font-size: 13px;
+}
+
+.v2-display-queue {
+  max-width: 1440px;
 }
 
 .v2-evidence-meta {
@@ -388,6 +610,7 @@ html[data-theme="dark"] .v2-resolution-chip.unknown {
 
 @media (max-width: 620px) {
   .v2-metric-grid,
+  .v2-metric-detail-grid,
   .v2-detail-meta,
   .v2-detail-grid,
   .v2-filter-bar {
