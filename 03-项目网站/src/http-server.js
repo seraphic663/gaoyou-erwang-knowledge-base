@@ -10,6 +10,24 @@ const { getV2Acceptance } = require('./v2-acceptance');
 
 let v2SummaryCache = null;
 
+function fileRevision(filePath) {
+  try {
+    const stat = fs.statSync(filePath);
+    return `${filePath}:${stat.mtimeMs}:${stat.size}`;
+  } catch {
+    return `${filePath}:missing`;
+  }
+}
+
+function v2SummaryCacheKey(config) {
+  return [
+    config.V2_DB_FILE,
+    path.join(config.WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'v2_validation_report.json'),
+    path.join(config.WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'review_tasks', 'review_task_manifest.review.v1.json'),
+    path.join(config.WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'work_queues_report.json'),
+  ].map(fileRevision).join('|');
+}
+
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
@@ -115,8 +133,7 @@ function resolveStaticFile(requestPath) {
 }
 
 async function getCachedV2Summary(config) {
-  const stat = fs.statSync(config.V2_DB_FILE);
-  const cacheKey = `${stat.mtimeMs}:${stat.size}`;
+  const cacheKey = v2SummaryCacheKey(config);
   if (
     v2SummaryCache
     && v2SummaryCache.cacheKey === cacheKey

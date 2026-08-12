@@ -166,6 +166,12 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该命令生成 `target_work_resolution_queue`（当前 7,962 项）、`external_source_resolution_queue`（100 个外部来源）、`external_passage_resolution_queue`（121 条外部证据）和 `human_review_queue` 快照（7,581 个案例）。公开转录只进入 candidate_available，不进入 canonical；no_public_match/search_hit_only 保留原状态。队列报告位于 `v2/data/real_runs/work_queues_report.json`，JSONL 明细位于 `v2/data/real_runs/queues/`。
 
-人工审校写入边界由 `erwang_v2.database.apply_review_event()` 提供：每个命令必须带唯一 `operation_id`；重复提交幂等；每次写入在同一事务中更新 `human_review_json`、案例 lifecycle/status 和 `review_events`。审批还必须有 reviewer、source/target/evidence/process/conclusion 六类 field decisions、逐条 evidence decisions、已绑定 target passage 和 quote passed；不满足时只能保持 pending/uncertain/rejected，不能进入 gold。当前生产库没有执行人工事件，`review_events=0`。
+人工审校写入边界由四个事务 seam 提供：`apply_case_review_submission()` 写案例 patch 和 `review_events`，`apply_target_work_resolution()` 写目标典籍消歧但不改变 human pending，`apply_external_source_resolution()` 和 `apply_external_passage_resolution()` 写外部来源/段落的独立 `resolution_events`。每个命令必须带唯一 `operation_id`，重复提交幂等；案例审批还必须有 reviewer、source/target/evidence/process/conclusion 六类 field decisions、逐条 evidence decisions、已绑定 canonical target passage 和 quote passed；不满足时不能进入 gold。外部来源即使被人工标为 verified，也必须提供可核对的文件/hash/版本和与其一致的 canonical passage，且不会自动修改 annotation evidence 的 quote_check。当前生产库没有执行人工事件，`review_events=0`、`resolution_events=0`。
+
+人工审校任务包：
+
+    python v2/scripts/build_review_task_batches.py --batch-size 100
+
+该只读命令把案例、target_work、外部来源版本和外部 passage/quote 分成四条 `review_task.v1` JSONL 流，每条任务有稳定 `task_id`、`batch_id`、核心摘要和 detail ref；manifest 会逐条与当前 pending queue 反向比对，任务包不写数据库、不产生 review event。当前生产任务包为案例 7,581 条/76 批、target_work 7,962 条/80 批、外部来源 100 条/1 批、外部 passage 121 条/2 批，批次上限 100；manifest 位于 `v2/data/real_runs/review_tasks/review_task_manifest.review.v1.json`，并由 `run_v2_validation.py` 的 `review_task_artifacts` 检查纳入正式验收。
 
 本地只读验收页：启动 `03-项目网站` 后访问 `/v2-database.html` 使用核心展示版；访问 `/v2-acceptance.html` 使用完整详情/审计版。两者通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取同一个 V2 工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，列表默认只显示案例核心字段和目标定位候选数量，目标定位候选、来源 passage、证据、词条、五步过程、hash 和完整 JSON 在详细页按折叠区展开。

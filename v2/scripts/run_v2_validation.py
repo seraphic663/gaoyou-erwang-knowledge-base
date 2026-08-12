@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import json
 import sqlite3
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -22,6 +23,12 @@ V2_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = V2_ROOT.parent
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_REPORT = V2_ROOT / "data/real_runs/v2_validation_report.json"
+DEFAULT_REVIEW_TASK_MANIFEST = (
+    V2_ROOT / "data/real_runs/review_tasks/review_task_manifest.review.v1.json"
+)
+
+sys.path.insert(0, str(V2_ROOT / "scripts"))
+from build_review_task_batches import validate_review_task_artifacts  # noqa: E402
 
 DUSHU_CANONICAL_SHA256 = (
     "1460a906825998bf8a4bf3c51d4525fe19b8b79f377fb6d25ccdad4dc698e19e"
@@ -91,6 +98,7 @@ def table_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "annotation_evidences",
         "annotation_process_steps",
         "review_events",
+        "resolution_events",
         "external_source_registry",
         "annotation_evidence_external_sources",
         "work_registry",
@@ -536,6 +544,39 @@ def work_queue_validation(connection: sqlite3.Connection) -> dict[str, Any]:
     review_boundary_valid = {
         "operation_id", "event_kind", "from_lifecycle", "from_human_status", "to_lifecycle"
     }.issubset(review_columns) and review_operation_index == 1
+    resolution_columns = {
+        row[1] for row in connection.execute("PRAGMA table_info(resolution_events)")
+    }
+    resolution_operation_index = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM sqlite_master
+            WHERE type='index' AND name='sqlite_autoindex_resolution_events_1'
+            """,
+        )
+    )
+    resolution_orphan_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM resolution_events e
+            LEFT JOIN external_source_resolution_queue esq
+              ON esq.queue_item_id = e.queue_item_id
+             AND e.resolution_kind = 'external_source_resolution'
+            LEFT JOIN external_passage_resolution_queue epq
+              ON epq.queue_item_id = e.queue_item_id
+             AND e.resolution_kind = 'external_passage_resolution'
+            WHERE (e.resolution_kind = 'external_source_resolution' AND esq.queue_item_id IS NULL)
+               OR (e.resolution_kind = 'external_passage_resolution' AND epq.queue_item_id IS NULL)
+            """,
+        )
+    )
+    resolution_boundary_valid = {
+        "resolution_kind", "queue_item_id", "reviewer", "operation_id",
+        "from_queue_status", "to_queue_status", "resolution_json",
+    }.issubset(resolution_columns) and resolution_operation_index == 1
     return {
         "target_queue_count": as_count(scalar(connection, "SELECT COUNT(*) FROM target_work_resolution_queue")),
         "external_source_queue_count": as_count(scalar(connection, "SELECT COUNT(*) FROM external_source_resolution_queue")),
@@ -549,6 +590,11 @@ def work_queue_validation(connection: sqlite3.Connection) -> dict[str, Any]:
         "review_boundary_columns": sorted(review_columns),
         "review_operation_index_count": review_operation_index,
         "review_boundary_valid": review_boundary_valid,
+        "resolution_events_count": as_count(scalar(connection, "SELECT COUNT(*) FROM resolution_events")),
+        "resolution_boundary_columns": sorted(resolution_columns),
+        "resolution_operation_index_count": resolution_operation_index,
+        "resolution_boundary_valid": resolution_boundary_valid,
+        "resolution_orphan_count": resolution_orphan_count,
         "valid": (
             orphan_target == 0
             and orphan_external_source == 0
@@ -562,6 +608,8 @@ def work_queue_validation(connection: sqlite3.Connection) -> dict[str, Any]:
                 "SELECT COUNT(DISTINCT case_id) FROM target_work_resolution_queue WHERE queue_status IN ('pending','needs_context')",
             ))
             and review_boundary_valid
+            and resolution_boundary_valid
+            and resolution_orphan_count == 0
         ),
     }
 
@@ -630,7 +678,26 @@ def candidate_target_location_validation(connection: sqlite3.Connection) -> dict
     return result
 
 
-def build_report(database_path: Path) -> dict[str, Any]:
+def review_task_artifact_validation(
+    database_path: Path,
+    manifest_path: Path = DEFAULT_REVIEW_TASK_MANIFEST,
+) -> dict[str, Any]:
+    """Verify persisted review-task streams cover the current pending queues."""
+
+    return validate_review_task_artifacts(
+        database_path=database_path,
+        manifest_path=manifest_path,
+    )
+
+
+def build_report(
+    database_path: Path,
+    review_task_manifest_path: Path = DEFAULT_REVIEW_TASK_MANIFEST,
+) -> dict[str, Any]:
+    review_tasks = review_task_artifact_validation(
+        database_path,
+        review_task_manifest_path,
+    )
     connection = connect_read_only(database_path)
     try:
         counts = table_counts(connection)
@@ -778,6 +845,7 @@ def build_report(database_path: Path) -> dict[str, Any]:
         ),
         "work_identity_registry": work_identity["valid"],
         "work_queues": work_queues["valid"],
+        "review_task_artifacts": review_tasks["valid"],
     }
     warnings = {
         "external_canonical_files": {
@@ -808,6 +876,7 @@ def build_report(database_path: Path) -> dict[str, Any]:
         "work_queue_validation": work_queues,
         "legacy_dictionary_inventory_validation": legacy_inventory,
         "candidate_target_location_validation": candidate_target_locations,
+        "review_task_artifact_validation": review_tasks,
         "warnings": warnings,
     }
 
@@ -816,8 +885,13 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", type=Path, default=DEFAULT_DATABASE)
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument(
+        "--review-task-manifest",
+        type=Path,
+        default=DEFAULT_REVIEW_TASK_MANIFEST,
+    )
     args = parser.parse_args()
-    report = build_report(args.db.resolve())
+    report = build_report(args.db.resolve(), args.review_task_manifest.resolve())
     args.report.resolve().parent.mkdir(parents=True, exist_ok=True)
     args.report.resolve().write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",

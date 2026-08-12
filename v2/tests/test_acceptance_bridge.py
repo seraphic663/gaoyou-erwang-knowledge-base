@@ -9,7 +9,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(PROJECT_ROOT / "03-项目网站" / "scripts"))
 
-from v2_acceptance_bridge import get_case, list_cases  # noqa: E402
+from v2_acceptance_bridge import build_summary, get_case, list_cases  # noqa: E402
 
 
 class V2AcceptanceBridgeTest(unittest.TestCase):
@@ -69,6 +69,7 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         self.assertEqual(len(payload["process_steps"]), 5)
         self.assertIn("_migration", payload["case_data"])
         self.assertIn("source_file_sha256", payload["provenance"])
+        self.assertEqual(payload["resolution_events"], [])
 
     def test_candidate_shell_detail_keeps_target_location_as_machine_candidate(self) -> None:
         payload = get_case(self.connection, "candidate-shell:dushu_zazhi_0002_candidate")
@@ -83,6 +84,22 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
                 and row["human_status"] == "pending"
                 for row in payload["target_location_candidates"]
             )
+        )
+
+    def test_summary_exposes_valid_batched_review_task_artifacts(self) -> None:
+        payload = build_summary(self.connection, self.database_path)
+
+        task_artifacts = payload["review_task_artifacts"]
+        self.assertTrue(task_artifacts["valid"])
+        self.assertEqual(task_artifacts["batch_size"], 100)
+        self.assertEqual(task_artifacts["counts"]["case_review"], 7581)
+        self.assertEqual(task_artifacts["counts"]["target_work_resolution"], 7962)
+        self.assertTrue(
+            any(item["key"] == "review_task_artifacts" for item in payload["checks"])
+        )
+        self.assertEqual(
+            payload["report_context"]["review_task_manifest"]["counts"]["external_passage_resolution"],
+            121,
         )
 
 

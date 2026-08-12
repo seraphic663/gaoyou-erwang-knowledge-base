@@ -100,6 +100,12 @@ const V2Acceptance = (() => {
   function renderMetrics() {
     if (!elements.metrics) return;
     const summary = state.summary;
+    const taskArtifacts = summary.review_task_artifacts || {};
+    const taskCounts = taskArtifacts.counts || {};
+    const taskValidation = (taskArtifacts.coverage || {}).stream_validation || {};
+    const taskBatchText = ['case_review', 'target_work_resolution', 'external_source_resolution', 'external_passage_resolution']
+      .map((key) => `${key} ${taskCounts[key] || 0}/${taskValidation[key]?.batch_count || 0} 批`)
+      .join(' · ');
     const coreMetrics = [
       ['候选层入库', summary.counts.candidate_items, '四部王氏原文机器候选'],
       ['案例入库', summary.counts.annotation_cases, '机器库记录'],
@@ -120,6 +126,7 @@ const V2Acceptance = (() => {
       ['外部 edition 来源队列', summary.counts.external_source_resolution_queue || 0, '版本选择和底本登记待核'],
       ['外部 passage 引文队列', summary.counts.external_passage_resolution_queue || 0, '逐条 quote / location 待核'],
       ['人工审校队列', summary.report_context.work_queue_counts?.human_review_queue || summary.human_status_counts.pending || 0, `review_events ${summary.counts.review_events || 0}`],
+      ['分批审校任务包', taskArtifacts.valid ? '覆盖通过' : '待重建', taskBatchText || '尚未生成稳定任务包'],
     ];
     const renderMetric = ([label, value, note]) => `
       <article class="card v2-metric">
@@ -194,10 +201,16 @@ const V2Acceptance = (() => {
     const queueText = queueCounts.target_work_queue
       ? `队列：target_work ${queueCounts.target_work_queue}；external passage ${queueCounts.external_passage_queue}；人工 ${queueCounts.human_review_queue}`
       : '';
+    const taskManifest = context.review_task_manifest || {};
+    const taskCounts = taskManifest.counts || {};
+    const taskValidation = (taskManifest.coverage || {}).stream_validation || {};
+    const taskText = Object.keys(taskCounts).length
+      ? `任务包：case ${taskCounts.case_review || 0}/${taskValidation.case_review?.batch_count || 0} 批；target ${taskCounts.target_work_resolution || 0}/${taskValidation.target_work_resolution?.batch_count || 0} 批；external source ${taskCounts.external_source_resolution || 0}/${taskValidation.external_source_resolution?.batch_count || 0} 批；external passage ${taskCounts.external_passage_resolution || 0}/${taskValidation.external_passage_resolution?.batch_count || 0} 批`
+      : '任务包：尚未生成';
     const locationText = `目标定位候选 ${state.summary.candidate_target_location_count || 0} 条；canonical 标签 ${state.summary.candidate_target_canonical_count || 0} 条；均未自动升级 target_work/target_passage`;
     elements.reportContext.textContent = fullJson
-      ? `旧 full JSON 上下文命中（仅迁移线索）：${fullJson}；${inventoryText}；${originText}；${queueText}；${locationText}`
-      : `${inventoryText}；${originText}；${queueText}；${locationText}。`;
+      ? `旧 full JSON 上下文命中（仅迁移线索）：${fullJson}；${inventoryText}；${originText}；${queueText}；${taskText}；${locationText}`
+      : `${inventoryText}；${originText}；${queueText}；${taskText}；${locationText}。`;
   }
 
   function renderCaseTable() {
@@ -376,6 +389,18 @@ const V2Acceptance = (() => {
     `;
   }
 
+  function renderResolutionEvents(events) {
+    if (!detailedMode) return '';
+    return `
+      <details class="fold-card v2-raw-panel">
+        <summary>外部来源解析事件 · ${escapeHtml(events?.length || 0)} 条</summary>
+        <div class="fold-body">
+          ${events?.length ? events.map((event) => `<article class="v2-review-row"><strong>${escapeHtml(event.resolution_kind || 'resolution')}</strong><span>${escapeHtml(event.to_queue_status || 'pending')} · ${escapeHtml(event.reviewer || '未记录审校人')}</span><p>${escapeHtml(event.resolution_note || '')}</p><pre>${escapeHtml(JSON.stringify(event.data || {}, null, 2))}</pre></article>`).join('') : '<p>当前尚无外部来源解析事件；外部队列仍按 pending/candidate 状态处理。</p>'}
+        </div>
+      </details>
+    `;
+  }
+
   function renderDetail(item) {
     const targetWorks = item.target_works?.length ? item.target_works.join('、') : '未明确';
     const targetScope = item.target_scope || {};
@@ -441,6 +466,7 @@ const V2Acceptance = (() => {
       </details>
       ${renderTerms(item.terms)}
       ${renderReviewEvents(item.review_events)}
+      ${renderResolutionEvents(item.resolution_events)}
       ${renderJsonPanel(item.machine_result, 'machine_result JSON')}
       ${renderJsonPanel(item.human_review, 'human_review JSON')}
       ${renderJsonPanel(item.case_data, '完整 annotation_case.v1 JSON')}

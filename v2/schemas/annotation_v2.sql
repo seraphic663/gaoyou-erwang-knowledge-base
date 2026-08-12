@@ -202,6 +202,7 @@ CREATE TABLE IF NOT EXISTS external_passage_resolution_queue (
     )),
     candidate_manifest_path TEXT,
     candidate_manifest_sha256 TEXT,
+    selected_passage_id TEXT,
     candidate_refs_json TEXT NOT NULL DEFAULT '[]',
     context_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,
@@ -209,11 +210,15 @@ CREATE TABLE IF NOT EXISTS external_passage_resolution_queue (
     UNIQUE(case_id, evidence_index),
     FOREIGN KEY(external_source_id) REFERENCES external_source_registry(external_source_id),
     FOREIGN KEY(case_id, evidence_index)
-        REFERENCES annotation_evidences(case_id, evidence_index) ON DELETE CASCADE
+        REFERENCES annotation_evidences(case_id, evidence_index) ON DELETE CASCADE,
+    FOREIGN KEY(selected_passage_id) REFERENCES passages(passage_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_external_passage_queue_status
     ON external_passage_resolution_queue(queue_status, edition_status, passage_status);
+
+CREATE INDEX IF NOT EXISTS idx_external_passage_queue_selected_passage
+    ON external_passage_resolution_queue(selected_passage_id);
 
 CREATE TABLE IF NOT EXISTS candidate_items (
     candidate_id TEXT PRIMARY KEY,
@@ -495,6 +500,35 @@ CREATE TABLE IF NOT EXISTS review_events (
     created_at TEXT NOT NULL,
     FOREIGN KEY(case_id) REFERENCES annotation_cases(case_id) ON DELETE CASCADE
 );
+
+-- Auxiliary human decisions for queue items that do not belong to one
+-- annotation case: external edition/source and external passage resolution.
+-- These events are separate from case lifecycle events so one external source
+-- shared by many cases is not falsely represented by a single case review.
+CREATE TABLE IF NOT EXISTS resolution_events (
+    resolution_event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    resolution_kind TEXT NOT NULL CHECK(resolution_kind IN (
+        'external_source_resolution', 'external_passage_resolution'
+    )),
+    queue_item_id TEXT NOT NULL,
+    external_source_id TEXT,
+    case_id TEXT,
+    evidence_index INTEGER,
+    reviewer TEXT NOT NULL,
+    operation_id TEXT NOT NULL UNIQUE,
+    from_queue_status TEXT,
+    to_queue_status TEXT NOT NULL,
+    resolution_note TEXT,
+    resolution_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL,
+    FOREIGN KEY(external_source_id) REFERENCES external_source_registry(external_source_id),
+    FOREIGN KEY(case_id, evidence_index)
+        REFERENCES annotation_evidences(case_id, evidence_index)
+        ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_resolution_events_queue_item
+    ON resolution_events(resolution_kind, queue_item_id, created_at);
 
 CREATE VIEW IF NOT EXISTS v_machine_cases AS
 SELECT * FROM annotation_cases

@@ -22,6 +22,8 @@ REPORT_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "batch_migration_re
 UNIFIED_REPORT_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "unified_ingress_report.json"
 EXTERNAL_INVENTORY_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "external_source_inventory.json"
 WORK_QUEUE_REPORT_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "work_queues_report.json"
+REVIEW_TASK_MANIFEST_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "review_tasks" / "review_task_manifest.review.v1.json"
+VALIDATION_REPORT_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "v2_validation_report.json"
 CANDIDATE_BATCH_REPORT_DIR = WORKSPACE_ROOT / "v2" / "data" / "real_runs"
 
 
@@ -88,6 +90,24 @@ def load_work_queue_report() -> dict[str, Any]:
         return {}
     try:
         return json.loads(WORK_QUEUE_REPORT_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def load_review_task_manifest() -> dict[str, Any]:
+    if not REVIEW_TASK_MANIFEST_FILE.exists():
+        return {}
+    try:
+        return json.loads(REVIEW_TASK_MANIFEST_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def load_validation_report() -> dict[str, Any]:
+    if not VALIDATION_REPORT_FILE.exists():
+        return {}
+    try:
+        return json.loads(VALIDATION_REPORT_FILE.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
 
@@ -257,6 +277,17 @@ def orphan_counts(connection: sqlite3.Connection) -> dict[str, int]:
               ON ae.case_id = q.case_id AND ae.evidence_index = q.evidence_index
             WHERE ae.case_id IS NULL
         """,
+        "orphan_resolution_events": """
+            SELECT COUNT(*) FROM resolution_events e
+            LEFT JOIN external_source_resolution_queue esq
+              ON esq.queue_item_id = e.queue_item_id
+             AND e.resolution_kind = 'external_source_resolution'
+            LEFT JOIN external_passage_resolution_queue epq
+              ON epq.queue_item_id = e.queue_item_id
+             AND e.resolution_kind = 'external_passage_resolution'
+            WHERE (e.resolution_kind = 'external_source_resolution' AND esq.queue_item_id IS NULL)
+               OR (e.resolution_kind = 'external_passage_resolution' AND epq.queue_item_id IS NULL)
+        """,
     }
     return {
         name: int(connection.execute(query).fetchone()[0])
@@ -294,6 +325,8 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     batch_report = load_batch_report()
     external_inventory = load_external_inventory()
     work_queue_report = load_work_queue_report()
+    review_task_manifest = load_review_task_manifest()
+    validation_report = load_validation_report()
     candidate_batch_reports = load_candidate_batch_reports()
     report_summary = batch_report.get("summary") or {}
     counts = {}
@@ -307,6 +340,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "annotation_evidences",
         "annotation_process_steps",
         "review_events",
+        "resolution_events",
         "external_source_registry",
         "annotation_evidence_external_sources",
         "work_registry",
@@ -458,6 +492,34 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         and queue_counts.get("external_source_resolution_queue") == expected_queue_counts.get("external_source_queue")
         and queue_counts.get("external_passage_resolution_queue") == expected_queue_counts.get("external_passage_queue")
     ) else "fail"
+    review_task_validation = validation_report.get("review_task_artifact_validation") or {}
+    review_task_counts = review_task_manifest.get("counts") or {}
+    review_task_coverage = review_task_manifest.get("coverage") or {}
+    review_task_artifacts = {
+        "manifest_path": "v2/data/real_runs/review_tasks/review_task_manifest.review.v1.json",
+        "generated_at": review_task_manifest.get("generated_at"),
+        "batch_size": review_task_manifest.get("batch_size"),
+        "counts": review_task_counts,
+        "coverage": review_task_coverage,
+        "policy": review_task_manifest.get("policy") or {},
+        "valid": bool(review_task_validation.get("valid")),
+        "validation_errors": review_task_validation.get("errors") or [],
+    }
+    review_task_status = "pass" if review_task_artifacts["valid"] else "warn"
+    review_task_value = (
+        "；".join(
+            f"{key} {int(review_task_counts.get(key, 0))}/"
+            f"{int(((review_task_coverage.get('stream_validation') or {}).get(key) or {}).get('batch_count', 0))}批"
+            for key in (
+                "case_review",
+                "target_work_resolution",
+                "external_source_resolution",
+                "external_passage_resolution",
+            )
+        )
+        if review_task_counts
+        else "未生成"
+    )
 
     checks = [
         acceptance_check(
@@ -560,6 +622,17 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             evidence_basis="target_work_resolution_queue + external_*_resolution_queue + work_queues_report.json",
         ),
         acceptance_check(
+            "review_task_artifacts",
+            "分批审校任务包",
+            review_task_status,
+            review_task_value,
+            "案例、target_work、外部来源和外部 passage 分成独立 JSONL 任务流；每批上限由 manifest 固定，任务包本身不写数据库、不产生 review_event。",
+            severity="high",
+            why_it_matters="人工审校需要可分批交接的稳定输入；没有 task_id、批次和当前队列反向覆盖校验，审校会遗漏或重复处理。",
+            next_action="先按 task_type 和 batch_id 读取；审校提交只能调用受控 review event 写入边界，任何任务包重建后都要重新验证覆盖。",
+            evidence_basis="review_task_manifest.review.v1.json + review_task_artifact_validation",
+        ),
+        acceptance_check(
             "machine_human_separation",
             "机器与人工状态分离",
             separation_status,
@@ -646,6 +719,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "candidate_target_unresolved_count": candidate_target_unresolved_count,
         "candidate_target_boundary_breach_count": candidate_target_boundary_breaches,
         "queue_counts": queue_counts,
+        "review_task_artifacts": review_task_artifacts,
         "lifecycle_counts": lifecycle_counts,
         "machine_status_counts": machine_counts,
         "human_status_counts": human_counts,
@@ -665,6 +739,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             "unified_ingress_report": "v2/data/real_runs/unified_ingress_report.json",
             "work_queues_report": "v2/data/real_runs/work_queues_report.json",
             "work_queue_counts": work_queue_report.get("counts", {}),
+            "review_task_manifest": review_task_artifacts,
             "candidate_batch_reports": candidate_batch_reports,
         },
     }
@@ -943,6 +1018,19 @@ def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | N
     ).fetchall())
     for review in item["review_events"]:
         review["data"] = parse_json(review.pop("review_json", "{}"), {})
+    item["resolution_events"] = rows_dict(connection.execute(
+        """
+        SELECT resolution_event_id, resolution_kind, queue_item_id,
+               external_source_id, evidence_index, reviewer, operation_id,
+               from_queue_status, to_queue_status, resolution_note,
+               resolution_json, created_at
+        FROM resolution_events
+        WHERE case_id = ? ORDER BY resolution_event_id
+        """,
+        (case_id,),
+    ).fetchall())
+    for resolution in item["resolution_events"]:
+        resolution["data"] = parse_json(resolution.pop("resolution_json", "{}"), {})
     return item
 
 

@@ -29,6 +29,17 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _sha256_file(path: str | Path) -> str | None:
+    file_path = Path(path)
+    if not file_path.is_file():
+        return None
+    digest = hashlib.sha256()
+    with file_path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def _normalize_work_label(value: str | None) -> str:
     text = unicodedata.normalize("NFKC", value or "").strip().strip("《》")
     return " ".join(text.split())
@@ -57,6 +68,9 @@ def _ensure_schema_extensions(connection: sqlite3.Connection) -> None:
             "from_human_status": "TEXT",
             "to_lifecycle": "TEXT",
         },
+        "external_passage_resolution_queue": {
+            "selected_passage_id": "TEXT",
+        },
     }
     for table, additions in table_additions.items():
         columns = {
@@ -72,6 +86,43 @@ def _ensure_schema_extensions(connection: sqlite3.Connection) -> None:
         CREATE UNIQUE INDEX IF NOT EXISTS idx_review_events_operation_id
         ON review_events(operation_id)
         WHERE operation_id IS NOT NULL
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS resolution_events (
+            resolution_event_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            resolution_kind TEXT NOT NULL CHECK(resolution_kind IN (
+                'external_source_resolution', 'external_passage_resolution'
+            )),
+            queue_item_id TEXT NOT NULL,
+            external_source_id TEXT,
+            case_id TEXT,
+            evidence_index INTEGER,
+            reviewer TEXT NOT NULL,
+            operation_id TEXT NOT NULL UNIQUE,
+            from_queue_status TEXT,
+            to_queue_status TEXT NOT NULL,
+            resolution_note TEXT,
+            resolution_json TEXT NOT NULL DEFAULT '{}',
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(external_source_id) REFERENCES external_source_registry(external_source_id),
+            FOREIGN KEY(case_id, evidence_index)
+                REFERENCES annotation_evidences(case_id, evidence_index)
+                ON DELETE CASCADE
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_resolution_events_queue_item
+        ON resolution_events(resolution_kind, queue_item_id, created_at)
+        """
+    )
+    connection.execute(
+        """
+        CREATE INDEX IF NOT EXISTS idx_external_passage_queue_selected_passage
+        ON external_passage_resolution_queue(selected_passage_id)
         """
     )
 
@@ -592,6 +643,331 @@ def _parse_json_object(value: Any) -> dict[str, Any]:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def _parse_json_list(value: Any) -> list[Any]:
+    if isinstance(value, list):
+        return value
+    try:
+        parsed = json.loads(value or "[]")
+    except (TypeError, ValueError):
+        return []
+    return parsed if isinstance(parsed, list) else []
+
+
+def _passage_source_status(
+    connection: sqlite3.Connection, passage_id: str | None
+) -> str | None:
+    if not passage_id:
+        return None
+    row = connection.execute(
+        """
+        SELECT sd.canonical_status
+        FROM passages p
+        JOIN source_documents sd ON sd.source_document_id = p.source_document_id
+        WHERE p.passage_id = ?
+        """,
+        (passage_id,),
+    ).fetchone()
+    return row["canonical_status"] if row else None
+
+
+def _require_passage(
+    connection: sqlite3.Connection,
+    passage_id: str,
+    *,
+    require_canonical: bool = False,
+    field_name: str,
+) -> None:
+    status = _passage_source_status(connection, passage_id)
+    if status is None:
+        raise ValueError(f"{field_name}_missing:{passage_id}")
+    if require_canonical and status != "canonical_active":
+        raise ValueError(f"{field_name}_not_canonical:{passage_id}")
+
+
+def _process_values(
+    connection: sqlite3.Connection,
+    case_id: str,
+    case_data: dict[str, Any],
+) -> dict[str, Any]:
+    existing_rows = connection.execute(
+        """
+        SELECT field_name, step_text
+        FROM annotation_process_steps
+        WHERE case_id = ? ORDER BY step_index
+        """,
+        (case_id,),
+    ).fetchall()
+    existing = {row["field_name"]: row["step_text"] for row in existing_rows}
+    values = {
+        field: case_data.get(field) or existing.get(field, "") or ""
+        for field in PROCESS_FIELDS
+    }
+    return values
+
+
+def _replace_process_steps(
+    connection: sqlite3.Connection,
+    case_id: str,
+    values: dict[str, Any],
+) -> None:
+    connection.execute("DELETE FROM annotation_process_steps WHERE case_id = ?", (case_id,))
+    for index, field_name in enumerate(PROCESS_FIELDS):
+        text = str(values.get(field_name) or "")
+        connection.execute(
+            """
+            INSERT INTO annotation_process_steps(
+                case_id, step_index, field_name, step_text, step_json
+            ) VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                case_id,
+                index,
+                field_name,
+                text,
+                _json({"field_name": field_name, "text": text}),
+            ),
+        )
+
+
+def _apply_evidence_decisions(
+    connection: sqlite3.Connection,
+    case_id: str,
+    decisions: Any,
+    case_data: dict[str, Any],
+) -> None:
+    if decisions is None:
+        return
+    if not isinstance(decisions, list):
+        raise ValueError("evidence_decisions_must_be_list")
+
+    evidence_data_by_index = {
+        index: evidence
+        for index, evidence in enumerate(case_data.get("evidences", []))
+        if isinstance(evidence, dict)
+    }
+    for decision in decisions:
+        if not isinstance(decision, dict):
+            raise ValueError("evidence_decision_must_be_object")
+        raw_index = decision.get("evidence_index")
+        try:
+            evidence_index = int(raw_index)
+        except (TypeError, ValueError):
+            raise ValueError("evidence_index_required") from None
+        row = connection.execute(
+            """
+            SELECT passage_id, source_work, quote, quote_sha256,
+                   quote_check, evidence_json
+            FROM annotation_evidences
+            WHERE case_id = ? AND evidence_index = ?
+            """,
+            (case_id, evidence_index),
+        ).fetchone()
+        if row is None:
+            raise ValueError(f"evidence_not_found:{evidence_index}")
+
+        evidence = _parse_json_object(row["evidence_json"])
+        evidence.update(evidence_data_by_index.get(evidence_index, {}))
+        field_values = {
+            "passage_id": row["passage_id"],
+            "source_work": row["source_work"],
+            "quote": row["quote"],
+            "quote_sha256": row["quote_sha256"],
+            "quote_check": row["quote_check"],
+        }
+        for field in field_values:
+            if field in decision:
+                field_values[field] = decision[field]
+        passage_id = field_values["passage_id"]
+        if passage_id:
+            _require_passage(
+                connection,
+                str(passage_id),
+                field_name="evidence_passage",
+            )
+        quote_check = field_values["quote_check"]
+        if quote_check not in {None, "unchecked", "passed", "failed", "normalized_passed"}:
+            raise ValueError(f"invalid_quote_check:{evidence_index}:{quote_check}")
+        quote = str(field_values["quote"] or "")
+        if not quote:
+            raise ValueError(f"empty_evidence_quote:{evidence_index}")
+        if "quote" in decision and "quote_sha256" not in decision:
+            field_values["quote_sha256"] = hashlib.sha256(quote.encode("utf-8")).hexdigest()
+
+        for field in ("source_resolution", "cited_work_match_status", "external_source_id"):
+            if field in decision:
+                evidence[field] = decision[field]
+        if quote_check in {"passed", "normalized_passed"}:
+            if evidence.get("source_resolution") != "canonical_source_passage":
+                raise ValueError(f"noncanonical_quote_cannot_pass:{evidence_index}")
+            if not passage_id or _passage_source_status(connection, str(passage_id)) != "canonical_active":
+                raise ValueError(f"noncanonical_evidence_passage_cannot_pass:{evidence_index}")
+            passage_row = connection.execute(
+                "SELECT raw_text, plain_text, normalized_text FROM passages WHERE passage_id = ?",
+                (passage_id,),
+            ).fetchone()
+            matched = passage_row is not None and any(
+                quote in (passage_row[column] or "")
+                for column in ("raw_text", "plain_text", "normalized_text")
+            )
+            if not matched:
+                raise ValueError(f"evidence_quote_not_in_passage:{evidence_index}")
+        evidence.update(
+            {
+                "passage_id": passage_id,
+                "source_work": field_values["source_work"],
+                "quote": quote,
+                "quote_sha256": field_values["quote_sha256"],
+                "quote_check": quote_check,
+            }
+        )
+        connection.execute(
+            """
+            UPDATE annotation_evidences
+            SET passage_id = ?, source_work = ?, quote = ?, quote_sha256 = ?,
+                quote_check = ?, evidence_json = ?
+            WHERE case_id = ? AND evidence_index = ?
+            """,
+            (
+                passage_id,
+                field_values["source_work"],
+                quote,
+                field_values["quote_sha256"],
+                quote_check,
+                _json(evidence),
+                case_id,
+                evidence_index,
+            ),
+        )
+        while len(case_data.setdefault("evidences", [])) <= evidence_index:
+            case_data["evidences"].append({})
+        case_data["evidences"][evidence_index] = evidence
+
+
+def _apply_case_patch(
+    connection: sqlite3.Connection,
+    case_id: str,
+    case_patch: dict[str, Any] | None,
+    evidence_decisions: Any,
+) -> None:
+    """Apply only an explicit review patch before the lifecycle gate.
+
+    This is intentionally a narrow write surface.  It updates the structured
+    annotation fields and their derived process/evidence rows, but it never
+    decides whether a machine result is academically correct.
+    """
+
+    patch = dict(case_patch or {})
+    allowed_fields = {
+        "source_passage_id",
+        "target_work",
+        "target_works",
+        "target_scope",
+        "target_text",
+        "target_passage_id",
+        "target_location",
+        "process_text",
+        *PROCESS_FIELDS,
+    }
+    unknown_fields = sorted(set(patch) - allowed_fields)
+    if unknown_fields:
+        raise ValueError("unsupported_case_patch_fields:" + ",".join(unknown_fields))
+
+    row = connection.execute(
+        """
+        SELECT case_json, source_passage_id, target_work, target_works_json,
+               target_scope_json, target_text, target_passage_id,
+               target_location_json, process_text
+        FROM annotation_cases WHERE case_id = ?
+        """,
+        (case_id,),
+    ).fetchone()
+    if row is None:
+        raise ValueError(f"case_not_found:{case_id}")
+    case_data = _parse_json_object(row["case_json"])
+
+    values: dict[str, Any] = {
+        "source_passage_id": row["source_passage_id"],
+        "target_work": row["target_work"],
+        "target_works": _parse_json_list(row["target_works_json"]),
+        "target_scope": _parse_json_object(row["target_scope_json"]),
+        "target_text": row["target_text"],
+        "target_passage_id": row["target_passage_id"],
+        "target_location": _parse_json_object(row["target_location_json"]),
+        "process_text": row["process_text"],
+    }
+    values.update({field: case_data.get(field, "") for field in PROCESS_FIELDS})
+    values.update({key: patch[key] for key in patch})
+
+    if values["source_passage_id"]:
+        _require_passage(
+            connection,
+            str(values["source_passage_id"]),
+            field_name="source_passage",
+        )
+    if values["target_passage_id"]:
+        _require_passage(
+            connection,
+            str(values["target_passage_id"]),
+            field_name="target_passage",
+        )
+    if not isinstance(values["target_works"], list):
+        raise ValueError("target_works_must_be_list")
+    if not isinstance(values["target_scope"], dict):
+        raise ValueError("target_scope_must_be_object")
+    if not isinstance(values["target_location"], dict):
+        raise ValueError("target_location_must_be_object")
+
+    values["target_works"] = [str(item).strip() for item in values["target_works"] if str(item).strip()]
+    if "target_work" in patch and str(values["target_work"] or "").strip() and "target_works" not in patch:
+        values["target_works"] = [str(values["target_work"]).strip()]
+    values["target_work"] = str(values["target_work"] or "")
+    process = _process_values(connection, case_id, {**case_data, **values})
+    values["process_text"] = patch.get(
+        "process_text",
+        "\n".join(f"{field}: {process[field]}" for field in PROCESS_FIELDS),
+    )
+
+    case_data.update(
+        {
+            "source_passage_id": values["source_passage_id"],
+            "target_work": values["target_work"],
+            "target_works": values["target_works"],
+            "target_scope": values["target_scope"],
+            "target_text": values["target_text"],
+            "target_passage_id": values["target_passage_id"],
+            "target_location": values["target_location"],
+            "process_text": values["process_text"],
+            **process,
+        }
+    )
+    _apply_evidence_decisions(connection, case_id, evidence_decisions, case_data)
+
+    connection.execute(
+        """
+        UPDATE annotation_cases
+        SET source_passage_id = ?, target_work = ?, target_works_json = ?,
+            target_scope_json = ?, target_text = ?, target_passage_id = ?,
+            target_location_json = ?, process_text = ?, case_json = ?,
+            updated_at = ?
+        WHERE case_id = ?
+        """,
+        (
+            values["source_passage_id"],
+            values["target_work"],
+            _json(values["target_works"]),
+            _json(values["target_scope"]),
+            values["target_text"],
+            values["target_passage_id"],
+            _json(values["target_location"]),
+            values["process_text"],
+            _json(case_data),
+            _now(),
+            case_id,
+        ),
+    )
+    _replace_process_steps(connection, case_id, process)
+
+
 def _review_approval_errors(
     connection: sqlite3.Connection,
     case_row: sqlite3.Row,
@@ -600,10 +976,53 @@ def _review_approval_errors(
     """Return the explicit gates required before a case can become gold."""
 
     errors: list[str] = []
+    if not case_row["source_passage_id"]:
+        errors.append("source_passage_not_bound")
     if not str(case_row["target_work"] or "").strip():
         errors.append("target_work_not_resolved")
     if not case_row["target_passage_id"]:
         errors.append("target_passage_not_bound")
+
+    process_rows = connection.execute(
+        """
+        SELECT field_name, step_text
+        FROM annotation_process_steps
+        WHERE case_id = ?
+        """,
+        (case_row["case_id"],),
+    ).fetchall()
+    process_by_field = {row["field_name"]: row["step_text"] for row in process_rows}
+    for field in PROCESS_FIELDS:
+        if not str(process_by_field.get(field) or "").strip():
+            errors.append(f"process_field_missing:{field}")
+
+    source_source_status = connection.execute(
+        """
+        SELECT sd.canonical_status
+        FROM passages p
+        JOIN source_documents sd ON sd.source_document_id = p.source_document_id
+        WHERE p.passage_id = ?
+        """,
+        (case_row["source_passage_id"],),
+    ).fetchone()
+    if source_source_status is None:
+        errors.append("source_passage_missing")
+    elif source_source_status["canonical_status"] != "canonical_active":
+        errors.append("source_passage_not_canonical")
+
+    target_source_status = connection.execute(
+        """
+        SELECT sd.canonical_status
+        FROM passages p
+        JOIN source_documents sd ON sd.source_document_id = p.source_document_id
+        WHERE p.passage_id = ?
+        """,
+        (case_row["target_passage_id"],),
+    ).fetchone()
+    if target_source_status is None:
+        errors.append("target_passage_missing")
+    elif target_source_status["canonical_status"] != "canonical_active":
+        errors.append("target_passage_not_canonical")
 
     field_decisions = review.get("field_decisions")
     required_fields = (
@@ -623,9 +1042,13 @@ def _review_approval_errors(
 
     evidence_rows = connection.execute(
         """
-        SELECT evidence_index, quote_check
-        FROM annotation_evidences
-        WHERE case_id = ?
+        SELECT e.evidence_index, e.quote, e.quote_check, e.passage_id,
+               e.evidence_json, p.raw_text, p.plain_text, p.normalized_text,
+               sd.canonical_status
+        FROM annotation_evidences e
+        LEFT JOIN passages p ON p.passage_id = e.passage_id
+        LEFT JOIN source_documents sd ON sd.source_document_id = p.source_document_id
+        WHERE e.case_id = ?
         ORDER BY evidence_index
         """,
         (case_row["case_id"],),
@@ -645,6 +1068,18 @@ def _review_approval_errors(
             errors.append(f"evidence_not_approved:{index}")
         if evidence["quote_check"] not in {"passed", "normalized_passed"}:
             errors.append(f"evidence_quote_not_passed:{index}")
+        evidence_data = _parse_json_object(evidence["evidence_json"])
+        quote = str(evidence["quote"] or "")
+        in_passage = any(
+            quote in (evidence[column] or "")
+            for column in ("raw_text", "plain_text", "normalized_text")
+        )
+        if evidence_data.get("source_resolution") != "canonical_source_passage":
+            errors.append(f"evidence_source_not_canonical:{index}")
+        if evidence["canonical_status"] != "canonical_active":
+            errors.append(f"evidence_passage_not_canonical:{index}")
+        if not in_passage:
+            errors.append(f"evidence_quote_not_in_passage:{index}")
     if len(decision_by_index) != len(evidence_rows):
         errors.append("evidence_decisions_incomplete")
     return errors
@@ -659,6 +1094,8 @@ def apply_review_event(
     operation_id: str,
     review_note: str = "",
     review: dict[str, Any] | None = None,
+    event_kind: str = "human_review",
+    update_case_state: bool = True,
 ) -> dict[str, Any]:
     """Apply one idempotent human-review command in a single DB transaction.
 
@@ -702,7 +1139,8 @@ def apply_review_event(
         case_row = connection.execute(
             """
             SELECT case_id, machine_status, human_status, lifecycle,
-                   target_work, target_passage_id, human_review_json
+                   source_passage_id, target_work, target_passage_id,
+                   human_review_json
             FROM annotation_cases
             WHERE case_id = ?
             """,
@@ -718,18 +1156,10 @@ def apply_review_event(
             if approval_errors:
                 raise ValueError("approval_gate_failed:" + ",".join(approval_errors))
 
-        to_lifecycle = _lifecycle(case_row["machine_status"], review_status)
-        human_review = _parse_json_object(case_row["human_review_json"])
-        human_review.update(
-            {
-                "status": review_status,
-                "reviewer": reviewer or None,
-                "review_note": review_note,
-                "operation_id": operation_id,
-                "review_contract": "human_review_transaction.v1",
-                "field_decisions": review_payload.get("field_decisions", {}),
-                "evidence_decisions": review_payload.get("evidence_decisions", []),
-            }
+        to_lifecycle = (
+            _lifecycle(case_row["machine_status"], review_status)
+            if update_case_state
+            else case_row["lifecycle"]
         )
         timestamp = _now()
         connection.execute(
@@ -738,12 +1168,13 @@ def apply_review_event(
                 case_id, reviewer, operation_id, event_kind,
                 from_lifecycle, from_human_status, to_lifecycle,
                 review_status, review_note, review_json, created_at
-            ) VALUES (?, ?, ?, 'human_review', ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 case_id,
                 reviewer or None,
                 operation_id,
+                event_kind,
                 case_row["lifecycle"],
                 case_row["human_status"],
                 to_lifecycle,
@@ -753,22 +1184,35 @@ def apply_review_event(
                 timestamp,
             ),
         )
-        connection.execute(
-            """
-            UPDATE annotation_cases
-            SET lifecycle = ?, human_status = ?, review_status = ?,
-                human_review_json = ?, updated_at = ?
-            WHERE case_id = ?
-            """,
-            (
-                to_lifecycle,
-                review_status,
-                review_status,
-                _json(human_review),
-                timestamp,
-                case_id,
-            ),
-        )
+        if update_case_state:
+            human_review = _parse_json_object(case_row["human_review_json"])
+            human_review.update(
+                {
+                    "status": review_status,
+                    "reviewer": reviewer or None,
+                    "review_note": review_note,
+                    "operation_id": operation_id,
+                    "review_contract": "human_review_transaction.v1",
+                    "field_decisions": review_payload.get("field_decisions", {}),
+                    "evidence_decisions": review_payload.get("evidence_decisions", []),
+                }
+            )
+            connection.execute(
+                """
+                UPDATE annotation_cases
+                SET lifecycle = ?, human_status = ?, review_status = ?,
+                    human_review_json = ?, updated_at = ?
+                WHERE case_id = ?
+                """,
+                (
+                    to_lifecycle,
+                    review_status,
+                    review_status,
+                    _json(human_review),
+                    timestamp,
+                    case_id,
+                ),
+            )
         event_id = connection.execute("SELECT last_insert_rowid()").fetchone()[0]
         if started_transaction:
             connection.commit()
@@ -780,6 +1224,669 @@ def apply_review_event(
             "operation_id": operation_id,
             "idempotent": False,
         }
+    except Exception:
+        if started_transaction:
+            connection.rollback()
+        raise
+
+
+def apply_case_review_submission(
+    connection: sqlite3.Connection,
+    case_id: str,
+    *,
+    reviewer: str,
+    review_status: str,
+    operation_id: str,
+    review_note: str = "",
+    case_patch: dict[str, Any] | None = None,
+    review: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Apply an explicit case patch and its human review event atomically.
+
+    The patch is deliberately applied before the approval gate is evaluated so
+    a reviewer can fill missing target/process/evidence fields in one request.
+    A retry identified by the same ``operation_id`` returns the original event
+    without applying the patch a second time.
+    """
+
+    review_payload = dict(review or {})
+    started_transaction = not connection.in_transaction
+    if started_transaction:
+        connection.execute("BEGIN IMMEDIATE")
+    try:
+        existing_event = connection.execute(
+            """
+            SELECT review_event_id, case_id, review_status, to_lifecycle,
+                   operation_id, review_json
+            FROM review_events WHERE operation_id = ?
+            """,
+            (operation_id,),
+        ).fetchone()
+        if existing_event is not None:
+            if existing_event["case_id"] != case_id:
+                raise ValueError("operation_id_already_used_for_other_case")
+            result = dict(existing_event)
+            result["idempotent"] = True
+            if started_transaction:
+                connection.commit()
+            return result
+
+        _apply_case_patch(
+            connection,
+            case_id,
+            case_patch,
+            review_payload.get("evidence_decisions"),
+        )
+        result = apply_review_event(
+            connection,
+            case_id,
+            reviewer=reviewer,
+            review_status=review_status,
+            operation_id=operation_id,
+            review_note=review_note,
+            review=review_payload,
+            event_kind="case_review",
+        )
+        if started_transaction:
+            connection.commit()
+        return result
+    except Exception:
+        if started_transaction:
+            connection.rollback()
+        raise
+
+
+def apply_target_work_resolution(
+    connection: sqlite3.Connection,
+    queue_item_id: str,
+    *,
+    reviewer: str,
+    operation_id: str,
+    target_work: str | None,
+    target_passage_id: str | None,
+    target_scope: dict[str, Any],
+    resolution_status: str,
+    review_note: str = "",
+) -> dict[str, Any]:
+    """Record a target-work decision without promoting the annotation case.
+
+    Resolving a target is an auxiliary review task.  It may populate target
+    fields, but the case remains machine-draft/human-pending until a separate
+    case review submission passes the complete human approval contract.
+    """
+
+    allowed_statuses = {"resolved", "uncertain", "rejected"}
+    if resolution_status not in allowed_statuses:
+        raise ValueError(f"invalid_target_resolution_status:{resolution_status}")
+    if not str(operation_id or "").strip():
+        raise ValueError("operation_id_required")
+    if not str(reviewer or "").strip():
+        raise ValueError("reviewer_required_for_decision")
+    if not isinstance(target_scope, dict):
+        raise ValueError("target_scope_must_be_object")
+    target_work_value = str(target_work or "").strip()
+
+    started_transaction = not connection.in_transaction
+    if started_transaction:
+        connection.execute("BEGIN IMMEDIATE")
+    try:
+        queue_row = connection.execute(
+            """
+            SELECT queue_item_id, case_id, context_json
+            FROM target_work_resolution_queue
+            WHERE queue_item_id = ?
+            """,
+            (queue_item_id,),
+        ).fetchone()
+        if queue_row is None:
+            raise ValueError(f"target_resolution_queue_item_not_found:{queue_item_id}")
+        case_id = queue_row["case_id"]
+
+        existing_event = connection.execute(
+            """
+            SELECT review_event_id, case_id, review_status, to_lifecycle,
+                   operation_id, review_json
+            FROM review_events WHERE operation_id = ?
+            """,
+            (operation_id,),
+        ).fetchone()
+        if existing_event is not None:
+            if existing_event["case_id"] != case_id:
+                raise ValueError("operation_id_already_used_for_other_case")
+            result = dict(existing_event)
+            result["idempotent"] = True
+            if started_transaction:
+                connection.commit()
+            return result
+
+        if resolution_status == "resolved":
+            if not target_work_value:
+                raise ValueError("resolved_target_work_required")
+            if not target_passage_id:
+                raise ValueError("resolved_target_passage_required")
+            if target_scope.get("status") != "resolved":
+                raise ValueError("resolved_target_scope_required")
+            _require_passage(
+                connection,
+                str(target_passage_id),
+                require_canonical=True,
+                field_name="target_passage",
+            )
+        elif target_passage_id:
+            _require_passage(connection, str(target_passage_id), field_name="target_passage")
+
+        case_row = connection.execute(
+            """
+            SELECT case_id, lifecycle, target_work, target_works_json,
+                   target_scope_json, target_passage_id, target_location_json,
+                   case_json
+            FROM annotation_cases WHERE case_id = ?
+            """,
+            (case_id,),
+        ).fetchone()
+        if case_row is None:
+            raise ValueError(f"case_not_found:{case_id}")
+        if case_row["lifecycle"] == "gold":
+            raise ValueError("gold_case_is_immutable")
+
+        existing_works = _parse_json_list(case_row["target_works_json"])
+        target_works = [str(item).strip() for item in existing_works if str(item).strip()]
+        if target_work_value and target_work_value not in target_works:
+            target_works = [target_work_value]
+        elif not target_work_value:
+            target_work_value = str(case_row["target_work"] or "")
+        if not target_works and target_work_value:
+            target_works = [target_work_value]
+        if resolution_status != "resolved":
+            target_scope = {
+                **_parse_json_object(case_row["target_scope_json"]),
+                **target_scope,
+            }
+            target_scope["status"] = resolution_status
+        if resolution_status != "resolved" and not target_passage_id:
+            target_passage_id = case_row["target_passage_id"]
+        target_location = _parse_json_object(case_row["target_location_json"])
+        if target_passage_id:
+            passage = connection.execute(
+                """
+                SELECT p.passage_id, p.source_document_id, p.work_key,
+                       p.document_title, p.section_title, p.entry_title,
+                       p.entry_kind, p.local_ordinal, p.md_line_start, p.md_line_end
+                FROM passages p WHERE p.passage_id = ?
+                """,
+                (target_passage_id,),
+            ).fetchone()
+            if passage is None:
+                raise ValueError(f"target_passage_missing:{target_passage_id}")
+            target_location = dict(passage)
+
+        case_data = _parse_json_object(case_row["case_json"])
+        case_data.update(
+            {
+                "target_work": target_work_value,
+                "target_works": target_works,
+                "target_scope": target_scope,
+                "target_passage_id": target_passage_id,
+                "target_location": target_location,
+            }
+        )
+        timestamp = _now()
+        connection.execute(
+            """
+            UPDATE annotation_cases
+            SET target_work = ?, target_works_json = ?, target_scope_json = ?,
+                target_passage_id = ?, target_location_json = ?, case_json = ?,
+                updated_at = ?
+            WHERE case_id = ?
+            """,
+            (
+                target_work_value,
+                _json(target_works),
+                _json(target_scope),
+                target_passage_id,
+                _json(target_location),
+                _json(case_data),
+                timestamp,
+                case_id,
+            ),
+        )
+        context = _parse_json_object(queue_row["context_json"])
+        context["human_resolution"] = {
+            "status": resolution_status,
+            "target_work": target_work_value,
+            "target_passage_id": target_passage_id,
+            "target_scope": target_scope,
+            "reviewer": reviewer,
+            "operation_id": operation_id,
+        }
+        connection.execute(
+            """
+            UPDATE target_work_resolution_queue
+            SET queue_status = ?, context_json = ?, updated_at = ?
+            WHERE queue_item_id = ?
+            """,
+            (
+                resolution_status,
+                _json(context),
+                timestamp,
+                queue_item_id,
+            ),
+        )
+        result = apply_review_event(
+            connection,
+            case_id,
+            reviewer=reviewer,
+            review_status="pending",
+            operation_id=operation_id,
+            review_note=review_note,
+            review={
+                "queue_item_id": queue_item_id,
+                "resolution_status": resolution_status,
+                "target_work": target_work_value,
+                "target_passage_id": target_passage_id,
+                "target_scope": target_scope,
+            },
+            event_kind="target_work_resolution",
+            update_case_state=False,
+        )
+        if started_transaction:
+            connection.commit()
+        return result
+    except Exception:
+        if started_transaction:
+            connection.rollback()
+        raise
+
+
+def _existing_resolution_event(
+    connection: sqlite3.Connection, operation_id: str
+) -> sqlite3.Row | None:
+    return connection.execute(
+        """
+        SELECT resolution_event_id, resolution_kind, queue_item_id,
+               external_source_id, case_id, evidence_index, reviewer,
+               operation_id, from_queue_status, to_queue_status,
+               resolution_note, resolution_json, created_at
+        FROM resolution_events WHERE operation_id = ?
+        """,
+        (operation_id,),
+    ).fetchone()
+
+
+def _insert_resolution_event(
+    connection: sqlite3.Connection,
+    *,
+    resolution_kind: str,
+    queue_item_id: str,
+    external_source_id: str | None,
+    case_id: str | None,
+    evidence_index: int | None,
+    reviewer: str,
+    operation_id: str,
+    from_queue_status: str,
+    to_queue_status: str,
+    resolution_note: str,
+    resolution: dict[str, Any],
+) -> dict[str, Any]:
+    timestamp = _now()
+    cursor = connection.execute(
+        """
+        INSERT INTO resolution_events(
+            resolution_kind, queue_item_id, external_source_id, case_id,
+            evidence_index, reviewer, operation_id, from_queue_status,
+            to_queue_status, resolution_note, resolution_json, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            resolution_kind,
+            queue_item_id,
+            external_source_id,
+            case_id,
+            evidence_index,
+            reviewer,
+            operation_id,
+            from_queue_status,
+            to_queue_status,
+            resolution_note,
+            _json(resolution),
+            timestamp,
+        ),
+    )
+    return {
+        "resolution_event_id": cursor.lastrowid,
+        "resolution_kind": resolution_kind,
+        "queue_item_id": queue_item_id,
+        "operation_id": operation_id,
+        "to_queue_status": to_queue_status,
+        "idempotent": False,
+    }
+
+
+def apply_external_source_resolution(
+    connection: sqlite3.Connection,
+    queue_item_id: str,
+    *,
+    reviewer: str,
+    operation_id: str,
+    resolution_status: str,
+    source_file: str | None = None,
+    source_file_sha256: str | None = None,
+    edition: str | None = None,
+    location_note: str | None = None,
+    resolution_note: str = "",
+) -> dict[str, Any]:
+    """Record an external edition decision without making it canonical.
+
+    ``verified`` is allowed only when an edition, file and hash are supplied;
+    the caller still has to register a canonical passage separately.  The
+    event itself never changes annotation evidence quote status.
+    """
+
+    allowed_statuses = {"candidate_available", "no_public_match", "verified", "rejected"}
+    if resolution_status not in allowed_statuses:
+        raise ValueError(f"invalid_external_source_resolution_status:{resolution_status}")
+    if not str(reviewer or "").strip():
+        raise ValueError("reviewer_required_for_decision")
+    if not str(operation_id or "").strip():
+        raise ValueError("operation_id_required")
+    if resolution_status == "verified":
+        if not str(source_file or "").strip():
+            raise ValueError("verified_external_source_file_required")
+        if not str(source_file_sha256 or "").strip():
+            raise ValueError("verified_external_source_hash_required")
+        if not str(edition or "").strip():
+            raise ValueError("verified_external_source_edition_required")
+
+    started_transaction = not connection.in_transaction
+    if started_transaction:
+        connection.execute("BEGIN IMMEDIATE")
+    try:
+        queue_row = connection.execute(
+            """
+            SELECT q.queue_item_id, q.external_source_id, q.queue_status,
+                   q.edition_status, r.source_file, r.source_file_sha256,
+                   r.edition, r.location_note
+            FROM external_source_resolution_queue q
+            JOIN external_source_registry r
+              ON r.external_source_id = q.external_source_id
+            WHERE q.queue_item_id = ?
+            """,
+            (queue_item_id,),
+        ).fetchone()
+        if queue_row is None:
+            raise ValueError(f"external_source_queue_item_not_found:{queue_item_id}")
+        existing = _existing_resolution_event(connection, operation_id)
+        if existing is not None:
+            if existing["queue_item_id"] != queue_item_id:
+                raise ValueError("operation_id_already_used_for_other_resolution")
+            result = dict(existing)
+            result["idempotent"] = True
+            if started_transaction:
+                connection.commit()
+            return result
+
+        if resolution_status == "verified":
+            verified_source_file = str(source_file).strip()
+            verified_hash = str(source_file_sha256).strip().lower()
+            if len(verified_hash) != 64 or any(char not in "0123456789abcdef" for char in verified_hash):
+                raise ValueError("verified_external_source_hash_invalid")
+            actual_hash = _sha256_file(verified_source_file)
+            if actual_hash is None:
+                raise ValueError("verified_external_source_file_not_found")
+            if actual_hash != verified_hash:
+                raise ValueError("verified_external_source_hash_mismatch")
+            edition_status = "verified"
+            resolved_source_file = verified_source_file
+            resolved_hash = verified_hash
+            resolved_edition = str(edition).strip()
+            resolved_location_note = location_note
+        elif resolution_status == "candidate_available":
+            resolved_source_file = source_file if source_file is not None else queue_row["source_file"]
+            resolved_hash = source_file_sha256 if source_file_sha256 is not None else queue_row["source_file_sha256"]
+            resolved_edition = edition if edition is not None else queue_row["edition"]
+            resolved_location_note = location_note if location_note is not None else queue_row["location_note"]
+            edition_status = "candidate_registered" if resolved_source_file else "missing"
+        else:
+            edition_status = "rejected" if resolution_status == "rejected" else (
+                "candidate_registered" if queue_row["source_file"] else "missing"
+            )
+            resolved_source_file = source_file if source_file is not None else queue_row["source_file"]
+            resolved_hash = source_file_sha256 if source_file_sha256 is not None else queue_row["source_file_sha256"]
+            resolved_edition = edition if edition is not None else queue_row["edition"]
+            resolved_location_note = location_note if location_note is not None else queue_row["location_note"]
+
+        connection.execute(
+            """
+            UPDATE external_source_registry
+            SET status = ?, source_file = ?, source_file_sha256 = ?, edition = ?,
+                location_note = ?, updated_at = ?
+            WHERE external_source_id = ?
+            """,
+            (
+                "verified" if resolution_status == "verified" else (
+                    "registered" if resolved_source_file else "pending"
+                ),
+                resolved_source_file,
+                resolved_hash,
+                resolved_edition,
+                resolved_location_note,
+                _now(),
+                queue_row["external_source_id"],
+            ),
+        )
+        connection.execute(
+            """
+            UPDATE external_source_resolution_queue
+            SET queue_status = ?, edition_status = ?, registry_status = ?,
+                context_json = json_set(
+                    context_json, '$.human_resolution', json(?)), updated_at = ?
+            WHERE queue_item_id = ?
+            """,
+            (
+                resolution_status,
+                edition_status,
+                "verified" if resolution_status == "verified" else (
+                    "registered" if resolved_source_file else "pending"
+                ),
+                _json(
+                    {
+                        "status": resolution_status,
+                        "reviewer": reviewer,
+                        "operation_id": operation_id,
+                        "source_file": resolved_source_file,
+                        "source_file_sha256": resolved_hash,
+                        "edition": resolved_edition,
+                    }
+                ),
+                _now(),
+                queue_item_id,
+            ),
+        )
+        result = _insert_resolution_event(
+            connection,
+            resolution_kind="external_source_resolution",
+            queue_item_id=queue_item_id,
+            external_source_id=queue_row["external_source_id"],
+            case_id=None,
+            evidence_index=None,
+            reviewer=reviewer,
+            operation_id=operation_id,
+            from_queue_status=queue_row["queue_status"],
+            to_queue_status=resolution_status,
+            resolution_note=resolution_note,
+            resolution={
+                "source_file": resolved_source_file,
+                "source_file_sha256": resolved_hash,
+                "edition": resolved_edition,
+                "location_note": resolved_location_note,
+            },
+        )
+        if started_transaction:
+            connection.commit()
+        return result
+    except Exception:
+        if started_transaction:
+            connection.rollback()
+        raise
+
+
+def apply_external_passage_resolution(
+    connection: sqlite3.Connection,
+    queue_item_id: str,
+    *,
+    reviewer: str,
+    operation_id: str,
+    resolution_status: str,
+    selected_passage_id: str | None = None,
+    resolution_note: str = "",
+) -> dict[str, Any]:
+    """Record an external quote/passage decision without auto-passing it.
+
+    A selected passage must be from a canonical-active source and contain the
+    quote.  The function records the selection and leaves ``annotation_evidences``
+    unchanged; quote_check/source_resolution change only in a later explicit
+    case-review patch after the evidence boundary is re-evaluated.
+    """
+
+    allowed_statuses = {"verified", "candidate_available", "no_public_match", "rejected"}
+    if resolution_status not in allowed_statuses:
+        raise ValueError(f"invalid_external_passage_resolution_status:{resolution_status}")
+    if not str(reviewer or "").strip():
+        raise ValueError("reviewer_required_for_decision")
+    if not str(operation_id or "").strip():
+        raise ValueError("operation_id_required")
+
+    started_transaction = not connection.in_transaction
+    if started_transaction:
+        connection.execute("BEGIN IMMEDIATE")
+    try:
+        queue_row = connection.execute(
+            """
+            SELECT queue_item_id, external_source_id, case_id, evidence_index,
+                   quote, queue_status, edition_status, passage_status
+            FROM external_passage_resolution_queue
+            WHERE queue_item_id = ?
+            """,
+            (queue_item_id,),
+        ).fetchone()
+        if queue_row is None:
+            raise ValueError(f"external_passage_queue_item_not_found:{queue_item_id}")
+        existing = _existing_resolution_event(connection, operation_id)
+        if existing is not None:
+            if existing["queue_item_id"] != queue_item_id:
+                raise ValueError("operation_id_already_used_for_other_resolution")
+            result = dict(existing)
+            result["idempotent"] = True
+            if started_transaction:
+                connection.commit()
+            return result
+
+        if resolution_status == "verified":
+            if not selected_passage_id:
+                raise ValueError("verified_external_passage_required")
+            source_queue = connection.execute(
+                """
+                SELECT q.edition_status, r.status
+                FROM external_source_resolution_queue q
+                JOIN external_source_registry r
+                  ON r.external_source_id = q.external_source_id
+                WHERE q.external_source_id = ?
+                """,
+                (queue_row["external_source_id"],),
+            ).fetchone()
+            if source_queue is None or source_queue["edition_status"] != "verified" or source_queue["status"] != "verified":
+                raise ValueError("verified_external_source_edition_required")
+            _require_passage(
+                connection,
+                selected_passage_id,
+                require_canonical=True,
+                field_name="external_selected_passage",
+            )
+            passage_row = connection.execute(
+                """
+                SELECT p.raw_text, p.plain_text, p.normalized_text,
+                       sd.source_file, sd.source_file_sha256,
+                       r.source_file AS registry_source_file,
+                       r.source_file_sha256 AS registry_source_hash
+                FROM passages p
+                JOIN source_documents sd ON sd.source_document_id = p.source_document_id
+                JOIN external_source_registry r
+                  ON r.external_source_id = ?
+                WHERE p.passage_id = ?
+                """,
+                (queue_row["external_source_id"], selected_passage_id),
+            ).fetchone()
+            quote = str(queue_row["quote"] or "")
+            if passage_row is None:
+                raise ValueError("verified_external_passage_missing")
+            if (
+                not passage_row["registry_source_file"]
+                or passage_row["source_file"] != passage_row["registry_source_file"]
+                or passage_row["source_file_sha256"] != passage_row["registry_source_hash"]
+            ):
+                raise ValueError("verified_external_passage_source_mismatch")
+            if not any(
+                quote in (passage_row[column] or "")
+                for column in ("raw_text", "plain_text", "normalized_text")
+            ):
+                raise ValueError("verified_external_quote_not_in_passage")
+            passage_status = "verified"
+            edition_status = "verified"
+        elif resolution_status == "candidate_available":
+            passage_status = "candidate_match" if selected_passage_id else "search_hit_only"
+            edition_status = "selected_pending" if selected_passage_id else queue_row["edition_status"]
+        elif resolution_status == "no_public_match":
+            passage_status = "missing"
+            edition_status = queue_row["edition_status"]
+            selected_passage_id = None
+        else:
+            passage_status = "rejected"
+            edition_status = "rejected"
+            selected_passage_id = None
+
+        connection.execute(
+            """
+            UPDATE external_passage_resolution_queue
+            SET queue_status = ?, edition_status = ?, passage_status = ?,
+                selected_passage_id = ?,
+                context_json = json_set(
+                    context_json, '$.human_resolution', json(?)), updated_at = ?
+            WHERE queue_item_id = ?
+            """,
+            (
+                resolution_status,
+                edition_status,
+                passage_status,
+                selected_passage_id,
+                _json(
+                    {
+                        "status": resolution_status,
+                        "reviewer": reviewer,
+                        "operation_id": operation_id,
+                        "selected_passage_id": selected_passage_id,
+                    }
+                ),
+                _now(),
+                queue_item_id,
+            ),
+        )
+        result = _insert_resolution_event(
+            connection,
+            resolution_kind="external_passage_resolution",
+            queue_item_id=queue_item_id,
+            external_source_id=queue_row["external_source_id"],
+            case_id=queue_row["case_id"],
+            evidence_index=queue_row["evidence_index"],
+            reviewer=reviewer,
+            operation_id=operation_id,
+            from_queue_status=queue_row["queue_status"],
+            to_queue_status=resolution_status,
+            resolution_note=resolution_note,
+            resolution={"selected_passage_id": selected_passage_id},
+        )
+        if started_transaction:
+            connection.commit()
+        return result
     except Exception:
         if started_transaction:
             connection.rollback()
@@ -1155,6 +2262,7 @@ def database_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "annotation_evidences",
         "annotation_process_steps",
         "review_events",
+        "resolution_events",
         "external_source_registry",
         "annotation_evidence_external_sources",
         "source_version_registry",
