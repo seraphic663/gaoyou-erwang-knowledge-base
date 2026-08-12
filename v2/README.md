@@ -102,7 +102,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该命令将 3 个旧 AI JSON 的 17 条案例、旧 `02-数据库/data/dictionary.db` 的 815 条机器案例和四部王氏原文的 6,749 条候选汇合到同一个 V2 工作库；四部原文各抽取 1 条代表候选实际调用 AI，生成 4 条 `original_markdown_ai` 案例。全量原文候选都进入 `candidate_items`，不是把 6,749 条直接冒充案例。报告位于 `v2/data/real_runs/unified_ingress_report.json`，明细 JSONL 位于 `v2/data/real_runs/unified_ingress/`。
 
-统一入口与首批候选壳结果：6 个 source documents（4 个王氏原典 canonical、2 个旧输入 legacy）、15,467 个 passages、6,749 个 candidate items、936 个 annotation cases；机器状态为 `draft=936`、`rejected=0`，人工状态 `pending=936`，gold 为 0。13 个原先因外部证据未挂接、target 仅候选或明确无引文而停在 rejected 的旧 AI 案例，现改为保留错误明细的 machine draft，进入人工审校队列；随后第一批候选壳新增 100 个 machine draft，没有自动补造证据或升级结论。当前工作库有 7,345 条证据、`review_events=0`。数据库完整性、外键和候选/案例孤儿检查均通过。四部原典的 7,532 个 canonical passages、当前来源 hash 和《读书杂志》canonical `1460a906825998bf…` 均记录在 V2 中，旧 `1534084959961a16…` 只在 `source_version_registry` 中标记为 `historical_superseded`，不进入 active passages。
+统一入口与全量候选壳结果：6 个 source documents（4 个王氏原典 canonical、2 个旧输入 legacy）、15,467 个 passages、6,749 个 candidate items、7,581 个 annotation cases；其中 17 个来自旧 AI JSON、815 个来自旧机器库、4 个来自原典代表性 AI 样例、6,745 个是原典 candidate shell。机器状态为 `draft=7,581`、`rejected=0`，人工状态 `pending=7,581`，gold 为 0。当前工作库有 13,990 条证据、37,905 个过程步骤、`review_events=0`。数据库完整性、外键、候选/案例孤儿和候选壳物化覆盖均通过。四部原典的 7,532 个 canonical passages、当前来源 hash 和《读书杂志》canonical `1460a906825998bf…` 均记录在 V2 中，旧 `1534084959961a16…` 只在 `source_version_registry` 中标记为 `historical_superseded`，不进入 active passages。
 
 机器侧完整运行：
 
@@ -146,20 +146,26 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
     python v2/scripts/build_work_registry.py
     python v2/scripts/plan_candidate_materialization.py --batch-size 100
 
-前一个命令建立可逆的 `work_registry` / `work_aliases` 层：格式等价的《》和空白差异可以映射到四部 canonical `work_key`；外部来源和无法安全消歧的目标标签保留为 `external_pending`/`unknown`，不静默写入 `target_work`。后一个命令只读扫描全部 6,749 个 `candidate_items`，输出逐条 `candidate_materialization_plan.candidate_shell.v1.jsonl` 和报告；原先 4 条已有原典代表案例，第一批已物化 100 条，剩余 6,645 条可生成确定性 candidate shell，按每批 100 条分批。未生成语义结论。报告位于 `v2/data/real_runs/work_registry_report.json` 和 `v2/data/real_runs/candidate_materialization_plan_report.json`。
+前一个命令建立可逆的 `work_registry` / `work_aliases` 层：格式等价的《》和空白差异可以映射到四部 canonical `work_key`；外部来源和无法安全消歧的目标标签保留为 `external_pending`/`unknown`，不静默写入 `target_work`。后一个命令只读扫描全部 6,749 个 `candidate_items`，输出逐条 `candidate_materialization_plan.candidate_shell.v1.jsonl` 和报告；4 条原典代表性 AI 案例保留，6,745 条候选已经全部按每批最多 100 条分成 68 批并物化为确定性 candidate shell。全量物化不调用 AI、不生成语义结论、不升级 target_work、target_passage 或 gold。报告位于 `v2/data/real_runs/work_registry_report.json`、`v2/data/real_runs/candidate_materialization_plan_report.json` 和 `v2/data/real_runs/candidate_shell_all_batches_report.json`。
 
-已实际物化第一批：
+全量物化候选壳：
 
-    python v2/scripts/materialize_candidate_batch.py --batch-id original-candidates-0001
+    python v2/scripts/materialize_all_candidate_batches.py
 
-`original-candidates-0001` 已将 100 条《读书杂志》候选写成 `candidate-shell:<candidate_id>` 案例壳，逐条保留 source passage、连续 source quote、原文文件/hash、候选规则/风险、计划批次和字段边界；不调用 AI、不解析 target_work、不生成语义结论，状态为 `machine_status=draft`、`human_status=pending`。产物为 `v2/data/real_runs/candidate_shell_batch_0001.annotation_case.v1.jsonl` 和 `v2/data/real_runs/candidate_shell_batch_0001_report.json`；`candidate_items.output_case_id` 已建立 100 条回链，重复执行会跳过已建立的同一链接。
+该命令按确定性批次调用单批写入 seam，生成 68 份 `candidate_shell_batch_*.annotation_case.v1.jsonl` 和对应报告；6,745 条 candidate shell 逐条保留 source passage、连续 source quote、原文文件/hash、候选规则/风险、计划批次和字段边界，`candidate_items.output_case_id` 全部建立回链，重复执行幂等跳过。每批 20/50/100 条的网页分页只改变展示范围，不改变数据库状态。
+
+机器目标定位候选：
+
+    python v2/scripts/infer_candidate_target_locations.py
+
+该命令从 6,749 个原典候选中抽取显式《书名》标记并在四部 canonical passages 内做保守的精确片段搜索，生成 74,171 条 `candidate_target_locations`；其中 283 条标签可映射到四部 canonical work、139 条有其他 canonical passage 候选。它不写入 `annotation_cases.target_work` 或 `target_passage_id`，不改变机器/人工状态，报告为 `v2/data/real_runs/candidate_target_location_report.json`。
 
 三类后续队列：
 
     python v2/scripts/build_work_queues.py
 
-该命令生成 `target_work_resolution_queue`（当前 1,317 项）、`external_source_resolution_queue`（100 个外部来源）、`external_passage_resolution_queue`（121 条外部证据）和 `human_review_queue` 快照（936 个案例）。公开转录只进入 candidate_available，不进入 canonical；no_public_match/search_hit_only 保留原状态。队列报告位于 `v2/data/real_runs/work_queues_report.json`，JSONL 明细位于 `v2/data/real_runs/queues/`。
+该命令生成 `target_work_resolution_queue`（当前 7,962 项）、`external_source_resolution_queue`（100 个外部来源）、`external_passage_resolution_queue`（121 条外部证据）和 `human_review_queue` 快照（7,581 个案例）。公开转录只进入 candidate_available，不进入 canonical；no_public_match/search_hit_only 保留原状态。队列报告位于 `v2/data/real_runs/work_queues_report.json`，JSONL 明细位于 `v2/data/real_runs/queues/`。
 
 人工审校写入边界由 `erwang_v2.database.apply_review_event()` 提供：每个命令必须带唯一 `operation_id`；重复提交幂等；每次写入在同一事务中更新 `human_review_json`、案例 lifecycle/status 和 `review_events`。审批还必须有 reviewer、source/target/evidence/process/conclusion 六类 field decisions、逐条 evidence decisions、已绑定 target passage 和 quote passed；不满足时只能保持 pending/uncertain/rejected，不能进入 gold。当前生产库没有执行人工事件，`review_events=0`。
 
-本地只读验收页：启动 `03-项目网站` 后访问 `/v2-database.html` 使用核心展示版；访问 `/v2-acceptance.html` 使用完整详情/审计版。两者通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取同一个 V2 工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，详细页保留完整来源链、hash、证据 JSON、词条、五步过程和 review events。
+本地只读验收页：启动 `03-项目网站` 后访问 `/v2-database.html` 使用核心展示版；访问 `/v2-acceptance.html` 使用完整详情/审计版。两者通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取同一个 V2 工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，列表默认只显示案例核心字段和目标定位候选数量，目标定位候选、来源 passage、证据、词条、五步过程、hash 和完整 JSON 在详细页按折叠区展开。

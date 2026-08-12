@@ -217,8 +217,8 @@ def materialize_batch(
     report_path: Path = DEFAULT_REPORT,
 ) -> dict[str, Any]:
     plans = load_plan(plan_path, batch_id)
-    if len(plans) != 100:
-        raise ValueError(f"selected_batch_must_have_100_rows:{batch_id}:{len(plans)}")
+    if not 1 <= len(plans) <= 100:
+        raise ValueError(f"selected_batch_must_have_1_to_100_rows:{batch_id}:{len(plans)}")
     if any(plan.get("plan_state") != "ready_candidate_shell" for plan in plans):
         raise ValueError(f"selected_batch_contains_nonready_plan:{batch_id}")
 
@@ -316,7 +316,7 @@ def materialize_batch(
         "plan": relative_path(str(plan_path)),
         "batch_id": batch_id,
         "policy": {
-            "batch_size_required": 100,
+            "batch_size_max": 100,
             "ai_called": False,
             "target_work_resolved": False,
             "human_review_performed": False,

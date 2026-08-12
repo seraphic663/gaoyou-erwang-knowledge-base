@@ -241,6 +241,48 @@ CREATE INDEX IF NOT EXISTS idx_candidate_items_work_status
 CREATE INDEX IF NOT EXISTS idx_candidate_items_output_case
     ON candidate_items(output_case_id);
 
+-- Deterministic machine-only target-location candidates.  These rows are
+-- review input, not resolved target_work/target_passage values: a citation
+-- label can identify a possible work without proving the intended edition or
+-- the semantic target of the Wang passage.
+CREATE TABLE IF NOT EXISTS candidate_target_locations (
+    candidate_target_id TEXT PRIMARY KEY,
+    candidate_id TEXT NOT NULL,
+    case_id TEXT NOT NULL,
+    raw_label TEXT NOT NULL,
+    normalized_label TEXT NOT NULL,
+    candidate_work_key TEXT,
+    work_identity_status TEXT NOT NULL CHECK(work_identity_status IN (
+        'canonical', 'candidate', 'unknown'
+    )),
+    label_start_char INTEGER NOT NULL,
+    label_end_char INTEGER NOT NULL,
+    label_match TEXT NOT NULL,
+    source_passage_id TEXT NOT NULL,
+    target_passage_candidate_id TEXT,
+    target_passage_match_status TEXT NOT NULL CHECK(target_passage_match_status IN (
+        'not_searched', 'no_match', 'same_source_only', 'candidate_match'
+    )),
+    target_passage_candidate_count INTEGER NOT NULL DEFAULT 0,
+    evidence_indexes_json TEXT NOT NULL DEFAULT '[]',
+    machine_status TEXT NOT NULL DEFAULT 'candidate_only' CHECK(machine_status = 'candidate_only'),
+    human_status TEXT NOT NULL DEFAULT 'pending' CHECK(human_status = 'pending'),
+    provenance_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    UNIQUE(candidate_id, label_start_char, label_end_char, raw_label),
+    FOREIGN KEY(candidate_id) REFERENCES candidate_items(candidate_id) ON DELETE CASCADE,
+    FOREIGN KEY(case_id) REFERENCES annotation_cases(case_id) ON DELETE CASCADE,
+    FOREIGN KEY(source_passage_id) REFERENCES passages(passage_id),
+    FOREIGN KEY(target_passage_candidate_id) REFERENCES passages(passage_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_candidate_target_locations_case
+    ON candidate_target_locations(case_id, human_status, work_identity_status);
+
+CREATE INDEX IF NOT EXISTS idx_candidate_target_locations_work
+    ON candidate_target_locations(candidate_work_key, target_passage_match_status);
+
 CREATE TABLE IF NOT EXISTS annotation_terms (
     case_id TEXT NOT NULL,
     term_index INTEGER NOT NULL,
@@ -343,6 +385,89 @@ CREATE INDEX IF NOT EXISTS idx_legacy_catalog_terms_status
 
 CREATE INDEX IF NOT EXISTS idx_legacy_catalog_works_status
     ON legacy_catalog_works(catalog_status, evidence_state);
+
+-- The legacy catalog-only tables above intentionally contain only rows that
+-- have no case/evidence relationship.  These inventory tables preserve every
+-- row from dictionary.db, including dialect, sound/loan and synonym metadata,
+-- without turning the inventory into canonical evidence or human gold.
+CREATE TABLE IF NOT EXISTS legacy_dictionary_terms (
+    legacy_term_id INTEGER PRIMARY KEY,
+    term TEXT NOT NULL,
+    term_type TEXT,
+    category TEXT,
+    aliases_json TEXT NOT NULL DEFAULT '[]',
+    notes TEXT,
+    core_meaning TEXT,
+    legacy_case_ids_json TEXT NOT NULL DEFAULT '[]',
+    usage_status TEXT NOT NULL CHECK(usage_status IN ('referenced', 'catalog_only')),
+    case_reference_count INTEGER NOT NULL DEFAULT 0,
+    evidence_reference_count INTEGER NOT NULL DEFAULT 0,
+    source_file TEXT NOT NULL,
+    source_file_sha256 TEXT NOT NULL,
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS legacy_dictionary_works (
+    legacy_work_id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL,
+    author TEXT,
+    work_type TEXT,
+    dynasty TEXT,
+    time_note TEXT,
+    notes TEXT,
+    legacy_case_ids_json TEXT NOT NULL DEFAULT '[]',
+    usage_status TEXT NOT NULL CHECK(usage_status IN ('referenced', 'catalog_only')),
+    case_reference_count INTEGER NOT NULL DEFAULT 0,
+    evidence_reference_count INTEGER NOT NULL DEFAULT 0,
+    source_file TEXT NOT NULL,
+    source_file_sha256 TEXT NOT NULL,
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS legacy_term_case_links (
+    legacy_term_id INTEGER NOT NULL,
+    legacy_case_id INTEGER NOT NULL,
+    v2_case_id TEXT NOT NULL,
+    term_position INTEGER NOT NULL,
+    source_field TEXT NOT NULL DEFAULT 'cases.term_ids',
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    PRIMARY KEY(legacy_term_id, legacy_case_id, term_position),
+    FOREIGN KEY(legacy_term_id) REFERENCES legacy_dictionary_terms(legacy_term_id),
+    FOREIGN KEY(v2_case_id) REFERENCES annotation_cases(case_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_legacy_term_case_links_case
+    ON legacy_term_case_links(v2_case_id, term_position);
+
+CREATE TABLE IF NOT EXISTS legacy_work_evidence_links (
+    legacy_work_id INTEGER NOT NULL,
+    legacy_evidence_id INTEGER PRIMARY KEY,
+    legacy_case_id INTEGER NOT NULL,
+    v2_case_id TEXT NOT NULL,
+    v2_evidence_index INTEGER NOT NULL,
+    legacy_term_id INTEGER,
+    evidence_type TEXT,
+    quote_sha256 TEXT,
+    source_field TEXT NOT NULL DEFAULT 'evidences.work_id',
+    metadata_json TEXT NOT NULL DEFAULT '{}',
+    FOREIGN KEY(legacy_work_id) REFERENCES legacy_dictionary_works(legacy_work_id),
+    FOREIGN KEY(legacy_term_id) REFERENCES legacy_dictionary_terms(legacy_term_id),
+    FOREIGN KEY(v2_case_id, v2_evidence_index)
+        REFERENCES annotation_evidences(case_id, evidence_index) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_legacy_work_evidence_links_work
+    ON legacy_work_evidence_links(legacy_work_id, legacy_case_id);
+
+CREATE INDEX IF NOT EXISTS idx_legacy_dictionary_terms_category
+    ON legacy_dictionary_terms(category, term_type, usage_status);
+
+CREATE INDEX IF NOT EXISTS idx_legacy_dictionary_works_usage
+    ON legacy_dictionary_works(usage_status, title);
 
 CREATE TABLE IF NOT EXISTS annotation_process_steps (
     case_id TEXT NOT NULL,

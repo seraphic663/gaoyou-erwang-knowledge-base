@@ -44,6 +44,12 @@ const V2Acceptance = (() => {
     external_source_pending: '外部原典待登记',
     canonical_source_passage: 'canonical 原典段落',
     source_no_citation: '原典无引文',
+    canonical: 'canonical 书名候选',
+    candidate: '未登记典籍候选',
+    candidate_match: 'canonical passage 候选',
+    same_source_only: '仅命中来源段落',
+    no_match: '未命中 passage',
+    not_searched: '未搜索',
   };
 
   function text(value, fallback = '—') {
@@ -104,6 +110,8 @@ const V2Acceptance = (() => {
     ];
     const detailedMetrics = [
       ['候选已生成案例', summary.candidate_output_case_count || 0, `其中 candidate shell ${summary.candidate_shell_case_count || 0} 条`],
+      ['机器目标定位候选', summary.candidate_target_location_count || 0, '书名标记和片段命中，仍待人工确认'],
+      ['canonical 目标标签', summary.candidate_target_canonical_count || 0, `其中 passage 候选 ${summary.candidate_target_passage_candidate_count || 0} 条`],
       ['机器拒绝', summary.machine_status_counts.rejected || 0, '仅表示显式结构不合格；target_work 未明确的案例保留 draft'],
       ['王氏正文二次命中', summary.evidence_counts.source_resolution.secondary_citation_match || 0, '不是原典核验通过'],
       ['外部来源登记', summary.counts.external_source_registry, '100 个唯一被引来源'],
@@ -186,9 +194,10 @@ const V2Acceptance = (() => {
     const queueText = queueCounts.target_work_queue
       ? `队列：target_work ${queueCounts.target_work_queue}；external passage ${queueCounts.external_passage_queue}；人工 ${queueCounts.human_review_queue}`
       : '';
+    const locationText = `目标定位候选 ${state.summary.candidate_target_location_count || 0} 条；canonical 标签 ${state.summary.candidate_target_canonical_count || 0} 条；均未自动升级 target_work/target_passage`;
     elements.reportContext.textContent = fullJson
-      ? `旧 full JSON 上下文命中（仅迁移线索）：${fullJson}；${inventoryText}；${originText}；${queueText}`
-      : `${inventoryText}；${originText}；${queueText}。`;
+      ? `旧 full JSON 上下文命中（仅迁移线索）：${fullJson}；${inventoryText}；${originText}；${queueText}；${locationText}`
+      : `${inventoryText}；${originText}；${queueText}；${locationText}。`;
   }
 
   function renderCaseTable() {
@@ -209,7 +218,7 @@ const V2Acceptance = (() => {
     elements.caseTable.innerHTML = `
       <table class="v2-case-table">
         <thead>
-          <tr><th>案例</th><th>机器状态</th><th>目标典籍</th><th>证据</th><th>人工状态</th></tr>
+          <tr><th>案例</th><th>机器状态</th><th>目标典籍</th><th>目标定位候选</th><th>证据</th><th>人工状态</th></tr>
         </thead>
         <tbody>
           ${items.map((item) => {
@@ -226,6 +235,7 @@ const V2Acceptance = (() => {
                 </td>
                 <td><span class="v2-status-chip ${statusClass(item.machine_status)}">${escapeHtml(statusLabel(item.machine_status))}</span><br /><small>${escapeHtml(item.lifecycle)}</small></td>
                 <td>${escapeHtml(item.target_work || '未明确')}<br /><small>${escapeHtml(item.target_scope?.status || '')}</small></td>
+                <td>${item.target_location_candidate_count ? `<span class="summary-pill">书名 ${escapeHtml(item.target_location_candidate_count)}</span><br /><small>canonical ${escapeHtml(item.target_location_canonical_count || 0)} · passage ${escapeHtml(item.target_location_passage_candidate_count || 0)}</small>` : '<small>无显式书名候选</small>'}</td>
                 <td><div class="v2-evidence-meta">${resolutions || '<span class="v2-resolution-chip unknown">无 evidence</span>'}</div></td>
                 <td><span class="v2-status-chip ${statusClass(item.human_status)}">${escapeHtml(statusLabel(item.human_status))}</span></td>
               </tr>
@@ -322,6 +332,38 @@ const V2Acceptance = (() => {
     `;
   }
 
+  function renderTargetLocations(locations) {
+    if (!detailedMode) return '';
+    if (!locations?.length) {
+      return '<div class="v2-detail-block"><span class="v2-detail-label">机器目标定位候选</span><p>没有显式《书名》标记；不自动补 target_work。</p></div>';
+    }
+    return `
+      <details class="fold-card v2-raw-panel v2-target-location-fold">
+        <summary>机器目标定位候选 · ${escapeHtml(locations.length)} 条</summary>
+        <div class="fold-body v2-target-location-list">
+          <p class="v2-evidence-note">以下仅是书名标记和 canonical passage 的机器候选，不能替代人工确认，也不等同于 quote_check 通过。</p>
+          ${locations.map((location) => {
+            const candidatePassage = location.target_passage_candidate;
+            const candidateLocation = candidatePassage
+              ? [candidatePassage.document_title, candidatePassage.section_title, candidatePassage.entry_title, `MD ${candidatePassage.md_line_start}-${candidatePassage.md_line_end}`].filter(Boolean).join(' · ')
+              : '';
+            return `
+              <article class="v2-target-location-row">
+                <div class="v2-detail-topline">
+                  <strong>${escapeHtml(location.raw_label)}</strong>
+                  <span class="summary-pill">${escapeHtml(statusLabel(location.work_identity_status))}</span>
+                </div>
+                <p>${escapeHtml(location.normalized_label)} · ${escapeHtml(statusLabel(location.target_passage_match_status))} · chars ${escapeHtml(location.label_start_char)}-${escapeHtml(location.label_end_char)}</p>
+                ${candidatePassage ? `<p><strong>passage 候选</strong> ${escapeHtml(candidateLocation)} · <code>${escapeHtml(candidatePassage.passage_id)}</code></p>` : ''}
+                <details class="v2-raw-fold"><summary>定位 provenance</summary><pre>${escapeHtml(JSON.stringify(location.provenance || {}, null, 2))}</pre></details>
+              </article>
+            `;
+          }).join('')}
+        </div>
+      </details>
+    `;
+  }
+
   function renderReviewEvents(events) {
     if (!detailedMode) return '';
     return `
@@ -379,6 +421,7 @@ const V2Acceptance = (() => {
           ${targetScope.reason ? `<p class="v2-evidence-note">范围说明：${escapeHtml(targetScope.reason)}</p>` : ''}
         </div>
       </div>
+      ${renderTargetLocations(item.target_location_candidates)}
       <div class="v2-detail-block">
         <div class="v2-detail-topline"><h3>证据层级</h3><span class="summary-pill">${escapeHtml(item.evidences?.length || 0)} 条</span></div>
         <div class="v2-evidence-meta">${evidenceSummary || '<span class="v2-resolution-chip unknown">无 evidence</span>'}</div>

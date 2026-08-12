@@ -230,6 +230,17 @@ def orphan_counts(connection: sqlite3.Connection) -> dict[str, int]:
             LEFT JOIN annotation_cases ac ON ac.case_id = ci.output_case_id
             WHERE ci.output_case_id IS NOT NULL AND ac.case_id IS NULL
         """,
+        "orphan_candidate_target_locations": """
+            SELECT COUNT(*) FROM candidate_target_locations ctl
+            LEFT JOIN candidate_items ci ON ci.candidate_id = ctl.candidate_id
+            LEFT JOIN annotation_cases ac ON ac.case_id = ctl.case_id
+            LEFT JOIN passages sp ON sp.passage_id = ctl.source_passage_id
+            LEFT JOIN passages tp ON tp.passage_id = ctl.target_passage_candidate_id
+            WHERE ci.candidate_id IS NULL
+               OR ac.case_id IS NULL
+               OR sp.passage_id IS NULL
+               OR (ctl.target_passage_candidate_id IS NOT NULL AND tp.passage_id IS NULL)
+        """,
         "orphan_target_work_queue_cases": """
             SELECT COUNT(*) FROM target_work_resolution_queue q
             LEFT JOIN annotation_cases ac ON ac.case_id = q.case_id
@@ -290,6 +301,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "source_documents",
         "passages",
         "candidate_items",
+        "candidate_target_locations",
         "annotation_cases",
         "annotation_terms",
         "annotation_evidences",
@@ -302,6 +314,12 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "target_work_resolution_queue",
         "external_source_resolution_queue",
         "external_passage_resolution_queue",
+        "legacy_catalog_terms",
+        "legacy_catalog_works",
+        "legacy_dictionary_terms",
+        "legacy_dictionary_works",
+        "legacy_term_case_links",
+        "legacy_work_evidence_links",
     ):
         counts[table] = int(connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
 
@@ -328,6 +346,38 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     ).fetchone()[0])
     candidate_shell_case_count = int(connection.execute(
         "SELECT COUNT(*) FROM annotation_cases WHERE origin='original_markdown_candidate_shell'"
+    ).fetchone()[0])
+    candidate_link_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_items WHERE output_case_id IS NOT NULL"
+    ).fetchone()[0])
+    candidate_link_orphans = int(connection.execute(
+        """
+        SELECT COUNT(*) FROM candidate_items ci
+        LEFT JOIN annotation_cases ac ON ac.case_id=ci.output_case_id
+        WHERE ci.output_case_id IS NOT NULL AND ac.case_id IS NULL
+        """
+    ).fetchone()[0])
+    candidate_target_location_count = counts["candidate_target_locations"]
+    candidate_target_canonical_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_target_locations WHERE work_identity_status = 'canonical'"
+    ).fetchone()[0])
+    candidate_target_passage_candidate_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_target_locations WHERE target_passage_match_status = 'candidate_match'"
+    ).fetchone()[0])
+    candidate_target_same_source_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_target_locations WHERE target_passage_match_status = 'same_source_only'"
+    ).fetchone()[0])
+    candidate_target_no_match_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_target_locations WHERE target_passage_match_status = 'no_match'"
+    ).fetchone()[0])
+    candidate_target_unresolved_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_target_locations WHERE work_identity_status = 'candidate'"
+    ).fetchone()[0])
+    candidate_target_boundary_breaches = int(connection.execute(
+        """
+        SELECT COUNT(*) FROM candidate_target_locations
+        WHERE machine_status <> 'candidate_only' OR human_status <> 'pending'
+        """
     ).fetchone()[0])
     queue_counts = {
         table: int(connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0])
@@ -387,6 +437,13 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     integrity_status = "pass" if integrity == "ok" else "fail"
     expected_status = "pass" if counts["annotation_cases"] == expected_cases else "fail"
     candidate_status = "pass" if counts["candidate_items"] == expected_candidates else "fail"
+    candidate_materialization_status = "pass" if (
+        candidate_link_count == counts["candidate_items"] and candidate_link_orphans == 0
+    ) else "warn"
+    candidate_target_location_status = "pass" if (
+        orphans.get("orphan_candidate_target_locations", 0) == 0
+        and candidate_target_boundary_breaches == 0
+    ) else "fail"
     separation_status = "pass" if gold_count == 0 and pending_human == counts["annotation_cases"] else "warn"
     source_status = "pass" if not conflicts else "fail"
     orphan_status = "pass" if orphan_total == 0 else "fail"
@@ -468,6 +525,28 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             why_it_matters="候选层是原典入口，漏候选会使后续人工审校范围不完整。",
             next_action="批量推进尚未生成案例的 candidate_items，但保持 candidate 与 case 两层可区分。",
             evidence_basis="candidate_items + original_markdown_route",
+        ),
+        acceptance_check(
+            "candidate_materialization",
+            "候选到案例壳的覆盖",
+            candidate_materialization_status,
+            f"已关联 {candidate_link_count} / {counts['candidate_items']}",
+            "每条原典 candidate_item 都应有可追踪的 annotation_case.v1 壳；壳仍是 machine draft，不代表语义结论已确认。",
+            severity="medium",
+            why_it_matters="候选层如果没有对应审校入口，原典抽取结果会成为不可操作的隐藏孤立项。",
+            next_action="运行 materialize_all_candidate_batches.py；若有阻塞行，先修复来源段落或候选文本边界。",
+            evidence_basis="candidate_items.output_case_id + annotation_cases(origin=original_markdown_candidate_shell)",
+        ),
+        acceptance_check(
+            "candidate_target_locations",
+            "目标位置机器候选",
+            candidate_target_location_status,
+            f"{candidate_target_location_count} 条；canonical 标签 {candidate_target_canonical_count}；其他 canonical passage 候选 {candidate_target_passage_candidate_count}",
+            "书名标记和精确片段命中只进入 candidate_target_locations；不得自动写入 annotation_cases.target_work 或 target_passage_id。",
+            severity="high",
+            why_it_matters="目标定位是人工审校的核心判断；机器命中只能缩小范围，不能把候选伪装成已确认学术证据。",
+            next_action="先按批次查看候选，再由人工确认 target_work、target passage 和证据边界。",
+            evidence_basis="candidate_target_locations 外键、固定状态和 target 字段未升级查询",
         ),
         acceptance_check(
             "work_queues",
@@ -557,7 +636,15 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "candidate_origin_counts": candidate_origin_counts,
         "candidate_work_counts": candidate_work_counts,
         "candidate_output_case_count": candidate_output_case_count,
+        "candidate_link_orphan_count": candidate_link_orphans,
         "candidate_shell_case_count": candidate_shell_case_count,
+        "candidate_target_location_count": candidate_target_location_count,
+        "candidate_target_canonical_count": candidate_target_canonical_count,
+        "candidate_target_passage_candidate_count": candidate_target_passage_candidate_count,
+        "candidate_target_same_source_count": candidate_target_same_source_count,
+        "candidate_target_no_match_count": candidate_target_no_match_count,
+        "candidate_target_unresolved_count": candidate_target_unresolved_count,
+        "candidate_target_boundary_breach_count": candidate_target_boundary_breaches,
         "queue_counts": queue_counts,
         "lifecycle_counts": lifecycle_counts,
         "machine_status_counts": machine_counts,
@@ -685,6 +772,9 @@ def list_cases(
                (SELECT COUNT(*) FROM annotation_terms t WHERE t.case_id = ac.case_id) AS term_count,
                (SELECT COUNT(*) FROM annotation_evidences e WHERE e.case_id = ac.case_id) AS evidence_count,
                (SELECT COUNT(*) FROM annotation_process_steps ps WHERE ps.case_id = ac.case_id) AS process_step_count
+               ,(SELECT COUNT(*) FROM candidate_target_locations ctl WHERE ctl.case_id = ac.case_id) AS target_location_candidate_count
+               ,(SELECT COUNT(*) FROM candidate_target_locations ctl WHERE ctl.case_id = ac.case_id AND ctl.work_identity_status = 'canonical') AS target_location_canonical_count
+               ,(SELECT COUNT(*) FROM candidate_target_locations ctl WHERE ctl.case_id = ac.case_id AND ctl.target_passage_match_status = 'candidate_match') AS target_location_passage_candidate_count
         FROM annotation_cases ac
         LEFT JOIN passages p ON p.passage_id = ac.source_passage_id
         {where_clause}
@@ -753,6 +843,31 @@ def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | N
         (item.get("target_passage_id"),),
     ).fetchone() if item.get("target_passage_id") else None
     item["target_passage"] = passage_payload(target_passage)
+
+    target_location_rows = connection.execute(
+        """
+        SELECT * FROM candidate_target_locations
+        WHERE case_id = ?
+        ORDER BY label_start_char, candidate_target_id
+        """,
+        (case_id,),
+    ).fetchall()
+    target_locations = []
+    for target_location_row in target_location_rows:
+        target_location = dict(target_location_row)
+        target_location["evidence_indexes"] = parse_json(
+            target_location.pop("evidence_indexes_json", "[]"), []
+        )
+        target_location["provenance"] = parse_json(
+            target_location.pop("provenance_json", "{}"), {}
+        )
+        target_candidate_passage = connection.execute(
+            "SELECT * FROM passages WHERE passage_id = ?",
+            (target_location.get("target_passage_candidate_id"),),
+        ).fetchone() if target_location.get("target_passage_candidate_id") else None
+        target_location["target_passage_candidate"] = passage_payload(target_candidate_passage)
+        target_locations.append(target_location)
+    item["target_location_candidates"] = target_locations
 
     term_rows = connection.execute(
         """

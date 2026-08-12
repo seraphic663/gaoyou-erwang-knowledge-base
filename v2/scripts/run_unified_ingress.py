@@ -25,6 +25,7 @@ from erwang_v2.database import (
     ingest_candidate_items,
     ingest_case,
     ingest_legacy_catalog,
+    ingest_legacy_dictionary_inventory,
     ingest_passages,
     open_database,
 )
@@ -510,6 +511,14 @@ def run_unified_ingress(
 
         for case in legacy_cases:
             ingest_case(connection, case, origin="legacy_dictionary_db_reprocessing")
+        legacy_inventory_counts = ingest_legacy_dictionary_inventory(
+            connection,
+            terms=legacy_material["all_terms"],
+            works=legacy_material["all_works"],
+            cases=legacy_cases,
+            source_file=_relative(LEGACY_DATABASE),
+            source_file_sha256=legacy_material["database_sha256"],
+        )
         connection.commit()
 
         db_counts = database_counts(connection)
@@ -552,6 +561,7 @@ def run_unified_ingress(
                     "legacy_derived": legacy_target_document_id,
                 },
                 "catalog_counts": legacy_catalog_counts,
+                "inventory_counts": legacy_inventory_counts,
             },
             "original_markdown_route": {
                 "status": "completed",

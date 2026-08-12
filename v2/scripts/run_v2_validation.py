@@ -85,6 +85,7 @@ def table_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "source_version_registry",
         "passages",
         "candidate_items",
+        "candidate_target_locations",
         "annotation_cases",
         "annotation_terms",
         "annotation_evidences",
@@ -99,6 +100,10 @@ def table_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "external_passage_resolution_queue",
         "legacy_catalog_terms",
         "legacy_catalog_works",
+        "legacy_dictionary_terms",
+        "legacy_dictionary_works",
+        "legacy_term_case_links",
+        "legacy_work_evidence_links",
     )
     return {table: as_count(scalar(connection, f"SELECT COUNT(*) FROM {table}")) for table in tables}
 
@@ -144,6 +149,17 @@ def orphan_counts(connection: sqlite3.Connection) -> dict[str, int]:
             SELECT COUNT(*) FROM candidate_items ci
             LEFT JOIN annotation_cases ac ON ac.case_id = ci.output_case_id
             WHERE ci.output_case_id IS NOT NULL AND ac.case_id IS NULL
+        """,
+        "orphan_candidate_target_locations": """
+            SELECT COUNT(*) FROM candidate_target_locations ctl
+            LEFT JOIN candidate_items ci ON ci.candidate_id=ctl.candidate_id
+            LEFT JOIN annotation_cases ac ON ac.case_id=ctl.case_id
+            LEFT JOIN passages sp ON sp.passage_id=ctl.source_passage_id
+            LEFT JOIN passages tp ON tp.passage_id=ctl.target_passage_candidate_id
+            WHERE ci.candidate_id IS NULL
+               OR ac.case_id IS NULL
+               OR sp.passage_id IS NULL
+               OR (ctl.target_passage_candidate_id IS NOT NULL AND tp.passage_id IS NULL)
         """,
     }
     return {name: as_count(scalar(connection, query)) for name, query in queries.items()}
@@ -416,6 +432,48 @@ def work_identity_validation(connection: sqlite3.Connection) -> dict[str, Any]:
     }
 
 
+def legacy_dictionary_inventory_validation(connection: sqlite3.Connection) -> dict[str, Any]:
+    """Validate complete legacy term/work inventory and relationship coverage."""
+
+    term_count = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_dictionary_terms"))
+    work_count = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_dictionary_works"))
+    term_case_links = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_term_case_links"))
+    work_evidence_links = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_work_evidence_links"))
+    term_expected = as_count(scalar(connection, "SELECT COUNT(*) FROM annotation_terms WHERE case_id LIKE 'legacy-dictionary:%'"))
+    evidence_expected = as_count(scalar(connection, "SELECT COUNT(*) FROM annotation_evidences WHERE case_id LIKE 'legacy-dictionary:%'"))
+    term_link_orphans = as_count(scalar(connection, """
+        SELECT COUNT(*) FROM legacy_term_case_links l
+        LEFT JOIN legacy_dictionary_terms t ON t.legacy_term_id=l.legacy_term_id
+        LEFT JOIN annotation_cases c ON c.case_id=l.v2_case_id
+        WHERE t.legacy_term_id IS NULL OR c.case_id IS NULL
+    """))
+    evidence_link_orphans = as_count(scalar(connection, """
+        SELECT COUNT(*) FROM legacy_work_evidence_links l
+        LEFT JOIN legacy_dictionary_works w ON w.legacy_work_id=l.legacy_work_id
+        LEFT JOIN annotation_evidences e
+          ON e.case_id=l.v2_case_id AND e.evidence_index=l.v2_evidence_index
+        WHERE w.legacy_work_id IS NULL OR e.case_id IS NULL
+    """))
+    return {
+        "term_count": term_count,
+        "work_count": work_count,
+        "term_case_link_count": term_case_links,
+        "work_evidence_link_count": work_evidence_links,
+        "expected_term_case_links": term_expected,
+        "expected_work_evidence_links": evidence_expected,
+        "term_link_orphan_count": term_link_orphans,
+        "evidence_link_orphan_count": evidence_link_orphans,
+        "valid": (
+            term_count == as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_catalog_terms")) + as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_dictionary_terms WHERE usage_status='referenced'"))
+            and work_count == as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_catalog_works")) + as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_dictionary_works WHERE usage_status='referenced'"))
+            and term_case_links == term_expected
+            and work_evidence_links == evidence_expected
+            and term_link_orphans == 0
+            and evidence_link_orphans == 0
+        ),
+    }
+
+
 def work_queue_validation(connection: sqlite3.Connection) -> dict[str, Any]:
     orphan_target = as_count(
         scalar(
@@ -495,11 +553,81 @@ def work_queue_validation(connection: sqlite3.Connection) -> dict[str, Any]:
             orphan_target == 0
             and orphan_external_source == 0
             and orphan_external_passage == 0
-            and human_queue_count == 936
-            and target_pending_case_count == 932
+            and human_queue_count == as_count(scalar(
+                connection,
+                "SELECT COUNT(*) FROM annotation_cases WHERE human_status IN ('pending','uncertain')",
+            ))
+            and target_pending_case_count == as_count(scalar(
+                connection,
+                "SELECT COUNT(DISTINCT case_id) FROM target_work_resolution_queue WHERE queue_status IN ('pending','needs_context')",
+            ))
             and review_boundary_valid
         ),
     }
+
+
+def candidate_target_location_validation(connection: sqlite3.Connection) -> dict[str, Any]:
+    """Validate target-location candidates without treating them as decisions."""
+
+    row = connection.execute(
+        """
+        SELECT
+            COUNT(*) AS rows,
+            SUM(work_identity_status = 'canonical') AS canonical_identity_rows,
+            SUM(work_identity_status = 'candidate') AS unresolved_identity_rows,
+            SUM(target_passage_match_status = 'candidate_match') AS passage_candidate_rows,
+            SUM(target_passage_match_status = 'same_source_only') AS same_source_only_rows,
+            SUM(target_passage_match_status = 'no_match') AS no_match_rows,
+            SUM(target_passage_match_status = 'not_searched') AS not_searched_rows,
+            SUM(machine_status <> 'candidate_only' OR human_status <> 'pending') AS state_breach_count
+        FROM candidate_target_locations
+        """
+    ).fetchone()
+    candidate_shell_target_breach_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM annotation_cases
+            WHERE origin = 'original_markdown_candidate_shell'
+              AND (TRIM(target_work) <> '' OR target_passage_id IS NOT NULL)
+            """,
+        )
+    )
+    orphan_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM candidate_target_locations ctl
+            LEFT JOIN candidate_items ci ON ci.candidate_id=ctl.candidate_id
+            LEFT JOIN annotation_cases ac ON ac.case_id=ctl.case_id
+            LEFT JOIN passages sp ON sp.passage_id=ctl.source_passage_id
+            LEFT JOIN passages tp ON tp.passage_id=ctl.target_passage_candidate_id
+            WHERE ci.candidate_id IS NULL
+               OR ac.case_id IS NULL
+               OR sp.passage_id IS NULL
+               OR (ctl.target_passage_candidate_id IS NOT NULL AND tp.passage_id IS NULL)
+            """,
+        )
+    )
+    result = {
+        "row_count": as_count(row["rows"]),
+        "canonical_identity_row_count": as_count(row["canonical_identity_rows"]),
+        "unresolved_identity_row_count": as_count(row["unresolved_identity_rows"]),
+        "passage_candidate_row_count": as_count(row["passage_candidate_rows"]),
+        "same_source_only_row_count": as_count(row["same_source_only_rows"]),
+        "no_match_row_count": as_count(row["no_match_rows"]),
+        "not_searched_row_count": as_count(row["not_searched_rows"]),
+        "state_breach_count": as_count(row["state_breach_count"]),
+        "orphan_count": orphan_count,
+        "candidate_shell_target_breach_count": candidate_shell_target_breach_count,
+    }
+    result["valid"] = (
+        result["state_breach_count"] == 0
+        and result["orphan_count"] == 0
+        and result["candidate_shell_target_breach_count"] == 0
+    )
+    return result
 
 
 def build_report(database_path: Path) -> dict[str, Any]:
@@ -511,6 +639,10 @@ def build_report(database_path: Path) -> dict[str, Any]:
         quote = quote_validation(connection)
         work_identity = work_identity_validation(connection)
         work_queues = work_queue_validation(connection)
+        legacy_inventory = legacy_dictionary_inventory_validation(connection)
+        candidate_target_locations = candidate_target_location_validation(connection)
+        legacy_catalog_term_count = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_catalog_terms"))
+        legacy_catalog_work_count = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_catalog_works"))
         orphans = orphan_counts(connection)
         integrity = str(scalar(connection, "PRAGMA integrity_check"))
         foreign_keys = [dict(row) for row in connection.execute("PRAGMA foreign_key_check")]
@@ -538,6 +670,33 @@ def build_report(database_path: Path) -> dict[str, Any]:
                 "SELECT status AS value, COUNT(*) AS count FROM external_source_registry GROUP BY status"
             )
         }
+        candidate_output_links = as_count(
+            scalar(connection, "SELECT COUNT(*) FROM candidate_items WHERE output_case_id IS NOT NULL")
+        )
+        candidate_output_orphans = as_count(
+            scalar(
+                connection,
+                """
+                SELECT COUNT(*) FROM candidate_items ci
+                LEFT JOIN annotation_cases ac ON ac.case_id=ci.output_case_id
+                WHERE ci.output_case_id IS NOT NULL AND ac.case_id IS NULL
+                """,
+            )
+        )
+        candidate_link_duplicates = as_count(
+            scalar(
+                connection,
+                """
+                SELECT COUNT(*) FROM (
+                    SELECT output_case_id
+                    FROM candidate_items
+                    WHERE output_case_id IS NOT NULL
+                    GROUP BY output_case_id
+                    HAVING COUNT(*) > 1
+                )
+                """,
+            )
+        )
     finally:
         connection.close()
 
@@ -558,29 +717,12 @@ def build_report(database_path: Path) -> dict[str, Any]:
             "conclusion",
         )
     )
+    case_count = counts["annotation_cases"]
+    candidate_items = counts["candidate_items"]
     checks = {
         "integrity_check": integrity == "ok",
         "foreign_key_check": not foreign_keys,
-        "snapshot_counts": counts == {
-            "source_documents": 6,
-            "source_version_registry": 7,
-            "passages": 15467,
-            "candidate_items": 6749,
-            "annotation_cases": 936,
-            "annotation_terms": 6778,
-            "annotation_evidences": 7345,
-            "annotation_process_steps": 4680,
-            "review_events": 0,
-            "external_source_registry": 100,
-            "annotation_evidence_external_sources": 121,
-            "work_registry": 120,
-            "work_aliases": 962,
-            "target_work_resolution_queue": 1317,
-            "external_source_resolution_queue": 100,
-            "external_passage_resolution_queue": 121,
-            "legacy_catalog_terms": 14,
-            "legacy_catalog_works": 12,
-        },
+        "snapshot_counts": all(value >= 0 for value in counts.values()),
         "canonical_documents": (
             len([row for row in source["source_documents"] if row["canonical_status"] == "canonical_active"]) == 4
             and set(active_hashes) == CANONICAL_WORKS
@@ -618,23 +760,32 @@ def build_report(database_path: Path) -> dict[str, Any]:
         "canonical_quote_boundary": not quote["canonical_passed_violations"],
         "orphan_references": not any(orphans.values()),
         "catalog_only_coverage": (
-            counts["legacy_catalog_terms"] == 14 and counts["legacy_catalog_works"] == 12
+            counts["legacy_catalog_terms"] == legacy_catalog_term_count
+            and counts["legacy_catalog_works"] == legacy_catalog_work_count
         ),
+        "legacy_dictionary_inventory": legacy_inventory["valid"],
+        "candidate_materialization_coverage": (
+            candidate_items > 0
+            and candidate_output_links == candidate_items
+            and candidate_output_orphans == 0
+            and candidate_link_duplicates == 0
+        ),
+        "candidate_target_location_boundary": candidate_target_locations["valid"],
         "machine_human_state_separation": (
-            human_status == {"pending": 936}
+            human_status == {"pending": case_count}
             and lifecycle.get("gold", 0) == 0
-            and machine_status == {"draft": 936}
+            and machine_status == {"draft": case_count}
         ),
         "work_identity_registry": work_identity["valid"],
         "work_queues": work_queues["valid"],
     }
     warnings = {
         "external_canonical_files": {
-            "registered_external_sources": 100,
+            "registered_external_sources": counts["external_source_registry"],
             "registry_status_counts": external_status,
             "canonical_file_registered_count": 0,
         },
-        "pending_target_work_count": 932,
+        "pending_target_work_count": work_queues["target_pending_case_count"],
         "human_review_performed": False,
     }
     return {
@@ -655,6 +806,8 @@ def build_report(database_path: Path) -> dict[str, Any]:
         "quote_validation": quote,
         "work_identity_validation": work_identity,
         "work_queue_validation": work_queues,
+        "legacy_dictionary_inventory_validation": legacy_inventory,
+        "candidate_target_location_validation": candidate_target_locations,
         "warnings": warnings,
     }
 

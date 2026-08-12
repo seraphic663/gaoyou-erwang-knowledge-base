@@ -23,7 +23,13 @@ V2_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = V2_ROOT.parent
 sys.path.insert(0, str(V2_ROOT / "src"))
 
-from erwang_v2.database import ingest_case, ingest_legacy_catalog, ingest_passages, open_database
+from erwang_v2.database import (
+    ingest_case,
+    ingest_legacy_catalog,
+    ingest_legacy_dictionary_inventory,
+    ingest_passages,
+    open_database,
+)
 from erwang_v2.legacy_dictionary_adapter import load_legacy_dictionary_material
 
 
@@ -191,6 +197,14 @@ def run_conversion(
         )
         for case in cases:
             ingest_case(connection, case, origin="legacy_dictionary_db_reprocessing")
+        inventory_counts = ingest_legacy_dictionary_inventory(
+            connection,
+            terms=material["all_terms"],
+            works=material["all_works"],
+            cases=cases,
+            source_file=str(source_database.relative_to(PROJECT_ROOT)),
+            source_file_sha256=material["database_sha256"],
+        )
         connection.commit()
 
         case_ids = {
@@ -327,6 +341,7 @@ def run_conversion(
                 "legacy_derived": target_document_id,
             },
             "catalog_counts": catalog_counts,
+            "inventory_counts": inventory_counts,
         },
         "source_profile": source_profile,
         "adapter_profile": adapter_report,

@@ -251,6 +251,7 @@ def load_legacy_dictionary_cases(
                         "quote": quote,
                         "evidence_role": evidence.get("evidence_type"),
                         "source_work": cited_work or f"legacy_work_id:{work_id}",
+                        "legacy_work_id": work_id,
                         "passage_id": None,
                         "quote_sha256": hashlib.sha256(quote.encode("utf-8")).hexdigest(),
                         "quote_check": "unchecked",
@@ -275,6 +276,8 @@ def load_legacy_dictionary_cases(
             case = {
                 "schema_version": "annotation_case.v1",
                 "case_id": f"legacy-dictionary:{legacy_id}",
+                "legacy_case_id": legacy_id,
+                "legacy_term_ids": term_ids,
                 "case_title": legacy.get("title") or f"legacy dictionary case {legacy_id}",
                 "submitted_by": "legacy_dictionary_db_adapter",
                 "reviewed_by": None,
@@ -685,6 +688,8 @@ def load_legacy_dictionary_material(
         "report": report,
         "source_sha256": source_text_sha256,
         "database_sha256": database_sha256,
+        "all_terms": term_rows,
+        "all_works": work_rows,
         "catalog_terms": unreferenced_term_rows,
         "catalog_works": unreferenced_work_rows,
     }

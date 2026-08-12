@@ -322,7 +322,7 @@ def ingest_candidate_items(
                 risk_flags_json = excluded.risk_flags_json,
                 candidate_status = excluded.candidate_status,
                 origin = excluded.origin,
-                output_case_id = excluded.output_case_id,
+                output_case_id = COALESCE(excluded.output_case_id, candidate_items.output_case_id),
                 provenance_json = excluded.provenance_json,
                 updated_at = excluded.updated_at
             """,
@@ -887,6 +887,250 @@ def ingest_legacy_catalog(
     return {"catalog_only_terms": len(term_rows), "catalog_only_works": len(work_rows)}
 
 
+def ingest_legacy_dictionary_inventory(
+    connection: sqlite3.Connection,
+    *,
+    terms: Iterable[dict[str, Any]],
+    works: Iterable[dict[str, Any]],
+    cases: Iterable[dict[str, Any]],
+    source_file: str,
+    source_file_sha256: str,
+) -> dict[str, int]:
+    """Persist the complete legacy term/work inventory and its relationships.
+
+    ``legacy_catalog_*`` is intentionally limited to unreferenced rows.  This
+    companion layer keeps *all* old rows and the old relationship fields so the
+    V2 database can use the legacy dictionary as migration material without
+    confusing inventory metadata with canonical evidence or human review.
+    """
+
+    now = _now()
+    term_rows = [dict(row) for row in terms]
+    work_rows = [dict(row) for row in works]
+    case_rows = [dict(row) for row in cases]
+    terms_by_id = {int(row["id"]): row for row in term_rows}
+    works_by_id = {int(row["id"]): row for row in work_rows}
+    term_case_ids: dict[int, list[int]] = {term_id: [] for term_id in terms_by_id}
+    term_case_positions: dict[tuple[int, int], list[int]] = {}
+    case_by_legacy_id: dict[int, str] = {}
+    for case in case_rows:
+        migration_provenance = (
+            case.get("_migration", {}).get("provenance", {})
+            if isinstance(case.get("_migration"), dict)
+            else {}
+        )
+        legacy_case_value = case.get("legacy_case_id") or migration_provenance.get("legacy_case_id")
+        if legacy_case_value is None:
+            case_id_text = str(case.get("case_id") or "")
+            legacy_case_value = case_id_text.rsplit(":", 1)[-1]
+        legacy_case_id = int(legacy_case_value)
+        v2_case_id = str(case["case_id"])
+        case_by_legacy_id[legacy_case_id] = v2_case_id
+        raw_term_ids = case.get("legacy_term_ids") or migration_provenance.get("legacy_term_ids") or []
+        if isinstance(raw_term_ids, str):
+            try:
+                raw_term_ids = json.loads(raw_term_ids)
+            except (TypeError, ValueError):
+                raw_term_ids = []
+        for position, raw_term_id in enumerate(raw_term_ids):
+            try:
+                term_id = int(raw_term_id)
+            except (TypeError, ValueError):
+                continue
+            if term_id not in terms_by_id:
+                continue
+            term_case_ids[term_id].append(legacy_case_id)
+            term_case_positions.setdefault((term_id, legacy_case_id), []).append(position)
+
+    evidence_rows: list[dict[str, Any]] = []
+    for case in case_rows:
+        migration_provenance = (
+            case.get("_migration", {}).get("provenance", {})
+            if isinstance(case.get("_migration"), dict)
+            else {}
+        )
+        legacy_case_value = case.get("legacy_case_id") or migration_provenance.get("legacy_case_id")
+        if legacy_case_value is None:
+            legacy_case_value = str(case.get("case_id") or "").rsplit(":", 1)[-1]
+        for evidence_index, evidence in enumerate(case.get("evidences") or []):
+            evidence_rows.append(
+                {
+                    "legacy_evidence_id": int(evidence["legacy_evidence_id"]),
+                    "legacy_case_id": int(legacy_case_value),
+                    "v2_case_id": str(case["case_id"]),
+                    "v2_evidence_index": evidence_index,
+                    "legacy_work_id": evidence.get("legacy_work_id"),
+                    "legacy_term_id": evidence.get("legacy_term_id"),
+                    "evidence_type": evidence.get("legacy_evidence_type"),
+                    "quote_sha256": evidence.get("quote_sha256"),
+                }
+            )
+    work_evidence_counts: dict[int, int] = {work_id: 0 for work_id in works_by_id}
+    work_case_ids: dict[int, list[int]] = {work_id: [] for work_id in works_by_id}
+    term_evidence_counts: dict[int, int] = {term_id: 0 for term_id in terms_by_id}
+    for evidence in evidence_rows:
+        try:
+            work_id = int(evidence["legacy_work_id"])
+        except (TypeError, ValueError):
+            work_id = None
+        if work_id in work_evidence_counts:
+            work_evidence_counts[work_id] += 1
+            work_case_ids[work_id].append(evidence["legacy_case_id"])
+        try:
+            term_id = int(evidence["legacy_term_id"])
+        except (TypeError, ValueError):
+            term_id = None
+        if term_id in term_evidence_counts:
+            term_evidence_counts[term_id] += 1
+
+    for term_id, row in terms_by_id.items():
+        case_ids = sorted(set(term_case_ids[term_id]))
+        connection.execute(
+            """
+            INSERT INTO legacy_dictionary_terms(
+                legacy_term_id, term, term_type, category, aliases_json, notes,
+                core_meaning, legacy_case_ids_json, usage_status,
+                case_reference_count, evidence_reference_count, source_file,
+                source_file_sha256, metadata_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(legacy_term_id) DO UPDATE SET
+                term=excluded.term, term_type=excluded.term_type,
+                category=excluded.category, aliases_json=excluded.aliases_json,
+                notes=excluded.notes, core_meaning=excluded.core_meaning,
+                legacy_case_ids_json=excluded.legacy_case_ids_json,
+                usage_status=excluded.usage_status,
+                case_reference_count=excluded.case_reference_count,
+                evidence_reference_count=excluded.evidence_reference_count,
+                source_file=excluded.source_file,
+                source_file_sha256=excluded.source_file_sha256,
+                metadata_json=excluded.metadata_json, updated_at=excluded.updated_at
+            """,
+            (
+                term_id,
+                row.get("term") or "未定",
+                row.get("term_type"),
+                row.get("category"),
+                _json(row.get("aliases") or []),
+                row.get("notes"),
+                row.get("core_meaning"),
+                _json(case_ids),
+                "referenced" if case_ids else "catalog_only",
+                len(case_ids),
+                term_evidence_counts[term_id],
+                source_file,
+                source_file_sha256,
+                _json({"legacy_row": row, "catalog_only": not bool(case_ids)}),
+                now,
+                now,
+            ),
+        )
+
+    for work_id, row in works_by_id.items():
+        case_ids = sorted(set(work_case_ids[work_id]))
+        connection.execute(
+            """
+            INSERT INTO legacy_dictionary_works(
+                legacy_work_id, title, author, work_type, dynasty, time_note,
+                notes, legacy_case_ids_json, usage_status, case_reference_count,
+                evidence_reference_count, source_file, source_file_sha256,
+                metadata_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(legacy_work_id) DO UPDATE SET
+                title=excluded.title, author=excluded.author,
+                work_type=excluded.work_type, dynasty=excluded.dynasty,
+                time_note=excluded.time_note, notes=excluded.notes,
+                legacy_case_ids_json=excluded.legacy_case_ids_json,
+                usage_status=excluded.usage_status,
+                case_reference_count=excluded.case_reference_count,
+                evidence_reference_count=excluded.evidence_reference_count,
+                source_file=excluded.source_file,
+                source_file_sha256=excluded.source_file_sha256,
+                metadata_json=excluded.metadata_json, updated_at=excluded.updated_at
+            """,
+            (
+                work_id,
+                row.get("title") or "未定",
+                row.get("author"),
+                row.get("work_type"),
+                row.get("dynasty"),
+                row.get("time_note"),
+                row.get("notes"),
+                _json(case_ids),
+                "referenced" if work_evidence_counts[work_id] else "catalog_only",
+                len(case_ids),
+                work_evidence_counts[work_id],
+                source_file,
+                source_file_sha256,
+                _json({"legacy_row": row, "catalog_only": not bool(work_evidence_counts[work_id])}),
+                now,
+                now,
+            ),
+        )
+
+    connection.execute(
+        "DELETE FROM legacy_term_case_links WHERE v2_case_id IN (SELECT case_id FROM annotation_cases WHERE origin='legacy_dictionary_db_reprocessing')"
+    )
+    for (term_id, legacy_case_id), positions in term_case_positions.items():
+        v2_case_id = case_by_legacy_id.get(legacy_case_id)
+        if not v2_case_id:
+            continue
+        for position in positions:
+            connection.execute(
+                """
+                INSERT INTO legacy_term_case_links(
+                    legacy_term_id, legacy_case_id, v2_case_id, term_position,
+                    source_field, metadata_json
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (term_id, legacy_case_id, v2_case_id, position, "cases.term_ids", "{}"),
+            )
+
+    connection.execute(
+        "DELETE FROM legacy_work_evidence_links WHERE v2_case_id IN (SELECT case_id FROM annotation_cases WHERE origin='legacy_dictionary_db_reprocessing')"
+    )
+    for evidence in evidence_rows:
+        try:
+            work_id = int(evidence["legacy_work_id"])
+        except (TypeError, ValueError):
+            continue
+        term_id = evidence.get("legacy_term_id")
+        try:
+            term_id = int(term_id) if term_id is not None else None
+        except (TypeError, ValueError):
+            term_id = None
+        connection.execute(
+            """
+            INSERT INTO legacy_work_evidence_links(
+                legacy_work_id, legacy_evidence_id, legacy_case_id, v2_case_id,
+                v2_evidence_index, legacy_term_id, evidence_type, quote_sha256,
+                source_field, metadata_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                work_id,
+                evidence["legacy_evidence_id"],
+                evidence["legacy_case_id"],
+                evidence["v2_case_id"],
+                evidence["v2_evidence_index"],
+                term_id,
+                evidence.get("evidence_type"),
+                evidence.get("quote_sha256"),
+                "evidences.work_id",
+                "{}",
+            ),
+        )
+    return {
+        "legacy_dictionary_terms": len(term_rows),
+        "legacy_dictionary_works": len(work_rows),
+        "legacy_term_case_links": sum(len(positions) for positions in term_case_positions.values()),
+        "legacy_work_evidence_links": len(evidence_rows),
+        "referenced_terms": sum(bool(term_case_ids[term_id]) for term_id in terms_by_id),
+        "catalog_only_terms": sum(not bool(term_case_ids[term_id]) for term_id in terms_by_id),
+        "referenced_works": sum(bool(work_evidence_counts[work_id]) for work_id in works_by_id),
+        "catalog_only_works": sum(not bool(work_evidence_counts[work_id]) for work_id in works_by_id),
+    }
+
+
 def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | None:
     row = connection.execute(
         """
@@ -905,6 +1149,7 @@ def database_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "source_documents",
         "passages",
         "candidate_items",
+        "candidate_target_locations",
         "annotation_cases",
         "annotation_terms",
         "annotation_evidences",
@@ -920,6 +1165,10 @@ def database_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "external_passage_resolution_queue",
         "legacy_catalog_terms",
         "legacy_catalog_works",
+        "legacy_dictionary_terms",
+        "legacy_dictionary_works",
+        "legacy_term_case_links",
+        "legacy_work_evidence_links",
     )
     return {
         table: connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]

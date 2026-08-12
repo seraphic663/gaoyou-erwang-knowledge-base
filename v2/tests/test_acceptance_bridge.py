@@ -28,16 +28,17 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         first_page = list_cases(self.connection, page=1, page_size=20)
         second_page = list_cases(self.connection, page=2, page_size=20)
 
-        self.assertEqual(first_page["total"], 936)
-        self.assertEqual(first_page["page_count"], 47)
+        self.assertEqual(first_page["total"], 7581)
+        self.assertEqual(first_page["page_count"], 380)
         self.assertEqual(len(first_page["items"]), 20)
         self.assertEqual(len(second_page["items"]), 20)
         self.assertNotEqual(first_page["items"][0]["case_id"], second_page["items"][0]["case_id"])
+        self.assertIn("target_location_candidate_count", first_page["items"][0])
 
     def test_case_filter_is_applied_before_pagination(self) -> None:
         payload = list_cases(
             self.connection,
-            query="平原",
+            query="legacy-ai:1",
             source_work="读书杂志",
             machine_status="draft",
             page=1,
@@ -68,6 +69,21 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         self.assertEqual(len(payload["process_steps"]), 5)
         self.assertIn("_migration", payload["case_data"])
         self.assertIn("source_file_sha256", payload["provenance"])
+
+    def test_candidate_shell_detail_keeps_target_location_as_machine_candidate(self) -> None:
+        payload = get_case(self.connection, "candidate-shell:dushu_zazhi_0002_candidate")
+
+        self.assertIsNotNone(payload)
+        self.assertGreater(len(payload["target_location_candidates"]), 0)
+        self.assertIsNone(payload["target_passage_id"])
+        self.assertEqual(payload["target_work"], "")
+        self.assertTrue(
+            all(
+                row["machine_status"] == "candidate_only"
+                and row["human_status"] == "pending"
+                for row in payload["target_location_candidates"]
+            )
+        )
 
 
 if __name__ == "__main__":
