@@ -70,6 +70,7 @@ def _ensure_schema_extensions(connection: sqlite3.Connection) -> None:
         },
         "external_passage_resolution_queue": {
             "selected_passage_id": "TEXT",
+            "candidate_passage_ids_json": "TEXT NOT NULL DEFAULT '[]'",
         },
     }
     for table, additions in table_additions.items():

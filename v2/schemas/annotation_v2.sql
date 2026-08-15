@@ -203,6 +203,7 @@ CREATE TABLE IF NOT EXISTS external_passage_resolution_queue (
     candidate_manifest_path TEXT,
     candidate_manifest_sha256 TEXT,
     selected_passage_id TEXT,
+    candidate_passage_ids_json TEXT NOT NULL DEFAULT '[]',
     candidate_refs_json TEXT NOT NULL DEFAULT '[]',
     context_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,

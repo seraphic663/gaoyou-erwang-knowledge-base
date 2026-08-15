@@ -33,6 +33,9 @@ PROJECT_ROOT = V2_ROOT.parent
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_OUTPUT_DIR = V2_ROOT / "data/real_runs/review_tasks"
 DEFAULT_MANIFEST = "review_task_manifest.review.v1.json"
+EXTERNAL_EVIDENCE_PACKET_PATH = "v2/data/real_runs/external_evidence_packets.v1.jsonl"
+TARGET_WORK_RESOLUTION_PACKET_PATH = "v2/data/real_runs/target_work_resolution_packets.v1.jsonl"
+TARGET_WORK_RESOLUTION_PROPOSAL_PATH = "v2/data/real_runs/target_work_resolution_proposals.v1.jsonl"
 
 STREAMS = (
     "case_review",
@@ -312,6 +315,20 @@ def build_target_work_tasks(connection: sqlite3.Connection) -> list[dict[str, An
                     "resolution_event_kind": "target_work_resolution",
                     "submission": "erwang_v2.database.apply_target_work_resolution",
                 },
+                "target_resolution_packet_ref": {
+                    "path": TARGET_WORK_RESOLUTION_PACKET_PATH,
+                    "packet_id": f"target-work-resolution-packet:{row['queue_item_id']}",
+                    "lookup_key": row["queue_item_id"],
+                    "packet_scope": "case source/evidence/work-registry/candidate-location context for this queue item",
+                    "machine_only": True,
+                },
+                "target_resolution_proposal_ref": {
+                    "path": TARGET_WORK_RESOLUTION_PROPOSAL_PATH,
+                    "proposal_id_prefix": "target-work-proposal:",
+                    "lookup_key": row["queue_item_id"],
+                    "proposal_scope": "compact machine-only target identity and passage-candidate review index",
+                    "machine_only": True,
+                },
                 "detail_ref": {
                     "case_id": row["case_id"],
                     "api_path": f"/api/v2/case?id={row['case_id']}",
@@ -351,7 +368,7 @@ def build_external_source_tasks(connection: sqlite3.Connection) -> list[dict[str
                 """
                 SELECT queue_item_id, case_id, evidence_index, quote,
                        queue_status, edition_status, passage_status,
-                       candidate_refs_json
+                       candidate_refs_json, candidate_passage_ids_json
                 FROM external_passage_resolution_queue
                 WHERE external_source_id = ?
                 ORDER BY case_id, evidence_index
@@ -361,6 +378,9 @@ def build_external_source_tasks(connection: sqlite3.Connection) -> list[dict[str
         ]
         for evidence in evidence_refs:
             evidence["candidate_refs"] = parse_json(evidence.pop("candidate_refs_json"), [])
+            evidence["candidate_passage_ids"] = parse_json(
+                evidence.pop("candidate_passage_ids_json"), []
+            )
         tasks.append(
             {
                 "task_id": row["queue_item_id"],
@@ -392,6 +412,12 @@ def build_external_source_tasks(connection: sqlite3.Connection) -> list[dict[str
                     "submission": "erwang_v2.database.apply_external_source_resolution",
                     "does_not_register_passage": True,
                 },
+                "evidence_packet_ref": {
+                    "path": EXTERNAL_EVIDENCE_PACKET_PATH,
+                    "packet_id": f"external-evidence-packet:{row['external_source_id']}",
+                    "lookup_key": row["external_source_id"],
+                    "packet_scope": "all linked evidence rows for this external source",
+                },
                 "updated_at": row["updated_at"],
             }
         )
@@ -405,7 +431,7 @@ def build_external_passage_tasks(connection: sqlite3.Connection) -> list[dict[st
                cited_work, quote, source_resolution, quote_check,
                queue_status, edition_status, passage_status,
                candidate_manifest_path, candidate_manifest_sha256,
-               selected_passage_id,
+               selected_passage_id, candidate_passage_ids_json,
                candidate_refs_json, context_json, updated_at
         FROM external_passage_resolution_queue
         WHERE queue_status IN ('pending', 'candidate_available', 'no_public_match')
@@ -438,6 +464,7 @@ def build_external_passage_tasks(connection: sqlite3.Connection) -> list[dict[st
                     "path": row["candidate_manifest_path"],
                     "sha256": row["candidate_manifest_sha256"],
                     "refs": parse_json(row["candidate_refs_json"], []),
+                    "passage_ids": parse_json(row["candidate_passage_ids_json"], []),
                 },
                 "selected_passage_id": row["selected_passage_id"],
                 "context": parse_json(row["context_json"], {}),
@@ -450,6 +477,13 @@ def build_external_passage_tasks(connection: sqlite3.Connection) -> list[dict[st
                     "resolution_event_kind": "external_passage_resolution",
                     "submission": "erwang_v2.database.apply_external_passage_resolution",
                     "does_not_mutate_annotation_evidence": True,
+                },
+                "evidence_packet_ref": {
+                    "path": EXTERNAL_EVIDENCE_PACKET_PATH,
+                    "packet_id": f"external-evidence-packet:{row['external_source_id']}",
+                    "lookup_key": row["external_source_id"],
+                    "queue_item_id": row["queue_item_id"],
+                    "packet_scope": "select this evidence row inside the source packet",
                 },
                 "detail_ref": {
                     "case_id": row["case_id"],
@@ -535,6 +569,11 @@ def build_review_task_artifacts(
     database_path = Path(database_path).resolve()
     output_dir = Path(output_dir).resolve()
     manifest_path = Path(manifest_path or (output_dir / DEFAULT_MANIFEST)).resolve()
+    if manifest_path.name == "external_public_candidate_manifest.json":
+        raise ValueError(
+            "review_manifest_path_must_not_be_external_candidate_manifest; "
+            "omit --manifest or pass review_task_manifest.review.v1.json"
+        )
     output_dir.mkdir(parents=True, exist_ok=True)
 
     with connect_read_only(database_path) as connection:
@@ -596,6 +635,8 @@ def build_review_task_artifacts(
             "public_transcription_is_not_canonical": True,
             "task_artifacts_are_not_review_events": True,
             "task_build_promotes_nothing": True,
+            "external_evidence_packet_is_machine_only": True,
+            "target_work_resolution_packet_is_machine_only": True,
             "review_event_write_boundary": [
                 "erwang_v2.database.apply_case_review_submission",
                 "erwang_v2.database.apply_target_work_resolution",

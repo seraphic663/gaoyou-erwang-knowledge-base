@@ -23,7 +23,7 @@
       <div class="hero-content">
         <p class="badge">V2 / VR · 详情 / 管理 / 审计</p>
         <h1>V2 数据库 · 详细审计</h1>
-        <p class="hero-copy">这是 V2 数据库的详情与管理界面：保留完整来源链、hash、迁移字段、机器校验、证据层级和验收依据。页面只读，不会把机器结果升级为人工或 gold。</p>
+        <p class="hero-copy">这是 V2 数据库的详情与管理界面：保留完整来源链、hash、迁移字段、机器校验、证据层级和验收依据。默认只读；只有本地显式开启审校写入后，才能提交人工决定，机器结果不会自行升级为人工或 gold。</p>
         <div id="v2HeroMeta" class="hero-panel"></div>
       </div>
     </header>
@@ -114,6 +114,43 @@
             <div id="v2CaseTable" class="v2-case-table-wrap"></div>
           </section>
 
+          <section class="card v2-panel v2-review-task-panel">
+            <div class="v2-panel-heading v2-case-heading">
+              <div>
+                <p class="section-kicker">人工审校入口</p>
+                <h2>按任务包逐批处理</h2>
+              </div>
+              <span id="v2ReviewWriteChip" class="v2-mode-chip">读取中</span>
+            </div>
+            <p class="compact-note">任务包只提供待办；选择任务不会写库。提交必须填写 reviewer 和 operation_id，并且仍受 V2 的人工审批门控制。</p>
+            <div class="v2-review-task-toolbar">
+              <label class="toolbar-field">
+                <span>任务流</span>
+                <select id="v2ReviewStream">
+                  <option value="case_review">案例审校</option>
+                  <option value="target_work_resolution">target_work 消歧</option>
+                  <option value="external_source_resolution">外部来源/版本</option>
+                  <option value="external_passage_resolution">外部 passage/引文</option>
+                </select>
+              </label>
+              <label class="toolbar-field">
+                <span>批次</span>
+                <select id="v2ReviewBatch"></select>
+              </label>
+              <label class="toolbar-field">
+                <span>本屏显示</span>
+                <select id="v2ReviewDisplayLimit">
+                  <option value="20" selected>20 条</option>
+                  <option value="50">50 条</option>
+                  <option value="100">100 条</option>
+                </select>
+              </label>
+              <button id="v2ReviewLoadBatch" class="pagination-button" type="button">读取任务批次</button>
+            </div>
+            <p id="v2ReviewTaskStatus" class="compact-note">尚未读取任务包。</p>
+            <div id="v2ReviewTaskList" class="v2-review-task-list"></div>
+          </section>
+
           <section id="v2CaseDetail" class="card v2-panel v2-case-detail" aria-live="polite">
             <div class="v2-empty-detail">选择一条案例，查看来源段落、目标范围、证据层级和机器校验结果。</div>
           </section>
@@ -122,7 +159,7 @@
     </main>
 
     <footer class="footer">
-      <p>V2 / VR 数据库 · 详细审计与管理入口 · 只读，不改变机器库与人工库的状态</p>
+      <p>V2 / VR 数据库 · 详细审计与管理入口 · 默认只读；人工写入需本地显式开启且不自动晋级 gold</p>
     </footer>
 
     <script src="./assets/js/utils.js"></script>

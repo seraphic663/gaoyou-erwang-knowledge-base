@@ -51,6 +51,38 @@ class ArchitectureLayerTest(unittest.TestCase):
                     4,
                 )
 
+    def test_referenced_legacy_work_is_candidate_identity_not_catalog_or_canonical(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            database_path = Path(directory) / "annotation_v2.db"
+            with open_database(database_path) as connection:
+                connection.execute(
+                    """
+                    INSERT INTO legacy_dictionary_works(
+                        legacy_work_id, title, author, work_type, usage_status,
+                        source_file, source_file_sha256, metadata_json,
+                        created_at, updated_at
+                    ) VALUES (24, '方言', '', '经部', 'referenced',
+                              '02-数据库/data/dictionary.db', 'fixture', '{}',
+                              '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00')
+                    """
+                )
+                builder = RegistryBuilder(connection)
+                builder.seed_known_identities()
+                stats = builder.ingest_referenced_legacy_works()
+                connection.commit()
+
+                row = connection.execute(
+                    "SELECT work_key, identity_status, metadata_json FROM work_registry WHERE canonical_title='方言'"
+                ).fetchone()
+                alias = connection.execute(
+                    "SELECT mapping_status, mapping_method, source_record_id FROM work_aliases WHERE normalized_label='方言'"
+                ).fetchone()
+                self.assertEqual(stats["new_legacy_candidate_identity"], 1)
+                self.assertIsNotNone(row)
+                self.assertEqual(row["identity_status"], "unknown")
+                self.assertEqual(json.loads(row["metadata_json"])["identity_class"], "legacy_dictionary_work_reference")
+                self.assertEqual(tuple(alias), ("candidate", "legacy_dictionary_work_reference", "legacy_work:24"))
+
     def test_candidate_materialization_plan_is_read_only_and_batched(self) -> None:
         source = V2_ROOT / "data/fixtures/sources/jingyi_shuwen.sample.md"
         passages = build_passages(source, "jingyi_shuwen")

@@ -44,5 +44,9 @@ note/
 02-数据库/parsed_data.py
 02-数据库/data/dictionary.empty.db
 
+# ---- External edition scans (local evidence cache, tracked by manifest/hash only) ----
+v2/data/external_sources/edition_candidates/**/*.pdf
+v2/data/external_sources/edition_candidates/**/*.part
+
 # ---- Optional local generated data (uncomment if needed) ----
 # 03-项目网站/data/*.bak

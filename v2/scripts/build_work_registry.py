@@ -280,6 +280,98 @@ class RegistryBuilder:
                 source_record_id=f"legacy_work:{row['legacy_work_id']}",
             )
 
+    def ingest_referenced_legacy_works(self) -> dict[str, int]:
+        """Register referenced dictionary works as candidate identities.
+
+        ``legacy_dictionary_works`` is an inventory boundary, not a canonical
+        edition registry.  Referenced rows can safely improve target-label
+        traceability, while catalog-only rows remain represented only by
+        ``legacy_catalog_works``.  Exact title matching is the only mapping
+        performed here; chapter/section labels remain unresolved.
+        """
+
+        stats: Counter[str] = Counter()
+        rows = self.connection.execute(
+            """
+            SELECT legacy_work_id, title, author, work_type, source_file,
+                   usage_status
+            FROM legacy_dictionary_works
+            WHERE usage_status = 'referenced'
+            ORDER BY legacy_work_id
+            """
+        ).fetchall()
+        for row in rows:
+            raw_label = str(row["title"] or "").strip()
+            normalized = normalize_label(raw_label)
+            if not normalized:
+                stats["empty_label"] += 1
+                continue
+
+            canonical_key = self.canonical_by_label.get(normalized)
+            if canonical_key:
+                work_key = canonical_key
+                mapping_status = "canonical"
+                mapping_method = "legacy_dictionary_work_exact_canonical_title"
+                confidence = "high"
+                stats["canonical_alias"] += 1
+            else:
+                existing = self.connection.execute(
+                    """
+                    SELECT work_key, mapping_status
+                    FROM work_aliases
+                    WHERE normalized_label = ?
+                      AND mapping_status IN ('canonical', 'candidate')
+                    ORDER BY CASE mapping_status WHEN 'canonical' THEN 0 ELSE 1 END,
+                             work_key
+                    LIMIT 1
+                    """,
+                    (normalized,),
+                ).fetchone()
+                if existing is not None:
+                    work_key = str(existing["work_key"])
+                    mapping_status = str(existing["mapping_status"])
+                    mapping_method = "legacy_dictionary_work_alias_to_existing_identity"
+                    confidence = "medium" if mapping_status == "candidate" else "high"
+                    stats["existing_identity_alias"] += 1
+                else:
+                    work_key = identity_key("legacy_candidate", normalized)
+                    self.upsert_work(
+                        work_key=work_key,
+                        canonical_title=raw_label,
+                        author=row["author"],
+                        work_type=row["work_type"] or "legacy_dictionary_work_reference",
+                        identity_status="unknown",
+                        metadata={
+                            "legacy_work_id": row["legacy_work_id"],
+                            "usage_status": row["usage_status"],
+                            "source_file": relative_path(row["source_file"]),
+                            "identity_class": "legacy_dictionary_work_reference",
+                            "semantic_resolution": "not_performed",
+                            "edition_resolution": "not_performed",
+                        },
+                    )
+                    mapping_status = "candidate"
+                    mapping_method = "legacy_dictionary_work_reference"
+                    confidence = "low"
+                    stats["new_legacy_candidate_identity"] += 1
+
+            self.alias(
+                work_key=work_key,
+                raw_label=raw_label,
+                mapping_status=mapping_status,
+                mapping_method=mapping_method,
+                confidence=confidence,
+                source_file=relative_path(row["source_file"]),
+                source_record_id=f"legacy_work:{row['legacy_work_id']}",
+                metadata={
+                    "legacy_work_id": row["legacy_work_id"],
+                    "usage_status": row["usage_status"],
+                    "identity_class": "legacy_dictionary_work_reference" if mapping_status != "canonical" else "canonical_title_identity_from_legacy_reference",
+                    "semantic_resolution": "not_performed" if mapping_status != "canonical" else "canonical_title_identity_only",
+                },
+            )
+        return dict(stats)
+
     def ingest_case_labels(self) -> dict[str, int]:
         stats: Counter[str] = Counter()
         rows = self.connection.execute(
@@ -354,6 +446,7 @@ class RegistryBuilder:
         self.seed_known_identities()
         self.ingest_source_documents()
         self.ingest_catalog_works()
+        legacy_work_stats = self.ingest_referenced_legacy_works()
         case_stats = self.ingest_case_labels()
         external_stats = self.ingest_external_sources()
         self.connection.commit()
@@ -401,6 +494,7 @@ class RegistryBuilder:
             "identity_status_counts": work_counts,
             "alias_mapping_status_counts": alias_counts,
             "case_label_mapping": case_stats,
+            "legacy_work_mapping": legacy_work_stats,
             "external_label_mapping": external_stats,
             "unresolved_identity_examples": unresolved,
         }

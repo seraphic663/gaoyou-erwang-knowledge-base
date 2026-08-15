@@ -115,8 +115,17 @@ function buildCaseHref(id) {
   return `./case.html?id=${encodeURIComponent(String(id))}`;
 }
 
-async function requestJson(path) {
-  const response = await fetch(path);
-  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+async function requestJson(path, options = {}) {
+  const response = await fetch(path, options);
+  if (!response.ok) {
+    let message = `Request failed: ${response.status}`;
+    try {
+      const payload = await response.json();
+      if (payload?.message) message = payload.message;
+    } catch {
+      // Keep the HTTP status when the server did not return JSON.
+    }
+    throw new Error(message);
+  }
   return response.json();
 }

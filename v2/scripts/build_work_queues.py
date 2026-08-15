@@ -61,6 +61,52 @@ def parse_json(value: Any, fallback: Any) -> Any:
         return fallback
 
 
+def candidate_ref_key(ref: dict[str, Any]) -> tuple[str, ...]:
+    """Return a stable identity for a frozen public candidate reference."""
+
+    raw_file = str(ref.get("raw_file") or "")
+    raw_sha256 = str(ref.get("raw_sha256") or "")
+    if raw_file and raw_sha256:
+        return ("raw", raw_file, raw_sha256)
+    pageid = str(ref.get("pageid") or "")
+    revid = str(ref.get("revid") or "")
+    if pageid and revid:
+        return ("revision", pageid, revid)
+    if raw_file and revid:
+        return ("file_revision", raw_file, revid)
+    page_url = str(ref.get("page_url") or "")
+    if page_url:
+        return ("url", page_url)
+    return ("json", json.dumps(ref, ensure_ascii=False, sort_keys=True))
+
+
+def merge_candidate_refs(
+    current_refs: list[dict[str, Any]],
+    previous_refs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Keep prior machine candidates when a later public search is unstable.
+
+    The current manifest is authoritative for newly observed fields, while a
+    prior frozen candidate (including a linked candidate passage id) remains
+    available for review if the public search ranking or API response changes.
+    """
+
+    merged: dict[tuple[str, ...], dict[str, Any]] = {}
+    order: list[tuple[str, ...]] = []
+    for ref in [*current_refs, *previous_refs]:
+        if not isinstance(ref, dict):
+            continue
+        key = candidate_ref_key(ref)
+        if key not in merged:
+            merged[key] = dict(ref)
+            order.append(key)
+            continue
+        for field, value in ref.items():
+            if value not in (None, "") and merged[key].get(field) in (None, ""):
+                merged[key][field] = value
+    return [merged[key] for key in order]
+
+
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
@@ -240,18 +286,77 @@ def build_external_queues(
                 "candidate_registered" if row["registry_status"] == "registered" else "missing"
             )
             passage_status = "missing"
+        queue_item_id = f"external-passage:{row['case_id']}:{row['evidence_index']}"
+        existing_queue = connection.execute(
+            "SELECT queue_status, edition_status, passage_status, "
+            "candidate_refs_json, candidate_passage_ids_json, context_json "
+            "FROM external_passage_resolution_queue WHERE queue_item_id = ?",
+            (queue_item_id,),
+        ).fetchone()
+        previous_candidate_refs = parse_json(
+            existing_queue["candidate_refs_json"] if existing_queue is not None else None,
+            [],
+        )
+        if not isinstance(previous_candidate_refs, list):
+            previous_candidate_refs = []
+        previous_candidate_passage_ids = parse_json(
+            existing_queue["candidate_passage_ids_json"] if existing_queue is not None else None,
+            [],
+        )
+        if not isinstance(previous_candidate_passage_ids, list):
+            previous_candidate_passage_ids = []
+        previous_candidate_passage_ids = sorted(
+            set(str(value) for value in previous_candidate_passage_ids if str(value).strip())
+        )
+        previous_candidate_available = bool(
+            existing_queue is not None
+            and (
+                existing_queue["queue_status"] == "candidate_available"
+                or previous_candidate_passage_ids
+                or any(
+                    isinstance(ref, dict)
+                    and (
+                        ref.get("candidate_passage_id")
+                        or ref.get("offline_match_mode") == "normalized_contiguous"
+                    )
+                    for ref in previous_candidate_refs
+                )
+            )
+        )
+        has_human_resolution = connection.execute(
+            "SELECT 1 FROM resolution_events "
+            "WHERE resolution_kind = 'external_passage_resolution' AND queue_item_id = ? LIMIT 1",
+            (queue_item_id,),
+        ).fetchone() is not None
+        if has_human_resolution and existing_queue is not None:
+            # Rebuilding machine indexes must not erase an explicit human
+            # resolution merely because a later manifest/search pass changes.
+            queue_status = existing_queue["queue_status"]
+            edition_status = existing_queue["edition_status"]
+            passage_status = existing_queue["passage_status"]
         candidate_refs = [
             {
                 key: candidate.get(key)
                 for key in (
                     "page_title", "pageid", "revid", "timestamp", "raw_file",
-                    "content_sha256", "match_mode", "start_char", "end_char",
+                    "raw_sha256", "content_sha256", "page_url", "api_url",
+                    "match_mode", "start_char", "end_char",
                     "offline_match_mode", "offline_start_char", "offline_end_char",
+                    "candidate_passage_id",
                 )
                 if key in candidate
             }
             for candidate in candidates
         ]
+        candidate_refs = merge_candidate_refs(candidate_refs, previous_candidate_refs)
+        if previous_candidate_available and not has_human_resolution and queue_status != "candidate_available":
+            # Public search is a discovery lane, not a destructive refresh.  A
+            # later run may omit a previously found page because search ranking
+            # and API results are not stable; retain that machine candidate for
+            # review instead of silently downgrading it to no-match/pending.
+            queue_status = "candidate_available"
+            edition_status = "candidate_registered" if row["registry_status"] != "verified" else "verified"
+            passage_status = "candidate_match"
         context = {
             "source_work_raw": row["source_work"],
             "evidence_json": parse_json(row["evidence_json"], {}),
@@ -260,8 +365,12 @@ def build_external_queues(
             "registry_edition": row["edition"],
             "manifest_status": status,
             "manifest_boundary": manifest.get("source_policy", {}).get("version_rule"),
+            "prior_candidate_preserved": bool(previous_candidate_refs),
         }
-        queue_item_id = f"external-passage:{row['case_id']}:{row['evidence_index']}"
+        if has_human_resolution and existing_queue is not None:
+            existing_context = parse_json(existing_queue["context_json"], {})
+            if isinstance(existing_context, dict) and existing_context.get("human_resolution"):
+                context["human_resolution"] = existing_context["human_resolution"]
         connection.execute(
             """
             INSERT INTO external_passage_resolution_queue(
@@ -277,6 +386,9 @@ def build_external_queues(
                 quote=excluded.quote,
                 source_resolution=excluded.source_resolution,
                 quote_check=excluded.quote_check,
+                queue_status=excluded.queue_status,
+                edition_status=excluded.edition_status,
+                passage_status=excluded.passage_status,
                 candidate_manifest_path=excluded.candidate_manifest_path,
                 candidate_manifest_sha256=excluded.candidate_manifest_sha256,
                 candidate_refs_json=excluded.candidate_refs_json,
@@ -303,6 +415,7 @@ def build_external_queues(
                 timestamp,
             ),
         )
+        stored_candidate_passage_ids = previous_candidate_passage_ids
         record = {
             "queue_schema": "external_passage_resolution_queue.v1",
             "queue_item_id": queue_item_id,
@@ -319,6 +432,7 @@ def build_external_queues(
             "candidate_manifest_path": relative_path(manifest_path),
             "candidate_manifest_sha256": manifest_sha,
             "candidate_refs": candidate_refs,
+            "candidate_passage_ids": stored_candidate_passage_ids,
             "context": context,
         }
         passage_rows.append(record)
@@ -343,6 +457,25 @@ def build_external_queues(
         else:
             queue_status = "pending"
             edition_status = "candidate_registered" if row["status"] == "registered" else "missing"
+        queue_item_id = f"external-source:{row['external_source_id']}"
+        existing_queue = connection.execute(
+            "SELECT queue_status, edition_status, registry_status, context_json "
+            "FROM external_source_resolution_queue WHERE queue_item_id = ?",
+            (queue_item_id,),
+        ).fetchone()
+        has_human_resolution = connection.execute(
+            "SELECT 1 FROM resolution_events "
+            "WHERE resolution_kind = 'external_source_resolution' AND queue_item_id = ? LIMIT 1",
+            (queue_item_id,),
+        ).fetchone() is not None
+        registry_status = row["status"]
+        if has_human_resolution and existing_queue is not None:
+            # Keep an explicit edition/source decision stable across machine
+            # queue rebuilds.  The next human event, not a new manifest, owns
+            # this state transition.
+            queue_status = existing_queue["queue_status"]
+            edition_status = existing_queue["edition_status"]
+            registry_status = existing_queue["registry_status"]
         context = {
             "normalized_work": row["normalized_work"],
             "source_file": row["source_file"],
@@ -352,7 +485,10 @@ def build_external_queues(
             "manifest_path": relative_path(manifest_path),
             "verification_boundary": "public transcription candidate is not an edition-verified canonical source",
         }
-        queue_item_id = f"external-source:{row['external_source_id']}"
+        if has_human_resolution and existing_queue is not None:
+            existing_context = parse_json(existing_queue["context_json"], {})
+            if isinstance(existing_context, dict) and existing_context.get("human_resolution"):
+                context["human_resolution"] = existing_context["human_resolution"]
         connection.execute(
             """
             INSERT INTO external_source_resolution_queue(
@@ -364,6 +500,7 @@ def build_external_queues(
             ON CONFLICT(external_source_id) DO UPDATE SET
                 cited_work=excluded.cited_work,
                 registry_status=excluded.registry_status,
+                queue_status=excluded.queue_status,
                 edition_status=excluded.edition_status,
                 evidence_count=excluded.evidence_count,
                 pending_evidence_count=excluded.pending_evidence_count,
@@ -375,7 +512,7 @@ def build_external_queues(
                 queue_item_id,
                 row["external_source_id"],
                 row["cited_work"],
-                row["status"],
+                registry_status,
                 queue_status,
                 edition_status,
                 len(records),
@@ -392,7 +529,7 @@ def build_external_queues(
                 "queue_item_id": queue_item_id,
                 "external_source_id": row["external_source_id"],
                 "cited_work": row["cited_work"],
-                "registry_status": row["status"],
+                "registry_status": registry_status,
                 "queue_status": queue_status,
                 "edition_status": edition_status,
                 "evidence_count": len(records),

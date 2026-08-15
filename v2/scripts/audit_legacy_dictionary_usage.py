@@ -186,6 +186,10 @@ def v2_report(connection: sqlite3.Connection) -> dict[str, Any]:
         "external_source_registry",
         "legacy_catalog_terms",
         "legacy_catalog_works",
+        "legacy_dictionary_terms",
+        "legacy_dictionary_works",
+        "legacy_term_case_links",
+        "legacy_work_evidence_links",
     ]
     term_ids: set[int] = set()
     legacy_case_term_relations: set[tuple[int, int]] = set()
@@ -204,6 +208,96 @@ def v2_report(connection: sqlite3.Connection) -> dict[str, Any]:
         data = parse_json(row.get("term_json"), {})
         if data.get("legacy_term_id") is not None:
             legacy_case_term_relations.add((int(row["case_id"].split(":")[-1]), int(data["legacy_term_id"])))
+
+    legacy_inventory = {
+        "terms": {
+            "legacy_dictionary_rows": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_dictionary_terms").fetchone()[0]
+            ),
+            "catalog_only_rows": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_catalog_terms").fetchone()[0]
+            ),
+            "referenced_rows": int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM legacy_dictionary_terms WHERE usage_status='referenced'"
+                ).fetchone()[0]
+            ),
+            "unique_legacy_ids_in_annotation_terms": len(term_ids),
+        },
+        "works": {
+            "legacy_dictionary_rows": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_dictionary_works").fetchone()[0]
+            ),
+            "catalog_only_rows": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_catalog_works").fetchone()[0]
+            ),
+            "referenced_rows": int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM legacy_dictionary_works WHERE usage_status='referenced'"
+                ).fetchone()[0]
+            ),
+            "unique_legacy_ids_in_annotation_evidences": int(
+                connection.execute(
+                    "SELECT COUNT(DISTINCT json_extract(evidence_json, '$.legacy_work_id')) "
+                    "FROM annotation_evidences "
+                    "WHERE json_extract(evidence_json, '$.legacy_work_id') IS NOT NULL"
+                ).fetchone()[0]
+            ),
+        },
+        "relationships": {
+            "legacy_term_case_links": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_term_case_links").fetchone()[0]
+            ),
+            "legacy_work_evidence_links": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_work_evidence_links").fetchone()[0]
+            ),
+            "annotation_term_rows_with_legacy_id": int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM annotation_terms "
+                    "WHERE json_extract(term_json, '$.legacy_term_id') IS NOT NULL"
+                ).fetchone()[0]
+            ),
+            "annotation_evidence_rows_with_legacy_work_id": int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM annotation_evidences "
+                    "WHERE json_extract(evidence_json, '$.legacy_work_id') IS NOT NULL"
+                ).fetchone()[0]
+            ),
+        },
+        "coverage_contract": {
+            "all_term_inventory_rows_present": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_dictionary_terms").fetchone()[0]
+            )
+            == int(connection.execute("SELECT COUNT(*) FROM legacy_catalog_terms").fetchone()[0])
+            + int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM legacy_dictionary_terms WHERE usage_status='referenced'"
+                ).fetchone()[0]
+            ),
+            "all_work_inventory_rows_present": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_dictionary_works").fetchone()[0]
+            )
+            == int(connection.execute("SELECT COUNT(*) FROM legacy_catalog_works").fetchone()[0])
+            + int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM legacy_dictionary_works WHERE usage_status='referenced'"
+                ).fetchone()[0]
+            ),
+            "all_term_case_relationships_present": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_term_case_links").fetchone()[0]
+            )
+            == len(legacy_case_term_relations),
+            "all_work_evidence_relationships_present": int(
+                connection.execute("SELECT COUNT(*) FROM legacy_work_evidence_links").fetchone()[0]
+            )
+            == int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM annotation_evidences "
+                    "WHERE json_extract(evidence_json, '$.legacy_work_id') IS NOT NULL"
+                ).fetchone()[0]
+            ),
+        },
+    }
 
     return {
         "counts": {
@@ -241,6 +335,7 @@ def v2_report(connection: sqlite3.Connection) -> dict[str, Any]:
             "legacy_case_term_relation_count": len(legacy_case_term_relations),
             "categories_seen_in_term_json": dict(term_categories),
         },
+        "legacy_inventory_coverage": legacy_inventory,
         "case_field_completion": {
             field: int(connection.execute(
                 "SELECT COUNT(*) FROM annotation_cases "
@@ -293,7 +388,7 @@ def build_report(main_db: Path, v2_db: Path) -> dict[str, Any]:
                 "not_semantic_canonicalization": [
                     "旧 source.txt、dictionary.db 派生文本进入 legacy passage，不是 canonical 原典 passage",
                     "旧 certainty/status 只保留为迁移元数据，未升级 human review 或 gold",
-                    "四部原典的 6,749 candidates 尚未全部生成 annotation_case；当前只有 4 条 original_markdown_ai 代表案例",
+                    "四部原典的 6,749 candidate_items 已全部物化为 annotation_case；其中 4 条是 original_markdown_ai，6,745 条是 machine-only candidate shell，不代表 6,749 条都已形成学术结论",
                 ],
                 "known_main_database_gaps": [
                     "main dictionary.db 的 passages 表为空",

@@ -7,6 +7,7 @@ const { analyzeWithAnnotationAi } = require('./ai-annotation');
 const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-browser');
 const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
+const { getV2ReviewTasks, getV2ReviewTask, submitV2Review } = require('./v2-review');
 
 let v2SummaryCache = null;
 
@@ -31,6 +32,8 @@ function v2SummaryCacheKey(config) {
 function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store, no-cache, must-revalidate',
+    'Pragma': 'no-cache',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -44,8 +47,9 @@ function readJsonBody(req) {
 
     req.on('data', (chunk) => {
       body += chunk;
-      if (body.length > 12000) {
-        req.destroy(new Error('Request body too large'));
+      if (body.length > 128000) {
+        reject(new Error('Request body too large'));
+        req.destroy();
       }
     });
 
@@ -87,6 +91,8 @@ function sendFile(res, filePath) {
 
     res.writeHead(200, {
       'Content-Type': contentTypes[extension] || 'application/octet-stream',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Pragma': 'no-cache',
     });
     res.end(fs.readFileSync(filePath));
   } catch {
@@ -252,6 +258,43 @@ function createServer() {
           return sendJson(res, 404, payload);
         }
         return sendJson(res, 200, payload);
+      }
+
+      if (parsedUrl.pathname === '/api/v2/review-tasks') {
+        if (req.method !== 'GET') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        const payload = await getV2ReviewTasks(config, {
+          stream: parsedUrl.query.stream || 'case_review',
+          batch: parsedUrl.query.batch ? Number(parsedUrl.query.batch) : undefined,
+        });
+        payload.write_enabled = config.V2_REVIEW_WRITE_ENABLED;
+        return sendJson(res, payload.ok === false ? 400 : 200, payload);
+      }
+
+      if (parsedUrl.pathname === '/api/v2/review-task') {
+        if (req.method !== 'GET') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        const payload = await getV2ReviewTask(config, parsedUrl.query.id || '');
+        payload.write_enabled = config.V2_REVIEW_WRITE_ENABLED;
+        return sendJson(res, payload.ok === false ? 404 : 200, payload);
+      }
+
+      if (parsedUrl.pathname === '/api/v2/review') {
+        if (req.method !== 'POST') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        if (!config.V2_REVIEW_WRITE_ENABLED) {
+          return sendJson(res, 403, {
+            ok: false,
+            write_enabled: false,
+            message: 'V2 review writes are disabled; set V2_REVIEW_WRITE_ENABLED=1 for an explicit local review session',
+          });
+        }
+        const body = await readJsonBody(req);
+        const payload = await submitV2Review(config, body);
+        return sendJson(res, payload.ok === false ? 400 : 200, payload);
       }
 
       if (parsedUrl.pathname === '/api/cases') {

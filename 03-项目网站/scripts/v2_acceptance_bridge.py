@@ -112,6 +112,29 @@ def load_validation_report() -> dict[str, Any]:
         return {}
 
 
+def validation_report_is_current(db_path: Path, report: dict[str, Any]) -> bool:
+    """Return whether the persisted read-only acceptance report covers this DB."""
+
+    if not report or report.get("status") not in {"passed", "failed"}:
+        return False
+    database_value = str(report.get("database") or "")
+    expected = str(db_path.resolve().relative_to(WORKSPACE_ROOT.resolve())).replace("\\", "/")
+    if database_value != expected:
+        return False
+    try:
+        generated_at = report.get("generated_at")
+        if not generated_at:
+            return False
+        # The report timestamp is ISO-8601; comparing file mtimes avoids
+        # re-running a 399 MB integrity scan on every page load.
+        from datetime import datetime
+
+        report_time = datetime.fromisoformat(str(generated_at).replace("Z", "+00:00")).timestamp()
+        return report_time >= db_path.stat().st_mtime
+    except (OSError, TypeError, ValueError):
+        return False
+
+
 def load_candidate_batch_reports() -> list[dict[str, Any]]:
     reports: list[dict[str, Any]] = []
     for path in sorted(CANDIDATE_BATCH_REPORT_DIR.glob("candidate_shell_batch_*_report.json")):
@@ -328,6 +351,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     review_task_manifest = load_review_task_manifest()
     validation_report = load_validation_report()
     candidate_batch_reports = load_candidate_batch_reports()
+    validation_current = validation_report_is_current(db_path, validation_report)
     report_summary = batch_report.get("summary") or {}
     counts = {}
     for table in (
@@ -404,6 +428,34 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     candidate_target_no_match_count = int(connection.execute(
         "SELECT COUNT(*) FROM candidate_target_locations WHERE target_passage_match_status = 'no_match'"
     ).fetchone()[0])
+    candidate_target_not_searched_count = int(connection.execute(
+        "SELECT COUNT(*) FROM candidate_target_locations WHERE target_passage_match_status = 'not_searched'"
+    ).fetchone()[0])
+    candidate_target_automatic_promotion_count = 0
+    candidate_target_canonical_singleton_count = int(connection.execute(
+        """
+        SELECT COUNT(*) FROM candidate_target_locations
+        WHERE work_identity_status = 'canonical'
+          AND target_passage_match_status = 'candidate_match'
+          AND target_passage_candidate_count = 1
+        """
+    ).fetchone()[0])
+    candidate_target_canonical_ambiguous_count = int(connection.execute(
+        """
+        SELECT COUNT(*) FROM candidate_target_locations
+        WHERE work_identity_status = 'canonical'
+          AND target_passage_match_status = 'candidate_match'
+          AND target_passage_candidate_count > 1
+        """
+    ).fetchone()[0])
+    candidate_target_without_selected_passage_count = int(connection.execute(
+        """
+        SELECT COUNT(*) FROM candidate_target_locations
+        WHERE work_identity_status = 'canonical'
+          AND target_passage_match_status = 'candidate_match'
+          AND target_passage_candidate_id IS NULL
+        """
+    ).fetchone()[0])
     candidate_target_unresolved_count = int(connection.execute(
         "SELECT COUNT(*) FROM candidate_target_locations WHERE work_identity_status = 'candidate'"
     ).fetchone()[0])
@@ -429,9 +481,17 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     evidence_counts = evidence_counters(connection)
     sources = source_rows(connection)
     conflicts = source_conflicts(connection)
-    orphans = orphan_counts(connection)
-    integrity = str(connection.execute("PRAGMA integrity_check").fetchone()[0])
-    foreign_key_rows = connection.execute("PRAGMA foreign_key_check").fetchall()
+    if validation_current:
+        # The VR page is read-only.  Reuse the last persisted validation result
+        # instead of repeating a full integrity/foreign-key/orphan scan on a
+        # 399 MB database every time the page is opened.
+        orphans = validation_report.get("orphan_counts") or {}
+        integrity = str(validation_report.get("integrity_check") or "unknown")
+        foreign_key_rows = validation_report.get("foreign_key_violations") or []
+    else:
+        orphans = orphan_counts(connection)
+        integrity = str(connection.execute("PRAGMA integrity_check").fetchone()[0])
+        foreign_key_rows = connection.execute("PRAGMA foreign_key_check").fetchall()
     legacy_ai_cases = int(
         ((report.get("legacy_ai_json_route") or {}).get("summary") or {}).get("case_count") or 0
     )
@@ -521,7 +581,20 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         else "未生成"
     )
 
+    validation_boundary_status = "pass" if validation_current else "warn"
+    validation_boundary_value = "当前验收报告覆盖数据库" if validation_current else "验收报告过期，需重新运行"
     checks = [
+        acceptance_check(
+            "validation_report_freshness",
+            "验收报告时效",
+            validation_boundary_status,
+            validation_boundary_value,
+            "VR 页面复用持久化验收报告；报告过期时不在每次打开页面时重复扫描大型 SQLite 文件。",
+            severity="high",
+            why_it_matters="避免页面加载阻塞，同时防止把旧验收结果误显示为当前数据库状态。",
+            next_action="数据库发生写入后重新运行 v2/scripts/run_v2_validation.py，再刷新页面。",
+            evidence_basis="v2/data/real_runs/v2_validation_report.json 的 generated_at 与数据库 mtime",
+        ),
         acceptance_check(
             "integrity",
             "数据库完整性",
@@ -716,6 +789,11 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "candidate_target_passage_candidate_count": candidate_target_passage_candidate_count,
         "candidate_target_same_source_count": candidate_target_same_source_count,
         "candidate_target_no_match_count": candidate_target_no_match_count,
+        "candidate_target_not_searched_count": candidate_target_not_searched_count,
+        "candidate_target_canonical_singleton_count": candidate_target_canonical_singleton_count,
+        "candidate_target_canonical_ambiguous_count": candidate_target_canonical_ambiguous_count,
+        "candidate_target_without_selected_passage_count": candidate_target_without_selected_passage_count,
+        "candidate_target_automatic_promotion_count": candidate_target_automatic_promotion_count,
         "candidate_target_unresolved_count": candidate_target_unresolved_count,
         "candidate_target_boundary_breach_count": candidate_target_boundary_breaches,
         "queue_counts": queue_counts,
@@ -729,6 +807,12 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "source_version_conflicts": conflicts,
         "orphans": orphans,
         "checks": checks,
+        "validation_report": {
+            "current": validation_current,
+            "generated_at": validation_report.get("generated_at"),
+            "status": validation_report.get("status"),
+            "path": "v2/data/real_runs/v2_validation_report.json",
+        },
         "report_context": {
             "report_version": report.get("report_version"),
             "run_status": report.get("status") or report.get("run_status"),
@@ -751,6 +835,33 @@ def passage_payload(row: sqlite3.Row | None) -> dict[str, Any] | None:
     item = dict(row)
     item["inline_notes"] = parse_json(item.pop("inline_notes_json", "[]"), [])
     return item
+
+
+def external_candidate_passage_payload(
+    connection: sqlite3.Connection,
+    passage_id: str,
+) -> dict[str, Any] | None:
+    """Return a candidate passage with its non-canonical source metadata."""
+
+    row = connection.execute(
+        """
+        SELECT p.*,
+               sd.source_kind AS source_kind,
+               sd.canonical_status AS source_canonical_status,
+               sd.source_file AS source_document_file,
+               sd.source_file_sha256 AS source_document_sha256,
+               sd.metadata_json AS source_metadata_json
+        FROM passages p
+        JOIN source_documents sd ON sd.source_document_id = p.source_document_id
+        WHERE p.passage_id = ? AND sd.source_kind = 'external_public_candidate'
+        """,
+        (passage_id,),
+    ).fetchone()
+    payload = passage_payload(row)
+    if payload is None:
+        return None
+    payload["source_metadata"] = parse_json(payload.pop("source_metadata_json", "{}"), {})
+    return payload
 
 
 def provenance_payload(case_data: dict[str, Any]) -> dict[str, Any]:
@@ -966,12 +1077,21 @@ def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | N
                es.status AS external_status,
                es.source_file AS external_source_file,
                es.edition AS external_edition,
-               es.location_note AS external_location_note
+               es.location_note AS external_location_note,
+               epq.queue_item_id AS external_queue_item_id,
+               epq.queue_status AS external_queue_status,
+               epq.edition_status AS external_edition_status,
+               epq.passage_status AS external_passage_status,
+               epq.selected_passage_id AS external_selected_passage_id,
+               epq.candidate_passage_ids_json AS external_candidate_passage_ids_json,
+               epq.candidate_refs_json AS external_candidate_refs_json
         FROM annotation_evidences e
         LEFT JOIN annotation_evidence_external_sources link
           ON link.case_id = e.case_id AND link.evidence_index = e.evidence_index
         LEFT JOIN external_source_registry es
           ON es.external_source_id = link.external_source_id
+        LEFT JOIN external_passage_resolution_queue epq
+          ON epq.case_id = e.case_id AND epq.evidence_index = e.evidence_index
         WHERE e.case_id = ?
         ORDER BY e.evidence_index
         """,
@@ -981,6 +1101,22 @@ def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | N
     for evidence_row in evidence_rows:
         evidence = dict(evidence_row)
         evidence["data"] = parse_json(evidence.pop("evidence_json", "{}"), {})
+        candidate_ids = parse_json(
+            evidence.pop("external_candidate_passage_ids_json", "[]"), []
+        )
+        if not isinstance(candidate_ids, list):
+            candidate_ids = []
+        evidence["external_candidate_passage_ids"] = [
+            str(candidate_id) for candidate_id in candidate_ids if candidate_id
+        ]
+        evidence["external_candidate_passages"] = [
+            candidate
+            for candidate_id in evidence["external_candidate_passage_ids"]
+            if (candidate := external_candidate_passage_payload(connection, candidate_id))
+        ]
+        evidence["external_candidate_refs"] = parse_json(
+            evidence.pop("external_candidate_refs_json", "[]"), []
+        )
         evidence["source_passage"] = passage_payload(
             connection.execute(
                 "SELECT * FROM passages WHERE passage_id = ?",

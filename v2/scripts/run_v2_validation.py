@@ -26,9 +26,19 @@ DEFAULT_REPORT = V2_ROOT / "data/real_runs/v2_validation_report.json"
 DEFAULT_REVIEW_TASK_MANIFEST = (
     V2_ROOT / "data/real_runs/review_tasks/review_task_manifest.review.v1.json"
 )
+DEFAULT_EXTERNAL_EVIDENCE_PACKET_REPORT = (
+    V2_ROOT / "data/real_runs/external_evidence_packets_report.json"
+)
+DEFAULT_TARGET_WORK_RESOLUTION_PACKET_REPORT = (
+    V2_ROOT / "data/real_runs/target_work_resolution_packets_report.json"
+)
 
 sys.path.insert(0, str(V2_ROOT / "scripts"))
 from build_review_task_batches import validate_review_task_artifacts  # noqa: E402
+from build_external_evidence_packets import validate_external_evidence_packets  # noqa: E402
+from build_target_work_resolution_packets import (  # noqa: E402
+    validate_target_work_resolution_packets,
+)
 
 DUSHU_CANONICAL_SHA256 = (
     "1460a906825998bf8a4bf3c51d4525fe19b8b79f377fb6d25ccdad4dc698e19e"
@@ -47,6 +57,10 @@ LEGACY_ORIGIN = "legacy_dictionary_db_reprocessing"
 
 def now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def report_database_path(database_path: Path) -> str:
+    return str(database_path.resolve().relative_to(PROJECT_ROOT)).replace("\\", "/")
 
 
 def connect_read_only(database_path: Path) -> sqlite3.Connection:
@@ -658,6 +672,88 @@ def candidate_target_location_validation(connection: sqlite3.Connection) -> dict
             """,
         )
     )
+    canonical_candidate_match_row_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+            """,
+        )
+    )
+    canonical_singleton_candidate_row_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+              AND target_passage_candidate_count=1
+            """,
+        )
+    )
+    canonical_ambiguous_candidate_row_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+              AND target_passage_candidate_count>1
+            """,
+        )
+    )
+    canonical_candidate_without_selected_passage_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+              AND target_passage_candidate_id IS NULL
+            """,
+        )
+    )
+    canonical_candidate_case_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(DISTINCT case_id)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+            """,
+        )
+    )
+    canonical_singleton_candidate_case_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(DISTINCT case_id)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+              AND target_passage_candidate_count=1
+            """,
+        )
+    )
+    canonical_ambiguous_candidate_case_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(DISTINCT case_id)
+            FROM candidate_target_locations
+            WHERE work_identity_status='canonical'
+              AND target_passage_match_status='candidate_match'
+              AND target_passage_candidate_count>1
+            """,
+        )
+    )
     result = {
         "row_count": as_count(row["rows"]),
         "canonical_identity_row_count": as_count(row["canonical_identity_rows"]),
@@ -669,6 +765,18 @@ def candidate_target_location_validation(connection: sqlite3.Connection) -> dict
         "state_breach_count": as_count(row["state_breach_count"]),
         "orphan_count": orphan_count,
         "candidate_shell_target_breach_count": candidate_shell_target_breach_count,
+        "canonical_candidate_match_row_count": canonical_candidate_match_row_count,
+        "canonical_singleton_candidate_row_count": canonical_singleton_candidate_row_count,
+        "canonical_ambiguous_candidate_row_count": canonical_ambiguous_candidate_row_count,
+        "canonical_candidate_without_selected_passage_count": canonical_candidate_without_selected_passage_count,
+        "canonical_candidate_case_count": canonical_candidate_case_count,
+        "canonical_singleton_candidate_case_count": canonical_singleton_candidate_case_count,
+        "canonical_ambiguous_candidate_case_count": canonical_ambiguous_candidate_case_count,
+        # A locating hit is never promoted by the machine route.  Keep this
+        # policy explicit so a non-empty candidate id cannot be mistaken for
+        # a resolved target passage.
+        "automatic_promotion_count": 0,
+        "automatic_promotion_policy": "candidate_only_until_target_work_edition_and_quote_review",
     }
     result["valid"] = (
         result["state_breach_count"] == 0
@@ -676,6 +784,143 @@ def candidate_target_location_validation(connection: sqlite3.Connection) -> dict
         and result["candidate_shell_target_breach_count"] == 0
     )
     return result
+
+
+def external_candidate_passage_validation(connection: sqlite3.Connection) -> dict[str, Any]:
+    """Check that public-text candidates are addressable but never canonical.
+
+    Candidate passage ids are deliberately stored on the external passage
+    queue rather than on annotation evidence.  This keeps a machine/public
+    locating hit reviewable without making it look like a verified citation.
+    """
+
+    candidate_document_count = as_count(
+        scalar(
+            connection,
+            "SELECT COUNT(*) FROM source_documents WHERE source_kind='external_public_candidate'",
+        )
+    )
+    candidate_passage_count = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM passages p
+            JOIN source_documents sd ON sd.source_document_id=p.source_document_id
+            WHERE sd.source_kind='external_public_candidate'
+            """,
+        )
+    )
+    canonical_status_breach = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM source_documents
+            WHERE source_kind='external_public_candidate'
+              AND canonical_status='canonical_active'
+            """,
+        )
+    )
+    canonical_registry_breach = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM source_version_registry sv
+            JOIN source_documents sd
+              ON sd.work_key=sv.work_key
+             AND sd.source_file=sv.source_file
+             AND sd.source_file_sha256=sv.source_file_sha256
+            WHERE sd.source_kind='external_public_candidate'
+              AND sv.canonical_status='canonical_active'
+            """,
+        )
+    )
+    orphan_candidate_passages = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM passages p
+            LEFT JOIN source_documents sd ON sd.source_document_id=p.source_document_id
+            WHERE sd.source_kind='external_public_candidate'
+              AND sd.source_document_id IS NULL
+            """,
+        )
+    )
+    evidence_link_breach = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM annotation_evidences ae
+            JOIN passages p ON p.passage_id=ae.passage_id
+            JOIN source_documents sd ON sd.source_document_id=p.source_document_id
+            WHERE sd.source_kind='external_public_candidate'
+            """,
+        )
+    )
+    external_pending_quote_pass_breach = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*) FROM annotation_evidences
+            WHERE json_extract(evidence_json, '$.source_resolution')='external_source_pending'
+              AND quote_check IN ('passed', 'normalized_passed')
+            """,
+        )
+    )
+    queue_rows = connection.execute(
+        "SELECT queue_item_id, candidate_passage_ids_json "
+        "FROM external_passage_resolution_queue"
+    ).fetchall()
+    queue_candidate_ids: list[str] = []
+    malformed_queue_ids = 0
+    for row in queue_rows:
+        try:
+            values = json.loads(row["candidate_passage_ids_json"] or "[]")
+        except (TypeError, ValueError):
+            values = None
+        if not isinstance(values, list):
+            malformed_queue_ids += 1
+            continue
+        queue_candidate_ids.extend(str(value) for value in values if str(value).strip())
+    queue_candidate_ids = sorted(set(queue_candidate_ids))
+    queue_candidate_count = len(queue_candidate_ids)
+    queue_candidate_orphans = as_count(
+        scalar(
+            connection,
+            """
+            SELECT COUNT(*)
+            FROM external_passage_resolution_queue q,
+                 json_each(q.candidate_passage_ids_json) ids
+            LEFT JOIN passages p ON p.passage_id=ids.value
+            LEFT JOIN source_documents sd ON sd.source_document_id=p.source_document_id
+            WHERE p.passage_id IS NULL
+               OR sd.source_kind <> 'external_public_candidate'
+            """,
+        )
+    )
+    return {
+        "candidate_document_count": candidate_document_count,
+        "candidate_passage_count": candidate_passage_count,
+        "canonical_status_breach_count": canonical_status_breach,
+        "canonical_registry_breach_count": canonical_registry_breach,
+        "orphan_candidate_passage_count": orphan_candidate_passages,
+        "annotation_evidence_link_breach_count": evidence_link_breach,
+        "external_pending_quote_pass_breach_count": external_pending_quote_pass_breach,
+        "queue_candidate_passage_count": queue_candidate_count,
+        "queue_candidate_orphan_count": queue_candidate_orphans,
+        "malformed_queue_candidate_ids_count": malformed_queue_ids,
+        "valid": (
+            canonical_status_breach == 0
+            and canonical_registry_breach == 0
+            and orphan_candidate_passages == 0
+            and evidence_link_breach == 0
+            and external_pending_quote_pass_breach == 0
+            and queue_candidate_orphans == 0
+            and malformed_queue_ids == 0
+        ),
+    }
 
 
 def review_task_artifact_validation(
@@ -690,6 +935,30 @@ def review_task_artifact_validation(
     )
 
 
+def external_evidence_packet_validation(
+    database_path: Path,
+    report_path: Path = DEFAULT_EXTERNAL_EVIDENCE_PACKET_REPORT,
+) -> dict[str, Any]:
+    """Verify every external source/passage queue row has a packet row."""
+
+    return validate_external_evidence_packets(
+        database_path=database_path,
+        report_path=report_path,
+    )
+
+
+def target_work_resolution_packet_validation(
+    database_path: Path,
+    report_path: Path = DEFAULT_TARGET_WORK_RESOLUTION_PACKET_REPORT,
+) -> dict[str, Any]:
+    """Verify every pending target-work queue row has a machine-only packet."""
+
+    return validate_target_work_resolution_packets(
+        database_path=database_path,
+        report_path=report_path,
+    )
+
+
 def build_report(
     database_path: Path,
     review_task_manifest_path: Path = DEFAULT_REVIEW_TASK_MANIFEST,
@@ -698,6 +967,8 @@ def build_report(
         database_path,
         review_task_manifest_path,
     )
+    external_evidence_packets = external_evidence_packet_validation(database_path)
+    target_work_resolution_packets = target_work_resolution_packet_validation(database_path)
     connection = connect_read_only(database_path)
     try:
         counts = table_counts(connection)
@@ -708,6 +979,7 @@ def build_report(
         work_queues = work_queue_validation(connection)
         legacy_inventory = legacy_dictionary_inventory_validation(connection)
         candidate_target_locations = candidate_target_location_validation(connection)
+        external_candidate_passages = external_candidate_passage_validation(connection)
         legacy_catalog_term_count = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_catalog_terms"))
         legacy_catalog_work_count = as_count(scalar(connection, "SELECT COUNT(*) FROM legacy_catalog_works"))
         orphans = orphan_counts(connection)
@@ -838,6 +1110,7 @@ def build_report(
             and candidate_link_duplicates == 0
         ),
         "candidate_target_location_boundary": candidate_target_locations["valid"],
+        "external_candidate_passage_boundary": external_candidate_passages["valid"],
         "machine_human_state_separation": (
             human_status == {"pending": case_count}
             and lifecycle.get("gold", 0) == 0
@@ -846,6 +1119,8 @@ def build_report(
         "work_identity_registry": work_identity["valid"],
         "work_queues": work_queues["valid"],
         "review_task_artifacts": review_tasks["valid"],
+        "external_evidence_packets": external_evidence_packets["valid"],
+        "target_work_resolution_packets": target_work_resolution_packets["valid"],
     }
     warnings = {
         "external_canonical_files": {
@@ -859,7 +1134,7 @@ def build_report(
     return {
         "report_version": "v2-validation.v1",
         "generated_at": now(),
-        "database": str(database_path.resolve().relative_to(PROJECT_ROOT)),
+        "database": report_database_path(database_path),
         "status": "passed" if all(checks.values()) else "failed",
         "checks": checks,
         "counts": counts,
@@ -876,7 +1151,10 @@ def build_report(
         "work_queue_validation": work_queues,
         "legacy_dictionary_inventory_validation": legacy_inventory,
         "candidate_target_location_validation": candidate_target_locations,
+        "external_candidate_passage_validation": external_candidate_passages,
         "review_task_artifact_validation": review_tasks,
+        "external_evidence_packet_validation": external_evidence_packets,
+        "target_work_resolution_packet_validation": target_work_resolution_packets,
         "warnings": warnings,
     }
 

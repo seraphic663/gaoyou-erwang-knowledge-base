@@ -14,7 +14,6 @@ import json
 import re
 import sqlite3
 import time
-import unicodedata
 import urllib.parse
 import urllib.request
 from collections import Counter
@@ -22,6 +21,12 @@ from datetime import datetime, timezone
 from html import unescape
 from pathlib import Path
 from typing import Any
+
+from external_text_normalization import (
+    compact_for_match,
+    normalized_contiguous_match,
+    strip_wikitext,
+)
 
 
 V2_ROOT = Path(__file__).resolve().parents[1]
@@ -32,14 +37,6 @@ DEFAULT_MANIFEST = V2_ROOT / "data/real_runs/external_public_candidate_manifest.
 DEFAULT_CANDIDATES = V2_ROOT / "data/real_runs/external_passage_candidates.passage.v1.jsonl"
 API_URL = "https://zh.wikisource.org/w/api.php"
 USER_AGENT = "Erwang-V2-public-source-candidate-fetch/1.0"
-
-
-# Only used to make a conservative cross-script lookup.  It is not a claim
-# that simplified and traditional characters are semantically interchangeable.
-_TRADITIONAL = str.maketrans(
-    "礼记书传说广雅势义乐乱国声风电与为也说文尔东义仪乡射齐鲁经论语诗击鼓邱齐采苹韩奕说苑慎汉将伤创疥癣旧简标识远举顾忧",
-    "禮記書傳說廣雅勢義樂亂國聲風電與為也說文爾東義儀鄉射齊魯經論語詩擊鼓丘齊採蘋韓奕說苑慎漢將傷創疥癬舊簡標識遠舉顧憂",
-)
 
 
 def _now() -> str:
@@ -54,19 +51,9 @@ def _sha256_text(value: str) -> str:
     return _sha256_bytes(value.encode("utf-8"))
 
 
-def _compact(value: str) -> str:
-    value = unicodedata.normalize("NFKC", value or "")
-    return "".join(
-        char
-        for char in value
-        if not unicodedata.category(char).startswith(("P", "Z"))
-        and unicodedata.category(char) != "Cf"
-    )
-
-
 def _variants(value: str) -> list[str]:
-    values = [value, value.translate(_TRADITIONAL)]
-    compact_values = [_compact(item) for item in values]
+    values = [value, strip_wikitext(value)]
+    compact_values = [compact_for_match(item) for item in values]
     return list(dict.fromkeys(item for item in values + compact_values if item))
 
 
@@ -124,15 +111,14 @@ def _label_tokens(label: str) -> list[str]:
         return []
     tokens: list[str] = []
     for part in parts:
-        for item in (part, part.translate(_TRADITIONAL)):
-            compact = _compact(item)
-            if len(compact) >= 2:
-                tokens.append(compact)
+        compact = compact_for_match(part)
+        if len(compact) >= 2:
+            tokens.append(compact)
     return list(dict.fromkeys(tokens))
 
 
 def _title_score(title: str, cited_work: str) -> int:
-    normalized_title = _compact(title.translate(_TRADITIONAL))
+    normalized_title = compact_for_match(title)
     return sum(1 for token in _label_tokens(cited_work) if token in normalized_title)
 
 
@@ -189,11 +175,10 @@ def _raw_match(content: str, quote: str) -> dict[str, Any]:
                 "end_char": start + len(variant),
                 "matched_text": variant,
             }
-    compact_content = _compact(content)
-    compact_quote = _compact(quote.translate(_TRADITIONAL))
-    if compact_quote and compact_quote in compact_content:
+    matched, _, _ = normalized_contiguous_match(content, quote)
+    if matched:
         return {
-            "match_mode": "compact_match",
+            "match_mode": "cleaned_compact_match",
             "start_char": None,
             "end_char": None,
             "matched_text": None,
@@ -214,12 +199,17 @@ def _snippet(content: str, match: dict[str, Any], quote: str) -> str:
     return quote
 
 
-def _load_evidence_rows(database: Path) -> list[dict[str, Any]]:
+def _load_evidence_rows(
+    database: Path,
+    *,
+    include_secondary_citations: bool = False,
+) -> list[dict[str, Any]]:
     connection = sqlite3.connect(database)
     connection.row_factory = sqlite3.Row
     rows = connection.execute(
         """
         SELECT ae.case_id, ae.evidence_index, ae.source_work, ae.quote,
+               json_extract(ae.evidence_json, '$.source_resolution') AS source_resolution,
                es.external_source_id, es.normalized_work
         FROM annotation_evidences AS ae
         JOIN annotation_evidence_external_sources AS link
@@ -227,8 +217,13 @@ def _load_evidence_rows(database: Path) -> list[dict[str, Any]]:
         JOIN external_source_registry AS es
           ON es.external_source_id = link.external_source_id
         WHERE json_extract(ae.evidence_json, '$.source_resolution') = 'external_source_pending'
+           OR (
+                ? = 1
+                AND json_extract(ae.evidence_json, '$.source_resolution') = 'secondary_citation_match'
+           )
         ORDER BY ae.case_id, ae.evidence_index
         """
+        , (1 if include_secondary_citations else 0,)
     ).fetchall()
     connection.close()
     return [dict(row) for row in rows]
@@ -333,11 +328,15 @@ def run(
     manifest_path: Path = DEFAULT_MANIFEST,
     candidates_path: Path = DEFAULT_CANDIDATES,
     max_results_per_quote: int = 10,
+    include_secondary_citations: bool = False,
 ) -> dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     pages_dir = output_dir / "pages"
     pages_dir.mkdir(parents=True, exist_ok=True)
-    evidence_rows = _load_evidence_rows(database)
+    evidence_rows = _load_evidence_rows(
+        database,
+        include_secondary_citations=include_secondary_citations,
+    )
     entries: list[dict[str, Any]] = []
     page_cache: dict[str, dict[str, Any] | None] = {}
     page_records: dict[str, dict[str, Any]] = {}
@@ -409,6 +408,7 @@ def run(
                 "external_source_id": row["external_source_id"],
                 "cited_work": row["source_work"],
                 "normalized_work": row["normalized_work"],
+                "source_resolution": row["source_resolution"],
                 "quote": quote,
                 "status": status,
                 "search": search_meta,
@@ -439,6 +439,11 @@ def run(
             "canonical_status": "not_verified",
             "quote_check_mutation": "none; all V2 evidence remains unchecked",
             "version_rule": "Wikisource page/revision metadata is recorded; edition and image-level verification remain pending",
+            "evidence_selection": {
+                "external_source_pending_included": True,
+                "secondary_citation_match_included": include_secondary_citations,
+                "secondary_citation_is_not_canonical": True,
+            },
         },
         "summary": {
             "evidence_count": len(entries),
@@ -469,6 +474,11 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--candidates", type=Path, default=DEFAULT_CANDIDATES)
+    parser.add_argument(
+        "--include-secondary-citations",
+        action="store_true",
+        help="also search rows whose source was found in a Wang passage; they remain secondary, not canonical",
+    )
     parser.add_argument("--reconcile-only", action="store_true")
     args = parser.parse_args()
     if args.reconcile_only:
@@ -480,6 +490,7 @@ def main() -> int:
         output_dir=args.output_dir,
         manifest_path=args.manifest,
         candidates_path=args.candidates,
+        include_secondary_citations=args.include_secondary_citations,
     )
     print(json.dumps(manifest["summary"], ensure_ascii=False, indent=2))
     return 0

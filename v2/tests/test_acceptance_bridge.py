@@ -59,6 +59,25 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         })
         self.assertEqual(len(payload["evidences"]), 22)
 
+    def test_case_detail_exposes_external_candidate_passages_without_promoting_them(self) -> None:
+        payload = get_case(self.connection, "legacy-ai:16")
+
+        self.assertIsNotNone(payload)
+        evidence = next(item for item in payload["evidences"] if item["evidence_index"] == 8)
+        self.assertEqual(evidence["external_queue_status"], "candidate_available")
+        self.assertEqual(evidence["external_edition_status"], "candidate_registered")
+        self.assertEqual(evidence["external_passage_status"], "candidate_match")
+        self.assertEqual(len(evidence["external_candidate_passage_ids"]), 3)
+        self.assertEqual(len(evidence["external_candidate_passages"]), 3)
+        self.assertTrue(
+            all(
+                passage["source_kind"] == "external_public_candidate"
+                and passage["source_canonical_status"] == "unknown"
+                for passage in evidence["external_candidate_passages"]
+            )
+        )
+        self.assertEqual(evidence["quote_check"], "unchecked")
+
     def test_legacy_case_detail_exposes_both_passage_links_and_full_payload(self) -> None:
         payload = get_case(self.connection, "legacy-dictionary:1")
 

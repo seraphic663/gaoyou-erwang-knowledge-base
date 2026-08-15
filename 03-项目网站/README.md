@@ -6,7 +6,7 @@
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
-- V2 数据库：`v2-database.html` 提供直接使用的案例展示界面；`v2-acceptance.html` 提供完整详情、来源链和验收审计界面，二者都只读读取独立的 `v2/data/real_runs/annotation_v2.db`。
+- V2 数据库：`v2-database.html` 提供核心案例展示界面；`v2-acceptance.html` 提供完整详情、来源链、验收审计和按批次读取 `review_task.v1` 的人工审校入口。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放本地人工决定写入。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
 - 标注工作台：给成员本地填写 `annotation_case.v1`，自动保存浏览器草稿，导出 JSON 文件后走 branch / PR。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
@@ -117,6 +117,12 @@ npm run sync:annotation
 - `GET /api/cases?q=关键词`：案例列表或案例检索。
 - `GET /api/term?id=编号`：字词详情。
 - `GET /api/case?id=编号`：案例详情。
+- `GET /api/v2/summary`：V2 工作库当前验收摘要。
+- `GET /api/v2/cases`：V2 案例队列，支持分页、检索、来源和机器状态筛选。
+- `GET /api/v2/case?id=编号`：V2 案例完整详情，包括来源 passage、证据、过程、队列和既有事件。
+- `GET /api/v2/review-tasks?stream=...&batch=...`：按批次读取静态 `review_task.v1` 任务；可选 `case_review`、`target_work_resolution`、`external_source_resolution`、`external_passage_resolution`。
+- `GET /api/v2/review-task?id=任务 ID`：读取单条人工审校任务及其决定契约。
+- `POST /api/v2/review`：受控人工决定写入接口；默认返回 403，只有 `V2_REVIEW_WRITE_ENABLED=1` 的本地服务才开放。它只调用 V2 已有事务 seam，要求稳定 `reviewer` 和唯一 `operation_id`，不会因读取任务或提交 target/source/passage resolution 自动产生 gold。
 - `POST /api/ai/annotation`：AI 释证接口，固定使用 `deepseek-v4-pro`，需要配置 DeepSeek API key。
 
 AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 条人工标注案例；若人工库命中不足 3 条，再补充最多 4 条主数据库案例。服务端把这些材料和系统提示一次性发送给 DeepSeek，不保留对话记忆。
@@ -129,3 +135,5 @@ AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 �
 4. 改首页或详情页数据库表述时，保持“同一数据库，不同视角”的口径；人工标注库是实验性功能，不叫主库。
 5. `data/sqlite-snapshot.json` 和 `data/annotation-snapshot.json` 都是导出产物，不要手工改。
 6. `更新记录.md` 只记录结构、数据链路和展示口径变化，不写日常流水账。
+
+V2 人工审校入口的读取和写入分开：任务 JSONL/manifest 是可重建的静态快照，VR 默认每批只显示前 20 条，可切换 50/100 条；提交后要重新运行 `python v2/scripts/build_review_task_batches.py --batch-size 100` 才会按最新队列状态重建任务包。写入 bridge 会把 `task_id`、任务类型、queue item、当前 pending 状态与任务包绑定，不能用任意 ID 绕过任务流。服务默认不打开写入，测试或本地审校时使用 `V2_REVIEW_WRITE_ENABLED=1 npm start`，并只在本地受控环境提交明确决定。

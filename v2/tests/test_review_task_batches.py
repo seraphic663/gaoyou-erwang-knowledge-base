@@ -17,6 +17,18 @@ from erwang_v2.validate_annotation_case import load_passages_jsonl  # noqa: E402
 
 
 class ReviewTaskBatchTest(unittest.TestCase):
+    def test_external_candidate_manifest_cannot_be_used_as_review_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            database_path = root / "annotation_v2.db"
+            output_dir = root / "review_batches"
+            with self.assertRaisesRegex(ValueError, "must_not_be_external_candidate_manifest"):
+                build_review_task_artifacts(
+                    database_path=database_path,
+                    output_dir=output_dir,
+                    manifest_path=root / "external_public_candidate_manifest.json",
+                )
+
     def test_build_is_read_only_batched_and_covers_pending_work(self) -> None:
         passages = list(load_passages_jsonl(V2_ROOT / "data/fixtures/passages.jsonl").values())
         case_paths = [
