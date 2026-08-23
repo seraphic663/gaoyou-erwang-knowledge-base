@@ -46,23 +46,23 @@
 
 html[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1f1b17;
-  --bg-soft: rgba(37, 32, 27, 0.9);
-  --bg-end: rgba(26, 23, 20, 0.98);
-  --card: rgba(43, 38, 32, 0.9);
-  --card-strong: #302a23;
-  --card-soft: rgba(49, 43, 36, 0.78);
-  --ink: #efe7d8;
-  --sub: #b9aa95;
+  --bg: #211d19;
+  --bg-soft: rgba(42, 36, 30, 0.94);
+  --bg-end: rgba(28, 25, 22, 0.99);
+  --card: rgba(50, 44, 37, 0.96);
+  --card-strong: #3a3229;
+  --card-soft: rgba(59, 51, 43, 0.92);
+  --ink: #f4ebde;
+  --sub: #c8b9a4;
   --pri: #d4b48b;
   --pri-2: #ead0aa;
   --accent: #d4845c;
   --accent-deep: #f0a078;
   --accent-soft: #b99066;
   --jade: #a8b09b;
-  --muted: #b9aa95;
-  --line: rgba(229, 205, 170, 0.16);
-  --line-strong: rgba(229, 205, 170, 0.3);
+  --muted: #c8b9a4;
+  --line: rgba(229, 205, 170, 0.22);
+  --line-strong: rgba(229, 205, 170, 0.4);
   --paper-shadow: 0 18px 42px rgba(0, 0, 0, 0.2);
   --shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
   --hero-ink: #f4ead7;
@@ -82,7 +82,7 @@ html[data-theme="dark"] {
     linear-gradient(180deg, var(--bg-soft), var(--bg-end));
   --grid-line-a: rgba(229, 205, 170, 0.04);
   --grid-line-b: rgba(229, 205, 170, 0.03);
-  --control-bg: rgba(47, 41, 35, 0.94);
+  --control-bg: #3b332b;
   --control-focus: rgba(212, 132, 92, 0.16);
   --link-button-bg: linear-gradient(180deg, rgba(54, 47, 40, 0.96), rgba(42, 36, 31, 0.94));
   --link-muted-bg: linear-gradient(180deg, rgba(47, 47, 39, 0.96), rgba(38, 39, 34, 0.94));
@@ -3446,4 +3446,123 @@ select,
   .annotation-search-actions .toolbar-button {
     flex: 1;
   }
+}
+
+/* Theme consistency: shared surfaces and controls must follow the active theme. */
+.fold-card,
+.inline-fold,
+.annotation-fold,
+.annotation-subcase,
+.repeat-card,
+.quality-card,
+.ai-reference-panel,
+.ai-reference-item,
+.annotation-ai-result,
+.annotation-ai-section,
+.workbench-export-status,
+.flow-placeholder-box,
+.flow-diagram {
+  background: var(--card-soft);
+  border-color: var(--line);
+}
+
+.annotation-card {
+  background: linear-gradient(180deg, var(--card-strong), var(--card));
+  border-color: var(--line-strong);
+}
+
+.annotation-subcase {
+  box-shadow: var(--paper-shadow);
+}
+
+.sidebar-button,
+.filter-chip,
+.preset-chip,
+.pagination-button,
+.pagination-jump input,
+.draft-list-item,
+.concept-chip,
+.annotation-ai-field textarea {
+  background: var(--control-bg);
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+.annotation-raw-grid p,
+.annotation-chip,
+.annotation-step-list li,
+.annotation-quote,
+.annotation-quote.compact,
+.workbench-help-block {
+  background: color-mix(in srgb, var(--sub) 8%, var(--card-soft));
+  border-color: var(--line);
+}
+
+.annotation-quote {
+  border-left-color: color-mix(in srgb, var(--jade) 68%, var(--line));
+}
+
+.annotation-ai-card {
+  background:
+    radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--jade) 12%, transparent), transparent 24%),
+    var(--card-soft);
+  border-left-color: var(--line-strong);
+}
+
+.annotation-subcase-panel {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--jade) 10%, transparent), var(--card-soft)),
+    var(--card-soft);
+  border-color: var(--line);
+}
+
+.sidebar-button.active,
+.filter-chip.active,
+.draft-list-item.active,
+.concept-chip.active {
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  background: color-mix(in srgb, var(--accent) 14%, var(--control-bg));
+}
+
+.quality-card.good {
+  border-color: color-mix(in srgb, var(--jade) 42%, var(--line));
+  background: color-mix(in srgb, var(--jade) 14%, var(--card-soft));
+}
+
+.quality-card.bad {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: color-mix(in srgb, var(--accent) 14%, var(--card-soft));
+}
+
+.quality-card.warn {
+  background: color-mix(in srgb, var(--accent-soft) 18%, var(--card-soft));
+}
+
+.draft-select-button em {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.draft-select-button em.ready {
+  background: color-mix(in srgb, var(--jade) 16%, transparent);
+}
+
+.draft-delete-button {
+  border-color: color-mix(in srgb, var(--accent) 36%, var(--line));
+  background: color-mix(in srgb, var(--accent) 12%, var(--control-bg));
+}
+
+.workbench-field span em {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.ai-reference-full {
+  border-top-color: var(--line);
+}
+
+.knowledge-anchor-chip,
+.case-term,
+.quote-chip {
+  background: color-mix(in srgb, var(--accent) 10%, var(--card-soft));
+  border-color: var(--line);
+  color: var(--ink);
 }

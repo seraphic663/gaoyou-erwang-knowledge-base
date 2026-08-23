@@ -467,7 +467,7 @@
 .v2-review-task-row:hover,
 .v2-review-task-row.active {
   border-color: var(--accent);
-  background: rgba(165, 77, 42, 0.07);
+  background: color-mix(in srgb, var(--accent) 12%, var(--card-soft));
 }
 
 .v2-review-task-button {
@@ -509,7 +509,7 @@
   padding: 14px;
   border: 1px solid var(--accent);
   border-radius: 13px;
-  background: rgba(165, 77, 42, 0.045);
+  background: color-mix(in srgb, var(--accent) 8%, var(--card-soft));
 }
 
 .v2-review-form h3,
@@ -855,7 +855,7 @@
   overflow: auto;
   padding: 10px;
   border-radius: 10px;
-  background: rgba(78, 54, 31, 0.06);
+  background: color-mix(in srgb, var(--sub) 8%, var(--card-soft));
   white-space: pre-wrap;
   line-height: 1.8;
 }
@@ -889,7 +889,7 @@
 .v2-raw-panel {
   border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(78, 54, 31, 0.035);
+  background: color-mix(in srgb, var(--sub) 5%, var(--card-soft));
 }
 
 .v2-raw-fold summary,
@@ -1011,6 +1011,22 @@ html[data-theme="dark"] .v2-status-chip.fail,
 html[data-theme="dark"] .v2-resolution-chip.external_source_pending,
 html[data-theme="dark"] .v2-resolution-chip.unknown {
   color: #f0a99a;
+}
+
+html[data-theme="dark"] .v2-status-chip.pass,
+html[data-theme="dark"] .v2-resolution-chip.canonical_source_passage {
+  background: color-mix(in srgb, var(--jade) 20%, var(--card-soft));
+}
+
+html[data-theme="dark"] .v2-status-chip.warn,
+html[data-theme="dark"] .v2-resolution-chip.secondary_citation_match {
+  background: color-mix(in srgb, var(--accent-soft) 22%, var(--card-soft));
+}
+
+html[data-theme="dark"] .v2-status-chip.fail,
+html[data-theme="dark"] .v2-resolution-chip.external_source_pending,
+html[data-theme="dark"] .v2-resolution-chip.unknown {
+  background: color-mix(in srgb, var(--accent) 20%, var(--card-soft));
 }
 
 @media (max-width: 900px) {
