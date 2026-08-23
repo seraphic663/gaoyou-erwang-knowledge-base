@@ -274,6 +274,55 @@ const V2Acceptance = (() => {
     return `${task.cited_work || '外部 passage'} · ${task.quote || ''}`;
   }
 
+  function renderStandaloneReviewTask(task) {
+    if (!elements.caseDetail) return;
+    const evidenceRefs = task.evidence_refs || [];
+    const caseIds = [...new Set(evidenceRefs.map((entry) => entry.case_id).filter(Boolean))];
+    const visibleEvidenceRefs = evidenceRefs.slice(0, 20);
+    const evidenceMarkup = visibleEvidenceRefs.length
+      ? visibleEvidenceRefs.map((entry) => `
+          <article class="v2-evidence-card">
+            <div class="v2-detail-topline">
+              <strong>${escapeHtml(entry.cited_work || task.cited_work || '外部来源')}</strong>
+              <span class="v2-resolution-chip ${escapeHtml(entry.queue_status || 'pending')}">${escapeHtml(statusLabel(entry.queue_status || 'pending'))}</span>
+            </div>
+            <p class="v2-evidence-note">${escapeHtml(entry.case_id || '未关联案例')} · evidence ${escapeHtml(entry.evidence_index)}</p>
+            <div class="v2-evidence-quote">${escapeHtml(entry.quote || '（无引文）')}</div>
+            <p class="v2-evidence-note">edition ${escapeHtml(entry.edition_status || 'missing')} · passage ${escapeHtml(entry.passage_status || 'missing')}</p>
+          </article>
+        `).join('')
+      : '<p class="v2-empty-detail">该来源任务暂未附关联引文摘要。</p>';
+    const moreEvidenceNote = evidenceRefs.length > visibleEvidenceRefs.length
+      ? `<p class="compact-note">本任务共 ${evidenceRefs.length} 条引文，当前先显示 ${visibleEvidenceRefs.length} 条；完整任务数据仍保留在下方折叠区。</p>`
+      : '';
+    state.selectedCaseId = null;
+    renderCaseTable();
+    elements.caseDetail.innerHTML = `
+      <div class="v2-detail-header">
+        <p class="section-kicker">外部来源任务详情</p>
+        <div class="v2-detail-topline">
+          <h2>${escapeHtml(reviewTaskLabel(task))}</h2>
+          <span class="v2-status-chip ${statusClass(task.queue_status || 'pending')}">${escapeHtml(statusLabel(task.queue_status || 'pending'))}</span>
+        </div>
+        <p class="compact-note">${escapeHtml(task.task_id)} · ${escapeHtml(task.external_source_id || '')}</p>
+      </div>
+      <div class="v2-detail-meta">
+        <div class="v2-detail-block"><span class="v2-detail-label">外部来源</span><p>${escapeHtml(task.cited_work || '未注明典籍')}</p></div>
+        <div class="v2-detail-block"><span class="v2-detail-label">当前状态</span><p>${escapeHtml(task.queue_status || 'pending')} · edition ${escapeHtml(task.edition_status || 'missing')}</p></div>
+        <div class="v2-detail-block"><span class="v2-detail-label">底本文件</span><p>${escapeHtml(task.registered_source?.source_file || '尚未登记')}</p></div>
+        <div class="v2-detail-block"><span class="v2-detail-label">关联案例</span><p>${escapeHtml(caseIds.length ? caseIds.join('、') : '任务级来源，需先完成来源决定')}</p></div>
+      </div>
+      <div class="v2-detail-block">
+        <div class="v2-detail-topline"><h3>关联引文摘要</h3><span class="summary-pill">${escapeHtml(evidenceRefs.length)} 条</span></div>
+        <div class="v2-evidence-list">${evidenceMarkup}</div>
+        ${moreEvidenceNote}
+      </div>
+      ${renderReviewForm({})}
+      ${renderJsonPanel(task, '任务上下文 JSON')}
+    `;
+    elements.caseDetail.querySelector('#v2ReviewSubmit')?.addEventListener('click', submitActiveReview);
+  }
+
   function renderReviewTaskList() {
     if (!elements.reviewTaskList || !state.reviewTaskResponse) return;
     const tasks = state.reviewTaskResponse.tasks || [];
@@ -311,7 +360,7 @@ const V2Acceptance = (() => {
         if (caseId) {
           selectCase(caseId);
         } else if (elements.caseDetail) {
-          elements.caseDetail.innerHTML = `<div class="v2-empty-detail">任务 ${escapeHtml(task.task_id)} 没有可直接打开的案例详情。</div>`;
+          renderStandaloneReviewTask(task);
         }
       });
     });
