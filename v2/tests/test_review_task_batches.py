@@ -47,8 +47,12 @@ class ReviewTaskBatchTest(unittest.TestCase):
             output_dir = root / "review_batches"
             with open_database(database_path) as connection:
                 ingest_passages(connection, passages)
-                for case in cases:
+                for index, case in enumerate(cases, start=1):
                     ingest_case(connection, case, origin="fixture")
+                    raw_label = "《左传》" if index == 1 else ""
+                    machine_inference_status = "machine_inferred" if raw_label else "unresolved"
+                    queue_status = "pending" if raw_label else "needs_context"
+                    priority = 55 if raw_label else 90
                     connection.execute(
                         """
                         INSERT INTO target_work_resolution_queue(
@@ -56,11 +60,19 @@ class ReviewTaskBatchTest(unittest.TestCase):
                             machine_candidate_work_key, machine_inference_status,
                             queue_status, evidence_indexes_json, context_json,
                             priority, created_at, updated_at
-                        ) VALUES (?, ?, '', '', NULL, 'unresolved', 'needs_context',
-                                  '[]', '{}', 90, '2026-01-01T00:00:00+00:00',
+                        ) VALUES (?, ?, ?, ?, NULL, ?, ?,
+                                  '[]', '{}', ?, '2026-01-01T00:00:00+00:00',
                                   '2026-01-01T00:00:00+00:00')
                         """,
-                        (f"target-work:{case['case_id']}:fixture", case["case_id"]),
+                        (
+                            f"target-work:{case['case_id']}:fixture",
+                            case["case_id"],
+                            raw_label,
+                            raw_label,
+                            machine_inference_status,
+                            queue_status,
+                            priority,
+                        ),
                     )
                 connection.commit()
                 before = tuple(
@@ -79,6 +91,8 @@ class ReviewTaskBatchTest(unittest.TestCase):
             self.assertEqual(report["counts"]["target_work_resolution"], 2)
             self.assertEqual(report["counts"]["external_source_resolution"], 0)
             self.assertEqual(report["counts"]["external_passage_resolution"], 0)
+            self.assertEqual(report["review_sequence"][0]["stream"], "external_source_resolution")
+            self.assertEqual(report["review_sequence"][-1]["stream"], "case_review")
             self.assertEqual(report["validation"]["valid"], True)
             self.assertEqual(report["policy"]["database_write_performed"], False)
 
@@ -93,12 +107,26 @@ class ReviewTaskBatchTest(unittest.TestCase):
                 "external_passage_resolution",
             })
             self.assertTrue(manifest["coverage"]["all_pending_tasks_linked"])
+            self.assertEqual(
+                manifest["review_sequence"][2]["stream"],
+                "target_work_resolution",
+            )
 
             for stream in manifest["streams"]:
                 path = output_dir / manifest["outputs"][stream]["path"]
                 rows = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
                 self.assertLessEqual(max((int(row["batch_size"]) for row in rows), default=0), 1)
                 self.assertTrue(all(row["task_id"] and row["batch_id"] for row in rows))
+
+            target_rows = [
+                json.loads(line)
+                for line in (
+                    output_dir / manifest["outputs"]["target_work_resolution"]["path"]
+                ).read_text(encoding="utf-8").splitlines()
+            ]
+            self.assertEqual(target_rows[0]["case_id"], cases[0]["case_id"])
+            self.assertEqual(target_rows[0]["review_stage"], "actionable_target_label")
+            self.assertEqual(target_rows[1]["review_stage"], "needs_context")
 
             with open_database(database_path) as connection:
                 after = tuple(

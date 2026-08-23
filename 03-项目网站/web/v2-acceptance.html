@@ -138,14 +138,15 @@
                 <span id="v2ReviewWriteChip" class="v2-mode-chip">读取中</span>
               </div>
               <p class="compact-note">任务包只提供待办；选择任务不会写库。提交必须填写 reviewer 和 operation_id，并且仍受 V2 的人工审批门控制。</p>
+              <p id="v2ReviewSequence" class="compact-note">推荐审校顺序读取中……</p>
               <div class="v2-review-task-toolbar">
                 <label class="toolbar-field">
                   <span>任务流</span>
                   <select id="v2ReviewStream">
-                    <option value="case_review">案例审校</option>
-                    <option value="target_work_resolution">target_work 消歧</option>
-                    <option value="external_source_resolution">外部来源/版本</option>
-                    <option value="external_passage_resolution">外部 passage/引文</option>
+                    <option value="external_source_resolution">1 · 外部来源/版本</option>
+                    <option value="external_passage_resolution">2 · 外部 passage/引文</option>
+                    <option value="target_work_resolution">3 · target_work 消歧</option>
+                    <option value="case_review">4 · 案例审校</option>
                   </select>
                 </label>
                 <label class="toolbar-field">

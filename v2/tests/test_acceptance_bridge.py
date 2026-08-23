@@ -113,6 +113,14 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         self.assertEqual(task_artifacts["batch_size"], 100)
         self.assertEqual(task_artifacts["counts"]["case_review"], 7581)
         self.assertEqual(task_artifacts["counts"]["target_work_resolution"], 7962)
+        self.assertEqual(
+            task_artifacts["review_sequence"][0]["stream"],
+            "external_source_resolution",
+        )
+        self.assertEqual(
+            task_artifacts["review_sequence"][-1]["stream"],
+            "case_review",
+        )
         self.assertTrue(
             any(item["key"] == "review_task_artifacts" for item in payload["checks"])
         )

@@ -43,6 +43,7 @@ const V2Acceptance = (() => {
     reviewDisplayLimit: document.querySelector('#v2ReviewDisplayLimit'),
     reviewLoadBatch: document.querySelector('#v2ReviewLoadBatch'),
     reviewTaskStatus: document.querySelector('#v2ReviewTaskStatus'),
+    reviewSequence: document.querySelector('#v2ReviewSequence'),
     reviewTaskList: document.querySelector('#v2ReviewTaskList'),
   };
 
@@ -249,6 +250,14 @@ const V2Acceptance = (() => {
     elements.reportContext.textContent = fullJson
       ? `旧 full JSON 上下文命中（仅迁移线索）：${fullJson}；${inventoryText}；${originText}；${queueText}；${taskText}；${locationText}`
       : `${inventoryText}；${originText}；${queueText}；${taskText}；${locationText}。`;
+  }
+
+  function renderReviewSequence() {
+    if (!elements.reviewSequence) return;
+    const sequence = state.summary?.review_task_artifacts?.review_sequence || [];
+    elements.reviewSequence.textContent = sequence.length
+      ? `推荐顺序：${sequence.map((item) => `${item.phase}. ${item.label}`).join(' → ')}。无上下文候选壳自动留到最后，不影响前面可操作批次。`
+      : '推荐顺序：外部来源 → 外部 passage → target_work → 案例字段。';
   }
 
   function reviewTaskCaseId(task) {
@@ -907,6 +916,7 @@ const V2Acceptance = (() => {
       renderChecks();
       renderSources();
       renderReportContext();
+      renderReviewSequence();
       populateSourceFilter(cases.source_works || []);
       renderCaseTable();
       elements.status.textContent = `V2 数据库已连接 · 只读 · ${summary.database.display_path}`;

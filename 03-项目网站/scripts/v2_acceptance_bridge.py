@@ -558,6 +558,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "manifest_path": "v2/data/real_runs/review_tasks/review_task_manifest.review.v1.json",
         "generated_at": review_task_manifest.get("generated_at"),
         "batch_size": review_task_manifest.get("batch_size"),
+        "review_sequence": review_task_manifest.get("review_sequence") or [],
         "counts": review_task_counts,
         "coverage": review_task_coverage,
         "policy": review_task_manifest.get("policy") or {},

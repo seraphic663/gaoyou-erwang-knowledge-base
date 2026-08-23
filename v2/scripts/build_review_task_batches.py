@@ -44,6 +44,33 @@ STREAMS = (
     "external_passage_resolution",
 )
 
+REVIEW_SEQUENCE = (
+    {
+        "phase": 1,
+        "stream": "external_source_resolution",
+        "label": "外部来源 / 底本",
+        "reason": "先确定被引典籍和可用底本；这一步不会直接把引文升级为 canonical。",
+    },
+    {
+        "phase": 2,
+        "stream": "external_passage_resolution",
+        "label": "外部 passage / 引文",
+        "reason": "底本登记后再核对 quote 与 passage；机器候选仍不能替代人工核验。",
+    },
+    {
+        "phase": 3,
+        "stream": "target_work_resolution",
+        "label": "目标典籍消歧",
+        "reason": "先处理有显式目标标签的可操作任务，无上下文候选壳留到最后。",
+    },
+    {
+        "phase": 4,
+        "stream": "case_review",
+        "label": "案例字段审校",
+        "reason": "目标范围和证据边界明确后，再逐案例决定字段与是否允许 approved。",
+    },
+)
+
 REVIEW_CONTRACT = {
     "operation_id_required": True,
     "reviewer_required_for_decision": True,
@@ -276,7 +303,15 @@ def build_target_work_tasks(connection: sqlite3.Connection) -> list[dict[str, An
                updated_at
         FROM target_work_resolution_queue
         WHERE queue_status IN ('pending', 'needs_context', 'uncertain')
-        ORDER BY priority DESC, queue_item_id
+        ORDER BY CASE queue_status
+                   WHEN 'pending' THEN 0
+                   WHEN 'uncertain' THEN 1
+                   WHEN 'needs_context' THEN 2
+                   ELSE 3
+                 END,
+                 CASE WHEN LENGTH(TRIM(raw_label)) > 0 THEN 0 ELSE 1 END,
+                 priority DESC,
+                 queue_item_id
         """
     ).fetchall()
     tasks = []
@@ -293,6 +328,11 @@ def build_target_work_tasks(connection: sqlite3.Connection) -> list[dict[str, An
                 "machine_candidate_work_key": row["machine_candidate_work_key"],
                 "machine_inference_status": row["machine_inference_status"],
                 "queue_status": row["queue_status"],
+                "review_stage": (
+                    "actionable_target_label"
+                    if str(row["raw_label"] or "").strip()
+                    else "needs_context"
+                ),
                 "evidence_indexes": parse_json(row["evidence_indexes_json"], []),
                 "priority": row["priority"],
                 "case_context": {
@@ -627,6 +667,7 @@ def build_review_task_artifacts(
         "output_directory": relative_path(output_dir),
         "batch_size": batch_size,
         "streams": list(STREAMS),
+        "review_sequence": list(REVIEW_SEQUENCE),
         "counts": counts,
         "policy": {
             "database_write_performed": False,
@@ -660,6 +701,7 @@ def build_review_task_artifacts(
     return {
         "manifest": relative_path(manifest_path),
         "manifest_sha256": manifest["manifest_sha256"],
+        "review_sequence": list(REVIEW_SEQUENCE),
         "counts": counts,
         "batch_counts": {
             stream: outputs[stream]["batch_count"] for stream in STREAMS
@@ -706,6 +748,10 @@ def validate_review_task_artifacts(
         errors.append("invalid_batch_size")
     if tuple(manifest.get("streams") or ()) != STREAMS:
         errors.append("stream_list_mismatch")
+    if tuple(
+        item.get("stream") for item in (manifest.get("review_sequence") or ())
+    ) != tuple(item["stream"] for item in REVIEW_SEQUENCE):
+        errors.append("review_sequence_mismatch")
 
     output_dir = manifest_path.parent
     actual_ids: dict[str, set[str]] = {}
