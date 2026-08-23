@@ -209,7 +209,6 @@ def source_rows(connection: sqlite3.Connection) -> list[dict[str, Any]]:
         item["passage_count"] = passage_counts.get(source_document_id, 0)
         item["case_count"] = case_counts.get(source_document_id, 0)
         item["metadata"] = parse_json(item.pop("metadata_json", "{}"), {})
-        item["source_file_sha256_short"] = item["source_file_sha256"][:16]
         result.append(item)
     return result
 
@@ -622,10 +621,10 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             "原典版本唯一",
             source_status,
             f"{len(sources)} 个来源版本" if not conflicts else f"{len(conflicts)} 个冲突",
-            "同一 work_key + source_file 不得混入多个 hash；当前读书杂志只保留 1460…版本。",
+            "同一 work_key + source_file 不得混入多个版本标识；当前读书杂志只保留 1460…版本。",
             severity="high",
             why_it_matters="来源版本不唯一会使 passage、行号和 quote 校验无法证明针对哪一版原文。",
-            next_action="保留历史 hash，但只允许一个 active canonical 版本；当前读书杂志固定为 1460a906825998bf…。",
+            next_action="保留历史版本记录，但只允许一个 active canonical 版本；当前读书杂志固定为 1460a906825998bf…。",
             evidence_basis="source_documents + source_version_registry",
         ),
         acceptance_check(

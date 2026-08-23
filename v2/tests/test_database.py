@@ -416,7 +416,6 @@ class UnifiedDatabaseTest(unittest.TestCase):
                     operation_id="external-source-op-0001",
                     resolution_status="verified",
                     source_file=str(external_file),
-                    source_file_sha256=external_hash,
                     edition="fixture edition",
                 )
                 repeated_source = apply_external_source_resolution(
@@ -426,10 +425,16 @@ class UnifiedDatabaseTest(unittest.TestCase):
                     operation_id="external-source-op-0001",
                     resolution_status="verified",
                     source_file=str(external_file),
-                    source_file_sha256=external_hash,
                     edition="fixture edition",
                 )
                 self.assertTrue(repeated_source["idempotent"])
+                self.assertEqual(
+                    connection.execute(
+                        "SELECT source_file_sha256 FROM external_source_registry WHERE external_source_id = ?",
+                        (external_source_id,),
+                    ).fetchone()["source_file_sha256"],
+                    external_hash,
+                )
 
                 external_passage = {
                     "passage_id": "external_zuozhuan_0001",

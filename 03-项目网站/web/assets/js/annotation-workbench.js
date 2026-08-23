@@ -75,7 +75,6 @@ function emptyEvidence(quote = '') {
     passage_id: null,
     quote_start_char: null,
     quote_end_char: null,
-    quote_sha256: null,
     quote_check: 'unchecked'
   };
 }
@@ -700,13 +699,6 @@ function cleanForExport(value) {
   return value;
 }
 
-async function sha256(text) {
-  if (!window.crypto?.subtle) return null;
-  const data = new TextEncoder().encode(text);
-  const hash = await window.crypto.subtle.digest('SHA-256', data);
-  return [...new Uint8Array(hash)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
-}
-
 async function buildExportCase() {
   const draft = getCurrentDraft();
   if (!draft) return null;
@@ -725,9 +717,6 @@ async function buildExportCase() {
     }));
 
   for (const evidence of payload.evidences) {
-    if (evidence.quote && !evidence.quote_sha256) {
-      evidence.quote_sha256 = await sha256(evidence.quote);
-    }
     if (evidence.quote && draft.source_excerpt) {
       evidence.quote_check = draft.source_excerpt.includes(evidence.quote) ? 'passed' : 'failed';
     }

@@ -1578,9 +1578,11 @@ def apply_external_source_resolution(
 ) -> dict[str, Any]:
     """Record an external edition decision without making it canonical.
 
-    ``verified`` is allowed only when an edition, file and hash are supplied;
-    the caller still has to register a canonical passage separately.  The
-    event itself never changes annotation evidence quote status.
+    verified is allowed only when an edition and readable file are supplied.
+    The service computes the file identity itself; a caller may optionally
+    supply a legacy hash for an explicit mismatch check.  The caller still
+    has to register a canonical passage separately.  The event itself never
+    changes annotation evidence quote status.
     """
 
     allowed_statuses = {"candidate_available", "no_public_match", "verified", "rejected"}
@@ -1593,8 +1595,6 @@ def apply_external_source_resolution(
     if resolution_status == "verified":
         if not str(source_file or "").strip():
             raise ValueError("verified_external_source_file_required")
-        if not str(source_file_sha256 or "").strip():
-            raise ValueError("verified_external_source_hash_required")
         if not str(edition or "").strip():
             raise ValueError("verified_external_source_edition_required")
 
@@ -1628,17 +1628,20 @@ def apply_external_source_resolution(
 
         if resolution_status == "verified":
             verified_source_file = str(source_file).strip()
-            verified_hash = str(source_file_sha256).strip().lower()
-            if len(verified_hash) != 64 or any(char not in "0123456789abcdef" for char in verified_hash):
-                raise ValueError("verified_external_source_hash_invalid")
             actual_hash = _sha256_file(verified_source_file)
             if actual_hash is None:
                 raise ValueError("verified_external_source_file_not_found")
-            if actual_hash != verified_hash:
+            supplied_hash = str(source_file_sha256 or "").strip().lower()
+            if supplied_hash and (
+                len(supplied_hash) != 64
+                or any(char not in "0123456789abcdef" for char in supplied_hash)
+            ):
+                raise ValueError("verified_external_source_hash_invalid")
+            if supplied_hash and actual_hash != supplied_hash:
                 raise ValueError("verified_external_source_hash_mismatch")
             edition_status = "verified"
             resolved_source_file = verified_source_file
-            resolved_hash = verified_hash
+            resolved_hash = actual_hash
             resolved_edition = str(edition).strip()
             resolved_location_note = location_note
         elif resolution_status == "candidate_available":

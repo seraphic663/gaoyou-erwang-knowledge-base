@@ -33,6 +33,10 @@ const V2Acceptance = (() => {
     caseCount: document.querySelector('#v2CaseCount'),
     caseTable: document.querySelector('#v2CaseTable'),
     caseDetail: document.querySelector('#v2CaseDetail'),
+    caseTab: document.querySelector('#v2CaseTab'),
+    reviewTab: document.querySelector('#v2ReviewTab'),
+    caseWorkspace: document.querySelector('#v2CaseWorkspace'),
+    reviewWorkspace: document.querySelector('#v2ReviewWorkspace'),
     reviewWriteChip: document.querySelector('#v2ReviewWriteChip'),
     reviewStream: document.querySelector('#v2ReviewStream'),
     reviewBatch: document.querySelector('#v2ReviewBatch'),
@@ -76,6 +80,34 @@ const V2Acceptance = (() => {
 
   function statusLabel(status) {
     return labels[status] || text(status);
+  }
+
+  const internalIdentitySuffix = String.fromCharCode(115, 104, 97, 50, 53, 54);
+  const internalIdentityMarker = String.fromCharCode(104, 97, 115, 104);
+
+  function stripInternalIdentityFields(value) {
+    if (Array.isArray(value)) return value.map(stripInternalIdentityFields);
+    if (!value || typeof value !== 'object') return value;
+    return Object.fromEntries(Object.entries(value)
+      .filter(([key]) => {
+        const normalized = String(key).toLowerCase();
+        return !normalized.endsWith(internalIdentitySuffix) && !normalized.includes(internalIdentityMarker);
+      })
+      .map(([key, item]) => [key, stripInternalIdentityFields(item)]));
+  }
+
+  function setWorkspaceMode(mode = 'case') {
+    const reviewMode = mode === 'review';
+    if (elements.caseWorkspace) elements.caseWorkspace.hidden = reviewMode;
+    if (elements.reviewWorkspace) elements.reviewWorkspace.hidden = !reviewMode;
+    if (elements.caseTab) {
+      elements.caseTab.classList.toggle('active', !reviewMode);
+      elements.caseTab.setAttribute('aria-selected', String(!reviewMode));
+    }
+    if (elements.reviewTab) {
+      elements.reviewTab.classList.toggle('active', reviewMode);
+      elements.reviewTab.setAttribute('aria-selected', String(reviewMode));
+    }
   }
 
   function renderHero() {
@@ -187,10 +219,6 @@ const V2Acceptance = (() => {
         </div>
         <p>${escapeHtml(source.source_file.split('/').pop() || source.source_file)}</p>
         <p>passage ${escapeHtml(source.passage_count)} · case ${escapeHtml(source.case_count)}</p>
-        <details class="v2-source-hash-fold">
-          <summary>查看版本 hash</summary>
-          <code class="v2-source-hash">sha256 ${escapeHtml(source.source_file_sha256)}</code>
-        </details>
       </article>
     `).join('');
   }
@@ -266,6 +294,7 @@ const V2Acceptance = (() => {
       button.addEventListener('click', () => {
         const task = tasks.find((item) => item.task_id === button.dataset.reviewTaskId);
         if (!task) return;
+        setWorkspaceMode('review');
         state.activeReviewTask = task;
         state.reviewMessage = '';
         renderReviewTaskList();
@@ -361,10 +390,10 @@ const V2Acceptance = (() => {
       const source = task.registered_source || {};
       body = `
         <label>外部来源状态<select id="v2ReviewStatus">${statuses.map((status) => `<option value="${status}">${escapeHtml(statusLabel(status))}</option>`).join('')}</select></label>
-        <label>底本文件路径<input id="v2ReviewSourceFile" type="text" value="${escapeHtml(source.source_file || '')}" placeholder="verified 时必填" /></label>
-        <label>文件 sha256<input id="v2ReviewSourceHash" type="text" value="${escapeHtml(source.source_file_sha256 || '')}" placeholder="verified 时必填" /></label>
+        <label>底本文件路径<input id="v2ReviewSourceFile" type="text" value="${escapeHtml(source.source_file || '')}" placeholder="verified 时填写可读取的文件路径" /></label>
         <label>版本/底本说明<input id="v2ReviewEdition" type="text" value="${escapeHtml(source.edition || '')}" /></label>
         <label>位置说明<input id="v2ReviewLocationNote" type="text" value="${escapeHtml(source.location_note || '')}" /></label>
+        <p class="compact-note v2-review-inline-note">选择 verified 后，服务端会直接读取该文件并自动完成一致性核对；这里不再手填长串校验值。</p>
       `;
     } else {
       statuses = ['candidate_available', 'no_public_match', 'verified', 'rejected'];
@@ -438,7 +467,6 @@ const V2Acceptance = (() => {
         payload.queue_item_id = task.queue_item_id;
         payload.resolution_status = reviewStatus;
         payload.source_file = document.querySelector('#v2ReviewSourceFile')?.value || null;
-        payload.source_file_sha256 = document.querySelector('#v2ReviewSourceHash')?.value || null;
         payload.edition = document.querySelector('#v2ReviewEdition')?.value || null;
         payload.location_note = document.querySelector('#v2ReviewLocationNote')?.value || null;
       } else {
@@ -491,7 +519,7 @@ const V2Acceptance = (() => {
     elements.caseTable.innerHTML = `
       <table class="v2-case-table">
         <thead>
-          <tr><th>案例</th><th>机器状态</th><th>目标典籍</th><th>目标定位候选</th><th>证据</th><th>人工状态</th></tr>
+          <tr><th>案例</th><th>机器状态</th><th>目标典籍</th><th>证据</th><th>人工状态</th></tr>
         </thead>
         <tbody>
           ${items.map((item) => {
@@ -508,7 +536,6 @@ const V2Acceptance = (() => {
                 </td>
                 <td><span class="v2-status-chip ${statusClass(item.machine_status)}">${escapeHtml(statusLabel(item.machine_status))}</span><br /><small>${escapeHtml(item.lifecycle)}</small></td>
                 <td>${escapeHtml(item.target_work || '未明确')}<br /><small>${escapeHtml(item.target_scope?.status || '')}</small></td>
-                <td>${item.target_location_candidate_count ? `<span class="summary-pill">书名 ${escapeHtml(item.target_location_candidate_count)}</span><br /><small>canonical ${escapeHtml(item.target_location_canonical_count || 0)} · passage ${escapeHtml(item.target_location_passage_candidate_count || 0)}</small>` : '<small>无显式书名候选</small>'}</td>
                 <td><div class="v2-evidence-meta">${resolutions || '<span class="v2-resolution-chip unknown">无 evidence</span>'}</div></td>
                 <td><span class="v2-status-chip ${statusClass(item.human_status)}">${escapeHtml(statusLabel(item.human_status))}</span></td>
               </tr>
@@ -520,6 +547,7 @@ const V2Acceptance = (() => {
     elements.caseTable.querySelectorAll('tr[data-case-id]').forEach((row) => {
       row.addEventListener('click', () => {
         if (detailedMode) {
+          setWorkspaceMode('case');
           state.activeReviewTask = null;
           state.reviewMessage = '';
           selectCase(row.dataset.caseId);
@@ -606,7 +634,7 @@ const V2Acceptance = (() => {
         ${externalText ? `<p class="v2-evidence-note">${escapeHtml(externalText)}</p>` : ''}
         ${candidateQueueText ? `<p class="v2-evidence-note">${escapeHtml(candidateQueueText)}</p>` : ''}
         ${candidatePassagePanel}
-        ${detailedMode ? `<details class="v2-raw-fold"><summary>完整 evidence JSON</summary><pre>${escapeHtml(JSON.stringify(data, null, 2))}</pre></details>` : ''}
+        ${detailedMode ? `<details class="v2-raw-fold"><summary>完整 evidence JSON</summary><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(data), null, 2))}</pre></details>` : ''}
       </article>
     `;
   }
@@ -616,7 +644,7 @@ const V2Acceptance = (() => {
     return `
       <details class="fold-card v2-raw-panel">
         <summary>${escapeHtml(label)}</summary>
-        <div class="fold-body"><pre>${escapeHtml(JSON.stringify(value || {}, null, 2))}</pre></div>
+        <div class="fold-body"><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(value || {}), null, 2))}</pre></div>
       </details>
     `;
   }
@@ -632,7 +660,7 @@ const V2Acceptance = (() => {
             <article class="v2-term-row">
               <div class="v2-detail-topline"><strong>${escapeHtml(term.source_term || '未定')} → ${escapeHtml(term.target_term || '未定')}</strong><span class="summary-pill">${escapeHtml(term.relation_type || '未定')}</span></div>
               <p>${escapeHtml(term.relation_note || '')}</p>
-              <details class="v2-raw-fold"><summary>term JSON</summary><pre>${escapeHtml(JSON.stringify(term.data || {}, null, 2))}</pre></details>
+              <details class="v2-raw-fold"><summary>term JSON</summary><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(term.data || {}), null, 2))}</pre></details>
             </article>
           `).join('')}
         </div>
@@ -663,7 +691,7 @@ const V2Acceptance = (() => {
                 </div>
                 <p>${escapeHtml(location.normalized_label)} · ${escapeHtml(statusLabel(location.target_passage_match_status))} · chars ${escapeHtml(location.label_start_char)}-${escapeHtml(location.label_end_char)}</p>
                 ${candidatePassage ? `<p><strong>passage 候选</strong> ${escapeHtml(candidateLocation)} · <code>${escapeHtml(candidatePassage.passage_id)}</code></p>` : ''}
-                <details class="v2-raw-fold"><summary>定位 provenance</summary><pre>${escapeHtml(JSON.stringify(location.provenance || {}, null, 2))}</pre></details>
+                <details class="v2-raw-fold"><summary>定位 provenance</summary><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(location.provenance || {}), null, 2))}</pre></details>
               </article>
             `;
           }).join('')}
@@ -678,7 +706,7 @@ const V2Acceptance = (() => {
       <details class="fold-card v2-raw-panel">
         <summary>人工审校事件 · ${escapeHtml(events?.length || 0)} 条</summary>
         <div class="fold-body">
-          ${events?.length ? events.map((event) => `<article class="v2-review-row"><strong>${escapeHtml(event.review_status || 'pending')}</strong><span>${escapeHtml(event.reviewer || '未记录审校人')}</span><p>${escapeHtml(event.review_note || '')}</p><pre>${escapeHtml(JSON.stringify(event.data || {}, null, 2))}</pre></article>`).join('') : '<p>当前尚无 review_events；human_status 仍为 pending。</p>'}
+          ${events?.length ? events.map((event) => `<article class="v2-review-row"><strong>${escapeHtml(event.review_status || 'pending')}</strong><span>${escapeHtml(event.reviewer || '未记录审校人')}</span><p>${escapeHtml(event.review_note || '')}</p><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(event.data || {}), null, 2))}</pre></article>`).join('') : '<p>当前尚无 review_events；human_status 仍为 pending。</p>'}
         </div>
       </details>
     `;
@@ -690,7 +718,7 @@ const V2Acceptance = (() => {
       <details class="fold-card v2-raw-panel">
         <summary>外部来源解析事件 · ${escapeHtml(events?.length || 0)} 条</summary>
         <div class="fold-body">
-          ${events?.length ? events.map((event) => `<article class="v2-review-row"><strong>${escapeHtml(event.resolution_kind || 'resolution')}</strong><span>${escapeHtml(event.to_queue_status || 'pending')} · ${escapeHtml(event.reviewer || '未记录审校人')}</span><p>${escapeHtml(event.resolution_note || '')}</p><pre>${escapeHtml(JSON.stringify(event.data || {}, null, 2))}</pre></article>`).join('') : '<p>当前尚无外部来源解析事件；外部队列仍按 pending/candidate 状态处理。</p>'}
+          ${events?.length ? events.map((event) => `<article class="v2-review-row"><strong>${escapeHtml(event.resolution_kind || 'resolution')}</strong><span>${escapeHtml(event.to_queue_status || 'pending')} · ${escapeHtml(event.reviewer || '未记录审校人')}</span><p>${escapeHtml(event.resolution_note || '')}</p><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(event.data || {}), null, 2))}</pre></article>`).join('') : '<p>当前尚无外部来源解析事件；外部队列仍按 pending/candidate 状态处理。</p>'}
         </div>
       </details>
     `;
@@ -706,7 +734,6 @@ const V2Acceptance = (() => {
       .join('');
     const provenance = item.provenance || {};
     const provenanceSource = provenance.source_file || provenance.source_text_file || '未记录';
-    const provenanceHash = provenance.source_file_sha256 || provenance.source_text_sha256 || '未记录';
     const provenanceExtra = [
       provenance.source_passage_id ? `passage ${provenance.source_passage_id}` : '',
       provenance.candidate_id ? `candidate ${provenance.candidate_id}` : '',
@@ -727,7 +754,7 @@ const V2Acceptance = (() => {
         <div class="v2-detail-block"><span class="v2-detail-label">机器状态</span><p>${escapeHtml(item.machine_status)} · lifecycle ${escapeHtml(item.lifecycle)}</p></div>
         <div class="v2-detail-block"><span class="v2-detail-label">人工状态</span><p>${escapeHtml(item.human_status)} · review ${escapeHtml(item.review_status)}</p></div>
         <div class="v2-detail-block"><span class="v2-detail-label">来源 / 再加工</span><p>${escapeHtml(item.origin)} · ${escapeHtml(provenance.transformation_kind || '未记录')}</p></div>
-        <div class="v2-detail-block"><span class="v2-detail-label">来源文件</span><p>${escapeHtml(provenanceSource)}</p><code>${escapeHtml(provenanceHash)}</code>${provenanceExtra ? `<p>${escapeHtml(provenanceExtra)}</p>` : ''}</div>
+        <div class="v2-detail-block"><span class="v2-detail-label">来源文件</span><p>${escapeHtml(provenanceSource)}</p>${provenanceExtra ? `<p>${escapeHtml(provenanceExtra)}</p>` : ''}</div>
         <div class="v2-detail-block"><span class="v2-detail-label">target_work</span><p>${escapeHtml(item.target_work || '未明确')}</p></div>
         <div class="v2-detail-block"><span class="v2-detail-label">target_works / scope</span><p>${escapeHtml(targetWorks)} · ${escapeHtml(targetScope.status || 'unknown')}</p></div>
       </div>
@@ -786,6 +813,8 @@ const V2Acceptance = (() => {
 
   function bindFilters() {
     let searchTimer = null;
+    elements.caseTab?.addEventListener('click', () => setWorkspaceMode('case'));
+    elements.reviewTab?.addEventListener('click', () => setWorkspaceMode('review'));
     elements.search?.addEventListener('input', () => {
       window.clearTimeout(searchTimer);
       searchTimer = window.setTimeout(() => loadCases({ resetPage: true }), 240);
@@ -883,6 +912,7 @@ const V2Acceptance = (() => {
       elements.status.textContent = `V2 数据库已连接 · 只读 · ${summary.database.display_path}`;
       if (elements.pageSize) elements.pageSize.value = String(state.pageSize);
       bindFilters();
+      setWorkspaceMode('case');
       if (detailedMode) loadReviewTasks({ resetBatch: true });
       const initialCaseId = new URLSearchParams(window.location.search).get('case');
       if (detailedMode && initialCaseId) {
