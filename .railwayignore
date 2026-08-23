@@ -1,0 +1,26 @@
+# Railway image context: runtime code is packaged in the image; large V2 data
+# is mounted separately through the Railway volume at /app/v2/data.
+.git/
+.vscode/
+.claude/
+.codex/
+00-项目说明/
+01-项目资料/
+02-数据库/
+04-项目文献/
+05-归档文献/
+国际数字人文节/
+v2/data/
+v2/tests/
+v2/research/
+v2/schemas/
+*.pdf
+*.docx
+*.xlsx
+*.caj
+*.zip
+*.pyc
+__pycache__/
+**/__pycache__/
+node_modules/
+**/node_modules/
