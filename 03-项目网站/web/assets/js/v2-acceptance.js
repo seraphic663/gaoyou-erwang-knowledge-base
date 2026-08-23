@@ -150,13 +150,18 @@ const V2Acceptance = (() => {
     const taskBatchText = ['case_review', 'target_work_resolution', 'external_source_resolution', 'external_passage_resolution']
       .map((key) => `${key} ${taskCounts[key] || 0}/${taskValidation[key]?.batch_count || 0} 批`)
       .join(' · ');
-    const coreMetrics = [
+    const coreMetrics = detailedMode ? [
       ['候选层入库', summary.counts.candidate_items, '四部王氏原文机器候选'],
       ['案例入库', summary.counts.annotation_cases, '机器库记录'],
       ['机器草稿', summary.machine_status_counts.draft || 0, '结构基本可用，仍待核验'],
       ['人工 pending', summary.human_status_counts.pending || 0, '尚无 gold 晋级'],
       ['证据总数', summary.counts.annotation_evidences, '引文记录'],
       ['外部原典待核验', summary.evidence_counts.source_resolution.external_source_pending || 0, '尚未进入 canonical passage'],
+    ] : [
+      ['案例入库', summary.counts.annotation_cases, '机器工作库记录'],
+      ['人工 pending', summary.human_status_counts.pending || 0, '尚无 gold 晋级'],
+      ['证据总数', summary.counts.annotation_evidences, '引文记录'],
+      ['外部原典待核验', summary.evidence_counts.source_resolution.external_source_pending || 0, '等待外部底本和引文核验'],
     ];
     const detailedMetrics = [
       ['候选已生成案例', summary.candidate_output_case_count || 0, `其中 candidate shell ${summary.candidate_shell_case_count || 0} 条`],
@@ -782,6 +787,83 @@ const V2Acceptance = (() => {
     `;
   }
 
+  function organizeDetailSections(item) {
+    const detail = elements.caseDetail;
+    if (!detail || detail.querySelector('.v2-detail-groups')) return;
+
+    const directNodes = Array.from(detail.children);
+    const header = directNodes.find((node) => node.classList.contains('v2-detail-header'));
+    const reviewForm = directNodes.find((node) => node.classList.contains('v2-review-form'));
+    const meta = directNodes.find((node) => node.classList.contains('v2-detail-meta'));
+    const grid = directNodes.find((node) => node.classList.contains('v2-detail-grid'));
+    const targetLocations = directNodes.find((node) => (
+      node.classList.contains('v2-target-location-fold')
+      || (node.classList.contains('v2-detail-block') && node.textContent.includes('机器目标定位候选'))
+    ));
+    const evidenceBlock = directNodes.find((node) => (
+      node.classList.contains('v2-detail-block') && node.textContent.includes('证据层级')
+    ));
+    const summaryText = (node) => node.querySelector('summary')?.textContent?.trim() || '';
+    const processFold = directNodes.find((node) => summaryText(node).includes('查看机器校验与五步过程'));
+    const termsPanel = directNodes.find((node) => summaryText(node).startsWith('词项关系'));
+    const reviewPanels = directNodes.filter((node) => summaryText(node).startsWith('人工审校事件'));
+    const resolutionPanels = directNodes.filter((node) => summaryText(node).startsWith('外部来源解析事件'));
+    const rawPanels = directNodes.filter((node) => (
+      node.classList.contains('v2-raw-panel')
+      && /machine_result JSON|human_review JSON|完整 annotation_case.v1 JSON/.test(summaryText(node))
+    ));
+
+    const makeSection = (title, badgeText, open) => {
+      const section = document.createElement('details');
+      section.className = 'v2-detail-section';
+      section.open = open;
+      const summary = document.createElement('summary');
+      const heading = document.createElement('span');
+      heading.textContent = title;
+      const badge = document.createElement('span');
+      badge.className = 'summary-pill';
+      badge.textContent = badgeText;
+      summary.append(heading, badge);
+      const body = document.createElement('div');
+      body.className = 'v2-detail-section-body';
+      section.append(summary, body);
+      return { section, body };
+    };
+
+    const groupOne = makeSection(
+      '一、来源与定位',
+      item.source_passage ? 'source passage 已定位' : 'source passage 待补',
+      true,
+    );
+    const groupTwo = makeSection(
+      '二、证据与过程',
+      `${item.evidences?.length || 0} 条证据 · ${(item.process_steps || []).filter((step) => step.step_text).length} 步`,
+      true,
+    );
+    const groupThree = makeSection('三、审校记录与原始数据', '按需展开', false);
+
+    [meta, grid, targetLocations].filter(Boolean).forEach((node) => groupOne.body.appendChild(node));
+    [evidenceBlock, processFold, termsPanel].filter(Boolean).forEach((node) => groupTwo.body.appendChild(node));
+    [...reviewPanels, ...resolutionPanels, ...rawPanels].forEach((node) => groupThree.body.appendChild(node));
+
+    const assigned = new Set([
+      header,
+      reviewForm,
+      meta,
+      grid,
+      targetLocations,
+      evidenceBlock,
+      processFold,
+      termsPanel,
+      ...reviewPanels,
+      ...resolutionPanels,
+      ...rawPanels,
+    ].filter(Boolean));
+    directNodes.filter((node) => !assigned.has(node)).forEach((node) => groupThree.body.appendChild(node));
+
+    detail.append(groupOne.section, groupTwo.section, groupThree.section);
+  }
+
   function renderDetail(item) {
     const targetWorks = item.target_works?.length ? item.target_works.join('、') : '未明确';
     const targetScope = item.target_scope || {};
@@ -853,6 +935,7 @@ const V2Acceptance = (() => {
       ${renderJsonPanel(item.human_review, 'human_review JSON')}
       ${renderJsonPanel(item.case_data, '完整 annotation_case.v1 JSON')}
     `;
+    organizeDetailSections(item);
     elements.caseDetail.querySelector('#v2ReviewSubmit')?.addEventListener('click', submitActiveReview);
   }
 

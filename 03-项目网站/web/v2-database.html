@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./assets/css/v2-acceptance.css" />
   </head>
   <body data-v2-view="display">
-    <header class="subhero">
+    <header class="subhero v2-reading-hero">
       <nav class="nav">
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
@@ -21,26 +21,47 @@
       </nav>
 
       <div class="hero-content">
-        <p class="badge">V2 / VR · 直接使用</p>
+        <p class="badge">V2 / VR · 案例阅读</p>
         <h1>V2 数据库</h1>
-        <p class="hero-copy">面向日常检索和人工审校准备的 V2 数据库展示界面。这里显示案例核心内容和证据摘要；迁移来源、机器校验原文和完整 JSON 保留在 V2 验收界面。</p>
+        <p class="hero-copy">先按条件找到案例，再打开单条记录。来源审计、证据边界、人工任务和完整字段统一放在 V2 验收工作台。</p>
         <div id="v2HeroMeta" class="hero-panel"></div>
       </div>
     </header>
 
-    <main class="section v2-page v2-display-page">
+    <main class="section v2-page v2-display-page v2-reading-page">
+      <div class="v2-page-lead">
+        <div>
+          <p class="section-kicker">V2 阅读入口</p>
+          <h2>先看案例，再看证据</h2>
+          <p>这里是机器工作库的摘要阅读层；需要判断来源和处理待办时，再进入 V2 验收。</p>
+        </div>
+        <div class="v2-page-actions">
+          <a class="page-link" href="./v2-acceptance.html">进入 V2 验收</a>
+        </div>
+      </div>
+
       <p id="v2Status" class="db-status">正在读取 V2 数据库...</p>
-      <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
-      <section id="v2Metrics" class="v2-metric-grid"></section>
+      <div class="v2-summary-zone">
+        <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
+        <section id="v2Metrics" class="v2-metric-grid"></section>
+      </div>
+
+      <div class="v2-reading-guide" aria-label="阅读方式">
+        <article><strong>1. 搜索</strong><span>按标题、来源和目标典籍筛选。</span></article>
+        <article><strong>2. 分批</strong><span>默认每批 20 条，避免一次铺满。</span></article>
+        <article><strong>3. 深入看</strong><span>选中案例后，到 V2 验收查看完整字段。</span></article>
+      </div>
 
       <section class="card v2-panel v2-display-queue">
         <div class="v2-panel-heading v2-case-heading">
           <div>
-            <p class="section-kicker">案例库</p>
-            <h2>可直接使用的案例列表</h2>
+            <p class="section-kicker">案例列表</p>
+            <h2>机器工作库中的案例</h2>
           </div>
           <span id="v2CaseCount" class="summary-pill"></span>
         </div>
+
+        <p class="compact-note">这里只保留定位和状态摘要；完整来源段落、证据和过程字段在 V2 验收中按需展开。</p>
 
         <div class="v2-filter-bar">
           <label class="toolbar-field">
@@ -78,7 +99,7 @@
         </div>
 
         <div id="v2CaseTable" class="v2-case-table-wrap"></div>
-      <p class="v2-display-note">点击案例进入 V2 验收界面。展示界面不隐藏案例的机器/人工状态，但默认不展开迁移元数据和完整证据 JSON。</p>
+        <p class="v2-display-note">点击案例进入 V2 验收界面。机器草稿仍是 machine draft，人工状态仍是 pending，不代表 gold。</p>
       </section>
     </main>
 

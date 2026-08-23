@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="./assets/css/v2-acceptance.css" />
   </head>
   <body data-v2-view="detail">
-    <header class="subhero">
+    <header class="subhero v2-acceptance-hero">
       <nav class="nav">
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
@@ -21,21 +21,32 @@
       </nav>
 
       <div class="hero-content">
-        <p class="badge">V2 / VR · 阅读 / 验收 / 审校</p>
-        <h1>V2 工作库 · 阅读与审校</h1>
-        <p class="hero-copy">这里集中查看数据库状态、来源关系、案例待办和机器证据。默认只读；只有本地显式开启审校写入后，才能提交人工决定，机器结果不会自行升级为人工或 gold。</p>
+        <p class="badge">V2 / VR · 验收工作台</p>
+        <h1>V2 验收与人工审校</h1>
+        <p class="hero-copy">这里处理来源版本、证据边界和人工待办。先看验收结论，再进入分批任务；机器结果不会自动成为 gold。</p>
         <div id="v2HeroMeta" class="hero-panel"></div>
       </div>
     </header>
 
-    <main class="section v2-page">
+    <main class="section v2-page v2-acceptance-page">
+      <div class="v2-page-lead">
+        <div>
+          <p class="section-kicker">V2 工作库</p>
+          <h2>把机器结果整理成可审的批次</h2>
+          <p>结构检查和来源登记先收进总览；案例列表、审校任务和单条详情分开阅读，减少信息同时出现。</p>
+        </div>
+        <div class="v2-page-actions">
+          <a class="page-link" href="./v2-database.html">返回案例阅读</a>
+        </div>
+      </div>
+
       <p id="v2Status" class="db-status">正在读取 V2 数据库...</p>
 
       <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
       <section id="v2Metrics" class="v2-metric-grid"></section>
 
       <div class="v2-layout">
-        <details class="card v2-panel v2-audit-panel" open>
+        <details class="card v2-panel v2-audit-panel">
           <summary class="v2-audit-summary">
             <span>
               <span class="section-kicker">验收与来源</span>
