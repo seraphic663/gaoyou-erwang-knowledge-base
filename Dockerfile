@@ -11,6 +11,7 @@ COPY v2 ./v2
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV DATA_SOURCE=sqlite
+ENV DATA_DIR=/app/03-项目网站/data
 ENV PYTHON_BIN=python3
 
 EXPOSE 3000
