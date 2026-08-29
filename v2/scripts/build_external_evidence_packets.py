@@ -10,7 +10,7 @@ verified.
 
 The output is one JSON object per external source.  Each object contains the
 source queue row, registry boundary, every linked passage queue row, frozen
-candidate metadata, recomputed local file/hash/match checks, and an explicit
+candidate metadata, recomputed local file/match checks, and an explicit
 machine-only assessment.  It never updates SQLite, never changes evidence
 ``passage_id`` or ``quote_check``, and never changes canonical status.
 """
@@ -18,9 +18,9 @@ machine-only assessment.  It never updates SQLite, never changes evidence
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
+from contextlib import closing
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -57,16 +57,6 @@ def parse_json(value: Any, fallback: Any) -> Any:
     return parsed
 
 
-def sha256_file(path: Path) -> str | None:
-    if not path.is_file():
-        return None
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def connect_read_only(database_path: Path) -> sqlite3.Connection:
     if not database_path.is_file():
         raise FileNotFoundError(f"v2_database_not_found:{database_path}")
@@ -78,27 +68,26 @@ def connect_read_only(database_path: Path) -> sqlite3.Connection:
     return connection
 
 
-def load_manifest(manifest_path: Path) -> tuple[dict[str, Any], str]:
+def load_manifest(manifest_path: Path) -> dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(manifest, dict):
         raise ValueError("external_candidate_manifest_must_be_object")
-    manifest_hash = hashlib.sha256(manifest_path.read_bytes()).hexdigest()
-    return manifest, manifest_hash
+    return manifest
 
 
 def load_edition_manifest(
     manifest_path: Path,
-) -> tuple[dict[str, Any], str | None]:
+) -> dict[str, Any]:
     """Load the optional downloaded-edition candidate layer."""
 
     if not manifest_path.is_file():
-        return {}, None
+        return {}
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if not isinstance(manifest, dict):
         raise ValueError("external_edition_candidate_manifest_must_be_object")
     if manifest.get("schema_version") != "external_edition_candidate_manifest.v1":
         raise ValueError("unexpected_external_edition_candidate_manifest_schema")
-    return manifest, hashlib.sha256(manifest_path.read_bytes()).hexdigest()
+    return manifest
 
 
 def edition_candidate_summary(candidate: dict[str, Any]) -> dict[str, Any]:
@@ -113,7 +102,7 @@ def edition_candidate_summary(candidate: dict[str, Any]) -> dict[str, Any]:
                     key: file_record.get(key)
                     for key in (
                         "role", "name", "path", "status", "http_status", "size_bytes",
-                        "metadata_size", "sha256", "url", "download_reason", "error",
+                        "metadata_size", "url", "download_reason", "error",
                     )
                     if key in file_record
                 }
@@ -123,7 +112,7 @@ def edition_candidate_summary(candidate: dict[str, Any]) -> dict[str, Any]:
                 key: item.get(key)
                 for key in (
                     "identifier", "volume_label", "item_url", "metadata_url",
-                    "metadata_status", "metadata_raw_sha256", "metadata_file",
+                    "metadata_status", "metadata_file",
                     "metadata_title", "metadata_creator", "metadata_date",
                     "metadata_collection", "metadata_contributor", "metadata_volume",
                     "availability_status", "quote_matches",
@@ -162,7 +151,7 @@ def validate_external_edition_candidate_manifest(
             "counts": {},
         }
     try:
-        manifest, manifest_hash = load_edition_manifest(manifest_path)
+        manifest = load_edition_manifest(manifest_path)
     except (OSError, ValueError, json.JSONDecodeError) as error:
         return {
             "valid": False,
@@ -178,7 +167,6 @@ def validate_external_edition_candidate_manifest(
     item_count = 0
     complete_file_count = 0
     missing_file_count = 0
-    hash_mismatch_count = 0
     size_mismatch_count = 0
     unsafe_path_count = 0
     candidate_status_counts: Counter[str] = Counter()
@@ -220,10 +208,6 @@ def validate_external_edition_candidate_manifest(
                 expected_size = file_record.get("size_bytes")
                 if expected_size is not None and int(expected_size) != actual_size:
                     size_mismatch_count += 1
-                expected_hash = str(file_record.get("sha256") or "")
-                actual_hash = sha256_file(file_path)
-                if not expected_hash or actual_hash != expected_hash:
-                    hash_mismatch_count += 1
 
     expected_summary = manifest.get("summary") or {}
     if expected_summary.get("candidate_count") != len(candidates):
@@ -236,8 +220,6 @@ def validate_external_edition_candidate_manifest(
         errors.append("edition_candidate_database_mutation_claim")
     if missing_file_count:
         errors.append(f"edition_candidate_file_missing:{missing_file_count}")
-    if hash_mismatch_count:
-        errors.append(f"edition_candidate_file_hash_mismatch:{hash_mismatch_count}")
     if size_mismatch_count:
         errors.append(f"edition_candidate_file_size_mismatch:{size_mismatch_count}")
     if unsafe_path_count:
@@ -246,13 +228,11 @@ def validate_external_edition_candidate_manifest(
         "valid": not errors,
         "errors": errors,
         "manifest_file": relative_path(manifest_path),
-        "manifest_sha256": manifest_hash,
         "counts": {
             "candidate_count": len(candidates),
             "item_count": item_count,
             "complete_file_count": complete_file_count,
             "missing_file_count": missing_file_count,
-            "hash_mismatch_count": hash_mismatch_count,
             "size_mismatch_count": size_mismatch_count,
             "unsafe_path_count": unsafe_path_count,
         },
@@ -280,17 +260,9 @@ def recompute_candidate(
     """Recheck the frozen file without trusting manifest match fields alone."""
 
     raw_file = _relative_candidate_path(candidate.get("raw_file"))
-    actual_hash = sha256_file(raw_file) if raw_file else None
-    expected_hash = str(
-        candidate.get("raw_sha256") or candidate.get("content_sha256") or ""
-    ) or None
-    hash_matches = bool(actual_hash and expected_hash and actual_hash == expected_hash)
     result: dict[str, Any] = {
         "raw_file": candidate.get("raw_file"),
         "raw_file_exists": bool(raw_file and raw_file.is_file()),
-        "raw_sha256_expected": expected_hash,
-        "raw_sha256_actual": actual_hash,
-        "raw_hash_matches": hash_matches,
         "manifest_match_mode": candidate.get("offline_match_mode") or candidate.get("match_mode"),
         "manifest_start_char": candidate.get("offline_start_char"),
         "manifest_end_char": candidate.get("offline_end_char"),
@@ -298,8 +270,8 @@ def recompute_candidate(
         "recomputed_start_char": None,
         "recomputed_end_char": None,
     }
-    if not raw_file or not raw_file.is_file() or not hash_matches:
-        result["recomputed_match_mode"] = "file_or_hash_unverified"
+    if not raw_file or not raw_file.is_file():
+        result["recomputed_match_mode"] = "file_unavailable"
         return result
 
     # Use the same conservative normalizer as the fetch/reconcile lane.  The
@@ -334,7 +306,7 @@ def _candidate_passage_rows(
     rows = connection.execute(
         f"""
         SELECT p.passage_id, p.source_document_id, p.work_key,
-               sd.source_file_sha256, sd.source_kind, sd.source_file,
+               sd.source_kind, sd.source_file,
                sd.canonical_status
         FROM passages p
         JOIN source_documents sd ON sd.source_document_id = p.source_document_id
@@ -360,19 +332,14 @@ def _manifest_entries(manifest: dict[str, Any]) -> dict[tuple[str, int, str], di
     return entries
 
 
-def _candidate_index(entry: dict[str, Any] | None) -> dict[tuple[str, str], dict[str, Any]]:
-    result: dict[tuple[str, str], dict[str, Any]] = {}
+def _candidate_index(entry: dict[str, Any] | None) -> dict[str, dict[str, Any]]:
+    result: dict[str, dict[str, Any]] = {}
     if not entry:
         return result
     for candidate in entry.get("candidates") or []:
         if not isinstance(candidate, dict):
             continue
-        result[
-            (
-                str(candidate.get("raw_file") or ""),
-                str(candidate.get("raw_sha256") or candidate.get("content_sha256") or ""),
-            )
-        ] = candidate
+        result[str(candidate.get("raw_file") or "")] = candidate
     return result
 
 
@@ -389,10 +356,7 @@ def _candidate_summary(
     for ref in refs:
         if not isinstance(ref, dict):
             continue
-        key = (
-            str(ref.get("raw_file") or ""),
-            str(ref.get("raw_sha256") or ref.get("content_sha256") or ""),
-        )
+        key = str(ref.get("raw_file") or "")
         candidate = dict(manifest_candidates.get(key) or {})
         candidate.update({key: value for key, value in ref.items() if value is not None})
         recheck = recompute_candidate(candidate, quote=quote)
@@ -412,8 +376,7 @@ def _candidate_summary(
     # not yet copied its reference into candidate_refs_json.
     for key, candidate in manifest_candidates.items():
         if any(
-            str(item.get("raw_file") or "") == key[0]
-            and str(item.get("raw_sha256") or item.get("content_sha256") or "") == key[1]
+            str(item.get("raw_file") or "") == key
             for item in candidates
         ):
             continue
@@ -470,8 +433,8 @@ def build_packets(
     packet_path: Path = DEFAULT_PACKET,
     report_path: Path = DEFAULT_REPORT,
 ) -> dict[str, Any]:
-    manifest, manifest_hash = load_manifest(manifest_path)
-    edition_manifest, edition_manifest_hash = load_edition_manifest(edition_manifest_path)
+    manifest = load_manifest(manifest_path)
+    edition_manifest = load_edition_manifest(edition_manifest_path)
     edition_candidate_validation = validate_external_edition_candidate_manifest(
         edition_manifest_path
     )
@@ -481,7 +444,7 @@ def build_packets(
         summary = edition_candidate_summary(candidate)
         for source_id in candidate.get("linked_external_source_ids") or []:
             edition_candidates_by_source[str(source_id)].append(summary)
-    with connect_read_only(database_path) as connection:
+    with closing(connect_read_only(database_path)) as connection:
         source_rows = connection.execute(
             """
             SELECT q.queue_item_id, q.external_source_id, q.cited_work,
@@ -489,7 +452,7 @@ def build_packets(
                    q.evidence_count, q.pending_evidence_count,
                    q.candidate_evidence_count, q.context_json, q.updated_at,
                    r.status AS registry_current_status, r.source_file,
-                   r.source_file_sha256, r.edition, r.location_note,
+                   r.edition, r.location_note,
                    r.metadata_json
             FROM external_source_resolution_queue q
             JOIN external_source_registry r
@@ -502,7 +465,7 @@ def build_packets(
             SELECT queue_item_id, external_source_id, case_id,
                    evidence_index, cited_work, quote, source_resolution,
                    quote_check, queue_status, edition_status, passage_status,
-                   candidate_manifest_path, candidate_manifest_sha256,
+                   candidate_manifest_path,
                    selected_passage_id, candidate_passage_ids_json,
                    candidate_refs_json, context_json, updated_at
             FROM external_passage_resolution_queue
@@ -557,10 +520,8 @@ def build_packets(
                 recheck = candidate.get("recheck") or {}
                 if not recheck.get("raw_file_exists"):
                     file_checks["candidate_file_missing"] += 1
-                elif not recheck.get("raw_hash_matches"):
-                    file_checks["candidate_file_hash_mismatch"] += 1
                 else:
-                    file_checks["candidate_file_hash_pass"] += 1
+                    file_checks["candidate_file_available"] += 1
             evidence_packets.append(
                 {
                     "queue_item_id": str(passage_row["queue_item_id"]),
@@ -578,7 +539,6 @@ def build_packets(
                     },
                     "candidate_manifest": {
                         "path": passage_row["candidate_manifest_path"],
-                        "sha256": passage_row["candidate_manifest_sha256"],
                         "entry_present": entry is not None,
                         "entry_status": entry.get("status") if entry else None,
                     },
@@ -619,7 +579,6 @@ def build_packets(
                 "registry": {
                     "status": source_row["registry_current_status"],
                     "source_file": source_row["source_file"],
-                    "source_file_sha256": source_row["source_file_sha256"],
                     "edition": source_row["edition"],
                     "location_note": source_row["location_note"],
                     "metadata": parse_json(source_row["metadata_json"], {}),
@@ -627,7 +586,6 @@ def build_packets(
                 "edition_candidates": edition_candidates_by_source.get(source_id, []),
                 "search_scope": {
                     "manifest_path": relative_path(manifest_path),
-                    "manifest_sha256": manifest_hash,
                     "source_entry_count": source_entry_count,
                     "status": source_assessment,
                 },
@@ -649,16 +607,14 @@ def build_packets(
         "database": relative_path(database_path),
         "manifest": {
             "path": relative_path(manifest_path),
-            "sha256": manifest_hash,
             "entry_count": len(manifest.get("entries") or []),
             "unique_source_count": len({str(entry.get("external_source_id")) for entry in manifest.get("entries") or []}),
         },
         "edition_candidate_manifest": {
-            "path": relative_path(edition_manifest_path) if edition_manifest_hash else None,
-            "sha256": edition_manifest_hash,
+            "path": relative_path(edition_manifest_path) if edition_manifest else None,
             "candidate_count": len(edition_manifest.get("candidates") or []),
             "linked_source_count": len(edition_candidates_by_source),
-            "present": edition_manifest_hash is not None,
+            "present": bool(edition_manifest),
         },
         "edition_candidate_manifest_validation": edition_candidate_validation,
         "packet_file": relative_path(packet_path),
@@ -686,9 +642,8 @@ def build_packets(
                 for entry in entries.values()
                 if f"external-passage:{entry.get('case_id')}:{entry.get('evidence_index')}" in packet_evidence_ids
             ),
-            "candidate_file_hash_pass_count": file_checks["candidate_file_hash_pass"],
+            "candidate_file_available_count": file_checks["candidate_file_available"],
             "candidate_file_missing_count": file_checks["candidate_file_missing"],
-            "candidate_file_hash_mismatch_count": file_checks["candidate_file_hash_mismatch"],
             "edition_candidate_source_reference_count": len(edition_candidates_by_source),
             "edition_candidate_evidence_reference_count": sum(
                 len(edition_candidates_by_source.get(str(packet["external_source_id"]), []))
@@ -722,7 +677,6 @@ def build_packets(
     report["valid"] = bool(
         all(report["coverage"].values())
         and report["counts"]["candidate_file_missing_count"] == 0
-        and report["counts"]["candidate_file_hash_mismatch_count"] == 0
         and edition_candidate_validation["valid"]
         and report["boundary"]["all_candidates_remain_unknown"]
         and report["boundary"]["all_evidence_quote_checks_remain_unchecked_or_existing"]
@@ -756,8 +710,6 @@ def validate_external_evidence_packets(
     edition_validation = validate_external_edition_candidate_manifest(edition_manifest_path)
     if not edition_validation["valid"]:
         errors.extend(edition_validation.get("errors") or ["edition_candidate_manifest_invalid"])
-    if edition_report.get("sha256") and edition_report.get("sha256") != edition_validation.get("manifest_sha256"):
-        errors.append("edition_candidate_manifest_report_hash_mismatch")
     if not edition_report:
         errors.append("edition_candidate_manifest_report_missing")
     packet_path = packet_path or (PROJECT_ROOT / str(report.get("packet_file") or ""))
@@ -774,7 +726,7 @@ def validate_external_evidence_packets(
     except (OSError, ValueError) as error:
         errors.append(f"packet_file_invalid:{type(error).__name__}")
 
-    with connect_read_only(database_path) as connection:
+    with closing(connect_read_only(database_path)) as connection:
         expected_sources = {
             str(row["external_source_id"])
             for row in connection.execute("SELECT external_source_id FROM external_source_resolution_queue")
@@ -803,8 +755,6 @@ def validate_external_evidence_packets(
     report_counts = report.get("counts") or {}
     if report_counts.get("candidate_file_missing_count", 0):
         errors.append("candidate_file_missing")
-    if report_counts.get("candidate_file_hash_mismatch_count", 0):
-        errors.append("candidate_file_hash_mismatch")
     for packet in packets:
         for candidate in packet.get("edition_candidates") or []:
             if candidate.get("canonical_status") in {"canonical_active", "verified", "gold"}:

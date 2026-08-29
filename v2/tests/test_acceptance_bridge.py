@@ -87,7 +87,7 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         self.assertEqual(len(payload["terms"]), 22)
         self.assertEqual(len(payload["process_steps"]), 5)
         self.assertIn("_migration", payload["case_data"])
-        self.assertIn("source_file_sha256", payload["provenance"])
+        self.assertIn("source_file", payload["provenance"])
         self.assertEqual(payload["resolution_events"], [])
 
     def test_candidate_shell_detail_keeps_target_location_as_machine_candidate(self) -> None:

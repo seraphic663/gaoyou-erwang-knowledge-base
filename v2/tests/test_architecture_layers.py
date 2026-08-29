@@ -59,10 +59,10 @@ class ArchitectureLayerTest(unittest.TestCase):
                     """
                     INSERT INTO legacy_dictionary_works(
                         legacy_work_id, title, author, work_type, usage_status,
-                        source_file, source_file_sha256, metadata_json,
+                        source_file, metadata_json,
                         created_at, updated_at
                     ) VALUES (24, '方言', '', '经部', 'referenced',
-                              '02-数据库/data/dictionary.db', 'fixture', '{}',
+                              '02-数据库/data/dictionary.db', '{}',
                               '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00')
                     """
                 )
@@ -129,7 +129,6 @@ class ArchitectureLayerTest(unittest.TestCase):
         passage.update(
             {
                 "source_file": str(source),
-                "source_file_sha256": "fixture-sha256",
                 "canonical_status": "canonical_active",
             }
         )
@@ -147,7 +146,6 @@ class ArchitectureLayerTest(unittest.TestCase):
             "risk_class": "risk_bearing",
             "source": {
                 "source_file": str(source),
-                "source_file_sha256": "fixture-sha256",
                 "canonical_status": "canonical_active",
             },
         }

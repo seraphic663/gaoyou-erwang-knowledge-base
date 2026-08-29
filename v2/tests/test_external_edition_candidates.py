@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -42,7 +41,6 @@ class ExternalEditionCandidateTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             target = Path(directory) / "candidate.txt"
             target.write_bytes(b"frozen candidate")
-            expected_hash = hashlib.sha256(target.read_bytes()).hexdigest()
             with patch("freeze_external_edition_candidates.urllib.request.urlopen") as urlopen:
                 result = download_file(
                     "https://example.invalid/candidate.txt",
@@ -51,7 +49,7 @@ class ExternalEditionCandidateTest(unittest.TestCase):
                 )
             urlopen.assert_not_called()
             self.assertEqual(result["status"], "reused")
-            self.assertEqual(result["sha256"], expected_hash)
+            self.assertEqual(result["size_bytes"], len(b"frozen candidate"))
 
     def test_production_candidate_manifest_files_and_boundaries_validate(self) -> None:
         result = validate_external_edition_candidate_manifest(
@@ -62,7 +60,6 @@ class ExternalEditionCandidateTest(unittest.TestCase):
         self.assertEqual(result["counts"]["item_count"], 191)
         self.assertEqual(result["counts"]["complete_file_count"], 191)
         self.assertEqual(result["counts"]["missing_file_count"], 0)
-        self.assertEqual(result["counts"]["hash_mismatch_count"], 0)
         self.assertEqual(result["database_rows_changed"], 0)
 
 

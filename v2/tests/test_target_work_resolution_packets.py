@@ -5,6 +5,7 @@ import sqlite3
 import sys
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 
@@ -96,7 +97,7 @@ class TargetWorkResolutionPacketsTest(unittest.TestCase):
             self.assertEqual(packet["evidence_context"]["count"], 1)
             self.assertEqual(packet["case_snapshot"]["target_work"], "")
 
-            with sqlite3.connect(database_path) as connection:
+            with closing(sqlite3.connect(database_path)) as connection:
                 after = tuple(
                     connection.execute(
                         """

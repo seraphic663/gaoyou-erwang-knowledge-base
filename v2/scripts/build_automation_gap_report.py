@@ -202,7 +202,7 @@ def build_report(
 
         source_policy = [dict(row) for row in connection.execute(
             """
-            SELECT work_key, source_file, source_file_sha256, canonical_status
+            SELECT work_key, source_file, canonical_status
             FROM source_documents WHERE canonical_status='canonical_active'
             ORDER BY work_key
             """
@@ -224,7 +224,6 @@ def build_report(
         "purpose": "Separate machine-materialized context from unresolved edition/semantic/human decisions; no state promotion is inferred.",
         "source_policy": {
             "active_canonical_documents": source_policy,
-            "dushu_active_sha256": next((row["source_file_sha256"] for row in source_policy if row["work_key"] == "dushu_zazhi"), None),
             "mysql10_snapshot_status": ((source_inventory.get("mysql10_snapshot_search") or {}).get("status")),
             "legacy_machine_route": "02-数据库/data/dictionary.db -> 02-数据库/main/source.txt/parser.py/importer.py -> legacy_* V2 materialization",
         },
@@ -292,7 +291,7 @@ def build_report(
                 {
                     "name": "external_source_and_passage_resolution",
                     "count": external["source_queue_count"] + external["passage_queue_count"],
-                    "boundary": "A public transcription/hash match is locating evidence; human must confirm edition, version and passage before canonical use.",
+                    "boundary": "A public transcription match is locating evidence; human must confirm edition, version and passage before canonical use.",
                 },
                 {
                     "name": "case_review_and_gold_gate",
@@ -303,7 +302,7 @@ def build_report(
         },
         "next_automated_actions": [
             "Keep rebuilding target packets, external packets, review tasks and validation after any queue or source change.",
-            "If an independent external edition/bottom is supplied, bind it through the external source/passage resolution seam and rerun quote/hash validation; do not promote from public candidates alone.",
+            "If an independent external edition/bottom is supplied, bind it through the external source/passage resolution seam and rerun quote/location validation; do not promote from public candidates alone.",
             "If human target-work or source decisions arrive, apply them through the transaction seams, then rebuild queues/tasks and rerun the full validation.",
             "Do not turn the 14 catalog-only terms or 12 catalog-only works into fabricated cases or evidence.",
         ],

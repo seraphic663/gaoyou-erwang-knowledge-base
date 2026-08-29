@@ -9,7 +9,6 @@ separate states and never promotes a case, source, or quote to gold.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -36,12 +35,6 @@ def now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def sha256_file(path: Path) -> str | None:
-    if not path.exists():
-        return None
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def relative_path(value: str | Path | None) -> str | None:
     if value is None:
         return None
@@ -65,9 +58,8 @@ def candidate_ref_key(ref: dict[str, Any]) -> tuple[str, ...]:
     """Return a stable identity for a frozen public candidate reference."""
 
     raw_file = str(ref.get("raw_file") or "")
-    raw_sha256 = str(ref.get("raw_sha256") or "")
-    if raw_file and raw_sha256:
-        return ("raw", raw_file, raw_sha256)
+    if raw_file:
+        return ("raw", raw_file)
     pageid = str(ref.get("pageid") or "")
     revid = str(ref.get("revid") or "")
     if pageid and revid:
@@ -172,10 +164,7 @@ def build_target_work_queue(connection: sqlite3.Connection) -> list[dict[str, An
             priority = 55 if raw_label else 90
             if len(labels) > 1:
                 priority -= 10
-            queue_item_id = (
-                f"target-work:{row['case_id']}:"
-                f"{hashlib.sha256((raw_label or '<empty>').encode('utf-8')).hexdigest()[:16]}"
-            )
+            queue_item_id = f"target-work:{row['case_id']}:{raw_label or '<empty>'}"
             context = {
                 "case_id": row["case_id"],
                 "case_title": row["case_title"],
@@ -249,7 +238,7 @@ def build_external_queues(
     evidence_rows = connection.execute(
         """
         SELECT link.external_source_id, es.cited_work, es.status AS registry_status,
-               es.source_file, es.source_file_sha256, es.edition,
+               es.source_file, es.edition,
                ae.case_id, ae.evidence_index, ae.source_work, ae.quote,
                ae.quote_check, ae.evidence_json
         FROM annotation_evidence_external_sources link
@@ -262,7 +251,6 @@ def build_external_queues(
     ).fetchall()
     by_source: dict[str, list[dict[str, Any]]] = defaultdict(list)
     passage_rows: list[dict[str, Any]] = []
-    manifest_sha = sha256_file(manifest_path)
     timestamp = now()
     for row in evidence_rows:
         entry = manifest_entries.get((row["case_id"], int(row["evidence_index"])), {})
@@ -339,7 +327,7 @@ def build_external_queues(
                 key: candidate.get(key)
                 for key in (
                     "page_title", "pageid", "revid", "timestamp", "raw_file",
-                    "raw_sha256", "content_sha256", "page_url", "api_url",
+                    "page_url", "api_url",
                     "match_mode", "start_char", "end_char",
                     "offline_match_mode", "offline_start_char", "offline_end_char",
                     "candidate_passage_id",
@@ -361,7 +349,6 @@ def build_external_queues(
             "source_work_raw": row["source_work"],
             "evidence_json": parse_json(row["evidence_json"], {}),
             "registry_source_file": row["source_file"],
-            "registry_source_file_sha256": row["source_file_sha256"],
             "registry_edition": row["edition"],
             "manifest_status": status,
             "manifest_boundary": manifest.get("source_policy", {}).get("version_rule"),
@@ -377,9 +364,9 @@ def build_external_queues(
                 queue_item_id, external_source_id, case_id, evidence_index,
                 cited_work, quote, source_resolution, quote_check, queue_status,
                 edition_status, passage_status, candidate_manifest_path,
-                candidate_manifest_sha256, candidate_refs_json, context_json,
+                candidate_refs_json, context_json,
                 created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(case_id, evidence_index) DO UPDATE SET
                 external_source_id=excluded.external_source_id,
                 cited_work=excluded.cited_work,
@@ -390,7 +377,6 @@ def build_external_queues(
                 edition_status=excluded.edition_status,
                 passage_status=excluded.passage_status,
                 candidate_manifest_path=excluded.candidate_manifest_path,
-                candidate_manifest_sha256=excluded.candidate_manifest_sha256,
                 candidate_refs_json=excluded.candidate_refs_json,
                 context_json=excluded.context_json,
                 updated_at=excluded.updated_at
@@ -408,7 +394,6 @@ def build_external_queues(
                 edition_status,
                 passage_status,
                 relative_path(manifest_path),
-                manifest_sha,
                 json.dumps(candidate_refs, ensure_ascii=False, sort_keys=True),
                 json.dumps(context, ensure_ascii=False, sort_keys=True),
                 timestamp,
@@ -430,7 +415,6 @@ def build_external_queues(
             "edition_status": edition_status,
             "passage_status": passage_status,
             "candidate_manifest_path": relative_path(manifest_path),
-            "candidate_manifest_sha256": manifest_sha,
             "candidate_refs": candidate_refs,
             "candidate_passage_ids": stored_candidate_passage_ids,
             "context": context,
@@ -479,7 +463,6 @@ def build_external_queues(
         context = {
             "normalized_work": row["normalized_work"],
             "source_file": row["source_file"],
-            "source_file_sha256": row["source_file_sha256"],
             "edition": row["edition"],
             "metadata": parse_json(row["metadata_json"], {}),
             "manifest_path": relative_path(manifest_path),
@@ -648,7 +631,6 @@ def build_queues(
         "generated_at": now(),
         "database": relative_path(database_path),
         "manifest": relative_path(manifest_path),
-        "manifest_sha256": sha256_file(manifest_path),
         "policy": {
             "target_work_resolution_is_human_pending": True,
             "external_public_candidates_are_not_canonical": True,

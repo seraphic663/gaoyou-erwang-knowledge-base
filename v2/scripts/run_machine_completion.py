@@ -55,7 +55,6 @@ def read_database_state(database_path: Path) -> dict:
             "review_events",
             "external_source_registry",
             "annotation_evidence_external_sources",
-            "source_version_registry",
             "legacy_catalog_terms",
             "legacy_catalog_works",
         ):

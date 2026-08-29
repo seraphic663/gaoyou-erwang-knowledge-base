@@ -176,7 +176,6 @@ def main_report(connection: sqlite3.Connection) -> dict[str, Any]:
 def v2_report(connection: sqlite3.Connection) -> dict[str, Any]:
     table_names = [
         "source_documents",
-        "source_version_registry",
         "passages",
         "candidate_items",
         "annotation_cases",
@@ -350,13 +349,6 @@ def v2_report(connection: sqlite3.Connection) -> dict[str, Any]:
                 "quote_check, COUNT(*) AS count "
                 "FROM annotation_evidences GROUP BY source_resolution, quote_check "
                 "ORDER BY source_resolution, quote_check"
-            ).fetchall()
-        ],
-        "source_versions": [
-            dict(row)
-            for row in connection.execute(
-                "SELECT work_key, source_file, source_file_sha256, canonical_status, "
-                "superseded_by_sha256 FROM source_version_registry ORDER BY work_key, canonical_status"
             ).fetchall()
         ],
     }

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from collections import Counter
@@ -36,10 +35,6 @@ def _relative(path: Path) -> str:
         return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
     except ValueError:
         return path.as_posix()
-
-
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _candidate_profile(
@@ -88,12 +83,7 @@ def run_case(
     passages = build_passages(markdown_path, "dushu_zazhi")
     passage_map = {passage["passage_id"]: passage for passage in passages}
 
-    provenance = {
-        "source_markdown_sha256": _sha256(markdown_path),
-        "legacy_ai_json_sha256": _sha256(ai_json_path),
-        "full_json": _relative(full_json_path),
-        "full_json_sha256": _sha256(full_json_path) if full_json_path.exists() else None,
-    }
+    provenance = {"full_json": _relative(full_json_path)}
     v2_case = adapt_legacy_case(
         legacy_case,
         passages,

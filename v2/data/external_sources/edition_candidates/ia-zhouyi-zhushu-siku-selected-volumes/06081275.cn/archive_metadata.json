@@ -3,7 +3,6 @@
   "http_status": 200,
   "content_type": "application/json",
   "status": "metadata_loaded",
-  "raw_sha256": "e15788cbab73593cde2b61d0773be8d24de31b673e0807627d68db0f1f86d67f",
   "metadata": {
     "alternate_locations": {
       "servers": [

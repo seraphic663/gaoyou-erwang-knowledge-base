@@ -3,7 +3,6 @@
   "http_status": 200,
   "content_type": "application/json",
   "status": "metadata_loaded",
-  "raw_sha256": "b0a0a1e2f7ced85532556e8cd8e40c9fd003f6e9003d1eba8fddcfcd548a2caf",
   "metadata": {
     "created": 1786619821,
     "d1": "ia903206.us.archive.org",

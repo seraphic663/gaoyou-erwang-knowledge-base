@@ -12,7 +12,6 @@ This script never touches dictionary.db.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import re
@@ -86,9 +85,6 @@ CREATE TABLE IF NOT EXISTS source_documents (
     full_json_file TEXT,
     ai_json_file TEXT,
     doc_type TEXT,
-    source_docx_sha256 TEXT,
-    paragraph_text_sha256 TEXT,
-    comment_text_sha256 TEXT,
     paragraph_count INTEGER DEFAULT 0,
     comment_count INTEGER DEFAULT 0,
     anchored_comment_count INTEGER DEFAULT 0,
@@ -245,13 +241,11 @@ def load_env_file() -> None:
             os.environ[key] = value
 
 
-def api_key_fingerprint() -> str:
+def api_key_summary() -> str:
     api_key = os.environ.get("DEEPSEEK_API_KEY", "").strip()
     if not api_key:
         return "missing"
-    digest = hashlib.sha256(api_key.encode("utf-8")).hexdigest()[:12]
-    tail = api_key[-4:] if len(api_key) >= 4 else api_key
-    return f"len={len(api_key)} sha12={digest} tail4={tail}"
+    return f"len={len(api_key)}"
 
 
 def init_annotation_db() -> None:
@@ -276,14 +270,6 @@ def text_of(element: ET.Element | None) -> str:
     if element is None:
         return ""
     return "".join(node.text or "" for node in element.iter(qname("t")))
-
-
-def sha256_bytes(value: bytes) -> str:
-    return hashlib.sha256(value).hexdigest()
-
-
-def sha256_text(value: str) -> str:
-    return sha256_bytes(value.encode("utf-8"))
 
 
 def parse_comments(docx_path: Path) -> dict[str, dict[str, Any]]:
@@ -512,11 +498,6 @@ def convert_one(docx_path: Path) -> dict[str, Any]:
         "notes": notes,
         "annotation_blocks": build_annotation_blocks(paragraphs),
         "package_inventory": package_inventory(docx_path),
-        "checksums": {
-            "source_docx_sha256": sha256_bytes(docx_path.read_bytes()),
-            "paragraph_text_sha256": sha256_text(paragraph_text),
-            "comment_text_sha256": sha256_text(comment_text),
-        },
         "controlled_vocabularies": {
             "method_tags": sorted(METHOD_TAGS),
             "relation_types": sorted(RELATION_TYPES),
@@ -543,7 +524,7 @@ def convert_docx_files(only: str | None = None) -> list[Path]:
         output_path = FULL_JSON_DIR / f"{docx_path.stem}.json"
         output_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
         outputs.append(output_path)
-        report.append({"source_file": docx_path.name, "json_file": output_path.name, "stats": payload["document_stats"], "checksums": payload["checksums"]})
+        report.append({"source_file": docx_path.name, "json_file": output_path.name, "stats": payload["document_stats"]})
         stats = payload["document_stats"]
         print(f"full_json: {output_path.name} paragraphs={stats['paragraph_count']} comments={stats['comment_count']} anchors={stats['anchored_comment_count']}")
 
@@ -556,10 +537,6 @@ def validate_full_json(path: Path) -> None:
     paragraphs = data["paragraphs"]
     comments = data["comments"]
     stats = data["document_stats"]
-    checksums = data["checksums"]
-    paragraph_text = "\n".join(item["text"] for item in paragraphs)
-    comment_text = "\n".join(item["text"] for item in comments)
-
     checks = {
         "paragraph_count": len(paragraphs),
         "nonempty_paragraph_count": sum(1 for item in paragraphs if not item["is_empty"]),
@@ -571,10 +548,6 @@ def validate_full_json(path: Path) -> None:
     for key, value in checks.items():
         if stats.get(key) != value:
             raise RuntimeError(f"{path.name}: {key} mismatch, stats={stats.get(key)!r}, actual={value!r}")
-    if checksums["paragraph_text_sha256"] != sha256_text(paragraph_text):
-        raise RuntimeError(f"{path.name}: paragraph checksum mismatch")
-    if checksums["comment_text_sha256"] != sha256_text(comment_text):
-        raise RuntimeError(f"{path.name}: comment checksum mismatch")
 
 
 def slim_for_ai(data: dict[str, Any]) -> dict[str, Any]:
@@ -677,10 +650,10 @@ def check_api_key(model: str, timeout: int) -> None:
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             json.loads(response.read().decode("utf-8"))
-        print(f"DeepSeek API key OK ({api_key_fingerprint()})")
+        print(f"DeepSeek API key OK ({api_key_summary()})")
     except urllib.error.HTTPError as error:
         if error.code == 401:
-            raise RuntimeError(f"DeepSeek API key rejected: HTTP 401 ({api_key_fingerprint()})") from error
+            raise RuntimeError(f"DeepSeek API key rejected: HTTP 401 ({api_key_summary()})") from error
         raise
 
 
@@ -791,24 +764,20 @@ def import_ai_json_files(ai_json_paths: list[Path]) -> None:
             full_data = json.loads(full_json_path.read_text(encoding="utf-8"))
             source = full_data["source_file"]
             stats = full_data["document_stats"]
-            checksums = full_data["checksums"]
 
             conn.execute(
                 """
                 INSERT INTO source_documents(
                     source_file_name, source_file_path, full_json_file, ai_json_file,
-                    doc_type, source_docx_sha256, paragraph_text_sha256, comment_text_sha256,
+                    doc_type,
                     paragraph_count, comment_count, anchored_comment_count, updated_at
                 )
-                VALUES(?,?,?,?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
+                VALUES(?,?,?,?,?,?,?,?,CURRENT_TIMESTAMP)
                 ON CONFLICT(source_file_name) DO UPDATE SET
                     source_file_path=excluded.source_file_path,
                     full_json_file=excluded.full_json_file,
                     ai_json_file=excluded.ai_json_file,
                     doc_type=excluded.doc_type,
-                    source_docx_sha256=excluded.source_docx_sha256,
-                    paragraph_text_sha256=excluded.paragraph_text_sha256,
-                    comment_text_sha256=excluded.comment_text_sha256,
                     paragraph_count=excluded.paragraph_count,
                     comment_count=excluded.comment_count,
                     anchored_comment_count=excluded.anchored_comment_count,
@@ -820,9 +789,6 @@ def import_ai_json_files(ai_json_paths: list[Path]) -> None:
                     str(full_json_path.relative_to(SCRIPT_DIR)),
                     str(ai_json_path.relative_to(SCRIPT_DIR)),
                     full_data.get("doc_type", ""),
-                    checksums.get("source_docx_sha256", ""),
-                    checksums.get("paragraph_text_sha256", ""),
-                    checksums.get("comment_text_sha256", ""),
                     stats.get("paragraph_count", 0),
                     stats.get("comment_count", 0),
                     stats.get("anchored_comment_count", 0),

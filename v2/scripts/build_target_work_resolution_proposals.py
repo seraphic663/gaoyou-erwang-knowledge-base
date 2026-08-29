@@ -11,7 +11,6 @@ resolution events.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 from collections import Counter
@@ -56,10 +55,6 @@ def connect_read_only(database_path: Path) -> sqlite3.Connection:
     return connection
 
 
-def digest(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()[:24]
-
-
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
@@ -75,7 +70,7 @@ def _target_passage_context(connection: sqlite3.Connection, passage_id: str | No
         SELECT p.passage_id, p.work_key, p.document_title, p.section_title,
                p.entry_title, p.entry_kind, p.local_ordinal, p.md_line_start,
                p.md_line_end, sd.source_document_id, sd.source_kind,
-               sd.canonical_status, sd.source_file, sd.source_file_sha256
+               sd.canonical_status, sd.source_file
         FROM passages p
         JOIN source_documents sd USING(source_document_id)
         WHERE p.passage_id = ?
@@ -142,8 +137,7 @@ def _location_summary(connection: sqlite3.Connection, case_id: str) -> tuple[dic
                ctl.target_passage_candidate_id, ctl.target_passage_match_status,
                ctl.target_passage_candidate_count, ctl.machine_status,
                p.document_title, p.section_title, p.entry_title, p.local_ordinal,
-               sd.source_kind, sd.canonical_status, sd.source_file,
-               sd.source_file_sha256
+               sd.source_kind, sd.canonical_status, sd.source_file
         FROM candidate_target_locations ctl
         LEFT JOIN passages p ON p.passage_id=ctl.target_passage_candidate_id
         LEFT JOIN source_documents sd ON sd.source_document_id=p.source_document_id
@@ -176,7 +170,6 @@ def _location_summary(connection: sqlite3.Connection, case_id: str) -> tuple[dic
                     "source_kind": row["source_kind"],
                     "canonical_status": row["canonical_status"],
                     "source_file": row["source_file"],
-                    "source_file_sha256": row["source_file_sha256"],
                 },
             }
         )
@@ -270,7 +263,7 @@ def build_proposals(
             rows_out.append(
                 {
                     "proposal_schema": "target_work_resolution_proposal.v1",
-                    "proposal_id": "target-work-proposal:" + digest(str(row["queue_item_id"])),
+                    "proposal_id": "target-work-proposal:" + str(row["queue_item_id"]),
                     "queue_item_id": row["queue_item_id"],
                     "case_id": row["case_id"],
                     "case_snapshot": {

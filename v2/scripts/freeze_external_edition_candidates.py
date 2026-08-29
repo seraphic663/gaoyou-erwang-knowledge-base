@@ -16,7 +16,6 @@ cannot promote an evidence row.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import re
@@ -44,18 +43,6 @@ CHUNK_SIZE = 1024 * 1024
 
 def now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-def sha256_bytes(value: bytes) -> str:
-    return hashlib.sha256(value).hexdigest()
-
-
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(CHUNK_SIZE), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def relative(path: Path) -> str:
@@ -132,7 +119,6 @@ def download_file(
             "status": "reused",
             "http_status": None,
             "size_bytes": expected_size,
-            "sha256": sha256_file(target),
             "url": url,
             "reuse_reason": "existing_file_matches_metadata_size",
         }
@@ -147,7 +133,6 @@ def download_file(
                     "Accept": "application/octet-stream, */*",
                 },
             )
-            digest = hashlib.sha256()
             size = 0
             with urllib.request.urlopen(request, timeout=timeout) as response:
                 status = int(response.status)
@@ -157,7 +142,6 @@ def download_file(
                         if not chunk:
                             break
                         handle.write(chunk)
-                        digest.update(chunk)
                         size += len(chunk)
             if expected_size is not None and size != expected_size:
                 raise ValueError(f"size_mismatch:expected={expected_size}:actual={size}")
@@ -166,7 +150,6 @@ def download_file(
                 "status": "downloaded",
                 "http_status": status,
                 "size_bytes": size,
-                "sha256": digest.hexdigest(),
                 "url": url,
             }
         except urllib.error.HTTPError as error:
@@ -179,7 +162,6 @@ def download_file(
                     "status": "blocked_or_missing",
                     "http_status": status,
                     "size_bytes": 0,
-                    "sha256": None,
                     "url": url,
                     "error": f"HTTPError:{status}",
                 }
@@ -193,7 +175,6 @@ def download_file(
         "status": "download_error",
         "http_status": None,
         "size_bytes": 0,
-        "sha256": None,
         "url": url,
         "error": f"{type(last_error).__name__}:{last_error}",
     }
@@ -210,19 +191,16 @@ def load_metadata(identifier: str) -> dict[str, Any]:
     if status != 200:
         record["status"] = "metadata_blocked_or_missing"
         record["error"] = f"HTTPError:{status}"
-        record["raw_sha256"] = sha256_bytes(body) if body else None
         return record
     try:
         data = json.loads(body.decode("utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as error:
         record["status"] = "metadata_invalid"
         record["error"] = f"{type(error).__name__}:{error}"
-        record["raw_sha256"] = sha256_bytes(body)
         return record
     record.update(
         {
             "status": "metadata_loaded",
-            "raw_sha256": sha256_bytes(body),
             "metadata": data,
         }
     )
@@ -352,7 +330,6 @@ def process_candidate(
                 "url": url,
                 "http_status": status,
                 "content_type": headers.get("content-type"),
-                "body_sha256": sha256_bytes(body) if body else None,
                 "body_bytes_captured": len(body),
             }
         except Exception as exc:  # pragma: no cover - network dependent
@@ -394,7 +371,6 @@ def process_candidate(
             "item_url": f"https://archive.org/details/{urllib.parse.quote(identifier, safe='')}",
             "metadata_url": metadata_record.get("url"),
             "metadata_status": metadata_record.get("status"),
-            "metadata_raw_sha256": metadata_record.get("raw_sha256"),
             "metadata_file": relative(metadata_path),
             "metadata_title": (metadata.get("metadata") or {}).get("title") if isinstance(metadata.get("metadata"), dict) else metadata.get("title"),
             "files": [],
@@ -565,7 +541,6 @@ def run(
         "schema_version": "external_edition_candidate_manifest.v1",
         "generated_at": generated_at,
         "input_manifest": relative(input_manifest),
-        "input_manifest_sha256": sha256_file(input_manifest),
         "database": relative(database),
         "output_root": relative(output_root),
         "policy": {
@@ -595,11 +570,6 @@ def run(
         "conclusion": "Downloaded files and OCR matches are frozen public candidates. They remain outside source_documents canonical and outside quote_check passed until edition, image, passage, and human gates are completed.",
     }
     save_json(output_manifest, manifest)
-    manifest_hash = sha256_file(output_manifest)
-    output_manifest.with_suffix(output_manifest.suffix + ".sha256").write_text(
-        f"{manifest_hash}  {output_manifest.name}\n", encoding="utf-8"
-    )
-    manifest["manifest_sha256"] = manifest_hash
     return manifest
 
 

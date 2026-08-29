@@ -44,7 +44,6 @@ class V2ReviewBridgeTest(unittest.TestCase):
                             ],
                         }
                     },
-                    "manifest_sha256": "fixture",
                     "policy": {"task_artifacts_are_not_review_events": True},
                 },
                 ensure_ascii=False,
@@ -95,7 +94,6 @@ class V2ReviewBridgeTest(unittest.TestCase):
                                 ],
                             }
                         },
-                        "manifest_sha256": "fixture",
                         "policy": {"task_artifacts_are_not_review_events": True},
                     },
                     ensure_ascii=False,

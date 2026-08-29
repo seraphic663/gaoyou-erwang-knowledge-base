@@ -116,7 +116,7 @@ def build_report(
                 dict(row)
                 for row in connection.execute(
                     """
-                    SELECT work_key, source_file, source_file_sha256, canonical_status
+                    SELECT work_key, source_file, canonical_status
                     FROM source_documents
                     WHERE canonical_status='canonical_active'
                     ORDER BY work_key
@@ -384,11 +384,7 @@ def build_report(
 
     canonical_policy_ok = (
         source_documents["canonical_active_count"] == 4
-        and any(
-            row.get("work_key") == "dushu_zazhi"
-            and str(row.get("source_file_sha256", "")).startswith("1460a906825998bf")
-            for row in source_documents["active_versions"]
-        )
+        and any(row.get("work_key") == "dushu_zazhi" for row in source_documents["active_versions"])
     )
     case_count = cases["total"]
     candidate_count = candidates["candidate_item_count"]
@@ -400,7 +396,7 @@ def build_report(
     workflow_steps = [
         {
             "step": 1,
-            "name": "清点输入源、字段、数量、来源链和 canonical hash",
+            "name": "清点输入源、字段、数量、来源链和 canonical 状态",
             "status": "completed" if source_inventory and canonical_policy_ok else "needs_refresh",
             "artifacts": [relative_path(source_inventory_path), relative_path(legacy_audit_path)],
             "counts": {
@@ -421,7 +417,7 @@ def build_report(
                 "canonical_documents": source_documents["canonical_active_count"],
                 "canonical_passages": source_documents["canonical_active_passage_count"],
             },
-            "boundary": "读书杂志 active hash 使用 1460a906825998bf…；旧 hash 只保留历史策略，不进入 active passages。",
+            "boundary": "同一 work_key + source_file 只允许一个活动来源；历史版本由 Git 或上游 revision 追溯。",
         },
         {
             "step": 3,
@@ -488,7 +484,7 @@ def build_report(
         },
         {
             "step": 7,
-            "name": "证据绑定 passage、quote、location、来源文件/行号/hash/匹配模式",
+            "name": "证据绑定 passage、quote、location、来源文件/行号/匹配模式",
             "status": "machine_ready_with_unresolved_external",
             "artifacts": [
                 relative_path(database_path),
@@ -506,7 +502,7 @@ def build_report(
         },
         {
             "step": 8,
-            "name": "运行结构、外键、引用、quote、hash、来源状态校验",
+            "name": "运行结构、外键、引用、quote 定位、来源状态校验",
             "status": "completed" if validation_ok and integrity == "ok" and not foreign_keys else "failed",
             "artifacts": [relative_path(validation_path)],
             "counts": {

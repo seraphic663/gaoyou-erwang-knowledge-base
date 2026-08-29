@@ -5070,11 +5070,6 @@
       "crc": "f21ab5dd"
     }
   ],
-  "checksums": {
-    "source_docx_sha256": "fec1e9bfe5865c3233a272aa6450753043d10c1a6d5879e35f25189eb7094433",
-    "paragraph_text_sha256": "227480c9a48f5fb3d9d113f608bf0adced9c668db6d6759e75d91fe06b92a1d7",
-    "comment_text_sha256": "4fddbd42d4c87198e01fa63651ebf405f5795b66c16f307b42de95aa67d0c928"
-  },
   "controlled_vocabularies": {
     "method_tags": [
       "义证",

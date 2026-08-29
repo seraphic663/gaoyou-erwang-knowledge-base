@@ -18,9 +18,9 @@ edition/location decision.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
+from contextlib import closing
 import unicodedata
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -102,14 +102,6 @@ def select_in(
     return rows
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def _compact_counter(counter: Counter[str]) -> dict[str, int]:
     return {str(key): int(value) for key, value in sorted(counter.items())}
 
@@ -130,9 +122,8 @@ def _passage_payload(
                p.document_title, p.section_title, p.entry_title,
                p.entry_kind, p.local_ordinal, p.md_line_start, p.md_line_end,
                p.raw_text, p.plain_text, p.normalized_text,
-               p.raw_text_sha256, p.normalized_text_sha256,
                p.inline_notes_json,
-               sd.source_kind, sd.source_file, sd.source_file_sha256,
+               sd.source_kind, sd.source_file,
                sd.canonical_status AS source_canonical_status,
                sd.metadata_json AS source_metadata_json,
                sd.supersedes_source_document_id
@@ -168,40 +159,20 @@ def _source_version_context(
         for row in connection.execute(
             """
             SELECT source_document_id, work_key, source_kind, source_file,
-                   source_file_sha256, canonical_status, supersedes_source_document_id,
+                   canonical_status, supersedes_source_document_id,
                    metadata_json
             FROM source_documents WHERE work_key = ?
-            ORDER BY canonical_status, source_file_sha256
+            ORDER BY canonical_status, source_file
             """,
             (work_key,),
         ).fetchall()
     ]
     for row in documents:
         row["metadata"] = parse_json(row.pop("metadata_json"), {})
-    registry = [
-        dict(row)
-        for row in connection.execute(
-            """
-            SELECT source_version_id, work_key, source_file, source_file_sha256,
-                   canonical_status, superseded_by_sha256, reason, metadata_json,
-                   recorded_at
-            FROM source_version_registry WHERE work_key = ?
-            ORDER BY canonical_status, source_file_sha256
-            """,
-            (work_key,),
-        ).fetchall()
-    ]
-    for row in registry:
-        row["metadata"] = parse_json(row.pop("metadata_json"), {})
     return {
         "work_key": work_key,
         "source_documents": documents,
-        "source_version_registry": registry,
-        "canonical_active_hashes": sorted({
-            str(row["source_file_sha256"])
-            for row in documents
-            if row["canonical_status"] == "canonical_active"
-        }),
+        "canonical_active_files": sorted({str(row["source_file"]) for row in documents if row["canonical_status"] == "canonical_active"}),
     }
 
 
@@ -243,9 +214,6 @@ def _alias_context(
         "mapping_method_counts": _compact_counter(methods),
         "work_key_counts": _compact_counter(work_keys),
         "source_record_count": len(source_records),
-        "source_record_ids_sha256": hashlib.sha256(
-            "\n".join(source_records).encode("utf-8")
-        ).hexdigest() if source_records else None,
         "source_record_id_sample": source_records[:100],
         "sample_limit": 100,
         "matches_sample": sample,
@@ -358,7 +326,7 @@ def build_packets(
     packet_path = Path(packet_path).resolve()
     report_path = Path(report_path).resolve()
 
-    with connect_read_only(database_path) as connection:
+    with closing(connect_read_only(database_path)) as connection:
         queue_rows = [
             dict(row)
             for row in connection.execute(
@@ -424,7 +392,7 @@ def build_packets(
                 connection,
                 """
                 SELECT case_id, evidence_index, passage_id, source_work,
-                       quote, quote_sha256, quote_check, evidence_json
+                       quote, quote_check, evidence_json
                 FROM annotation_evidences WHERE case_id IN
                 """,
                 case_ids,
@@ -579,7 +547,6 @@ def build_packets(
                     "passage_id": evidence["passage_id"],
                     "source_work": evidence["source_work"],
                     "quote": evidence["quote"],
-                    "quote_sha256": evidence["quote_sha256"],
                     "quote_check": evidence["quote_check"],
                     "source_resolution": evidence["source_resolution"],
                     "source_location": evidence["source_location"],
@@ -717,7 +684,6 @@ def build_packets(
         "generated_at": generated_at,
         "database": relative_path(database_path),
         "packet_file": relative_path(packet_path),
-        "packet_sha256": sha256_file(packet_path),
         "policy": {
             "database_write_performed": False,
             "target_work_mutated": False,
@@ -802,10 +768,6 @@ def validate_target_work_resolution_packets(
     packet_path = Path(packet_path or (PROJECT_ROOT / str(report.get("packet_file") or ""))).resolve()
     if not packet_path.is_file():
         return {"valid": False, "errors": ["packet_file_missing"], "counts": {}}
-    actual_hash = sha256_file(packet_path)
-    if actual_hash != report.get("packet_sha256"):
-        errors.append("packet_sha256_mismatch")
-
     packets: list[dict[str, Any]] = []
     try:
         for line_number, line in enumerate(packet_path.read_text(encoding="utf-8").splitlines(), start=1):
@@ -817,7 +779,7 @@ def validate_target_work_resolution_packets(
     except (OSError, ValueError) as error:
         errors.append(f"packet_file_invalid:{type(error).__name__}")
 
-    with connect_read_only(database_path) as connection:
+    with closing(connect_read_only(database_path)) as connection:
         expected_rows = connection.execute(
             """
             SELECT queue_item_id, case_id, queue_status

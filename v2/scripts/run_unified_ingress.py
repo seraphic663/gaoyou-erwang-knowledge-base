@@ -75,16 +75,6 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _sha256(path: Path) -> str:
-    import hashlib
-
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def _relative(path: Path) -> str:
     try:
         return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
@@ -108,7 +98,7 @@ def _schema_errors(case: dict[str, Any]) -> list[str]:
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
-        return []
+        return ["jsonschema_dependency_required"]
     schema = json.loads(
         (V2_ROOT / "schemas/annotation_case.v1.schema.json").read_text(encoding="utf-8")
     )
@@ -204,7 +194,7 @@ def _choose_sample(records: list[dict[str, Any]], passage_map: dict[str, dict[st
 
 
 def _fallback_original_case(
-    candidate: dict[str, Any], passage: dict[str, Any], *, source_file: str, source_hash: str
+    candidate: dict[str, Any], passage: dict[str, Any], *, source_file: str
 ) -> dict[str, Any]:
     raw = {
         "case_title": passage.get("entry_title") or candidate.get("candidate_id"),
@@ -218,7 +208,6 @@ def _fallback_original_case(
         candidate=candidate,
         passage=passage,
         source_file=source_file,
-        source_file_sha256=source_hash,
         model="not_called",
         prompt_version="original-text-machine-fallback.v1",
     )
@@ -324,11 +313,9 @@ def run_unified_ingress(
             terms=legacy_material["catalog_terms"],
             works=legacy_material["catalog_works"],
             source_file=_relative(LEGACY_DATABASE),
-            source_file_sha256=legacy_material["database_sha256"],
         )
         for source_work, config in ORIGINAL_WORKS.items():
             markdown = config["markdown"]
-            source_hash = _sha256(markdown)
             passages = build_passages(markdown, config["work_key"])
             source_document_id = ingest_passages(
                 connection,
@@ -350,7 +337,6 @@ def run_unified_ingress(
                 source_work=source_work,
                 source_document_id=source_document_id,
                 source_file=_relative(markdown),
-                source_file_sha256=source_hash,
             )
             ingest_candidate_items(
                 connection,
@@ -376,7 +362,6 @@ def run_unified_ingress(
                     "source_work": source_work,
                     "work_key": config["work_key"],
                     "source_file": _relative(markdown),
-                    "source_file_sha256": source_hash,
                     "source_document_id": source_document_id,
                     "passage_count": len(passages),
                     "parsed_count": len(layers["parsed_items"]),
@@ -427,7 +412,7 @@ def run_unified_ingress(
                 )
                 continue
             passage = connection.execute(
-                "SELECT passage_id, work_key, document_title, section_title, entry_title, md_line_start, md_line_end, raw_text, plain_text, normalized_text, raw_text_sha256, normalized_text_sha256, inline_notes_json FROM passages WHERE passage_id = ?",
+                "SELECT passage_id, work_key, document_title, section_title, entry_title, md_line_start, md_line_end, raw_text, plain_text, normalized_text, inline_notes_json FROM passages WHERE passage_id = ?",
                 (candidate["passage_id"],),
             ).fetchone()
             if passage is None:
@@ -435,7 +420,6 @@ def run_unified_ingress(
                 continue
             passage_dict = dict(passage)
             passage_dict["source_file"] = candidate["provenance"]["source_file"]
-            passage_dict["source_file_sha256"] = candidate["provenance"]["source_file_sha256"]
             try:
                 if with_ai_samples and api_key:
                     raw_ai, ai_meta = _call_candidate_ai(
@@ -450,7 +434,6 @@ def run_unified_ingress(
                         candidate=candidate,
                         passage=passage_dict,
                         source_file=candidate["provenance"]["source_file"],
-                        source_file_sha256=candidate["provenance"]["source_file_sha256"],
                         model=ai_meta["model"],
                         prompt_version=PROMPT_VERSION,
                     )
@@ -461,7 +444,6 @@ def run_unified_ingress(
                         candidate,
                         passage_dict,
                         source_file=candidate["provenance"]["source_file"],
-                        source_hash=candidate["provenance"]["source_file_sha256"],
                     )
                     sample_report["ai_status"] = "not_called_fallback"
                     sample_report["model"] = "not_called"
@@ -495,7 +477,6 @@ def run_unified_ingress(
                     candidate,
                     passage_dict,
                     source_file=candidate["provenance"]["source_file"],
-                    source_hash=candidate["provenance"]["source_file_sha256"],
                 )
                 validation_errors = _validate_original_case(case, {candidate["passage_id"]: passage_dict})
                 stored = ingest_case(connection, case, origin="original_markdown_machine_extraction")
@@ -517,7 +498,6 @@ def run_unified_ingress(
             works=legacy_material["all_works"],
             cases=legacy_cases,
             source_file=_relative(LEGACY_DATABASE),
-            source_file_sha256=legacy_material["database_sha256"],
         )
         connection.commit()
 

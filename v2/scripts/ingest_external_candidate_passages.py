@@ -14,13 +14,12 @@ while preserving the evidence boundary:
   later human selection decision.
 
 This is idempotent for an unchanged page/revision and keeps a changed page as
-another hash-addressed candidate rather than overwriting the old candidate.
+another revision-addressed candidate rather than overwriting the old candidate.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -41,14 +40,6 @@ sys.path.insert(0, str(V2_ROOT / "scripts"))
 from external_text_normalization import compact_for_match, strip_wikitext  # noqa: E402
 
 
-def sha256_bytes(value: bytes) -> str:
-    return hashlib.sha256(value).hexdigest()
-
-
-def sha256_file(path: Path) -> str:
-    return sha256_bytes(path.read_bytes())
-
-
 def parse_json(value: Any, fallback: Any) -> Any:
     if isinstance(value, (dict, list)):
         return value
@@ -65,18 +56,19 @@ def relative_path(path: Path, project_root: Path = PROJECT_ROOT) -> str:
         return path.as_posix()
 
 
-def _candidate_passage_id(external_source_id: str, raw_sha256: str) -> str:
-    return f"external-candidate:{external_source_id}:{raw_sha256[:16]}"
+def _candidate_passage_id(external_source_id: str, candidate: dict[str, Any]) -> str:
+    revision = candidate.get("revid") or candidate.get("pageid") or Path(str(candidate.get("raw_file") or "page")).stem
+    return f"external-candidate:{external_source_id}:{revision}"
 
 
-def _candidate_work_key(external_source_id: str, raw_sha256: str) -> str:
-    return f"external_candidate:{external_source_id}:{raw_sha256[:16]}"
+def _candidate_work_key(external_source_id: str) -> str:
+    return f"external_candidate:{external_source_id}"
 
 
 def _candidate_matches_ref(ref: dict[str, Any], candidate: dict[str, Any]) -> bool:
     if ref.get("raw_file") != candidate.get("raw_file"):
         return False
-    for key in ("raw_sha256", "pageid", "revid"):
+    for key in ("pageid", "revid"):
         left = ref.get(key)
         right = candidate.get(key)
         if left is not None and right is not None and str(left) != str(right):
@@ -90,14 +82,12 @@ def _candidate_passage(
     candidate: dict[str, Any],
     raw_text: str,
     source_file: Path,
-    source_hash: str,
     manifest_path: Path,
-    manifest_hash: str,
     project_root: Path,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     external_source_id = str(entry["external_source_id"])
-    work_key = _candidate_work_key(external_source_id, source_hash)
-    passage_id = _candidate_passage_id(external_source_id, source_hash)
+    work_key = _candidate_work_key(external_source_id)
+    passage_id = _candidate_passage_id(external_source_id, candidate)
     plain_text = strip_wikitext(raw_text)
     normalized_text = " ".join(plain_text.split())
     quote = str(entry.get("quote") or "")
@@ -118,10 +108,7 @@ def _candidate_passage(
         "raw_text": raw_text,
         "plain_text": plain_text,
         "normalized_text": normalized_text,
-        "raw_text_sha256": sha256_bytes(raw_text.encode("utf-8")),
-        "normalized_text_sha256": sha256_bytes(normalized_text.encode("utf-8")),
         "source_file": relative_path(source_file, project_root),
-        "source_file_sha256": source_hash,
         "inline_notes": [
             {
                 "note_type": "external_public_candidate_metadata",
@@ -142,7 +129,6 @@ def _candidate_passage(
                 "page_url": candidate.get("page_url"),
                 "api_url": candidate.get("api_url"),
                 "manifest_path": relative_path(manifest_path, project_root),
-                "manifest_sha256": manifest_hash,
                 "transform": "conservative_wikitext_strip_v1",
                 "review_boundary": "candidate passage only; edition and canonical status require human verification",
             }
@@ -163,8 +149,6 @@ def _candidate_passage(
         "page_url": candidate.get("page_url"),
         "api_url": candidate.get("api_url"),
         "manifest_path": relative_path(manifest_path, project_root),
-        "manifest_sha256": manifest_hash,
-        "raw_page_sha256": source_hash,
         "quote": quote,
         "quote_in_candidate_compact_text": quote_in_candidate,
         "match_mode": candidate.get("match_mode"),
@@ -184,7 +168,6 @@ def ingest_external_candidate_passages(
     project_root: Path = PROJECT_ROOT,
 ) -> dict[str, Any]:
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    manifest_hash = sha256_file(manifest_path)
     scanned = 0
     matched_candidates = 0
     imported = 0
@@ -216,20 +199,13 @@ def ingest_external_candidate_passages(
                 skipped["raw_file_missing"] += 1
                 continue
             raw_bytes = raw_file.read_bytes()
-            actual_hash = sha256_bytes(raw_bytes)
-            expected_hash = str(candidate.get("raw_sha256") or candidate.get("content_sha256") or "")
-            if expected_hash and actual_hash != expected_hash:
-                skipped["raw_hash_mismatch"] += 1
-                continue
             raw_text = raw_bytes.decode("utf-8")
             passage, source_metadata = _candidate_passage(
                 entry=entry,
                 candidate=candidate,
                 raw_text=raw_text,
                 source_file=raw_file,
-                source_hash=actual_hash,
                 manifest_path=manifest_path,
-                manifest_hash=manifest_hash,
                 project_root=project_root,
             )
             ingest_passages(
@@ -244,14 +220,13 @@ def ingest_external_candidate_passages(
             imported_rows.append(
                 {
                     "passage_id": passage_id,
-                    "source_document_id": f"{passage['work_key']}:{actual_hash[:16]}",
+                    "source_document_id": f"{passage['work_key']}:{raw_file.stem}",
                     "external_source_id": entry.get("external_source_id"),
                     "case_id": entry.get("case_id"),
                     "evidence_index": entry.get("evidence_index"),
                     "page_title": candidate.get("page_title"),
                     "revid": candidate.get("revid"),
                     "raw_file": relative_path(raw_file, project_root),
-                    "raw_sha256": actual_hash,
                     "canonical_status": "unknown",
                     "quote_in_candidate_compact_text": source_metadata["quote_in_candidate_compact_text"],
                 }
@@ -297,7 +272,6 @@ def ingest_external_candidate_passages(
     return {
         "report_version": "external_candidate_passage_ingest.v1",
         "manifest_path": relative_path(manifest_path, project_root),
-        "manifest_sha256": manifest_hash,
         "policy": {
             "source_kind": "external_public_candidate",
             "canonical_status": "unknown",

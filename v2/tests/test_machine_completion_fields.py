@@ -33,14 +33,12 @@ class MachineCompletionFieldsTest(unittest.TestCase):
                 "text": "甲。心服曰畏。乙。",
                 "paragraph_index": 17,
                 "source_file": "04-项目文献/D-标注/json/full_json/sample.json",
-                "source_file_sha256": "full-json-hash",
                 "source_schema_version": "annotation_docx_full_json_v1",
             }
         }
         result = _full_json_context_match("心服曰畏。", [17], context)
         self.assertEqual(result["status"], "exact")
         self.assertEqual(result["source_file"], context[17]["source_file"])
-        self.assertEqual(result["source_file_sha256"], "full-json-hash")
         self.assertEqual(result["paragraph_indexes"], [17])
         self.assertEqual(result["matches"][0]["start_char"], 2)
         self.assertEqual(result["matches"][0]["end_char"], 7)
@@ -93,7 +91,7 @@ class MachineCompletionFieldsTest(unittest.TestCase):
             classify_machine_status(["unresolved_target_work", "source_has_no_citation"]),
             "draft",
         )
-        self.assertEqual(classify_machine_status(["quote_hash_mismatch:0"]), "rejected")
+        self.assertEqual(classify_machine_status(["quote_not_found:0:p1"]), "rejected")
 
 
 if __name__ == "__main__":

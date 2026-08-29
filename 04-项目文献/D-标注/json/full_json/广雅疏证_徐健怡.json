@@ -6174,11 +6174,6 @@
       "crc": "f21ab5dd"
     }
   ],
-  "checksums": {
-    "source_docx_sha256": "812779b7b59f263997ff566ada5ac0741574f2325641f1875164f776b6f12970",
-    "paragraph_text_sha256": "a6dc04e80279c9947d341f70af6d9bc2cd2c6dc1b7a2222393c8f7e2c7a86d89",
-    "comment_text_sha256": "5b5ac60ef8f649dffc92496b76ebae0e610b06a853ccb03d7a2c2d1abb6ea2fb"
-  },
   "controlled_vocabularies": {
     "method_tags": [
       "义证",

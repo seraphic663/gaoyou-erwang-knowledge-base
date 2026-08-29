@@ -1,19 +1,13 @@
 from __future__ import annotations
 
-import hashlib
 from pathlib import Path
 from typing import Any, Iterable
-
-
-def _sha256(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def _location(passage: dict[str, Any]) -> dict[str, Any]:
     return {
         "passage_id": passage.get("passage_id"),
         "source_file": passage.get("source_file"),
-        "source_file_sha256": passage.get("source_file_sha256"),
         "md_line_start": passage.get("md_line_start"),
         "md_line_end": passage.get("md_line_end"),
         "title_path": passage.get("title_path", []),
@@ -28,7 +22,6 @@ def build_candidate_records(
     source_work: str,
     source_document_id: str,
     source_file: str,
-    source_file_sha256: str,
 ) -> list[dict[str, Any]]:
     """Combine extractor output and audit output into V2 candidate records."""
 
@@ -60,7 +53,6 @@ def build_candidate_records(
                     "source_layer": "original_text_candidate",
                     "transformation_kind": "original_text_machine_extraction",
                     "source_file": source_file,
-                    "source_file_sha256": source_file_sha256,
                     "source_document_id": source_document_id,
                     "passage_id": result.get("passage_id"),
                     "source_location": _location(passage),
@@ -164,7 +156,6 @@ def normalize_ai_case(
     candidate: dict[str, Any],
     passage: dict[str, Any],
     source_file: str,
-    source_file_sha256: str,
     model: str,
     prompt_version: str,
 ) -> dict[str, Any]:
@@ -222,7 +213,6 @@ def normalize_ai_case(
                 "passage_id": candidate.get("passage_id"),
                 "quote_start_char": start,
                 "quote_end_char": start + len(quote),
-                "quote_sha256": _sha256(quote),
                 "quote_check": "passed",
                 "source_location": _location(passage),
                 "source_resolution": "canonical_source_passage",
@@ -244,7 +234,6 @@ def normalize_ai_case(
                     "passage_id": candidate.get("passage_id"),
                     "quote_start_char": start,
                     "quote_end_char": start + len(quote),
-                    "quote_sha256": _sha256(quote),
                     "quote_check": "passed",
                     "source_location": _location(passage),
                     "source_resolution": "canonical_source_passage",
@@ -299,7 +288,6 @@ def normalize_ai_case(
             "transformation_kind": "original_text_ai_generation",
             "provenance": {
                 "source_file": source_file,
-                "source_file_sha256": source_file_sha256,
                 "source_document_id": candidate.get("source_document_id"),
                 "candidate_id": candidate.get("candidate_id"),
                 "source_passage_id": candidate.get("passage_id"),

@@ -10,7 +10,6 @@ resolves target works, and never changes human/gold state.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -47,10 +46,6 @@ def relative_path(value: str | None) -> str | None:
         return str(path)
 
 
-def sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
 def load_plan(path: Path, batch_id: str) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -69,7 +64,7 @@ def _passage_map(connection: sqlite3.Connection, passage_ids: list[str]) -> dict
     placeholders = ",".join("?" for _ in passage_ids)
     rows = connection.execute(
         f"""
-        SELECT p.*, sd.source_file, sd.source_file_sha256,
+        SELECT p.*, sd.source_file,
                sd.source_document_id AS joined_source_document_id,
                sd.canonical_status
         FROM passages p
@@ -95,7 +90,6 @@ def build_candidate_shell(
         "passage_id": plan["source_passage_id"],
         "source_document_id": plan["source_document_id"],
         "source_file": relative_path(passage.get("source_file")),
-        "source_file_sha256": passage.get("source_file_sha256"),
         "canonical_status": passage.get("canonical_status"),
         "local_ordinal": passage.get("local_ordinal"),
         "md_line_start": passage.get("md_line_start"),
@@ -141,7 +135,6 @@ def build_candidate_shell(
                 "passage_id": plan["source_passage_id"],
                 "quote_start_char": quote_start,
                 "quote_end_char": quote_start + len(candidate_text),
-                "quote_sha256": sha256_text(candidate_text),
                 "quote_check": "passed",
                 "source_location": source_location,
                 "source_resolution": "canonical_source_passage",
@@ -181,14 +174,12 @@ def build_candidate_shell(
             "provenance": {
                 "candidate_id": candidate_id,
                 "candidate_status": plan.get("candidate_status"),
-                "candidate_text_sha256": sha256_text(candidate_text),
                 "candidate_rule_hits": plan.get("rule_hits", []),
                 "candidate_risk_flags": plan.get("risk_flags", []),
                 "candidate_risk_class": plan.get("risk_class"),
                 "source_document_id": plan["source_document_id"],
                 "source_passage_id": plan["source_passage_id"],
                 "source_file": plan.get("source", {}).get("source_file"),
-                "source_file_sha256": plan.get("source", {}).get("source_file_sha256"),
                 "source_canonical_status": plan.get("source", {}).get("canonical_status"),
                 "plan_schema": plan.get("plan_schema"),
                 "plan_policy": plan.get("materialization_policy"),

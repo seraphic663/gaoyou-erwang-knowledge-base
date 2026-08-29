@@ -10,7 +10,6 @@ unmounted source outside the claim boundary.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 from datetime import datetime, timezone
@@ -45,15 +44,7 @@ WEBSITE_SNAPSHOTS = {
 }
 
 
-def sha256_file(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
-
-
-def file_record(path: Path, *, role: str, include_hash: bool = True) -> dict[str, Any]:
+def file_record(path: Path, *, role: str) -> dict[str, Any]:
     record: dict[str, Any] = {
         "path": path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix(),
         "role": role,
@@ -61,8 +52,6 @@ def file_record(path: Path, *, role: str, include_hash: bool = True) -> dict[str
     }
     if path.is_file():
         record["size_bytes"] = path.stat().st_size
-        if include_hash:
-            record["sha256"] = sha256_file(path)
     return record
 
 
@@ -77,7 +66,7 @@ def discover_mysql_named_files() -> list[dict[str, Any]]:
         if pattern.search(path.name) or path.suffix.lower() in {".sql", ".dump", ".bak"}:
             records.append(
                 {
-                    **file_record(path, role="possible_mysql_or_dump_artifact", include_hash=False),
+                    **file_record(path, role="possible_mysql_or_dump_artifact"),
                     "classification": (
                         "mysql_named_artifact"
                         if pattern.search(path.name)

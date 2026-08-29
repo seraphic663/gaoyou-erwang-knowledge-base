@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import sqlite3
 import unicodedata
@@ -21,23 +20,22 @@ PROCESS_FIELDS = (
 DEFAULT_SCHEMA_PATH = Path(__file__).resolve().parents[2] / "schemas/annotation_v2.sql"
 
 
+class ClosingConnection(sqlite3.Connection):
+    """Commit or roll back, then release the database handle on context exit."""
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        try:
+            return super().__exit__(exc_type, exc_value, traceback)
+        finally:
+            self.close()
+
+
 def _json(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, sort_keys=True)
 
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-def _sha256_file(path: str | Path) -> str | None:
-    file_path = Path(path)
-    if not file_path.is_file():
-        return None
-    digest = hashlib.sha256()
-    with file_path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _normalize_work_label(value: str | None) -> str:
@@ -133,58 +131,9 @@ def _source_document_id(passages: list[dict[str, Any]]) -> str:
         raise ValueError("cannot_register_empty_passages")
     first = passages[0]
     work_key = first.get("work_key") or "unknown_work"
-    source_hash = first.get("source_file_sha256") or "nohash"
-    return f"{work_key}:{source_hash[:16]}"
-
-
-def register_source_version(
-    connection: sqlite3.Connection,
-    *,
-    work_key: str,
-    source_file: str,
-    source_file_sha256: str,
-    canonical_status: str,
-    reason: str,
-    superseded_by_sha256: str | None = None,
-    metadata: dict[str, Any] | None = None,
-) -> str:
-    """Record source-version lineage separately from loaded passage rows.
-
-    A historical or rejected version may be registered without loading its
-    text.  This makes the canonical decision auditable while preventing an
-    inactive hash from silently becoming a passage source.
-    """
-
-    source_version_id = f"{work_key}:{source_file_sha256}"
-    now = _now()
-    connection.execute(
-        """
-        INSERT INTO source_version_registry(
-            source_version_id, work_key, source_file, source_file_sha256,
-            canonical_status, superseded_by_sha256, reason, metadata_json,
-            recorded_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(source_version_id) DO UPDATE SET
-            source_file = excluded.source_file,
-            canonical_status = excluded.canonical_status,
-            superseded_by_sha256 = excluded.superseded_by_sha256,
-            reason = excluded.reason,
-            metadata_json = excluded.metadata_json,
-            recorded_at = excluded.recorded_at
-        """,
-        (
-            source_version_id,
-            work_key,
-            source_file,
-            source_file_sha256,
-            canonical_status,
-            superseded_by_sha256,
-            reason,
-            _json(metadata or {}),
-            now,
-        ),
-    )
-    return source_version_id
+    source_file = str(first.get("source_file") or "source")
+    source_name = Path(source_file).stem or "source"
+    return f"{work_key}:{source_name}"
 
 
 def open_database(
@@ -193,7 +142,7 @@ def open_database(
 ) -> sqlite3.Connection:
     path = Path(database_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(path)
+    connection = sqlite3.connect(path, factory=ClosingConnection)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
     connection.executescript(Path(schema_path).read_text(encoding="utf-8"))
@@ -211,26 +160,8 @@ def ingest_passages(
     passage_list = list(passages)
     source_document_id = _source_document_id(passage_list)
     first = passage_list[0]
-    conflicting_source = connection.execute(
-        """
-        SELECT source_document_id, source_file_sha256
-        FROM source_documents
-        WHERE work_key = ? AND source_file = ? AND source_file_sha256 <> ?
-        """,
-        (
-            first.get("work_key", ""),
-            first.get("source_file", ""),
-            first.get("source_file_sha256", ""),
-        ),
-    ).fetchone()
-    if conflicting_source is not None:
-        raise ValueError(
-            "source_version_conflict:"
-            f"{conflicting_source['source_document_id']}"
-        )
     source_metadata = {
         "source_file": first.get("source_file"),
-        "source_file_sha256": first.get("source_file_sha256"),
     }
     if metadata:
         source_metadata.update(metadata)
@@ -251,12 +182,11 @@ def ingest_passages(
         """
         INSERT INTO source_documents(
             source_document_id, work_key, source_kind, source_file,
-            source_file_sha256, canonical_status, supersedes_source_document_id,
+            canonical_status, supersedes_source_document_id,
             metadata_json, created_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(source_document_id) DO UPDATE SET
             source_file = excluded.source_file,
-            source_file_sha256 = excluded.source_file_sha256,
             canonical_status = excluded.canonical_status,
             supersedes_source_document_id = excluded.supersedes_source_document_id,
             metadata_json = excluded.metadata_json
@@ -266,31 +196,12 @@ def ingest_passages(
             first.get("work_key", ""),
             source_kind,
             first.get("source_file", ""),
-            first.get("source_file_sha256", ""),
             canonical_status,
             supersedes_source_document_id,
             _json(source_metadata),
             _now(),
         ),
     )
-    register_source_version(
-        connection,
-        work_key=first.get("work_key", ""),
-        source_file=first.get("source_file", ""),
-        source_file_sha256=first.get("source_file_sha256", ""),
-        canonical_status=canonical_status,
-        reason=source_metadata.get(
-            "source_version_reason",
-            "loaded source version registered by V2 passage ingestion",
-        ),
-        superseded_by_sha256=source_metadata.get("superseded_by_sha256"),
-        metadata={
-            "source_document_id": source_document_id,
-            "source_kind": source_kind,
-            "source_role": source_metadata.get("source_role"),
-        },
-    )
-
     for passage in passage_list:
         connection.execute(
             """
@@ -298,9 +209,8 @@ def ingest_passages(
                 passage_id, source_document_id, work_key, document_title,
                 section_title, entry_title, entry_kind, local_ordinal,
                 md_line_start, md_line_end, raw_text, plain_text,
-                normalized_text, raw_text_sha256, normalized_text_sha256,
-                inline_notes_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                normalized_text, inline_notes_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(passage_id) DO UPDATE SET
                 source_document_id = excluded.source_document_id,
                 work_key = excluded.work_key,
@@ -314,8 +224,6 @@ def ingest_passages(
                 raw_text = excluded.raw_text,
                 plain_text = excluded.plain_text,
                 normalized_text = excluded.normalized_text,
-                raw_text_sha256 = excluded.raw_text_sha256,
-                normalized_text_sha256 = excluded.normalized_text_sha256,
                 inline_notes_json = excluded.inline_notes_json
             """,
             (
@@ -332,8 +240,6 @@ def ingest_passages(
                 passage.get("raw_text", ""),
                 passage.get("plain_text", ""),
                 passage.get("normalized_text", ""),
-                passage.get("raw_text_sha256"),
-                passage.get("normalized_text_sha256"),
                 _json(passage.get("inline_notes", [])),
             ),
         )
@@ -421,9 +327,7 @@ def _register_external_sources(
         normalized_work = _normalize_work_label(cited_work)
         if not normalized_work:
             continue
-        external_source_id = "external:" + hashlib.sha256(
-            normalized_work.encode("utf-8")
-        ).hexdigest()[:16]
+        external_source_id = f"external:{normalized_work}"
         now = _now()
         connection.execute(
             """
@@ -586,8 +490,8 @@ def ingest_case(
             """
             INSERT INTO annotation_evidences(
                 case_id, evidence_index, passage_id, source_work, quote,
-                quote_sha256, quote_check, evidence_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                quote_check, evidence_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 case_id,
@@ -595,7 +499,6 @@ def ingest_case(
                 evidence.get("passage_id"),
                 evidence.get("source_work"),
                 evidence.get("quote", ""),
-                evidence.get("quote_sha256"),
                 evidence.get("quote_check"),
                 _json(evidence),
             ),
@@ -756,8 +659,7 @@ def _apply_evidence_decisions(
             raise ValueError("evidence_index_required") from None
         row = connection.execute(
             """
-            SELECT passage_id, source_work, quote, quote_sha256,
-                   quote_check, evidence_json
+            SELECT passage_id, source_work, quote, quote_check, evidence_json
             FROM annotation_evidences
             WHERE case_id = ? AND evidence_index = ?
             """,
@@ -772,7 +674,6 @@ def _apply_evidence_decisions(
             "passage_id": row["passage_id"],
             "source_work": row["source_work"],
             "quote": row["quote"],
-            "quote_sha256": row["quote_sha256"],
             "quote_check": row["quote_check"],
         }
         for field in field_values:
@@ -791,9 +692,6 @@ def _apply_evidence_decisions(
         quote = str(field_values["quote"] or "")
         if not quote:
             raise ValueError(f"empty_evidence_quote:{evidence_index}")
-        if "quote" in decision and "quote_sha256" not in decision:
-            field_values["quote_sha256"] = hashlib.sha256(quote.encode("utf-8")).hexdigest()
-
         for field in ("source_resolution", "cited_work_match_status", "external_source_id"):
             if field in decision:
                 evidence[field] = decision[field]
@@ -817,22 +715,20 @@ def _apply_evidence_decisions(
                 "passage_id": passage_id,
                 "source_work": field_values["source_work"],
                 "quote": quote,
-                "quote_sha256": field_values["quote_sha256"],
                 "quote_check": quote_check,
             }
         )
         connection.execute(
             """
             UPDATE annotation_evidences
-            SET passage_id = ?, source_work = ?, quote = ?, quote_sha256 = ?,
-                quote_check = ?, evidence_json = ?
+            SET passage_id = ?, source_work = ?, quote = ?, quote_check = ?,
+                evidence_json = ?
             WHERE case_id = ? AND evidence_index = ?
             """,
             (
                 passage_id,
                 field_values["source_work"],
                 quote,
-                field_values["quote_sha256"],
                 quote_check,
                 _json(evidence),
                 case_id,
@@ -1571,7 +1467,6 @@ def apply_external_source_resolution(
     operation_id: str,
     resolution_status: str,
     source_file: str | None = None,
-    source_file_sha256: str | None = None,
     edition: str | None = None,
     location_note: str | None = None,
     resolution_note: str = "",
@@ -1579,9 +1474,7 @@ def apply_external_source_resolution(
     """Record an external edition decision without making it canonical.
 
     verified is allowed only when an edition and readable file are supplied.
-    The service computes the file identity itself; a caller may optionally
-    supply a legacy hash for an explicit mismatch check.  The caller still
-    has to register a canonical passage separately.  The event itself never
+    The caller still has to register a canonical passage separately. The event itself never
     changes annotation evidence quote status.
     """
 
@@ -1605,8 +1498,7 @@ def apply_external_source_resolution(
         queue_row = connection.execute(
             """
             SELECT q.queue_item_id, q.external_source_id, q.queue_status,
-                   q.edition_status, r.source_file, r.source_file_sha256,
-                   r.edition, r.location_note
+                   q.edition_status, r.source_file, r.edition, r.location_note
             FROM external_source_resolution_queue q
             JOIN external_source_registry r
               ON r.external_source_id = q.external_source_id
@@ -1628,25 +1520,14 @@ def apply_external_source_resolution(
 
         if resolution_status == "verified":
             verified_source_file = str(source_file).strip()
-            actual_hash = _sha256_file(verified_source_file)
-            if actual_hash is None:
+            if not Path(verified_source_file).is_file():
                 raise ValueError("verified_external_source_file_not_found")
-            supplied_hash = str(source_file_sha256 or "").strip().lower()
-            if supplied_hash and (
-                len(supplied_hash) != 64
-                or any(char not in "0123456789abcdef" for char in supplied_hash)
-            ):
-                raise ValueError("verified_external_source_hash_invalid")
-            if supplied_hash and actual_hash != supplied_hash:
-                raise ValueError("verified_external_source_hash_mismatch")
             edition_status = "verified"
             resolved_source_file = verified_source_file
-            resolved_hash = actual_hash
             resolved_edition = str(edition).strip()
             resolved_location_note = location_note
         elif resolution_status == "candidate_available":
             resolved_source_file = source_file if source_file is not None else queue_row["source_file"]
-            resolved_hash = source_file_sha256 if source_file_sha256 is not None else queue_row["source_file_sha256"]
             resolved_edition = edition if edition is not None else queue_row["edition"]
             resolved_location_note = location_note if location_note is not None else queue_row["location_note"]
             edition_status = "candidate_registered" if resolved_source_file else "missing"
@@ -1655,14 +1536,13 @@ def apply_external_source_resolution(
                 "candidate_registered" if queue_row["source_file"] else "missing"
             )
             resolved_source_file = source_file if source_file is not None else queue_row["source_file"]
-            resolved_hash = source_file_sha256 if source_file_sha256 is not None else queue_row["source_file_sha256"]
             resolved_edition = edition if edition is not None else queue_row["edition"]
             resolved_location_note = location_note if location_note is not None else queue_row["location_note"]
 
         connection.execute(
             """
             UPDATE external_source_registry
-            SET status = ?, source_file = ?, source_file_sha256 = ?, edition = ?,
+            SET status = ?, source_file = ?, edition = ?,
                 location_note = ?, updated_at = ?
             WHERE external_source_id = ?
             """,
@@ -1671,7 +1551,6 @@ def apply_external_source_resolution(
                     "registered" if resolved_source_file else "pending"
                 ),
                 resolved_source_file,
-                resolved_hash,
                 resolved_edition,
                 resolved_location_note,
                 _now(),
@@ -1698,7 +1577,6 @@ def apply_external_source_resolution(
                         "reviewer": reviewer,
                         "operation_id": operation_id,
                         "source_file": resolved_source_file,
-                        "source_file_sha256": resolved_hash,
                         "edition": resolved_edition,
                     }
                 ),
@@ -1720,7 +1598,6 @@ def apply_external_source_resolution(
             resolution_note=resolution_note,
             resolution={
                 "source_file": resolved_source_file,
-                "source_file_sha256": resolved_hash,
                 "edition": resolved_edition,
                 "location_note": resolved_location_note,
             },
@@ -1809,9 +1686,7 @@ def apply_external_passage_resolution(
             passage_row = connection.execute(
                 """
                 SELECT p.raw_text, p.plain_text, p.normalized_text,
-                       sd.source_file, sd.source_file_sha256,
-                       r.source_file AS registry_source_file,
-                       r.source_file_sha256 AS registry_source_hash
+                       sd.source_file, r.source_file AS registry_source_file
                 FROM passages p
                 JOIN source_documents sd ON sd.source_document_id = p.source_document_id
                 JOIN external_source_registry r
@@ -1826,7 +1701,6 @@ def apply_external_passage_resolution(
             if (
                 not passage_row["registry_source_file"]
                 or passage_row["source_file"] != passage_row["registry_source_file"]
-                or passage_row["source_file_sha256"] != passage_row["registry_source_hash"]
             ):
                 raise ValueError("verified_external_passage_source_mismatch")
             if not any(
@@ -1903,7 +1777,6 @@ def ingest_legacy_catalog(
     terms: Iterable[dict[str, Any]],
     works: Iterable[dict[str, Any]],
     source_file: str,
-    source_file_sha256: str,
 ) -> dict[str, int]:
     """Persist unreferenced legacy terms/works as explicit catalog-only rows.
 
@@ -1922,9 +1795,9 @@ def ingest_legacy_catalog(
             INSERT INTO legacy_catalog_terms(
                 catalog_term_id, legacy_term_id, term, term_type, category,
                 aliases_json, notes, core_meaning, catalog_status,
-                evidence_state, reason, source_file, source_file_sha256,
+                evidence_state, reason, source_file,
                 metadata_json, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'catalog_only', 'unreferenced', ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'catalog_only', 'unreferenced', ?, ?, ?, ?, ?)
             ON CONFLICT(catalog_term_id) DO UPDATE SET
                 term = excluded.term,
                 term_type = excluded.term_type,
@@ -1934,7 +1807,6 @@ def ingest_legacy_catalog(
                 core_meaning = excluded.core_meaning,
                 reason = excluded.reason,
                 source_file = excluded.source_file,
-                source_file_sha256 = excluded.source_file_sha256,
                 metadata_json = excluded.metadata_json,
                 updated_at = excluded.updated_at
             """,
@@ -1949,7 +1821,6 @@ def ingest_legacy_catalog(
                 term.get("core_meaning"),
                 "legacy terms table has no case_ids/evidence relationship",
                 source_file,
-                source_file_sha256,
                 _json({"legacy_row": term}),
                 now,
                 now,
@@ -1962,9 +1833,9 @@ def ingest_legacy_catalog(
             INSERT INTO legacy_catalog_works(
                 catalog_work_id, legacy_work_id, title, author, work_type,
                 dynasty, time_note, notes, catalog_status, evidence_state,
-                reason, source_file, source_file_sha256, metadata_json,
+                reason, source_file, metadata_json,
                 created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'catalog_only', 'unreferenced', ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'catalog_only', 'unreferenced', ?, ?, ?, ?, ?)
             ON CONFLICT(catalog_work_id) DO UPDATE SET
                 title = excluded.title,
                 author = excluded.author,
@@ -1974,7 +1845,6 @@ def ingest_legacy_catalog(
                 notes = excluded.notes,
                 reason = excluded.reason,
                 source_file = excluded.source_file,
-                source_file_sha256 = excluded.source_file_sha256,
                 metadata_json = excluded.metadata_json,
                 updated_at = excluded.updated_at
             """,
@@ -1989,7 +1859,6 @@ def ingest_legacy_catalog(
                 work.get("notes"),
                 "legacy works row has no evidence reference",
                 source_file,
-                source_file_sha256,
                 _json({"legacy_row": work}),
                 now,
                 now,
@@ -2005,7 +1874,6 @@ def ingest_legacy_dictionary_inventory(
     works: Iterable[dict[str, Any]],
     cases: Iterable[dict[str, Any]],
     source_file: str,
-    source_file_sha256: str,
 ) -> dict[str, int]:
     """Persist the complete legacy term/work inventory and its relationships.
 
@@ -2073,7 +1941,6 @@ def ingest_legacy_dictionary_inventory(
                     "legacy_work_id": evidence.get("legacy_work_id"),
                     "legacy_term_id": evidence.get("legacy_term_id"),
                     "evidence_type": evidence.get("legacy_evidence_type"),
-                    "quote_sha256": evidence.get("quote_sha256"),
                 }
             )
     work_evidence_counts: dict[int, int] = {work_id: 0 for work_id in works_by_id}
@@ -2102,8 +1969,8 @@ def ingest_legacy_dictionary_inventory(
                 legacy_term_id, term, term_type, category, aliases_json, notes,
                 core_meaning, legacy_case_ids_json, usage_status,
                 case_reference_count, evidence_reference_count, source_file,
-                source_file_sha256, metadata_json, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                metadata_json, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(legacy_term_id) DO UPDATE SET
                 term=excluded.term, term_type=excluded.term_type,
                 category=excluded.category, aliases_json=excluded.aliases_json,
@@ -2113,7 +1980,6 @@ def ingest_legacy_dictionary_inventory(
                 case_reference_count=excluded.case_reference_count,
                 evidence_reference_count=excluded.evidence_reference_count,
                 source_file=excluded.source_file,
-                source_file_sha256=excluded.source_file_sha256,
                 metadata_json=excluded.metadata_json, updated_at=excluded.updated_at
             """,
             (
@@ -2129,7 +1995,6 @@ def ingest_legacy_dictionary_inventory(
                 len(case_ids),
                 term_evidence_counts[term_id],
                 source_file,
-                source_file_sha256,
                 _json({"legacy_row": row, "catalog_only": not bool(case_ids)}),
                 now,
                 now,
@@ -2143,9 +2008,9 @@ def ingest_legacy_dictionary_inventory(
             INSERT INTO legacy_dictionary_works(
                 legacy_work_id, title, author, work_type, dynasty, time_note,
                 notes, legacy_case_ids_json, usage_status, case_reference_count,
-                evidence_reference_count, source_file, source_file_sha256,
+                evidence_reference_count, source_file,
                 metadata_json, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(legacy_work_id) DO UPDATE SET
                 title=excluded.title, author=excluded.author,
                 work_type=excluded.work_type, dynasty=excluded.dynasty,
@@ -2155,7 +2020,6 @@ def ingest_legacy_dictionary_inventory(
                 case_reference_count=excluded.case_reference_count,
                 evidence_reference_count=excluded.evidence_reference_count,
                 source_file=excluded.source_file,
-                source_file_sha256=excluded.source_file_sha256,
                 metadata_json=excluded.metadata_json, updated_at=excluded.updated_at
             """,
             (
@@ -2171,7 +2035,6 @@ def ingest_legacy_dictionary_inventory(
                 len(case_ids),
                 work_evidence_counts[work_id],
                 source_file,
-                source_file_sha256,
                 _json({"legacy_row": row, "catalog_only": not bool(work_evidence_counts[work_id])}),
                 now,
                 now,
@@ -2213,9 +2076,9 @@ def ingest_legacy_dictionary_inventory(
             """
             INSERT INTO legacy_work_evidence_links(
                 legacy_work_id, legacy_evidence_id, legacy_case_id, v2_case_id,
-                v2_evidence_index, legacy_term_id, evidence_type, quote_sha256,
+                v2_evidence_index, legacy_term_id, evidence_type,
                 source_field, metadata_json
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 work_id,
@@ -2225,7 +2088,6 @@ def ingest_legacy_dictionary_inventory(
                 evidence["v2_evidence_index"],
                 term_id,
                 evidence.get("evidence_type"),
-                evidence.get("quote_sha256"),
                 "evidences.work_id",
                 "{}",
             ),
@@ -2269,7 +2131,6 @@ def database_counts(connection: sqlite3.Connection) -> dict[str, int]:
         "resolution_events",
         "external_source_registry",
         "annotation_evidence_external_sources",
-        "source_version_registry",
         "work_registry",
         "work_aliases",
         "target_work_resolution_queue",

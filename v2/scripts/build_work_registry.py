@@ -10,7 +10,6 @@ identity and remain unresolved in the case data.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -51,8 +50,7 @@ def normalize_label(value: str | None) -> str:
 
 
 def identity_key(prefix: str, normalized_label: str) -> str:
-    digest = hashlib.sha256(normalized_label.encode("utf-8")).hexdigest()[:20]
-    return f"{prefix}:{digest}"
+    return f"{prefix}:{normalized_label}"
 
 
 def relative_path(value: str | None) -> str | None:

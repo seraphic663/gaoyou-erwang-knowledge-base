@@ -64,7 +64,6 @@
           "passage_id": {"type": ["string", "null"]},
           "quote_start_char": {"type": ["integer", "null"], "minimum": 0},
           "quote_end_char": {"type": ["integer", "null"], "minimum": 0},
-          "quote_sha256": {"type": ["string", "null"]},
           "quote_check": {
             "type": ["string", "null"],
             "enum": ["unchecked", "passed", "failed", "normalized_passed", null]

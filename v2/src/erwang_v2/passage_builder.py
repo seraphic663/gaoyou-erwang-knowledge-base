@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import re
 from pathlib import Path
 from typing import Any
@@ -9,11 +8,6 @@ from .markdown_preprocess import preprocess_text
 
 
 HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.+?)\s*$")
-
-
-def _sha256(value: str | bytes) -> str:
-    data = value.encode("utf-8") if isinstance(value, str) else value
-    return hashlib.sha256(data).hexdigest()
 
 
 def _title_kind(title: str) -> str:
@@ -33,7 +27,6 @@ def build_passages(
 
     path = Path(source_path)
     lines = path.read_text(encoding="utf-8").splitlines()
-    source_hash = _sha256(path.read_bytes())
     passages: list[dict[str, Any]] = []
     current_document = document_title or ""
     current_section = ""
@@ -80,10 +73,7 @@ def build_passages(
                 "raw_text": processed["raw_text"],
                 "plain_text": processed["plain_text"],
                 "normalized_text": processed["normalized_text"],
-                "raw_text_sha256": _sha256(processed["raw_text"]),
-                "normalized_text_sha256": _sha256(processed["normalized_text"]),
                 "source_file": str(path),
-                "source_file_sha256": source_hash,
                 "inline_notes": notes,
             }
         )

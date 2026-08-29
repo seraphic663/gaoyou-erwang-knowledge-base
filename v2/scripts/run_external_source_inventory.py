@@ -11,7 +11,6 @@ source file is present and registered by a separate ingest step.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import sqlite3
 import unicodedata
@@ -98,7 +97,6 @@ def load_local_texts() -> list[dict[str, Any]]:
                     "role": file_role(path),
                     "text": text,
                     "compact_text": compact(text),
-                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                 }
             )
     return files
@@ -126,7 +124,6 @@ def name_candidates(cited_work: str, files: list[dict[str, Any]]) -> list[dict[s
                 {
                     "path": item["relative_path"],
                     "role": item["role"],
-                    "sha256": item["sha256"],
                 }
             )
     return candidates
@@ -145,7 +142,6 @@ def exact_matches(quote: str, files: list[dict[str, Any]]) -> list[dict[str, str
                 {
                     "path": item["relative_path"],
                     "role": item["role"],
-                    "sha256": item["sha256"],
                     "match_mode": "exact" if exact else "punctuation_normalized",
                 }
             )
@@ -161,7 +157,7 @@ def run(database_path: Path = DEFAULT_DATABASE, report_path: Path = DEFAULT_REPO
     connection.execute("PRAGMA busy_timeout = 30000")
     connection.execute("PRAGMA foreign_keys = ON")
     rows = connection.execute(
-        "SELECT external_source_id, cited_work, normalized_work, status, source_file, source_file_sha256, metadata_json FROM external_source_registry ORDER BY normalized_work"
+        "SELECT external_source_id, cited_work, normalized_work, status, source_file, metadata_json FROM external_source_registry ORDER BY normalized_work"
     ).fetchall()
     evidence_rows = connection.execute(
         "SELECT case_id, evidence_index, quote, evidence_json FROM annotation_evidences ORDER BY case_id, evidence_index"
@@ -189,7 +185,6 @@ def run(database_path: Path = DEFAULT_DATABASE, report_path: Path = DEFAULT_REPO
             "machine_inventory_status": status,
             "canonical_file_candidates": filename_candidates,
             "source_file": row["source_file"],
-            "source_file_sha256": row["source_file_sha256"],
             "candidate_status": candidate_status,
         }
         source_records.append(record)

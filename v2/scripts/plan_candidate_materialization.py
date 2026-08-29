@@ -66,7 +66,7 @@ def plan_candidates(database_path: Path, batch_size: int = 100) -> tuple[list[di
                    ci.work_key, ci.source_work, ci.candidate_text,
                    ci.rule_hits_json, ci.risk_flags_json, ci.candidate_status,
                    ci.origin, ci.output_case_id, ci.provenance_json,
-                   sd.source_file, sd.source_file_sha256, sd.canonical_status,
+                   sd.source_file, sd.canonical_status,
                    p.local_ordinal, p.md_line_start, p.md_line_end,
                    p.document_title, p.section_title, p.entry_title
             FROM candidate_items ci
@@ -141,7 +141,6 @@ def plan_candidates(database_path: Path, batch_size: int = 100) -> tuple[list[di
                 "existing_output_case_id": row["output_case_id"],
                 "source": {
                     "source_file": relative_path(row["source_file"]),
-                    "source_file_sha256": row["source_file_sha256"],
                     "canonical_status": row["canonical_status"],
                     "local_ordinal": row["local_ordinal"],
                     "md_line_start": row["md_line_start"],

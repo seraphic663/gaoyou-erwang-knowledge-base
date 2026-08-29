@@ -15,11 +15,6 @@
         "endnote_count": 0,
         "paragraph_text_length": 4516,
         "comment_text_length": 73
-      },
-      "checksums": {
-        "source_docx_sha256": "812779b7b59f263997ff566ada5ac0741574f2325641f1875164f776b6f12970",
-        "paragraph_text_sha256": "a6dc04e80279c9947d341f70af6d9bc2cd2c6dc1b7a2222393c8f7e2c7a86d89",
-        "comment_text_sha256": "5b5ac60ef8f649dffc92496b76ebae0e610b06a853ccb03d7a2c2d1abb6ea2fb"
       }
     },
     {
@@ -36,11 +31,6 @@
         "endnote_count": 0,
         "paragraph_text_length": 4568,
         "comment_text_length": 343
-      },
-      "checksums": {
-        "source_docx_sha256": "fec1e9bfe5865c3233a272aa6450753043d10c1a6d5879e35f25189eb7094433",
-        "paragraph_text_sha256": "227480c9a48f5fb3d9d113f608bf0adced9c668db6d6759e75d91fe06b92a1d7",
-        "comment_text_sha256": "4fddbd42d4c87198e01fa63651ebf405f5795b66c16f307b42de95aa67d0c928"
       }
     },
     {
@@ -57,11 +47,6 @@
         "endnote_count": 0,
         "paragraph_text_length": 1786,
         "comment_text_length": 0
-      },
-      "checksums": {
-        "source_docx_sha256": "3f56400ec0fa294dc3d75f20e0b64f479f7af5bd32594d65ce84362d071226dd",
-        "paragraph_text_sha256": "b40f72b487defa7333d26712657d42370276b13a153b2902f0c244d5982288a7",
-        "comment_text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
       }
     }
   ]

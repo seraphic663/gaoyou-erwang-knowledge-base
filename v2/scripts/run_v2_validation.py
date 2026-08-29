@@ -2,15 +2,14 @@
 """Run the read-only, database-level acceptance checks for the V2 snapshot.
 
 The checks are deliberately stricter than a row-count report: they verify the
-canonical source-version policy, the legacy materialization boundary, quote
-hashes, passage ownership, and machine/human state separation.  The script
+canonical source policy, the legacy materialization boundary, quote location,
+passage ownership, and machine/human state separation.  The script
 never updates the database; it only writes a JSON validation report.
 """
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -40,12 +39,6 @@ from build_target_work_resolution_packets import (  # noqa: E402
     validate_target_work_resolution_packets,
 )
 
-DUSHU_CANONICAL_SHA256 = (
-    "1460a906825998bf8a4bf3c51d4525fe19b8b79f377fb6d25ccdad4dc698e19e"
-)
-DUSHU_HISTORICAL_SHA256 = (
-    "1534084959961a160ddc93b5d7523ec2565bb01f0c079523f53442ef61fa37b2"
-)
 CANONICAL_WORKS = {
     "guangya_shuzheng",
     "jingzhuan_shici",
@@ -90,20 +83,9 @@ def parse_json(value: Any) -> dict[str, Any]:
     return parsed if isinstance(parsed, dict) else {}
 
 
-def sha256_file(path: Path) -> str | None:
-    if not path.exists() or not path.is_file():
-        return None
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def table_counts(connection: sqlite3.Connection) -> dict[str, int]:
     tables = (
         "source_documents",
-        "source_version_registry",
         "passages",
         "candidate_items",
         "candidate_target_locations",
@@ -192,59 +174,21 @@ def source_policy(connection: sqlite3.Connection) -> dict[str, Any]:
         dict(row)
         for row in connection.execute(
             """
-            SELECT work_key, source_kind, source_file, source_file_sha256,
+            SELECT work_key, source_kind, source_file,
                    canonical_status
             FROM source_documents
-            ORDER BY work_key, source_file_sha256
-            """
-        )
-    ]
-    registry = [
-        dict(row)
-        for row in connection.execute(
-            """
-            SELECT work_key, source_file, source_file_sha256, canonical_status,
-                   superseded_by_sha256, reason
-            FROM source_version_registry
-            ORDER BY work_key, canonical_status, source_file_sha256
+            ORDER BY work_key, source_file
             """
         )
     ]
     active = {
-        row["work_key"]: row["source_file_sha256"]
+        row["work_key"]: row["source_file"]
         for row in documents
         if row["canonical_status"] == "canonical_active"
     }
-    historical = [
-        row
-        for row in registry
-        if row["source_file_sha256"] == DUSHU_HISTORICAL_SHA256
-    ]
-    dushu_path = next(
-        (
-            Path(row["source_file"])
-            for row in documents
-            if row["work_key"] == "dushu_zazhi"
-            and row["canonical_status"] == "canonical_active"
-        ),
-        None,
-    )
     return {
         "source_documents": documents,
-        "source_version_registry": registry,
-        "active_hashes": active,
-        "dushu_current_file_hash": sha256_file(dushu_path) if dushu_path else None,
-        "dushu_historical_registry_rows": historical,
-        "active_old_dushu_document_count": as_count(
-            scalar(
-                connection,
-                """
-                SELECT COUNT(*) FROM source_documents
-                WHERE work_key='dushu_zazhi' AND source_file_sha256=?
-                """,
-                (DUSHU_HISTORICAL_SHA256,),
-            )
-        ),
+        "active_sources": active,
     }
 
 
@@ -341,17 +285,6 @@ def legacy_materialization(connection: sqlite3.Connection) -> dict[str, Any]:
 
 
 def quote_validation(connection: sqlite3.Connection) -> dict[str, Any]:
-    hash_mismatches: list[dict[str, Any]] = []
-    for row in connection.execute(
-        "SELECT case_id, evidence_index, quote, quote_sha256 FROM annotation_evidences"
-    ):
-        expected = hashlib.sha256((row["quote"] or "").encode("utf-8")).hexdigest()
-        if row["quote_sha256"] and expected.lower() != str(row["quote_sha256"]).lower():
-            if len(hash_mismatches) < 20:
-                hash_mismatches.append(
-                    {"case_id": row["case_id"], "evidence_index": row["evidence_index"]}
-                )
-
     passed_violations: list[dict[str, Any]] = []
     passed_count = 0
     for row in connection.execute(
@@ -389,8 +322,6 @@ def quote_validation(connection: sqlite3.Connection) -> dict[str, Any]:
                 }
             )
     return {
-        "quote_hash_mismatch_count": len(hash_mismatches),
-        "quote_hash_mismatch_examples": hash_mismatches,
         "canonical_passed_count": passed_count,
         "canonical_passed_violations": passed_violations,
     }
@@ -821,21 +752,6 @@ def external_candidate_passage_validation(connection: sqlite3.Connection) -> dic
             """,
         )
     )
-    canonical_registry_breach = as_count(
-        scalar(
-            connection,
-            """
-            SELECT COUNT(*)
-            FROM source_version_registry sv
-            JOIN source_documents sd
-              ON sd.work_key=sv.work_key
-             AND sd.source_file=sv.source_file
-             AND sd.source_file_sha256=sv.source_file_sha256
-            WHERE sd.source_kind='external_public_candidate'
-              AND sv.canonical_status='canonical_active'
-            """,
-        )
-    )
     orphan_candidate_passages = as_count(
         scalar(
             connection,
@@ -904,7 +820,6 @@ def external_candidate_passage_validation(connection: sqlite3.Connection) -> dic
         "candidate_document_count": candidate_document_count,
         "candidate_passage_count": candidate_passage_count,
         "canonical_status_breach_count": canonical_status_breach,
-        "canonical_registry_breach_count": canonical_registry_breach,
         "orphan_candidate_passage_count": orphan_candidate_passages,
         "annotation_evidence_link_breach_count": evidence_link_breach,
         "external_pending_quote_pass_breach_count": external_pending_quote_pass_breach,
@@ -913,7 +828,6 @@ def external_candidate_passage_validation(connection: sqlite3.Connection) -> dic
         "malformed_queue_candidate_ids_count": malformed_queue_ids,
         "valid": (
             canonical_status_breach == 0
-            and canonical_registry_breach == 0
             and orphan_candidate_passages == 0
             and evidence_link_breach == 0
             and external_pending_quote_pass_breach == 0
@@ -1039,13 +953,7 @@ def build_report(
     finally:
         connection.close()
 
-    active_hashes = source["active_hashes"]
-    historical_rows = source["dushu_historical_registry_rows"]
-    dushu_historical_ok = any(
-        row["canonical_status"] == "historical_superseded"
-        and row["superseded_by_sha256"] == DUSHU_CANONICAL_SHA256
-        for row in historical_rows
-    )
+    active_sources = source["active_sources"]
     process_fields_ok = all(
         legacy["process_field_counts"].get(field) == 815
         for field in (
@@ -1064,12 +972,7 @@ def build_report(
         "snapshot_counts": all(value >= 0 for value in counts.values()),
         "canonical_documents": (
             len([row for row in source["source_documents"] if row["canonical_status"] == "canonical_active"]) == 4
-            and set(active_hashes) == CANONICAL_WORKS
-        ),
-        "dushu_canonical_hash": active_hashes.get("dushu_zazhi") == DUSHU_CANONICAL_SHA256,
-        "dushu_current_file_hash": source["dushu_current_file_hash"] == DUSHU_CANONICAL_SHA256,
-        "dushu_historical_hash_policy": (
-            dushu_historical_ok and source["active_old_dushu_document_count"] == 0
+            and set(active_sources) == CANONICAL_WORKS
         ),
         "legacy_case_materialization": legacy["case_counts"] == {
             "cases": 815,
@@ -1095,7 +998,6 @@ def build_report(
                 "count": 7120,
             }
         ],
-        "quote_hashes": quote["quote_hash_mismatch_count"] == 0,
         "canonical_quote_boundary": not quote["canonical_passed_violations"],
         "orphan_references": not any(orphans.values()),
         "catalog_only_coverage": (

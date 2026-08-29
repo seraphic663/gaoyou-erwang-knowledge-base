@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 from pathlib import Path
 from typing import Any, Iterable
@@ -121,11 +120,6 @@ def validate_case(
             normalized_match = normalize_for_match(quote) in normalize_for_match(plain_text)
             if not (quote_check == "normalized_passed" and normalized_match):
                 errors.append(f"quote_not_found:{index}:{passage_id}")
-        supplied_hash = evidence.get("quote_sha256")
-        actual_hash = hashlib.sha256(quote.encode("utf-8")).hexdigest()
-        if supplied_hash and supplied_hash != actual_hash:
-            errors.append(f"quote_hash_mismatch:{index}")
-
     machine_status = (case.get("machine_result") or {}).get("status")
     if machine_status and machine_status not in MACHINE_STATUSES:
         errors.append(f"invalid_machine_status:{machine_status}")

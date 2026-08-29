@@ -122,7 +122,6 @@ def read_tasks(
     return {
         "ok": True,
         "manifest": relative_path(manifest_path),
-        "manifest_sha256": manifest.get("manifest_sha256"),
         "generated_at": manifest.get("generated_at"),
         "stream": stream,
         "batch_number": batch_number,
@@ -156,7 +155,6 @@ def find_task(
                 return {
                     "ok": True,
                     "manifest": relative_path(manifest_path),
-                    "manifest_sha256": manifest.get("manifest_sha256"),
                     "generated_at": manifest.get("generated_at"),
                     "stream": stream_name,
                     "task": task,
@@ -354,7 +352,6 @@ def submit_payload(
                 operation_id=operation_id,
                 resolution_status=str(payload.get("resolution_status") or "").strip(),
                 source_file=payload.get("source_file"),
-                source_file_sha256=payload.get("source_file_sha256"),
                 edition=payload.get("edition"),
                 location_note=payload.get("location_note"),
                 resolution_note=str(payload.get("review_note") or ""),

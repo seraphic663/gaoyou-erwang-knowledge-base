@@ -2022,11 +2022,6 @@
       "crc": "48fade26"
     }
   ],
-  "checksums": {
-    "source_docx_sha256": "3f56400ec0fa294dc3d75f20e0b64f479f7af5bd32594d65ce84362d071226dd",
-    "paragraph_text_sha256": "b40f72b487defa7333d26712657d42370276b13a153b2902f0c244d5982288a7",
-    "comment_text_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-  },
   "controlled_vocabularies": {
     "method_tags": [
       "义证",

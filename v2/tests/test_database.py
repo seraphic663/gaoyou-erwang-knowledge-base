@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import hashlib
 import sys
 import tempfile
 import unittest
@@ -356,7 +355,6 @@ class UnifiedDatabaseTest(unittest.TestCase):
             database_path = Path(directory) / "annotation_v2.db"
             external_file = Path(directory) / "external.txt"
             external_file.write_text("造、次一声之转", encoding="utf-8")
-            external_hash = hashlib.sha256(external_file.read_bytes()).hexdigest()
             with open_database(database_path) as connection:
                 ingest_passages(connection, passages)
                 ingest_case(connection, case, origin="legacy_ai_json")
@@ -406,7 +404,6 @@ class UnifiedDatabaseTest(unittest.TestCase):
                         operation_id="external-source-op-0001",
                         resolution_status="verified",
                         source_file=str(external_file),
-                        source_file_sha256=external_hash,
                     )
 
                 apply_external_source_resolution(
@@ -430,10 +427,10 @@ class UnifiedDatabaseTest(unittest.TestCase):
                 self.assertTrue(repeated_source["idempotent"])
                 self.assertEqual(
                     connection.execute(
-                        "SELECT source_file_sha256 FROM external_source_registry WHERE external_source_id = ?",
+                        "SELECT source_file FROM external_source_registry WHERE external_source_id = ?",
                         (external_source_id,),
-                    ).fetchone()["source_file_sha256"],
-                    external_hash,
+                    ).fetchone()["source_file"],
+                    str(external_file),
                 )
 
                 external_passage = {
@@ -450,7 +447,6 @@ class UnifiedDatabaseTest(unittest.TestCase):
                     "plain_text": "造、次一声之转",
                     "normalized_text": "造、次一声之转",
                     "source_file": str(external_file),
-                    "source_file_sha256": external_hash,
                 }
                 ingest_passages(
                     connection,

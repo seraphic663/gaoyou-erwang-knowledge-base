@@ -10,7 +10,6 @@ contiguous substring of the page.  It still never changes V2 quote_check.
 """
 
 import argparse
-import hashlib
 import json
 import sqlite3
 from pathlib import Path
@@ -25,10 +24,6 @@ DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_MANIFEST = V2_ROOT / "data/real_runs/external_public_candidate_manifest.json"
 
 
-def sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
 def relative(path: Path) -> str:
     try:
         return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
@@ -37,17 +32,11 @@ def relative(path: Path) -> str:
 
 
 def _write_manifest(manifest_path: Path, manifest: dict[str, Any]) -> dict[str, Any]:
-    """Write a manifest and its sidecar hash after deterministic reconciliation."""
+    """Write a manifest after deterministic reconciliation."""
 
-    manifest.pop("manifest_sha256", None)
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    manifest_hash = sha256(manifest_path)
-    manifest_path.with_suffix(manifest_path.suffix + ".sha256").write_text(
-        f"{manifest_hash}  {manifest_path.name}\n", encoding="utf-8"
-    )
-    manifest["manifest_sha256"] = manifest_hash
     return manifest
 
 
@@ -60,7 +49,7 @@ def merge_queue_candidates(
     The network fetch is intentionally not the source of truth for a frozen
     page.  If a generated manifest is accidentally replaced or a later API
     search returns a different ranking, the queue still contains the raw file,
-    revision and hash of every previously materialized candidate.  Merge those
+    revision and path of every previously materialized candidate.  Merge those
     refs back into the current 80-entry manifest, then let ``reconcile``
     recompute the contiguous-match status from the frozen files.
     """
@@ -90,10 +79,7 @@ def merge_queue_candidates(
             unmatched += 1
             continue
         candidates = entry.setdefault("candidates", [])
-        by_file = {
-            (str(candidate.get("raw_file")), str(candidate.get("raw_sha256") or candidate.get("content_sha256") or "")): candidate
-            for candidate in candidates
-        }
+        by_file = {str(candidate.get("raw_file")): candidate for candidate in candidates}
         try:
             refs = json.loads(refs_json or "[]")
         except (TypeError, ValueError):
@@ -103,7 +89,7 @@ def merge_queue_candidates(
         for ref in refs:
             if not isinstance(ref, dict) or not ref.get("raw_file"):
                 continue
-            key = (str(ref.get("raw_file")), str(ref.get("raw_sha256") or ref.get("content_sha256") or ""))
+            key = str(ref.get("raw_file"))
             candidate = by_file.get(key)
             if candidate is None:
                 candidate = dict(ref)
@@ -112,7 +98,7 @@ def merge_queue_candidates(
                 merged += 1
             for field in (
                 "page_title", "pageid", "revid", "timestamp", "page_url",
-                "api_url", "raw_file", "raw_sha256", "content_sha256",
+                "api_url", "raw_file",
                 "match_mode", "start_char", "end_char", "matched_text",
             ):
                 if ref.get(field) is not None:
@@ -123,7 +109,7 @@ def merge_queue_candidates(
                     field: candidate.get(field)
                     for field in (
                         "page_title", "pageid", "revid", "timestamp", "page_url",
-                        "api_url", "raw_file", "raw_sha256",
+                        "api_url", "raw_file",
                     )
                     if candidate.get(field) is not None
                 },
@@ -230,10 +216,9 @@ def update_registry(database: Path, manifest_path: Path, manifest: dict[str, Any
             }
         )
         connection.execute(
-            "UPDATE external_source_registry SET status='registered', source_file=?, source_file_sha256=?, edition=?, location_note=?, metadata_json=?, updated_at=datetime('now') WHERE external_source_id=?",
+            "UPDATE external_source_registry SET status='registered', source_file=?, edition=?, location_note=?, metadata_json=?, updated_at=datetime('now') WHERE external_source_id=?",
             (
                 relative(manifest_path),
-                manifest["manifest_sha256"],
                 "Wikisource public transcription; edition unresolved",
                 "quote matched in frozen wikitext; image/edition verification pending",
                 json.dumps(metadata, ensure_ascii=False, sort_keys=True),

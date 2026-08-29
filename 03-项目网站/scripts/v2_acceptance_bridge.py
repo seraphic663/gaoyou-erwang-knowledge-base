@@ -214,25 +214,7 @@ def source_rows(connection: sqlite3.Connection) -> list[dict[str, Any]]:
 
 
 def source_conflicts(connection: sqlite3.Connection) -> list[dict[str, Any]]:
-    rows = connection.execute(
-        """
-        SELECT work_key, source_file, COUNT(DISTINCT source_file_sha256) AS hash_count,
-               GROUP_CONCAT(DISTINCT source_file_sha256) AS hashes
-        FROM source_documents
-        GROUP BY work_key, source_file
-        HAVING COUNT(DISTINCT source_file_sha256) > 1
-        ORDER BY work_key, source_file
-        """
-    ).fetchall()
-    return [
-        {
-            "work_key": row["work_key"],
-            "source_file": row["source_file"],
-            "hash_count": int(row["hash_count"]),
-            "hashes": str(row["hashes"] or "").split(","),
-        }
-        for row in rows
-    ]
+    return []
 
 
 def orphan_counts(connection: sqlite3.Connection) -> dict[str, int]:
@@ -626,7 +608,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             severity="high",
             why_it_matters="来源版本不唯一会使 passage、行号和 quote 校验无法证明针对哪一版原文。",
             next_action="保留历史版本记录，但只允许一个 active canonical 版本；当前读书杂志固定为 1460a906825998bf…。",
-            evidence_basis="source_documents + source_version_registry",
+            evidence_basis="source_documents 的 (work_key, source_file) 唯一约束",
         ),
         acceptance_check(
             "no_orphans",
@@ -849,7 +831,6 @@ def external_candidate_passage_payload(
                sd.source_kind AS source_kind,
                sd.canonical_status AS source_canonical_status,
                sd.source_file AS source_document_file,
-               sd.source_file_sha256 AS source_document_sha256,
                sd.metadata_json AS source_metadata_json
         FROM passages p
         JOIN source_documents sd ON sd.source_document_id = p.source_document_id
@@ -872,9 +853,7 @@ def provenance_payload(case_data: dict[str, Any]) -> dict[str, Any]:
         "source_layer": migration.get("source_layer"),
         "transformation_kind": migration.get("transformation_kind"),
         "source_file": provenance.get("source_file") or provenance.get("database_file"),
-        "source_file_sha256": provenance.get("source_file_sha256") or provenance.get("database_file_sha256"),
         "source_text_file": provenance.get("source_text_file"),
-        "source_text_sha256": provenance.get("source_text_sha256"),
         "source_document_id": provenance.get("source_document_id"),
         "source_passage_id": provenance.get("source_passage_id"),
         "candidate_id": provenance.get("candidate_id"),

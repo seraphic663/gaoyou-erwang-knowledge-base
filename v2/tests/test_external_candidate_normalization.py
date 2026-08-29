@@ -78,7 +78,6 @@ class ExternalCandidateNormalizationTest(unittest.TestCase):
                 database_path,
                 manifest_path,
                 {
-                    "manifest_sha256": "manifest-hash",
                     "entries": [
                         {
                             "external_source_id": "external:test-source",
@@ -90,12 +89,12 @@ class ExternalCandidateNormalizationTest(unittest.TestCase):
             )
             with open_database(database_path) as connection:
                 row = connection.execute(
-                    "SELECT status, source_file_sha256, metadata_json "
+                    "SELECT status, source_file, metadata_json "
                     "FROM external_source_registry WHERE external_source_id='external:test-source'"
                 ).fetchone()
             metadata = json.loads(row["metadata_json"])
             self.assertEqual(row["status"], "registered")
-            self.assertEqual(row["source_file_sha256"], "manifest-hash")
+            self.assertTrue(row["source_file"])
             self.assertEqual(metadata["candidate_status"], "public_transcription_candidate")
             self.assertFalse(metadata["canonical_verified"])
 

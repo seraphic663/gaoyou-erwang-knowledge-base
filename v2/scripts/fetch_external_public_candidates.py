@@ -9,7 +9,6 @@ chosen edition or an image-verified canonical passage.
 """
 
 import argparse
-import hashlib
 import json
 import re
 import sqlite3
@@ -41,14 +40,6 @@ USER_AGENT = "Erwang-V2-public-source-candidate-fetch/1.0"
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-def _sha256_bytes(value: bytes) -> str:
-    return hashlib.sha256(value).hexdigest()
-
-
-def _sha256_text(value: str) -> str:
-    return _sha256_bytes(value.encode("utf-8"))
 
 
 def _variants(value: str) -> list[str]:
@@ -161,7 +152,6 @@ def _fetch_page(title: str) -> dict[str, Any] | None:
         "revid": revision.get("revid"),
         "timestamp": revision.get("timestamp"),
         "content": content,
-        "content_sha256": _sha256_text(content),
     }
 
 
@@ -230,9 +220,8 @@ def _load_evidence_rows(
 
 
 def _page_filename(page_title: str) -> str:
-    digest = hashlib.sha256(page_title.encode("utf-8")).hexdigest()[:16]
-    safe = re.sub(r"[^0-9A-Za-z一-龥_-]+", "_", page_title).strip("_")[:80]
-    return f"{safe or 'page'}-{digest}.wikitext"
+    safe = re.sub(r"[^0-9A-Za-z一-龥_-]+", "_", page_title).strip("_")[:120]
+    return f"{safe or 'page'}.wikitext"
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -250,7 +239,6 @@ def _write_jsonl(path: Path, values: list[dict[str, Any]]) -> None:
 def _register_candidates(
     database: Path,
     manifest_relative: str,
-    manifest_sha256: str,
     entries: list[dict[str, Any]],
 ) -> None:
     """Register a fetched public candidate, never a verified canonical source."""
@@ -282,13 +270,12 @@ def _register_candidates(
         connection.execute(
             """
             UPDATE external_source_registry
-            SET status = 'registered', source_file = ?, source_file_sha256 = ?,
-                edition = ?, location_note = ?, metadata_json = ?, updated_at = ?
+            SET status = 'registered', source_file = ?, edition = ?,
+                location_note = ?, metadata_json = ?, updated_at = ?
             WHERE external_source_id = ?
             """,
             (
                 manifest_relative,
-                manifest_sha256,
                 "Wikisource public transcription; edition unresolved",
                 f"{len(source_entries)} quote candidate(s); quote remains unchecked",
                 json.dumps(metadata, ensure_ascii=False, sort_keys=True),
@@ -300,24 +287,15 @@ def _register_candidates(
     connection.close()
 
 
-def _reconcile_manifest_hash(manifest_path: Path, database: Path) -> dict[str, Any]:
+def _reconcile_manifest(manifest_path: Path, database: Path) -> dict[str, Any]:
     """Repair a previously written manifest without making network requests."""
 
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    manifest.pop("manifest_sha256", None)
     _write_json(manifest_path, manifest)
-    manifest_sha256 = _sha256_bytes(manifest_path.read_bytes())
-    manifest_path.with_suffix(manifest_path.suffix + ".sha256").write_text(
-        f"{manifest_sha256}  {manifest_path.name}\n", encoding="utf-8"
-    )
     connection = sqlite3.connect(database)
-    connection.execute(
-        "UPDATE external_source_registry SET source_file_sha256 = ?, updated_at = ? WHERE source_file = ?",
-        (manifest_sha256, _now(), _relative(manifest_path)),
-    )
+    connection.execute("UPDATE external_source_registry SET updated_at = ? WHERE source_file = ?", (_now(), _relative(manifest_path)))
     connection.commit()
     connection.close()
-    manifest["manifest_sha256"] = manifest_sha256
     return manifest
 
 
@@ -386,7 +364,6 @@ def run(
                 "page_url": "https://zh.wikisource.org/wiki/" + urllib.parse.quote(title, safe="/"),
                 "api_url": API_URL + "?" + urllib.parse.urlencode({"action": "query", "prop": "revisions", "titles": title}),
                 "raw_file": _relative(page_file),
-                "raw_sha256": page.get("content_sha256"),
             }
             page_records[title] = page_record
             candidate_records.append(
@@ -459,12 +436,7 @@ def run(
     }
     _write_json(manifest_path, manifest)
     _write_jsonl(candidates_path, entries)
-    manifest_sha256 = _sha256_bytes(manifest_path.read_bytes())
-    _register_candidates(database, _relative(manifest_path), manifest_sha256, entries)
-    manifest_path.with_suffix(manifest_path.suffix + ".sha256").write_text(
-        f"{manifest_sha256}  {manifest_path.name}\n", encoding="utf-8"
-    )
-    manifest["manifest_sha256"] = manifest_sha256
+    _register_candidates(database, _relative(manifest_path), entries)
     return manifest
 
 
@@ -482,8 +454,8 @@ def main() -> int:
     parser.add_argument("--reconcile-only", action="store_true")
     args = parser.parse_args()
     if args.reconcile_only:
-        manifest = _reconcile_manifest_hash(args.manifest, args.database)
-        print(json.dumps({"manifest_sha256": manifest["manifest_sha256"]}, ensure_ascii=False, indent=2))
+        manifest = _reconcile_manifest(args.manifest, args.database)
+        print(json.dumps({"status": "reconciled", "entries": len(manifest.get("entries", []))}, ensure_ascii=False, indent=2))
         return 0
     manifest = run(
         database=args.database,

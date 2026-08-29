@@ -9,7 +9,6 @@ records with explicit provenance and unresolved-field boundaries.
 """
 
 import argparse
-import hashlib
 import json
 import sqlite3
 import sys
@@ -43,14 +42,6 @@ REPORT_FILE = V2_ROOT / "data/real_runs/legacy_machine_conversion_report.json"
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _write_json(path: Path, value: Any) -> None:
@@ -193,7 +184,6 @@ def run_conversion(
             terms=material["catalog_terms"],
             works=material["catalog_works"],
             source_file=str(source_database.relative_to(PROJECT_ROOT)),
-            source_file_sha256=material["database_sha256"],
         )
         for case in cases:
             ingest_case(connection, case, origin="legacy_dictionary_db_reprocessing")
@@ -203,7 +193,6 @@ def run_conversion(
             works=material["all_works"],
             cases=cases,
             source_file=str(source_database.relative_to(PROJECT_ROOT)),
-            source_file_sha256=material["database_sha256"],
         )
         connection.commit()
 
@@ -318,11 +307,8 @@ def run_conversion(
         "status": "completed_with_explicit_boundaries" if all(checks.values()) else "completed_with_failures",
         "source_lineage": {
             "database": "02-数据库/data/dictionary.db",
-            "database_sha256": _sha256(source_database),
             "upstream_text": "02-数据库/main/source.txt",
-            "upstream_text_sha256": _sha256(source_text),
             "parser": "02-数据库/main/parser.py",
-            "parser_sha256": _sha256(source_parser),
             "importer": "02-数据库/main/importer.py",
             "source_kind": "legacy_machine_parser_output",
             "ai_model_called": False,

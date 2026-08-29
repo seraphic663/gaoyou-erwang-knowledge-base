@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import sqlite3
@@ -9,14 +8,6 @@ from typing import Any
 
 
 TARGET_RE = re.compile(r"[「『]([^」』]+)[」』]")
-
-
-def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _json_list(value: Any) -> list[Any]:
@@ -52,7 +43,6 @@ def _legacy_passage(
     raw_text: str,
     local_ordinal: int,
     source_file: Path,
-    source_file_sha256: str,
     md_line_start: int | None = None,
     md_line_end: int | None = None,
     entry_kind: str = "legacy_derived",
@@ -73,10 +63,9 @@ def _legacy_passage(
         "raw_text": text,
         "plain_text": text,
         "normalized_text": normalized,
-        "raw_text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
-        "normalized_text_sha256": hashlib.sha256(normalized.encode("utf-8")).hexdigest(),
-        "source_file": str(source_file.resolve()),
-        "source_file_sha256": source_file_sha256,
+        # Callers resolve the shared source path once. Resolving here would
+        # repeat the same filesystem lookup for every derived passage.
+        "source_file": str(source_file),
         "inline_notes": [],
     }
 
@@ -84,7 +73,6 @@ def _legacy_passage(
 def _source_txt_passages(
     source_text: Path,
     legacy_case_rows: list[dict[str, Any]],
-    source_text_sha256: str,
 ) -> tuple[list[dict[str, Any]], dict[int, dict[str, Any]]]:
     """Split the parser input into stable, line-addressable legacy passages."""
 
@@ -96,6 +84,7 @@ def _source_txt_passages(
         if match:
             line_by_case[int(row["id"])] = int(match.group(1))
 
+    rows_by_id = {int(row["id"]): row for row in legacy_case_rows}
     ordered = sorted(
         ((case_id, line_number) for case_id, line_number in line_by_case.items()),
         key=lambda item: item[1],
@@ -107,7 +96,7 @@ def _source_txt_passages(
         if start_line < 1 or start_line > len(lines):
             continue
         raw_text = "\n".join(lines[start_line - 1 : end_line])
-        row = next(item for item in legacy_case_rows if int(item["id"]) == case_id)
+        row = rows_by_id[case_id]
         passage = _legacy_passage(
             passage_id=f"legacy-source:{case_id}",
             work_key="legacy_guangya_shuzheng_source",
@@ -117,7 +106,6 @@ def _source_txt_passages(
             raw_text=raw_text,
             local_ordinal=index + 1,
             source_file=source_text,
-            source_file_sha256=source_text_sha256,
             md_line_start=start_line,
             md_line_end=end_line,
             entry_kind="legacy_source_case",
@@ -131,7 +119,6 @@ def _legacy_quote_passages(
     database_path: Path,
     evidence_rows: list[dict[str, Any]],
     works: dict[int, str],
-    database_sha256: str,
 ) -> tuple[list[dict[str, Any]], dict[int, dict[str, Any]]]:
     """Materialize each old quote as a derived, non-canonical passage.
 
@@ -156,7 +143,6 @@ def _legacy_quote_passages(
             raw_text=quote,
             local_ordinal=index,
             source_file=database_path,
-            source_file_sha256=database_sha256,
             entry_kind="legacy_derived_quote",
         )
         passages.append(passage)
@@ -183,10 +169,6 @@ def load_legacy_dictionary_cases(
 
     source_text = Path(source_text_path).resolve() if source_text_path else None
     parser = Path(parser_path).resolve() if parser_path else None
-    database_sha256 = _sha256(db_path)
-    source_text_sha256 = _sha256(source_text) if source_text and source_text.exists() else None
-    parser_sha256 = _sha256(parser) if parser and parser.exists() else None
-
     connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
     try:
@@ -253,7 +235,6 @@ def load_legacy_dictionary_cases(
                         "source_work": cited_work or f"legacy_work_id:{work_id}",
                         "legacy_work_id": work_id,
                         "passage_id": None,
-                        "quote_sha256": hashlib.sha256(quote.encode("utf-8")).hexdigest(),
                         "quote_check": "unchecked",
                         "source_location": None,
                         "source_resolution": "legacy_machine_unlinked",
@@ -286,9 +267,7 @@ def load_legacy_dictionary_cases(
                 "source_location": {
                     "source_kind": "legacy_machine_database",
                     "source_file": "02-数据库/main/source.txt",
-                    "source_file_sha256": source_text_sha256,
                     "database_file": "02-数据库/data/dictionary.db",
-                    "database_file_sha256": database_sha256,
                     "legacy_table": "cases",
                     "legacy_case_id": legacy_id,
                     "section_title": legacy.get("section_title"),
@@ -342,11 +321,8 @@ def load_legacy_dictionary_cases(
                     "transformation_description": "从旧 dictionary.db 的 cases/terms/evidences 机械映射为 annotation_case.v1，不重新判定学术结论。",
                     "provenance": {
                         "source_file": "02-数据库/data/dictionary.db",
-                        "source_file_sha256": database_sha256,
                         "source_text_file": "02-数据库/main/source.txt",
-                        "source_text_sha256": source_text_sha256,
                         "parser_file": "02-数据库/main/parser.py",
-                        "parser_sha256": parser_sha256,
                         "legacy_table": "cases",
                         "legacy_case_id": legacy_id,
                         "legacy_term_ids": term_ids,
@@ -370,11 +346,8 @@ def load_legacy_dictionary_cases(
         report = {
             "source_kind": "legacy_machine_database",
             "source_file": "02-数据库/data/dictionary.db",
-            "source_file_sha256": database_sha256,
             "source_text_file": "02-数据库/main/source.txt",
-            "source_text_sha256": source_text_sha256,
             "parser_file": "02-数据库/main/parser.py",
-            "parser_sha256": parser_sha256,
             "case_count": len(cases),
             "evidence_count": sum(len(case["evidences"]) for case in cases),
             "term_relation_count": sum(len(case["term_relations"]) for case in cases),
@@ -411,9 +384,6 @@ def load_legacy_dictionary_material(
         source_text_path=source_text,
         parser_path=parser_path,
     )
-    database_sha256 = _sha256(db_path)
-    source_text_sha256 = _sha256(source_text)
-
     connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
     try:
@@ -433,16 +403,11 @@ def load_legacy_dictionary_material(
         connection.close()
 
     works = {int(row["id"]): str(row.get("title") or "") for row in work_rows}
-    source_passages, source_by_case = _source_txt_passages(
-        source_text,
-        legacy_case_rows,
-        source_text_sha256,
-    )
+    source_passages, source_by_case = _source_txt_passages(source_text, legacy_case_rows)
     target_passages, target_by_evidence = _legacy_quote_passages(
         db_path,
         evidence_rows,
         works,
-        database_sha256,
     )
 
     evidence_by_case: dict[int, list[dict[str, Any]]] = {}
@@ -490,7 +455,6 @@ def load_legacy_dictionary_material(
                 **(case.get("source_location") or {}),
                 "passage_id": source_passage["passage_id"],
                 "source_file": source_passage["source_file"],
-                "source_file_sha256": source_passage["source_file_sha256"],
                 "md_line_start": source_passage["md_line_start"],
                 "md_line_end": source_passage["md_line_end"],
                 "title_path": source_passage["title_path"],
@@ -507,7 +471,6 @@ def load_legacy_dictionary_material(
             {
                 "passage_id": first_target["passage_id"],
                 "source_file": first_target["source_file"],
-                "source_file_sha256": first_target["source_file_sha256"],
                 "title_path": first_target["title_path"],
                 "match_mode": "first_legacy_evidence_quote",
                 "target_work_candidates": candidates,
@@ -533,7 +496,6 @@ def load_legacy_dictionary_material(
             evidence["source_location"] = {
                 "passage_id": target["passage_id"],
                 "source_file": target["source_file"],
-                "source_file_sha256": target["source_file_sha256"],
                 "title_path": target["title_path"],
                 "start_char": 0,
                 "end_char": len(evidence.get("quote") or ""),
@@ -686,8 +648,6 @@ def load_legacy_dictionary_material(
     }
     return cases, source_passages, target_passages, {
         "report": report,
-        "source_sha256": source_text_sha256,
-        "database_sha256": database_sha256,
         "all_terms": term_rows,
         "all_works": work_rows,
         "catalog_terms": unreferenced_term_rows,

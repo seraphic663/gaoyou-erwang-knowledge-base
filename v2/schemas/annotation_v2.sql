@@ -14,11 +14,11 @@ CREATE TABLE IF NOT EXISTS source_documents (
     work_key TEXT NOT NULL,
     source_kind TEXT NOT NULL,
     source_file TEXT NOT NULL,
-    source_file_sha256 TEXT NOT NULL,
     canonical_status TEXT NOT NULL DEFAULT 'unknown',
     supersedes_source_document_id TEXT,
     metadata_json TEXT NOT NULL DEFAULT '{}',
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    UNIQUE(work_key, source_file)
 );
 
 CREATE TABLE IF NOT EXISTS passages (
@@ -35,14 +35,15 @@ CREATE TABLE IF NOT EXISTS passages (
     raw_text TEXT NOT NULL,
     plain_text TEXT NOT NULL,
     normalized_text TEXT NOT NULL,
-    raw_text_sha256 TEXT,
-    normalized_text_sha256 TEXT,
     inline_notes_json TEXT NOT NULL DEFAULT '[]',
     FOREIGN KEY(source_document_id) REFERENCES source_documents(source_document_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_passages_work_title
-    ON passages(work_key, document_title, section_title, entry_title);
+ON passages(work_key, document_title, section_title, entry_title);
+
+CREATE INDEX IF NOT EXISTS idx_passages_source_document
+ON passages(source_document_id);
 
 CREATE TABLE IF NOT EXISTS annotation_cases (
     case_id TEXT PRIMARY KEY,
@@ -75,22 +76,6 @@ CREATE TABLE IF NOT EXISTS annotation_cases (
 
 CREATE INDEX IF NOT EXISTS idx_annotation_cases_work_state
     ON annotation_cases(source_work, lifecycle, machine_status, human_status);
-
-CREATE TABLE IF NOT EXISTS source_version_registry (
-    source_version_id TEXT PRIMARY KEY,
-    work_key TEXT NOT NULL,
-    source_file TEXT NOT NULL,
-    source_file_sha256 TEXT NOT NULL,
-    canonical_status TEXT NOT NULL CHECK(canonical_status IN ('canonical_active', 'historical_superseded', 'legacy_unverified', 'rejected_not_loaded', 'unknown')),
-    superseded_by_sha256 TEXT,
-    reason TEXT NOT NULL,
-    metadata_json TEXT NOT NULL DEFAULT '{}',
-    recorded_at TEXT NOT NULL,
-    UNIQUE(work_key, source_file, source_file_sha256)
-);
-
-CREATE INDEX IF NOT EXISTS idx_source_version_registry_work
-    ON source_version_registry(work_key, source_file, canonical_status);
 
 -- Work identity is deliberately separate from source editions and passages.
 -- A raw citation label may be retained as an alias without silently resolving
@@ -201,7 +186,6 @@ CREATE TABLE IF NOT EXISTS external_passage_resolution_queue (
         'missing', 'search_hit_only', 'candidate_match', 'verified', 'rejected'
     )),
     candidate_manifest_path TEXT,
-    candidate_manifest_sha256 TEXT,
     selected_passage_id TEXT,
     candidate_passage_ids_json TEXT NOT NULL DEFAULT '[]',
     candidate_refs_json TEXT NOT NULL DEFAULT '[]',
@@ -308,7 +292,6 @@ CREATE TABLE IF NOT EXISTS annotation_evidences (
     passage_id TEXT,
     source_work TEXT,
     quote TEXT NOT NULL,
-    quote_sha256 TEXT,
     quote_check TEXT,
     evidence_json TEXT NOT NULL,
     PRIMARY KEY(case_id, evidence_index),
@@ -326,7 +309,6 @@ CREATE TABLE IF NOT EXISTS external_source_registry (
     source_kind TEXT NOT NULL DEFAULT 'external_citation',
     status TEXT NOT NULL CHECK(status IN ('pending', 'registered', 'verified')),
     source_file TEXT,
-    source_file_sha256 TEXT,
     edition TEXT,
     location_note TEXT,
     metadata_json TEXT NOT NULL DEFAULT '{}',
@@ -361,7 +343,6 @@ CREATE TABLE IF NOT EXISTS legacy_catalog_terms (
     evidence_state TEXT NOT NULL CHECK(evidence_state = 'unreferenced'),
     reason TEXT NOT NULL,
     source_file TEXT NOT NULL,
-    source_file_sha256 TEXT NOT NULL,
     metadata_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -380,7 +361,6 @@ CREATE TABLE IF NOT EXISTS legacy_catalog_works (
     evidence_state TEXT NOT NULL CHECK(evidence_state = 'unreferenced'),
     reason TEXT NOT NULL,
     source_file TEXT NOT NULL,
-    source_file_sha256 TEXT NOT NULL,
     metadata_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -409,7 +389,6 @@ CREATE TABLE IF NOT EXISTS legacy_dictionary_terms (
     case_reference_count INTEGER NOT NULL DEFAULT 0,
     evidence_reference_count INTEGER NOT NULL DEFAULT 0,
     source_file TEXT NOT NULL,
-    source_file_sha256 TEXT NOT NULL,
     metadata_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -428,7 +407,6 @@ CREATE TABLE IF NOT EXISTS legacy_dictionary_works (
     case_reference_count INTEGER NOT NULL DEFAULT 0,
     evidence_reference_count INTEGER NOT NULL DEFAULT 0,
     source_file TEXT NOT NULL,
-    source_file_sha256 TEXT NOT NULL,
     metadata_json TEXT NOT NULL DEFAULT '{}',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
@@ -457,7 +435,6 @@ CREATE TABLE IF NOT EXISTS legacy_work_evidence_links (
     v2_evidence_index INTEGER NOT NULL,
     legacy_term_id INTEGER,
     evidence_type TEXT,
-    quote_sha256 TEXT,
     source_field TEXT NOT NULL DEFAULT 'evidences.work_id',
     metadata_json TEXT NOT NULL DEFAULT '{}',
     FOREIGN KEY(legacy_work_id) REFERENCES legacy_dictionary_works(legacy_work_id),

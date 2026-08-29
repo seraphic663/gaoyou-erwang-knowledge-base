@@ -12,7 +12,6 @@ gold state.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import sqlite3
@@ -82,10 +81,6 @@ def canonical_work_for_label(normalized_label: str) -> tuple[str | None, str]:
     return None, "explicit_book_title_mark"
 
 
-def digest(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
 def extract_book_labels(text: str) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for match in BOOK_TITLE_RE.finditer(text or ""):
@@ -130,8 +125,7 @@ def build_location_candidates(database_path: Path) -> dict[str, Any]:
             """
             SELECT p.passage_id, p.work_key, p.plain_text, p.raw_text,
                    p.md_line_start, p.md_line_end, p.document_title,
-                   p.section_title, p.entry_title, sd.source_file,
-                   sd.source_file_sha256
+                   p.section_title, p.entry_title, sd.source_file
             FROM passages p
             JOIN source_documents sd ON sd.source_document_id=p.source_document_id
             WHERE sd.canonical_status='canonical_active'
@@ -194,9 +188,10 @@ def build_location_candidates(database_path: Path) -> dict[str, Any]:
                 else:
                     match_status = "candidate_match"
                     target_candidate = None
-                candidate_target_id = "candidate-target:" + digest(
-                    f"{candidate['candidate_id']}|{label['label_start_char']}|{label['label_end_char']}|{label['raw_label']}"
-                )[:24]
+                candidate_target_id = (
+                    f"candidate-target:{candidate['candidate_id']}:"
+                    f"{label['label_start_char']}:{label['label_end_char']}"
+                )
                 provenance = {
                     "inference_version": "candidate_target_location.v1",
                     "candidate_id": candidate["candidate_id"],

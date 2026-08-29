@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import unicodedata
@@ -51,10 +50,6 @@ def select_legacy_case(
         if case.get("case_title") == case_title:
             return index, case
     raise ValueError(f"legacy_case_not_found:{case_title}")
-
-
-def _sha256(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def normalize_work_name(value: str | None) -> str:
@@ -211,7 +206,6 @@ def _location(
     location: dict[str, Any] = {
         "passage_id": passage.get("passage_id"),
         "source_file": passage.get("source_file"),
-        "source_file_sha256": passage.get("source_file_sha256"),
         "md_line_start": passage.get("md_line_start"),
         "md_line_end": passage.get("md_line_end"),
         "title_path": passage.get("title_path", []),
@@ -421,7 +415,6 @@ def adapt_legacy_case(
                 "evidence_role": evidence.get("role"),
                 "source_work": evidence.get("work"),
                 "passage_id": passage.get("passage_id") if passage else None,
-                "quote_sha256": _sha256(quote) if quote else None,
                 "quote_check": quote_check,
                 "source_location": _location(passage, match_data),
                 "source_resolution": source_resolution,

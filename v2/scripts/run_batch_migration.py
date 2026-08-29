@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 import unicodedata
@@ -21,7 +20,6 @@ from erwang_v2.database import (
     ingest_case,
     ingest_passages,
     open_database,
-    register_source_version,
 )
 from erwang_v2.legacy_ai_adapter import (
     adapt_legacy_case,
@@ -58,53 +56,6 @@ WORKS = {
     },
 }
 
-DUSHU_CANONICAL_SHA256 = (
-    "1460a906825998bf8a4bf3c51d4525fe19b8b79f377fb6d25ccdad4dc698e19e"
-)
-DUSHU_HISTORICAL_SHA256 = (
-    "1534084959961a160ddc93b5d7523ec2565bb01f0c079523f53442ef61fa37b2"
-)
-
-
-def _register_source_version_policy(connection) -> dict[str, Any]:
-    source_file_path = WORKS["读书杂志"]["markdown"].resolve()
-    source_file = str(source_file_path)
-    historical_id = register_source_version(
-        connection,
-        work_key="dushu_zazhi",
-        source_file=source_file,
-        source_file_sha256=DUSHU_HISTORICAL_SHA256,
-        canonical_status="historical_superseded",
-        superseded_by_sha256=DUSHU_CANONICAL_SHA256,
-        reason=(
-            "历史运行遗留 hash；当前活动 canonical Markdown 已固定为 "
-            "1460a906825998bf...，旧版本不进入 active passages。"
-        ),
-        metadata={"legacy_hash_prefix": "1534084959961a16"},
-    )
-    active_id = register_source_version(
-        connection,
-        work_key="dushu_zazhi",
-        source_file=source_file,
-        source_file_sha256=DUSHU_CANONICAL_SHA256,
-        canonical_status="canonical_active",
-        reason=(
-            "当前磁盘上的《读书杂志》Markdown canonical 版本；旧 "
-            "1534084959961a16... 仅作 historical/superseded lineage。"
-        ),
-        metadata={"canonical_hash_prefix": "1460a906825998bf"},
-    )
-    return {
-        "work_key": "dushu_zazhi",
-        "source_file": source_file,
-        "canonical_source_version_id": active_id,
-        "canonical_sha256": DUSHU_CANONICAL_SHA256,
-        "historical_source_version_id": historical_id,
-        "historical_sha256": DUSHU_HISTORICAL_SHA256,
-        "active_hash_policy": "only canonical_active may load dushu_zazhi passages",
-    }
-
-
 def _relative(path: Path) -> str:
     try:
         return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
@@ -112,20 +63,12 @@ def _relative(path: Path) -> str:
         return path.as_posix()
 
 
-def _sha256(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-def _sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
-
-
 def _schema_errors(case: dict[str, Any]) -> tuple[str, list[str]]:
     schema_path = V2_ROOT / "schemas/annotation_case.v1.schema.json"
     try:
         from jsonschema import Draft202012Validator
     except ImportError:
-        return "skipped_missing_jsonschema", []
+        return "failed_missing_jsonschema", ["jsonschema_dependency_required"]
 
     schema = json.loads(schema_path.read_text(encoding="utf-8"))
     errors = sorted(
@@ -175,13 +118,11 @@ def _load_full_json_context(path: Path) -> dict[int, dict[str, Any]]:
         return {}
     data = json.loads(path.read_text(encoding="utf-8-sig"))
     source_file = _relative(path)
-    source_file_sha256 = _sha256(path)
     return {
         int(paragraph["index"]): {
             "text": paragraph.get("text", ""),
             "paragraph_index": int(paragraph["index"]),
             "source_file": source_file,
-            "source_file_sha256": source_file_sha256,
             "source_schema_version": data.get("schema_version"),
         }
         for paragraph in data.get("paragraphs", [])
@@ -214,7 +155,6 @@ def _full_json_context_match(
     result: dict[str, Any] = {
         "status": "unavailable",
         "source_file": first_context.get("source_file"),
-        "source_file_sha256": first_context.get("source_file_sha256"),
         "source_schema_version": first_context.get("source_schema_version"),
         "paragraph_indexes": list(paragraph_indexes),
         "matches": [],
@@ -236,7 +176,6 @@ def _full_json_context_match(
                     "match_mode": "exact",
                     "start_char": start,
                     "end_char": start + len(quote),
-                    "paragraph_text_sha256": _sha256_text(text),
                 }
             )
 
@@ -264,7 +203,6 @@ def _full_json_context_match(
                     "match_mode": "punctuation_normalized",
                     "start_char": start,
                     "end_char": end,
-                    "paragraph_text_sha256": _sha256_text(text),
                 }
             )
     if not result["matches"]:
@@ -361,7 +299,6 @@ def run_batch(
     passage_maps: dict[str, dict[str, dict[str, Any]]] = {}
 
     with open_database(database_path) as connection:
-        canonical_policy = _register_source_version_policy(connection)
         for ai_path in ai_paths:
             container = load_legacy_ai_json(ai_path)
             cases = container.get("cases", [])
@@ -382,15 +319,6 @@ def run_batch(
             config = _source_config(source_work)
             assert config is not None
             markdown_path = config["markdown"]
-            markdown_hash = _sha256(markdown_path)
-            if (
-                config["work_key"] == "dushu_zazhi"
-                and markdown_hash != DUSHU_CANONICAL_SHA256
-            ):
-                raise ValueError(
-                    "dushu_zazhi_canonical_hash_mismatch:"
-                    f"{markdown_hash}:{DUSHU_CANONICAL_SHA256}"
-                )
             full_json_path = FULL_JSON_DIR / ai_path.name
             full_json_context = _load_full_json_context(full_json_path)
             passages = build_passages(markdown_path, config["work_key"])
@@ -410,13 +338,8 @@ def run_batch(
                     "work_key": config["work_key"],
                     "source_role": "legacy_ai_migration",
                     "markdown": _relative(markdown_path),
-                    "markdown_sha256": markdown_hash,
                     "ai_json": _relative(ai_path),
-                    "ai_json_sha256": _sha256(ai_path),
                     "full_json": _relative(full_json_path),
-                    "full_json_sha256": _sha256(full_json_path)
-                    if full_json_path.exists()
-                    else None,
                     "source_document_id": source_document_id,
                     "candidate_profile": _candidate_profile(passages),
                     "legacy_case_count": len(cases),
@@ -428,13 +351,7 @@ def run_batch(
                     "source_work": source_work,
                     "work_key": config["work_key"],
                     "source_document_id": source_document_id,
-                    "source_markdown_sha256": markdown_hash,
-                    "legacy_ai_json_sha256": _sha256(ai_path),
-                    "source_file_sha256": _sha256(ai_path),
                     "full_json": _relative(full_json_path),
-                    "full_json_sha256": _sha256(full_json_path)
-                    if full_json_path.exists()
-                    else None,
                 }
                 v2_case = adapt_legacy_case(
                     legacy_case,
@@ -529,15 +446,6 @@ def run_batch(
             if config["work_key"] in loaded_work_keys:
                 continue
             markdown_path = config["markdown"]
-            markdown_hash = _sha256(markdown_path)
-            if (
-                config["work_key"] == "dushu_zazhi"
-                and markdown_hash != DUSHU_CANONICAL_SHA256
-            ):
-                raise ValueError(
-                    "dushu_zazhi_canonical_hash_mismatch:"
-                    f"{markdown_hash}:{DUSHU_CANONICAL_SHA256}"
-                )
             passages = build_passages(markdown_path, config["work_key"])
             passage_maps[config["work_key"]] = {
                 passage["passage_id"]: passage for passage in passages
@@ -558,11 +466,8 @@ def run_batch(
                     "work_key": config["work_key"],
                     "source_role": "core_canonical",
                     "markdown": _relative(markdown_path),
-                    "markdown_sha256": markdown_hash,
                     "ai_json": None,
-                    "ai_json_sha256": None,
                     "full_json": None,
-                    "full_json_sha256": None,
                     "source_document_id": source_document_id,
                     "candidate_profile": candidate_profile,
                     "legacy_case_count": 0,
@@ -586,34 +491,6 @@ def run_batch(
                 "SELECT human_status, COUNT(*) FROM annotation_cases GROUP BY human_status"
             ).fetchall()
         )
-        source_version_conflicts: list[dict[str, Any]] = []
-        conflict_groups = connection.execute(
-            """
-            SELECT work_key, source_file, COUNT(*) AS version_count
-            FROM source_documents
-            GROUP BY work_key, source_file
-            HAVING COUNT(*) > 1
-            """
-        ).fetchall()
-        for group in conflict_groups:
-            versions = connection.execute(
-                """
-                SELECT source_document_id, source_file_sha256, created_at
-                FROM source_documents
-                WHERE work_key = ? AND source_file = ?
-                ORDER BY created_at
-                """,
-                (group["work_key"], group["source_file"]),
-            ).fetchall()
-            source_version_conflicts.append(
-                {
-                    "work_key": group["work_key"],
-                    "source_file": group["source_file"],
-                    "version_count": group["version_count"],
-                    "versions": [dict(version) for version in versions],
-                }
-            )
-
     total_cases = len(case_reports)
     approved_cases = sum(item["machine_status"] == "approved" for item in case_reports)
     draft_cases = sum(item["machine_status"] == "draft" for item in case_reports)
@@ -659,17 +536,6 @@ def run_batch(
                 "count": len(mapping_errors),
                 "evidence": mapping_errors,
                 "remediation": "补充 work_key/source_work 映射后再迁移。",
-            }
-        )
-    if source_version_conflicts:
-        findings.append(
-            {
-                "severity": "high",
-                "confidence": "high",
-                "finding": "同一 work_key 和 source_file 在工作库中存在多个 source hash 版本。",
-                "count": len(source_version_conflicts),
-                "evidence": source_version_conflicts,
-                "remediation": "先确定当前 canonical Markdown 版本；旧版本保留为历史来源，不要在未确认时混合迁移。",
             }
         )
     if draft_cases:
@@ -803,7 +669,6 @@ def run_batch(
                 profile.get("source_role") == "core_canonical"
                 for profile in source_profiles
             ),
-            "canonical_source_policy": canonical_policy,
         },
         "summary": {
             "source_file_count": len(source_profiles),
@@ -831,7 +696,6 @@ def run_batch(
             "lifecycle_counts": lifecycle_counts,
             "machine_status_counts": machine_counts,
             "human_status_counts": human_counts,
-            "source_version_conflicts": source_version_conflicts,
         },
         "findings": findings,
         "cases": case_reports,

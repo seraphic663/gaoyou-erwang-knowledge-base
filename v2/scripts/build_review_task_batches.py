@@ -18,9 +18,9 @@ human_status, lifecycle, or gold state.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sqlite3
+from contextlib import closing
 import sys
 from collections import Counter
 from datetime import datetime, timezone
@@ -386,7 +386,7 @@ def build_external_source_tasks(connection: sqlite3.Connection) -> list[dict[str
                q.registry_status, q.queue_status, q.edition_status,
                q.evidence_count, q.pending_evidence_count,
                q.candidate_evidence_count, q.context_json, q.updated_at,
-               r.source_file, r.source_file_sha256, r.edition,
+               r.source_file, r.edition,
                r.location_note, r.metadata_json
         FROM external_source_resolution_queue q
         JOIN external_source_registry r
@@ -436,7 +436,6 @@ def build_external_source_tasks(connection: sqlite3.Connection) -> list[dict[str
                 "candidate_evidence_count": row["candidate_evidence_count"],
                 "registered_source": {
                     "source_file": row["source_file"],
-                    "source_file_sha256": row["source_file_sha256"],
                     "edition": row["edition"],
                     "location_note": row["location_note"],
                 },
@@ -470,7 +469,7 @@ def build_external_passage_tasks(connection: sqlite3.Connection) -> list[dict[st
         SELECT queue_item_id, external_source_id, case_id, evidence_index,
                cited_work, quote, source_resolution, quote_check,
                queue_status, edition_status, passage_status,
-               candidate_manifest_path, candidate_manifest_sha256,
+               candidate_manifest_path,
                selected_passage_id, candidate_passage_ids_json,
                candidate_refs_json, context_json, updated_at
         FROM external_passage_resolution_queue
@@ -502,7 +501,6 @@ def build_external_passage_tasks(connection: sqlite3.Connection) -> list[dict[st
                 "passage_status": row["passage_status"],
                 "candidate_manifest": {
                     "path": row["candidate_manifest_path"],
-                    "sha256": row["candidate_manifest_sha256"],
                     "refs": parse_json(row["candidate_refs_json"], []),
                     "passage_ids": parse_json(row["candidate_passage_ids_json"], []),
                 },
@@ -538,18 +536,6 @@ def build_external_passage_tasks(connection: sqlite3.Connection) -> list[dict[st
 
 def _task_id_set(tasks: Iterable[dict[str, Any]]) -> set[str]:
     return {str(task["task_id"]) for task in tasks}
-
-
-def _task_id_digest(task_ids: Iterable[str]) -> str:
-    payload = "\n".join(sorted(str(task_id) for task_id in task_ids)).encode("utf-8")
-    return hashlib.sha256(payload).hexdigest()
-
-
-def _manifest_digest(manifest: dict[str, Any]) -> str:
-    payload = dict(manifest)
-    payload.pop("manifest_sha256", None)
-    encoded = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
-    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def _write_stream(path: Path, tasks: list[dict[str, Any]], batch_size: int) -> list[dict[str, Any]]:
@@ -616,7 +602,7 @@ def build_review_task_artifacts(
         )
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    with connect_read_only(database_path) as connection:
+    with closing(connect_read_only(database_path)) as connection:
         task_map = {
             "case_review": build_case_review_tasks(connection),
             "target_work_resolution": build_target_work_tasks(connection),
@@ -632,12 +618,8 @@ def build_review_task_artifacts(
         batches = _write_stream(path, task_map[stream], batch_size)
         outputs[stream] = {
             "path": filename,
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
             "task_count": len(task_map[stream]),
             "batch_count": len(batches),
-            "task_id_sha256": _task_id_digest(
-                task["task_id"] for task in task_map[stream]
-            ),
             "batches": batches,
         }
         stream_validation[stream] = _validate_stream(
@@ -689,18 +671,12 @@ def build_review_task_artifacts(
         "outputs": outputs,
     }
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
-    manifest["manifest_sha256"] = _manifest_digest(manifest)
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    manifest_path.with_suffix(manifest_path.suffix + ".sha256").write_text(
-        f"{manifest['manifest_sha256']}  {manifest_path.name}\n",
-        encoding="utf-8",
-    )
     return {
         "manifest": relative_path(manifest_path),
-        "manifest_sha256": manifest["manifest_sha256"],
         "review_sequence": list(REVIEW_SEQUENCE),
         "counts": counts,
         "batch_counts": {
@@ -740,9 +716,6 @@ def validate_review_task_artifacts(
             "stream_counts": {},
         }
 
-    expected_manifest_hash = manifest.get("manifest_sha256")
-    if expected_manifest_hash != _manifest_digest(manifest):
-        errors.append("manifest_sha256_mismatch")
     batch_size = int(manifest.get("batch_size") or 0)
     if batch_size <= 0:
         errors.append("invalid_batch_size")
@@ -768,9 +741,6 @@ def validate_review_task_artifacts(
             errors.append(f"output_missing:{stream}")
             actual_ids[stream] = set()
             continue
-        actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
-        if actual_hash != output.get("sha256"):
-            errors.append(f"output_sha256_mismatch:{stream}")
         ids: list[str] = []
         invalid_batch_rows = 0
         parse_errors = 0
@@ -795,8 +765,6 @@ def validate_review_task_artifacts(
             errors.append(f"batch_size_exceeded:{stream}:{invalid_batch_rows}")
         if len(ids) != int(output.get("task_count") or 0):
             errors.append(f"task_count_mismatch:{stream}")
-        if _task_id_digest(ids) != output.get("task_id_sha256"):
-            errors.append(f"task_id_sha256_mismatch:{stream}")
         stream_counts[stream] = {
             "artifact_count": len(ids),
             "manifest_count": int(output.get("task_count") or 0),
@@ -804,7 +772,7 @@ def validate_review_task_artifacts(
         }
 
     expected_ids: dict[str, set[str]] = {}
-    with connect_read_only(database_path) as connection:
+    with closing(connect_read_only(database_path)) as connection:
         expected_ids["case_review"] = {
             f"case-review:{row['case_id']}"
             for row in connection.execute(
