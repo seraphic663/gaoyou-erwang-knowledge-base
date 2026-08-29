@@ -61,12 +61,12 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 - 不自动覆盖原始 Markdown。
 - 机器案例可以在通过校验后进入 V2 统一工作数据库；不能把机器通过结果当作人工审校结果。
 - `annotation_cases` 同时保存机器状态和人工状态；只有 `human_review.status=approved` 的案例才能晋级 gold。
-- `passage_id`、quote、hash、来源位置和状态字段先在小样本上跑通，再接真实全量资料；同一 `work_key/source_file` 不允许混入不同 hash。
+- `passage_id`、quote、offset、来源位置和状态字段先在小样本上跑通，再接真实全量资料；同一 `work_key/source_file` 只对应一个稳定 source document。
 - `target_work` 不明确时保留为空，并使用 `target_works`、`target_scope` 记录未决状态；原典明确不引证时使用 `evidence_state=source_no_citation`，不制造占位 evidence。
 - 机器可以从旧 evidence 的显式 `source_work` 生成 `target_works` 候选，但候选状态为 `machine_inferred/candidate_only`，不等于 resolved `target_work`，也不等于机器通过。
 - 引文区分 `canonical_source_passage`、`secondary_citation_match`、`external_source_pending`；后两者都不能当作原典核验通过。
 - `candidate_items` 是原典入口的机器候选层，和 `annotation_cases` 分开；候选只有在明确走 AI 或其他案例适配器后，才生成 `annotation_case.v1`。
-- 每条案例都保留 `_migration.source_layer`、`transformation_kind`、来源文件/记录 ID 和 hash。当前来源类型为：`legacy_ai_json_reprocessing`（旧 AI JSON 再加工）、`legacy_dictionary_db_reprocessing`（旧机器库再加工）、`original_markdown_machine_extraction`（原文机器抽取）、`original_markdown_ai`（原文候选经 AI 再加工）。
+- 每条案例都保留 `_migration.source_layer`、`transformation_kind`、来源文件/记录 ID 和上游 revision。当前来源类型为：`legacy_ai_json_reprocessing`（旧 AI JSON 再加工）、`legacy_dictionary_db_reprocessing`（旧机器库再加工）、`original_markdown_machine_extraction`（原文机器抽取）、`original_markdown_ai`（原文候选经 AI 再加工）。
 
 ## 运行最小测试
 
@@ -80,7 +80,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 ## 接入真实文件的原则
 
-真实 Markdown 通过路径传入 `passage_builder`；旧 AI JSON 通过 `legacy_ai_adapter` 映射到 V2；校验通过的机器案例进入统一 V2 工作数据库，人工状态保留为 `pending`。原始文件只读，原始 hash 必须进入输出元数据。未加载的外部典籍会进入 `external_source_registry`，等待独立底本登记和核验。
+真实 Markdown 通过路径传入 `passage_builder`；旧 AI JSON 通过 `legacy_ai_adapter` 映射到 V2；校验通过的机器案例进入统一 V2 工作数据库，人工状态保留为 `pending`。原始文件只读，来源路径、稳定记录 ID 和上游 revision 进入输出元数据。未加载的外部典籍会进入 `external_source_registry`，等待独立底本登记和核验。
 
 真实案例跑通命令：
 
@@ -94,7 +94,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该命令会把所有旧 AI JSON 作为迁移/回归材料写入同一个 V2 工作库，并额外登记《经义述闻》的 passage 和候选审计，不凭空生成案例。报告区分 `approved`、`draft`、`rejected`，保留人工 `pending`；未加载的外部原典引文只记为 `unchecked`，同时保留 full JSON 上下文命中和王氏正文二次命中，但不会被误报为原典核验通过。
 
-旧 AI 的 full JSON 定位现在也被完整保存：每条迁移证据保留 full JSON 相对路径、文件 hash、段落号、匹配模式、段落内字符起止位置和段落文本 hash。full JSON 命中只是旧标注上下文的迁移线索，不等于外部原典 quote passed。
+旧 AI 的 full JSON 定位现在也被完整保存：每条迁移证据保留 full JSON 相对路径、段落号、匹配模式和段落内字符起止位置。full JSON 命中只是旧标注上下文的迁移线索，不等于外部原典 quote passed。
 
 两条来源入口统一跑通：
 
@@ -102,7 +102,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该命令将 3 个旧 AI JSON 的 17 条案例、旧 `02-数据库/data/dictionary.db` 的 815 条机器案例和四部王氏原文的 6,749 条候选汇合到同一个 V2 工作库；四部原文各抽取 1 条代表候选实际调用 AI，生成 4 条 `original_markdown_ai` 案例。全量原文候选都进入 `candidate_items`，不是把 6,749 条直接冒充案例。报告位于 `v2/data/real_runs/unified_ingress_report.json`，明细 JSONL 位于 `v2/data/real_runs/unified_ingress/`。
 
-统一入口与全量候选壳结果（不含外部公开候选 passage 导入）：6 个 source documents、15,467 个 passages、6,749 个 candidate items、7,581 个 annotation cases；其中 17 个来自旧 AI JSON、815 个来自旧机器库、4 个来自原典代表性 AI 样例、6,745 个是原典 candidate shell。当前生产工作库已登记 29 个 `external_public_candidate` source documents/passages，因此实际为 35 个 source documents、15,496 个 passages；这些外部页面仍是 `canonical_status=unknown` 的候选，不改变 annotation evidence。机器状态为 `draft=7,581`、`rejected=0`，人工状态 `pending=7,581`，gold 为 0。当前工作库有 13,990 条证据、37,905 个过程步骤、`review_events=0`。数据库完整性、外键、候选/案例孤儿和候选壳物化覆盖均通过。四部原典的 7,532 个 canonical passages、当前来源 hash 和《读书杂志》canonical `1460a906825998bf…` 均记录在 V2 中，旧 `1534084959961a16…` 只在 `source_version_registry` 中标记为 `historical_superseded`，不进入 active passages。
+统一入口与全量候选壳结果（不含外部公开候选 passage 导入）：6 个 source documents、15,467 个 passages、6,749 个 candidate items、7,581 个 annotation cases；其中 17 个来自旧 AI JSON、815 个来自旧机器库、4 个来自原典代表性 AI 样例、6,745 个是原典 candidate shell。当前生产工作库已登记 29 个 `external_public_candidate` source documents/passages，因此实际为 35 个 source documents、15,496 个 passages；这些外部页面仍是 `canonical_status=unknown` 的候选，不改变 annotation evidence。机器状态为 `draft=7,581`、`rejected=0`，人工状态 `pending=7,581`，gold 为 0。当前工作库有 13,990 条证据、37,905 个过程步骤、`review_events=0`。数据库完整性、外键、候选/案例孤儿和候选壳物化覆盖均通过。四部原典的 7,532 个 canonical passages 通过稳定 source document、来源路径和标题路径登记；LF/CRLF 不再被视为两个内容版本。
 
 机器侧完整运行：
 
@@ -117,7 +117,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
       --manifest v2/data/real_runs/external_public_candidate_manifest.json \
       --candidates v2/data/real_runs/external_passage_candidates.passage.v1.jsonl
 
-该命令现在通过 `--include-secondary-citations` 同时读取 80 条 `external_source_pending` 和 41 条 `secondary_citation_match` 引文，共 121 条；它通过维基文库公开 API 搜索并冻结页面 revision 原文，标题不命中被引作品/篇名的搜索结果不会下载为候选。对已冻结页面再运行 `v2/scripts/reconcile_external_public_matches.py`，用共用的保守 Wikitext 清理和小范围简繁定位重算连续命中，并从 V2 外部 passage 队列恢复已有的 hash-addressed 候选页面。当前 manifest 为 `candidate_found=11`、`search_hit_only=10`、`no_public_match=100`，共 17 个候选记录、31 个公开页面记录，其中 17 个可作 `normalized_contiguous` 机器匹配；这是定位候选，不是 canonical。所有 external evidence 仍为 `quote_check=unchecked`；现有队列还保留此前检索已找到的候选，当前为 source `candidate_available=14`、`no_public_match=79`、`pending=7`，passage `candidate_available=15`、`no_public_match=96`、`pending=10`。外部版本/底本仍未确认。CText 的 API/网页人机验证边界及 Round 3 的逐来源研究记录在 `v2/research/external_source_research_round3.md`，早期入口记录仍保留在 `v2/research/external_source_research_round2.md` 和 `v2/research/external_source_research.md`。
+该命令现在通过 `--include-secondary-citations` 同时读取 80 条 `external_source_pending` 和 41 条 `secondary_citation_match` 引文，共 121 条；它通过维基文库公开 API 搜索并冻结页面 revision 原文，标题不命中被引作品/篇名的搜索结果不会下载为候选。对已冻结页面再运行 `v2/scripts/reconcile_external_public_matches.py`，用共用的保守 Wikitext 清理和小范围简繁定位重算连续命中，并从 V2 外部 passage 队列恢复按页面路径、pageid/revid 标识的候选页面。当前 manifest 为 `candidate_found=11`、`search_hit_only=10`、`no_public_match=100`，共 17 个候选记录、31 个公开页面记录，其中 17 个可作 `normalized_contiguous` 机器匹配；这是定位候选，不是 canonical。所有 external evidence 仍为 `quote_check=unchecked`；现有队列还保留此前检索已找到的候选，当前为 source `candidate_available=14`、`no_public_match=79`、`pending=7`，passage `candidate_available=15`、`no_public_match=96`、`pending=10`。外部版本/底本仍未确认。CText 的 API/网页人机验证边界及 Round 3 的逐来源研究记录在 `v2/research/external_source_research_round3.md`，早期入口记录仍保留在 `v2/research/external_source_research_round2.md` 和 `v2/research/external_source_research.md`。
 
 冻结的公开候选 passage 入库（仍不自动通过 canonical）：
 
@@ -131,15 +131,15 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
     python v2/scripts/build_external_evidence_packets.py
 
-该命令把 100 个 external source queue 行和 121 个 external passage queue 行分别打包为可追溯的机器证据包，重检候选文件 hash、连续匹配、manifest、queue、registry 和 evidence 的对应关系；当前 source/passsage 覆盖为 `100/100`、`121/121`，候选文件 hash 复核通过 60 条，缺失和 hash mismatch 均为 0。证据包只用于机器定位和人工审校准备，不改变 `canonical_status`、evidence link 或 `quote_check`。结果位于 `v2/data/real_runs/external_evidence_packets.v1.jsonl` 与 `v2/data/real_runs/external_evidence_packets_report.json`，并通过 `run_v2_validation.py` 的 `external_evidence_packets` 门。
+该命令把 100 个 external source queue 行和 121 个 external passage queue 行分别打包为可追溯的机器证据包，重检候选文件存在性、连续匹配、manifest、queue、registry 和 evidence 的对应关系；当前 source/passage 覆盖为 `100/100`、`121/121`。证据包只用于机器定位和人工审校准备，不改变 `canonical_status`、evidence link 或 `quote_check`。结果位于 `v2/data/real_runs/external_evidence_packets.v1.jsonl` 与 `v2/data/real_runs/external_evidence_packets_report.json`，并通过 `run_v2_validation.py` 的 `external_evidence_packets` 门。
 
 外部独立底本候选冻结（仍不登记为 canonical）：
 
     python v2/scripts/freeze_external_edition_candidates.py
 
-该命令读取 `v2/data/real_runs/external_edition_fetch_manifest.v1.json`，从 Internet Archive 冻结候选卷册的 metadata 和 DjVu OCR；扫描 PDF 只在 OCR 先命中引文时下载，当前没有自动 OCR 命中，因此本轮没有把大体量影印 PDF 伪装成已完成材料；CText 入口若被当前环境 403 阻断，则只记录阻断状态、URL 和响应 hash。结果位于 `v2/data/real_runs/external_edition_candidate_manifest.v1.json` 与 `v2/data/external_sources/edition_candidates/`。当前候选包为 34 个（32 个 IA 可下载候选、2 个 CText 阻断入口），191 个候选条目，191 个完整 OCR 文件记录，关联 95 个外部来源；文件缺失、大小错误、hash 错误均为 0，数据库写入为 0，自动 OCR quote match 为 0。OCR 只能定位，影印 PDF 仍需人工逐页确认；《礼记大全》《春秋左传注疏》《管子校正》《管子》及《论语注疏》保持不同版本/文本层，不互相替代。
+该命令读取 `v2/data/real_runs/external_edition_fetch_manifest.v1.json`，从 Internet Archive 冻结候选卷册的 metadata 和 DjVu OCR；扫描 PDF 只在 OCR 先命中引文时下载，当前没有自动 OCR 命中，因此本轮没有把大体量影印 PDF 伪装成已完成材料；CText 入口若被当前环境 403 阻断，则只记录阻断状态和 URL。结果位于 `v2/data/real_runs/external_edition_candidate_manifest.v1.json` 与 `v2/data/external_sources/edition_candidates/`。当前候选包为 34 个（32 个 IA 可下载候选、2 个 CText 阻断入口），191 个候选条目，191 个完整 OCR 文件记录，关联 95 个外部来源；文件缺失、大小错误均为 0，数据库写入为 0，自动 OCR quote match 为 0。OCR 只能定位，影印 PDF 仍需人工逐页确认；《礼记大全》《春秋左传注疏》《管子校正》《管子》及《论语注疏》保持不同版本/文本层，不互相替代。
 
-候选冻结包自校验由 `build_external_evidence_packets.py` 内的 `validate_external_edition_candidate_manifest()` 执行，并作为外部 evidence packet 和 `run_v2_validation.py` 的边界门：所有冻结文件逐个核路径、大小和 SHA-256；候选只允许保持 unknown，不能改变 `source_documents`、`annotation_evidences.quote_check`、人工 pending 或 gold。当前外部 packet 会把 95 个来源的候选卷册引用、文件路径、hash 和文本层直接带给后续人工任务。
+候选冻结包自校验由 `build_external_evidence_packets.py` 内的 `validate_external_edition_candidate_manifest()` 执行，并作为外部 evidence packet 和 `run_v2_validation.py` 的边界门：所有冻结文件逐个核安全路径、存在性和预期大小；候选只允许保持 unknown，不能改变 `source_documents`、`annotation_evidences.quote_check`、人工 pending 或 gold。当前外部 packet 会把 95 个来源的候选卷册引用、文件路径、上游标识和文本层直接带给后续人工任务。
 
 当前外部来源状态以 `v2/data/real_runs/external_source_inventory.json`、`v2/data/real_runs/work_queues_report.json` 和 `v2/data/real_runs/v2_validation_report.json` 为准：100 个外部来源中 14 个是已登记但未核验的公开转录候选、86 个仍为 `pending`，独立 canonical 底本为 0；外部来源队列为 `candidate_available=14`、`no_public_match=79`、`pending=7`，外部 passage 队列为 `candidate_available=15`、`no_public_match=96`、`pending=10`。公开候选定位完成不等于版本确认、引文通过或 gold。本轮对《急就篇》《管子·形势解》《礼记·月令》《论语·微子》的入口和失败边界记录在 `v2/research/external_canonical_source_research_round4.md`。
 
@@ -149,7 +149,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该命令读取 `02-数据库/data/dictionary.db`，追溯其上游 `02-数据库/main/source.txt -> parser.py -> importer.py`，把 815 个旧机器案例、6,628 条案例-词条关系和 7,120 条证据重新写成 `annotation_case.v1` 并入 V2；同时从 `source.txt` 生成 815 个 `legacy_source_case` passage，从旧证据文本生成 7,120 个 `legacy_derived_quote` passage，并将 815 个案例的 source/target/process 字段和 7,120 条证据绑定到这些 legacy passage。它不会把旧 `certainty=确定` 当成人工通过，也不会把 legacy passage 或机器拼接文本冒充 canonical quote；7,120 条 evidence 均保持 `unchecked`、`source_resolution=legacy_derived_passage`。报告位于 `v2/data/real_runs/legacy_machine_conversion_report.json`，转换 JSONL 位于 `v2/data/real_runs/legacy_machine_conversion/`。
 
-旧库中 14 个没有挂入任何案例的词条和 12 个没有被证据引用的著作目录项已经进入 V2 的 `legacy_catalog_terms` / `legacy_catalog_works`，状态为 `catalog_only`、`unreferenced`，保留旧 ID、来源文件、hash 和未引用原因；它们没有被伪造为研究案例、证据或 gold。
+旧库中 14 个没有挂入任何案例的词条和 12 个没有被证据引用的著作目录项已经进入 V2 的 `legacy_catalog_terms` / `legacy_catalog_works`，状态为 `catalog_only`、`unreferenced`，保留旧 ID、来源文件和未引用原因；它们没有被伪造为研究案例、证据或 gold。
 
 旧主库字段利用审计：
 
@@ -169,7 +169,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
     python v2/scripts/run_v2_validation.py
 
-该只读脚本检查 SQLite 完整性和外键、四部 canonical hash 及《读书杂志》历史版本策略、815/7,120 legacy passage 覆盖、五步字段、quote hash、canonical quote 边界、孤儿引用、14/12 个 catalog-only 项、machine/human 状态分离、三类队列引用和 `review_events.operation_id` 幂等索引。报告位于 `v2/data/real_runs/v2_validation_report.json`。
+该只读脚本检查 SQLite 完整性和外键、四部 canonical 来源、815/7,120 legacy passage 覆盖、五步字段、quote/offset、canonical quote 边界、孤儿引用、14/12 个 catalog-only 项、machine/human 状态分离、三类队列引用和 `review_events.operation_id` 幂等索引。报告位于 `v2/data/real_runs/v2_validation_report.json`。
 
 著作身份/别名注册与候选分批计划：
 
@@ -182,7 +182,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
     python v2/scripts/materialize_all_candidate_batches.py
 
-该命令按确定性批次调用单批写入 seam，生成 68 份 `candidate_shell_batch_*.annotation_case.v1.jsonl` 和对应报告；6,745 条 candidate shell 逐条保留 source passage、连续 source quote、原文文件/hash、候选规则/风险、计划批次和字段边界，`candidate_items.output_case_id` 全部建立回链，重复执行幂等跳过。每批 20/50/100 条的网页分页只改变展示范围，不改变数据库状态。
+该命令按确定性批次调用单批写入 seam，生成 68 份 `candidate_shell_batch_*.annotation_case.v1.jsonl` 和对应报告；6,745 条 candidate shell 逐条保留 source passage、连续 source quote、原文文件与来源 ID、候选规则/风险、计划批次和字段边界，`candidate_items.output_case_id` 全部建立回链，重复执行幂等跳过。每批 20/50/100 条的网页分页只改变展示范围，不改变数据库状态。
 
 机器目标定位候选：
 
@@ -220,7 +220,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该命令生成 `target_work_resolution_queue`（当前 7,962 项）、`external_source_resolution_queue`（100 个外部来源）、`external_passage_resolution_queue`（121 条外部证据）和 `human_review_queue` 快照（7,581 个案例）。公开转录只进入 candidate_available，不进入 canonical；no_public_match/search_hit_only 保留原状态。队列报告位于 `v2/data/real_runs/work_queues_report.json`，JSONL 明细位于 `v2/data/real_runs/queues/`。
 
-人工审校写入边界由四个事务 seam 提供：`apply_case_review_submission()` 写案例 patch 和 `review_events`，`apply_target_work_resolution()` 写目标典籍消歧但不改变 human pending，`apply_external_source_resolution()` 和 `apply_external_passage_resolution()` 写外部来源/段落的独立 `resolution_events`。每个命令必须带唯一 `operation_id`，重复提交幂等；案例审批还必须有 reviewer、source/target/evidence/process/conclusion 六类 field decisions、逐条 evidence decisions、已绑定 canonical target passage 和 quote passed；不满足时不能进入 gold。外部来源即使被人工标为 verified，也必须提供可核对的文件/hash/版本和与其一致的 canonical passage，且不会自动修改 annotation evidence 的 quote_check。当前生产库没有执行人工事件，`review_events=0`、`resolution_events=0`。
+人工审校写入边界由四个事务 seam 提供：`apply_case_review_submission()` 写案例 patch 和 `review_events`，`apply_target_work_resolution()` 写目标典籍消歧但不改变 human pending，`apply_external_source_resolution()` 和 `apply_external_passage_resolution()` 写外部来源/段落的独立 `resolution_events`。每个命令必须带唯一 `operation_id`，重复提交幂等；案例审批还必须有 reviewer、source/target/evidence/process/conclusion 六类 field decisions、逐条 evidence decisions、已绑定 canonical target passage 和 quote passed；不满足时不能进入 gold。外部来源即使被人工标为 verified，也必须提供可核对的文件、版本/上游 revision 和与其一致的 canonical passage，且不会自动修改 annotation evidence 的 quote_check。当前生产库没有执行人工事件，`review_events=0`、`resolution_events=0`。
 
 人工审校任务包：
 
@@ -228,7 +228,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 该只读命令把案例、target_work、外部来源版本和外部 passage/quote 分成四条 `review_task.v1` JSONL 流，每条任务有稳定 `task_id`、`batch_id`、核心摘要、detail ref 和对应的 machine-only target/external packet 引用；manifest 会逐条与当前 pending queue 反向比对，任务包不写数据库、不产生 review event。当前生产任务包为案例 7,581 条/76 批、target_work 7,962 条/80 批、外部来源 100 条/1 批、外部 passage 121 条/2 批，批次上限 100；manifest 位于 `v2/data/real_runs/review_tasks/review_task_manifest.review.v1.json`，并由 `run_v2_validation.py` 的 `review_task_artifacts` 与 `target_work_resolution_packets` 检查纳入正式验收。
 
-本地只读验收页：启动 `03-项目网站` 后访问 `/v2-database.html` 使用核心展示版；访问 `/v2-acceptance.html` 使用完整详情/审计版。两者通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取同一个 V2 工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，列表默认只显示案例核心字段和目标定位候选数量，目标定位候选、来源 passage、证据、词条、五步过程、hash 和完整 JSON 在详细页按折叠区展开。验收 bridge 会复用当前 `v2_validation_report.json`，报告过期时显示待重跑提示，不把旧验收结果冒充当前状态；外部候选 passage 在案例证据详情中按“候选、不等于 canonical”折叠展示。
+本地只读验收页：启动 `03-项目网站` 后访问 `/v2-database.html` 使用核心展示版；访问 `/v2-acceptance.html` 使用完整详情/审计版。两者通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取同一个 V2 工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，列表默认只显示案例核心字段和目标定位候选数量，目标定位候选、来源 passage、证据、词条、五步过程、来源记录和完整 JSON 在详细页按折叠区展开。验收 bridge 会复用当前 `v2_validation_report.json`，报告过期时显示待重跑提示，不把旧验收结果冒充当前状态；外部候选 passage 在案例证据详情中按“候选、不等于 canonical”折叠展示。
 
 当前 VR 还提供受控的人工审校任务入口：`GET /api/v2/review-tasks` 按四条任务流和批次读取静态 `review_task.v1`，`GET /api/v2/review-task` 读取单条任务，`POST /api/v2/review` 仅在以 `V2_REVIEW_WRITE_ENABLED=1` 启动本地服务时开放。VR 默认每批只显示前 20 条，可切换 50/100 条；提交 bridge 还会把 `task_id`、任务类型、queue item、当前 pending 状态与持久化任务包绑定，不能用任意 queue item 或 stale task 绕过任务流。提交接口只转发到 `apply_case_review_submission()`、`apply_target_work_resolution()`、`apply_external_source_resolution()` 或 `apply_external_passage_resolution()`；任务选择本身不写库，target/source/passage resolution 不晋级 gold，重复 `operation_id` 幂等，案例 `approved` 仍受完整字段决定、canonical target passage 和 quote gate 约束。提交后必须重建任务包，静态 JSONL 不会自行改变。默认启动仍是只读：
 

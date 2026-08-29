@@ -6,8 +6,8 @@
 
 - 检索时间：2026-08-13 13:20（Asia/Shanghai；报告写入后仅做文件复核）
 - 审计对象：当前 `external_source_resolution_queue.edition.v1.jsonl` 的 100 个来源；重点复核 manifest 中 6 个 `candidate_found`/queue `candidate_available` 来源和 8 个 `search_hit_only` 来源。
-- manifest：`v2/data/real_runs/external_public_candidate_manifest.json`；SHA-256 `57492f8f18723abbad454277a800542e440274c22426a79580bb22b961518a0d`。
-- source queue：`v2/data/real_runs/queues/external_source_resolution_queue.edition.v1.jsonl`；SHA-256 `861e57d0329d258558223233f8217dd0f34723d6a79e945d7097332873b0bc15`。
+- manifest：`v2/data/real_runs/external_public_candidate_manifest.json`。
+- source queue：`v2/data/real_runs/queues/external_source_resolution_queue.edition.v1.jsonl`。
 - 任务快照（只读辅助逐项取 quote）：`v2/data/real_runs/review_tasks/external_source_resolution.review_task.v1.jsonl`；报告写入前曾为 `88280e753d7ac300d6ad2e68b30174a6f33b95b0dbb9809b493379007ca83c9f`，随后被并发的候选抓取进程改写；最终复核 hash 为 `cc42593894d6095769957f5cbde020b413ee6fe8eaea6a89d7359826196a5e7a`。
 
 ## 1. 结论先行
@@ -23,7 +23,7 @@
 
 1. 优先使用 Wikisource 的公开页面、页面 revision 元数据和 MediaWiki API URL；同时用 CText/原始文本页面作版本与篇名交叉定位，不把搜索引擎摘要当原典。
 2. 对已冻结 Wikitext，区分 `normalized_contiguous`（仅去标点/空白并使用项目已有小范围简繁定位）与“正文/注文分别出现”“二次引文”“只命中近似句”。后者均不是 canonical quote passed。
-3. 本轮尝试再次访问 Wikisource API 时收到 `You are making too many requests to the API`（HTTP 429/速率限制）。因此新页面的 revision 未强行猜测；已有页面的 revision、timestamp、raw SHA-256 以 manifest 冻结记录为准，新增页面只记录稳定页面 URL和“revision 未取得”。
+3. 本轮尝试再次访问 Wikisource API 时收到 `You are making too many requests to the API`（HTTP 429/速率限制）。因此新页面的 revision 未强行猜测；已有页面的 revision、timestamp 和本地页面路径以 manifest 记录为准，新增页面只记录稳定页面 URL和“revision 未取得”。
 4. `Wikisource public transcription`、`四库全书本`页面标题和 CText 版本列表，都不能单独证明当前 evidence 使用的印本、底本、影印页或校勘层次；这些只构成 candidate/定位证据。
 
 ## 3. 六个 candidate_available 来源的逐项复核

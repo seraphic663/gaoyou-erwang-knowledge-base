@@ -177,7 +177,7 @@ URL 是直接页面或正式检索/馆藏入口。public candidate 复用已有 
 
 当前 manifest 中带有可复核 revision/raw hash 的 candidate page 共 26 个（同一 source 可能有多个版本/页面）。下面只列代表性 source、revision、时间、raw hash 与直接 URL；这些是候选冻结线索，不是 canonical 底本。完整 URL 和其余候选版本仍以 `v2/data/real_runs/external_public_candidate_manifest.json` 为准：
 
-| external_source_id | revision / 时间 / raw SHA-256 / URL |
+| external_source_id | revision / 时间 / 页面路径 / URL |
 |---|---|
 | external:070ad5cdcb5ba91e | `1765440 / 2020-02-03T16:29:02Z / 6fdb401be6787c9c7a724b4970f057ce5d5ee898f3d5f1a03a427b28a3fb3dda` / <https://zh.wikisource.org/wiki/%E5%8F%B2%E8%A8%98/%E5%8D%B7109>；`2514779 / 2025-01-06T08:32:38Z / c5e0dfeca5dbd51db7e83a9abb095554257f402fbc9a931e381aa3198721406f` / <https://zh.wikisource.org/wiki/%E5%8F%B2%E8%A8%98%E4%B8%89%E5%AE%B6%E8%A8%BB/%E5%8D%B7109>；另有 3 个同 source 候选版本，详见 `external_public_candidate_manifest.json`。 |
 | external:0e4af81ea01d4bc8 | `2346508 / 2023-12-21T03:48:18Z / f5cd5d8d3975444b20aa647fcb4a34c122402ffa53dddd5e571533ed6919e42f` / <https://zh.wikisource.org/wiki/%E7%A6%AE%E8%A8%98/%E6%A8%82%E8%A8%98>；`544488 / 2016-10-04T00:22:43Z / 4bd29d2a9a8e552bed8ec040310e10e9a727d9b0f5268f841a7d6b0e3c732e41` / <https://zh.wikisource.org/wiki/%E7%A6%AE%E8%A8%98%E6%B3%A8%E7%96%8F%20%28%E5%9B%9B%E5%BA%AB%E5%85%A8%E6%9B%B8%E6%9C%AC%29/%E5%8D%B737> |

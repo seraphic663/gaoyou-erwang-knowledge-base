@@ -154,7 +154,7 @@
 
 本轮先直接测试 CText 的机器接口和篇章页面。CText API 对 `gettext` 返回认证要求，连续访问篇章页面后也出现人机验证/403；因此没有把 CText 网页或 API 响应伪装成本地 canonical 文件，也没有绕过验证。CText 仍保留在来源调查报告中，作为版本和篇章入口，不作为本轮已下载的证据。
 
-随后使用维基文库公开 MediaWiki API 对当前 80 条 `external_source_pending` 引文逐条搜索，并在页面标题命中被引作品/篇名时保存 revision 原文。结果已经写入 `v2/data/real_runs/external_public_candidate_manifest.json`、`v2/data/real_runs/external_passage_candidates.passage.v1.jsonl` 和 `v2/data/external_sources/wikisource_candidate/pages/`；manifest 的最终 hash 记录在同名 `.sha256` 文件中。
+随后使用维基文库公开 MediaWiki API 对当前 80 条 `external_source_pending` 引文逐条搜索，并在页面标题命中被引作品/篇名时保存 revision 原文。结果已经写入 `v2/data/real_runs/external_public_candidate_manifest.json`、`v2/data/real_runs/external_passage_candidates.passage.v1.jsonl` 和 `v2/data/external_sources/wikisource_candidate/pages/`；来源版本以页面 URL、revision ID 和抓取时间记录。
 
 实际结果为：80 条中 1 条达到“公开页面原文可匹配”的候选状态，11 条只有被引作品相关页面的搜索命中但 quote 未成为当前原始 wikitext 的连续子串，68 条没有找到满足标题过滤的公开页面候选；共保存 22 个页面原文文件。唯一的 `candidate_found` 是 `legacy-ai:16` evidence 8 的“礼记·礼运”引文“山川所以儐鬼神也。”，其页面候选包括 `禮記/禮運`，另有 `禮記注疏` 和 `日講禮記解義` 的相关页；这仍然只是公开转录候选，未选择 edition、未做影印图文核验。
 

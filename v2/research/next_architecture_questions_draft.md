@@ -35,7 +35,7 @@
 
 研究后的确定性计划已生成：6,749 条中 4 条已有 `output_case_id`，6,745 条为 `ready_candidate_shell`，没有缺失 passage/source document 的阻塞项；按每批 100 条为 68 批。第一批 `original-candidates-0001` 已物化 100 条，当前剩余 6,645 条。计划和物化均保留 `planned_case_id=candidate-shell:<candidate_id>`、source passage/hash、规则命中和风险标志；候选壳不生成语义结论，也不改变人工状态。证据：`v2/data/real_runs/candidate_materialization_plan_report.json`、`v2/data/real_runs/candidate_shell_batch_0001_report.json`。
 
-第一批已经按该计划物化：`original-candidates-0001` 100/100 条进入 `annotation_cases`，所有案例的 `origin=original_markdown_candidate_shell`、`machine_status=draft`、`human_status=pending`、`lifecycle=machine_draft`，并通过 `candidate_items.output_case_id` 回链；没有 AI 调用、target_work 解析或 gold 晋级。100 条 source context quote 均有 canonical passage 绑定并可做字符串/sha256 校验，但其 `semantic_role=context_only`，不表示学术证据或结论。证据：`v2/data/real_runs/candidate_shell_batch_0001_report.json`、`v2/data/real_runs/candidate_shell_batch_0001.annotation_case.v1.jsonl`。
+第一批已经按该计划物化：`original-candidates-0001` 100/100 条进入 `annotation_cases`，所有案例的 `origin=original_markdown_candidate_shell`、`machine_status=draft`、`human_status=pending`、`lifecycle=machine_draft`，并通过 `candidate_items.output_case_id` 回链；没有 AI 调用、target_work 解析或 gold 晋级。100 条 source context quote 均有 canonical passage 绑定并可做字符串和字符偏移校验，但其 `semantic_role=context_only`，不表示学术证据或结论。证据：`v2/data/real_runs/candidate_shell_batch_0001_report.json`、`v2/data/real_runs/candidate_shell_batch_0001.annotation_case.v1.jsonl`。
 
 当前只有每部原典 1 条代表候选调用 AI；本轮另将第一批 100 条确定性 materialization 为 candidate shell，但没有把它们当作 AI 语义案例。当前剩余 6,645 条候选仍只在 candidate layer；因此不是 6,749 条学术案例，而是 4 条原典 AI 草稿 + 100 条结构候选壳 + 其余候选队列。证据：`v2/data/real_runs/unified_ingress_report.json`、`v2/data/real_runs/candidate_shell_batch_0001_report.json`。
 
@@ -92,7 +92,7 @@ V2 已把 80 条 external pending evidence 关联到 100 个外部 registry 条�
 
 ### 5.2 哪些可以自动化
 
-可以自动化的部分是资料工程而非学术确认：从 evidence 中抽取并去重 raw cited label；按 work registry 生成外部 source 任务；检查本地/公开候选文件是否存在；冻结文件/revision、来源 URL、revision ID、文件 hash、抓取时间；把 candidate passage 切分为带 edition/source_document/location 的 `passage.v1`；在 raw/normalized text 上做连续子串、字符偏移和 quote hash 检查；将每个 evidence 绑定到 candidate passage，同时维持 `source_resolution=external_source_pending` 或 `public_candidate_unverified`。
+可以自动化的部分是资料工程而非学术确认：从 evidence 中抽取并去重 raw cited label；按 work registry 生成外部 source 任务；检查本地/公开候选文件是否存在；冻结文件路径、预期大小、来源 URL、revision ID 和抓取时间；把 candidate passage 切分为带 edition/source_document/location 的 `passage.v1`；在 raw/normalized text 上做连续子串和字符偏移检查；将每个 evidence 绑定到 candidate passage，同时维持 `source_resolution=external_source_pending` 或 `public_candidate_unverified`。
 
 不能自动化为“verified”的部分是选择何种底本/版本、版本与引文是否对应、影印/校勘图像核对、篇章位置确认、异文是否影响结论，以及将候选升级为 canonical。`fetch_external_public_candidates.py` 的 `_register_candidates()` 已正确把公开转录写成 `registered` 而非 `verified`；下一步应新增人工确认的 edition/source record，而不是直接把 registered 改成 verified。证据：`v2/scripts/fetch_external_public_candidates.py:255-305`、`v2/schemas/annotation_v2.sql:151-178`。
 
@@ -128,7 +128,7 @@ V2 已在一个物理工作库中分离状态：`annotation_cases` 保存 machin
 
 1. 初始基线验收：`machine_status=draft`、`human_status=pending`、`lifecycle=machine_draft`、gold=0、review_events=0 的数量与报告一致。
 2. 单条审校验收：一次人工动作产生一条不可变 review event；案例状态、`human_review_json`、lifecycle 和 `v_human_review_queue/v_gold_cases` 同一事务更新，重复提交幂等。
-3. 反向验收：机器 validator 通过、quote hash 通过、external candidate found、旧字段 `已审核/确定` 都不能单独造成 human approved 或 gold。
+3. 反向验收：机器 validator 通过、引文定位通过、external candidate found、旧字段 `已审核/确定` 都不能单独造成 human approved 或 gold。
 4. 不确定/退回验收：uncertain 保留在人工队列并显示原因；rejected 保留完整 raw provenance 和 rejection reason，不能删除 candidate/evidence。
 5. UI 读写验收：UI 的数量必须能由视图/查询复算；展示文案明确区分“候选审计通过”“机器草稿”“人工已审”“gold”，禁止用“已校对/已审核”等旧库标签覆盖 V2 状态。
 6. 主库边界验收：在 V2 gold 非空且导出契约通过前，不运行把 V2 工作库直接同步成旧 `dictionary.db` 或网站公开快照的路径；`02-数据库` 现有“审核通过案例再考虑迁移到主库”的优先级只能作为后置出口。

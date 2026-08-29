@@ -6,7 +6,7 @@
 
 本轮清单 `v2/data/real_runs/external_edition_fetch_manifest.v1.json` 共 28 个候选包，其中 26 个为 Internet Archive 公共扫描候选，2 个为 CText 直接入口受 HTTP 403 阻断的 edition lead。共 171 个候选条目、335 个完整 OCR/PDF 文件记录、83 个关联外部来源；自动 OCR quote match 为 0，SQLite 行变更为 0。
 
-冻结产物位于 `v2/data/external_sources/edition_candidates/`，汇总 manifest 位于 `v2/data/real_runs/external_edition_candidate_manifest.v1.json`，manifest SHA-256 为 `e62cd6fde23250a3afccbca35acd6b5d718174e6c3dedf6552b09afffc240a3b`。每个可下载条目保存 Internet Archive metadata、DjVu OCR；当前与外部引文存在关联的条目同时保存 PDF 影印候选。下载采用临时文件、预期大小、SHA-256、原子改名顺序，最终 `.part` 文件数为 0。
+冻结产物位于 `v2/data/external_sources/edition_candidates/`，汇总 manifest 位于 `v2/data/real_runs/external_edition_candidate_manifest.v1.json`。每个可下载条目保存 Internet Archive metadata、DjVu OCR；当前与外部引文存在关联的条目同时保存 PDF 影印候选。下载采用临时文件、预期大小和原子改名顺序，最终 `.part` 文件数为 0。
 
 ## 主要来源与版本边界
 
@@ -19,7 +19,7 @@
 
 ## 自动校验
 
-`build_external_evidence_packets.py` 的 `validate_external_edition_candidate_manifest()` 已逐文件核验：候选包 28/28，条目 171/171，完整文件 335/335，缺失 0，大小不符 0，SHA-256 不符 0，不安全路径 0，`.part` 0，`database_rows_changed=0`。外部 evidence packet 覆盖 source queue 100/100、passage queue 121/121；候选文件 hash 复核通过 60 条，缺失和 hash mismatch 均为 0；候选包引用到 83 个 source 和 96 条 evidence。
+`build_external_evidence_packets.py` 的 `validate_external_edition_candidate_manifest()` 已逐文件核验：候选包 28/28，条目 171/171，完整文件 335/335，缺失 0，大小不符 0，不安全路径 0，`.part` 0，`database_rows_changed=0`。外部 evidence packet 覆盖 source queue 100/100、passage queue 121/121；候选文件存在性和预期大小复核通过，候选包引用到 83 个 source 和 96 条 evidence。
 
 ## 解释口径
 
