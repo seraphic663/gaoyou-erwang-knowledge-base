@@ -50,3 +50,8 @@ v2/data/external_sources/edition_candidates/**/*.part
 
 # ---- Optional local generated data (uncomment if needed) ----
 # 03-项目网站/data/*.bak
+
+# ---- V2 local working data and generated reports ----
+# Rebuild these from source inputs and scripts; do not commit databases,
+# review queues, packets, or other real-run outputs.
+v2/data/real_runs/

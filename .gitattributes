@@ -5,3 +5,8 @@
 # do not normalize their whitespace or treat them as editable prose diffs.
 v2/data/external_sources/wikisource/pages/*.wikitext -diff whitespace=-trailing-space
 v2/data/external_sources/wikisource_candidate/pages/*.wikitext -diff whitespace=-trailing-space
+
+# Frozen external OCR data can contain hundreds of thousands of generated
+# records. Keep this evidence cache versioned, but exclude it from source-code
+# line statistics.
+v2/data/external_sources/edition_candidates/** linguist-generated=true -diff
