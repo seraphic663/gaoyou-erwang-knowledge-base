@@ -1,6 +1,6 @@
 # 数据库目录说明
 
-`02-数据库` 是项目的数据层，包含两个独立 SQLite 数据库、各自的生成管线，以及共享工具层。
+`02-数据库` 是旧兼容数据层，包含两个独立 SQLite 数据库、各自的生成管线，以及共享工具层。当前 V2 统一工作库另位于 `v2/data/real_runs/annotation_v2.db`；三者性质不同，不能统称为已经人工审校的主库。
 
 ## 目录结构
 
@@ -20,7 +20,7 @@
   │   ├── schema.sql             标注库 DDL（参考）
   │   └── importer.py            标注库建表与查询接口
   ├── data/                      两个 SQLite 数据库产物
-  │   ├── dictionary.db          主库（已校对，面向公众）
+  │   ├── dictionary.db          旧机器解析展示库（兼容/迁移/对照）
   │   └── annotations.db         标注库（草稿/待核，内部研究用）
   └── README.md
 ```
@@ -37,6 +37,8 @@
 | 核心表 | works, passages, terms, cases, evidences | source_documents, annotation_cases, annotation_terms, annotation_evidences, annotation_process_steps |
 
 两个库物理独立，架构统一：共享 `lib/` 工具层，产物统一放在 `data/`。
+
+它们与 V2 的关系是：`dictionary.db` 和 `annotations.db` 都可以通过适配器进入 `v2/data/real_runs/annotation_v2.db`，但迁移只保留和规范机器材料，不会把旧 `草稿`、`确定`、`已校对` 等字段自动解释为人工审核。V2 的机器状态、人工状态和 lifecycle 以 `00-项目说明/10-V2统一工作流与数据库状态规范.md` 为准。
 
 ## 主库数据链路
 
@@ -136,7 +138,7 @@ __pycache__/
 
 ## 当前扩展优先级
 
-1. 补实 `passages`，让著作、原文片段、案例、证据链条更完整。
-2. 规范 `terms` 与 `cases` 的多对多关系，后续可考虑独立关联表。
-3. 标注库中审核通过的案例，考虑迁移到主库（作为新的 source 渠道）。
-4. 再考虑版本层、关系层或知识图谱层。
+1. 旧库只做必要修复、兼容展示和回归检查，不再扩展模板化 case 或把旧 `passages` 补建当作 V2 主任务。
+2. 新的 passage、candidate、来源定位、状态和审校工作进入 `v2/`，不要直接扩展旧 schema。
+3. 优先完成 V2 的 target-work 消歧、外部 canonical 来源/引文核验和人工审校，再形成首批 gold cases。
+4. gold 到正式发布库或网站快照的导出方式需单独设计；不要把旧标注库中的草稿直接迁移为正式主库数据。

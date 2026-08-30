@@ -1,6 +1,6 @@
 # 高邮二王考据过程知识库网站
 
-`03-项目网站` 是项目的展示与检索入口。它不是单独的数据仓库，而是读取 `02-数据库` 生成的 SQLite 快照，把同一专题数据库拆成首页概览、数据库浏览、字词详情、案例详情和术语说明几种阅读视角。
+`03-项目网站` 是项目的展示、检索和 V2 工作库只读验收入口。它不是单独的数据仓库：旧页面读取 `02-数据库` 导出的 JSON 快照，V2 页面通过 Python bridge 读取独立的 `v2/data/real_runs/annotation_v2.db`。
 
 ## 当前定位
 
@@ -15,6 +15,15 @@
 - 知识页：解释训诂术语，辅助阅读，不构成独立数据库。
 
 ## 运行方式
+
+需要 Node.js 18+ 和可执行的 Python 3。旧快照页面只依赖 Node；`/api/v2/*` 还需要 Python。Windows 若 `python` 指向 Microsoft Store 别名，请把真实解释器路径设置为 `PYTHON_BIN`，也可以使用 V2 bridge 专用的 `V2_PYTHON_BIN`。
+
+PowerShell 示例：
+
+```powershell
+$env:PYTHON_BIN = "C:\path\to\python.exe"
+npm start
+```
 
 推荐在仓库根目录运行：
 
@@ -41,6 +50,7 @@ http://localhost:3000
 /api/bootstrap
 /api/browser/bootstrap
 /api/search?q=始
+/api/v2/summary
 ```
 
 ## 数据来源
@@ -91,6 +101,8 @@ npm run sync:annotation
 │  ├─ annotation.html              人工标注库数据库页
 │  ├─ annotation-workbench.html     本地标注工作台，导出 annotation_case JSON
 │  ├─ ai-annotation.html           AI 释证页
+│  ├─ v2-database.html             V2 数据浏览、待办审校和质量报告
+│  ├─ v2-acceptance.html           旧 V2 验收入口的兼容跳转
 │  ├─ term.html                    字词详情页
 │  ├─ case.html                    案例详情页
 │  ├─ knowledge.html               术语说明页
@@ -100,6 +112,7 @@ npm run sync:annotation
 ├─ src/                            Node 服务、数据源、结构定义
 ├─ scripts/sqlite_bridge.py        SQLite 快照导出脚本
 ├─ scripts/annotation_bridge.py    人工标注库快照导出脚本
+├─ scripts/v2_acceptance_bridge.py V2 只读查询 bridge
 ├─ data/sqlite-snapshot.json       网站真实数据快照
 ├─ data/annotation-snapshot.json   人工标注库灰度快照
 └─ media/step.png                  首页流程图

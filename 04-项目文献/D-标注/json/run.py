@@ -906,7 +906,7 @@ def import_ai_json_files(ai_json_paths: list[Path]) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="DOCX -> full_json, optional DeepSeek -> ai_json. Does not touch database.")
+    parser = argparse.ArgumentParser(description="DOCX -> full_json, optional DeepSeek -> ai_json; database access occurs only with --import-ai or --init-db.")
     parser.add_argument("--api", action="store_true", help="Call DeepSeek and write ai_json/*.json.")
     parser.add_argument("--check-api-key", action="store_true", help="Send a tiny DeepSeek request to verify the configured key.")
     parser.add_argument("--import-ai", action="store_true", help="Import ai_json/*.json into the separate annotation database.")
