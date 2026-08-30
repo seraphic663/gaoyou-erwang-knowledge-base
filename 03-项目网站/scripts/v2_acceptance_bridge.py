@@ -911,20 +911,17 @@ def list_cases(
         ).fetchall()
     ]
 
-    pagination: dict[str, Any] = {}
-    limit_clause = ""
-    if page is not None and page_size is not None:
-        safe_page_size = max(1, min(page_size, 200))
-        page_count = max(1, (total + safe_page_size - 1) // safe_page_size)
-        safe_page = max(1, min(page, page_count))
-        pagination = {
-            "page": safe_page,
-            "page_size": safe_page_size,
-            "page_count": page_count,
-            "total": total,
-        }
-        limit_clause = " LIMIT ? OFFSET ?"
-        parameters = [*parameters, safe_page_size, (safe_page - 1) * safe_page_size]
+    safe_page_size = max(1, min(page_size if page_size is not None else 50, 200))
+    page_count = max(1, (total + safe_page_size - 1) // safe_page_size)
+    safe_page = max(1, min(page if page is not None else 1, page_count))
+    pagination = {
+        "page": safe_page,
+        "page_size": safe_page_size,
+        "page_count": page_count,
+        "total": total,
+    }
+    limit_clause = " LIMIT ? OFFSET ?"
+    parameters = [*parameters, safe_page_size, (safe_page - 1) * safe_page_size]
 
     rows = connection.execute(
         f"""

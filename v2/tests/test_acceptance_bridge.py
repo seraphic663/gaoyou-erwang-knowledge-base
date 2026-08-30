@@ -35,6 +35,15 @@ class V2AcceptanceBridgeTest(unittest.TestCase):
         self.assertNotEqual(first_page["items"][0]["case_id"], second_page["items"][0]["case_id"])
         self.assertIn("target_location_candidate_count", first_page["items"][0])
 
+    def test_cases_default_to_a_bounded_first_page(self) -> None:
+        payload = list_cases(self.connection)
+
+        self.assertEqual(payload["page"], 1)
+        self.assertEqual(payload["page_size"], 50)
+        self.assertEqual(payload["page_count"], 152)
+        self.assertEqual(payload["total"], 7581)
+        self.assertEqual(len(payload["items"]), 50)
+
     def test_case_filter_is_applied_before_pagination(self) -> None:
         payload = list_cases(
             self.connection,

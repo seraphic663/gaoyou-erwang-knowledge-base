@@ -118,7 +118,7 @@ npm run sync:annotation
 - `GET /api/term?id=编号`：字词详情。
 - `GET /api/case?id=编号`：案例详情。
 - `GET /api/v2/summary`：V2 工作库当前验收摘要。
-- `GET /api/v2/cases`：V2 案例队列，支持分页、检索、来源和机器状态筛选。
+- `GET /api/v2/cases`：V2 案例队列，支持分页、检索、来源和机器状态筛选；未提供分页参数时默认返回第 1 页、每页 50 条。
 - `GET /api/v2/case?id=编号`：V2 案例完整详情，包括来源 passage、证据、过程、队列和既有事件。
 - `GET /api/v2/review-tasks?stream=...&batch=...`：按批次读取静态 `review_task.v1` 任务；可选 `case_review`、`target_work_resolution`、`external_source_resolution`、`external_passage_resolution`。
 - `GET /api/v2/review-task?id=任务 ID`：读取单条人工审校任务及其决定契约。

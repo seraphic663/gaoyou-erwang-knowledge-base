@@ -1,7 +1,6 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
-const url = require('url');
 const config = require('./config');
 const { analyzeWithAnnotationAi } = require('./ai-annotation');
 const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-browser');
@@ -349,7 +348,11 @@ function createServer() {
 
   return http.createServer((req, res) => {
     try {
-      const parsedUrl = url.parse(req.url, true);
+      const requestUrl = new URL(req.url, 'http://localhost');
+      const parsedUrl = {
+        pathname: requestUrl.pathname,
+        query: Object.fromEntries(requestUrl.searchParams),
+      };
 
       if (parsedUrl.pathname.startsWith('/api/')) {
         return handleApi(req, res, parsedUrl);
