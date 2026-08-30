@@ -6,7 +6,7 @@
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 数据库页：统一浏览字词、案例和数据库结构。
-- V2 数据库：`v2-database.html` 提供核心案例展示界面；`v2-acceptance.html` 提供完整详情、来源链、验收审计和按批次读取 `review_task.v1` 的人工审校入口。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放本地人工决定写入。
+- V2 工作库：`v2-database.html` 是案例浏览、人工待办和质量报告的统一入口，三类信息以标签分开呈现；旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放本地人工决定写入。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
 - 标注工作台：给成员本地填写 `annotation_case.v1`，自动保存浏览器草稿，导出 JSON 文件后走 branch / PR。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。

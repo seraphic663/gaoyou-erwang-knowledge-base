@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>V2 数据库 · 高邮二王考据过程知识库</title>
+    <title>V2 工作库 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="./assets/css/styles.css" />
     <link rel="stylesheet" href="./assets/css/v2-acceptance.css" />
   </head>
-  <body data-v2-view="display">
+  <body data-v2-view="workspace">
     <header class="subhero v2-reading-hero">
       <nav class="nav">
         <div class="brand">高邮二王考据过程知识库</div>
@@ -15,96 +15,172 @@
           <a href="./index.html">专题首页</a>
           <a href="./database.html">主数据库</a>
           <a href="./annotation.html">标注库</a>
-          <a href="./v2-database.html">V2 数据库</a>
-          <a href="./v2-acceptance.html">V2 验收</a>
+          <a href="./v2-database.html">V2 工作库</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">V2 / VR · 案例阅读</p>
-        <h1>V2 数据库</h1>
-        <p class="hero-copy">先按条件找到案例，再打开单条记录。来源审计、证据边界、人工任务和完整字段统一放在 V2 验收工作台。</p>
+        <p class="badge">V2 / VR · 统一工作入口</p>
+        <h1>V2 工作库</h1>
+        <p class="hero-copy">浏览机器案例、处理人工待办、查看质量报告。三类信息分开呈现，机器结果不会自动成为 gold。</p>
         <div id="v2HeroMeta" class="hero-panel"></div>
       </div>
     </header>
 
-    <main class="section v2-page v2-display-page v2-reading-page">
+    <main class="section v2-page v2-workspace-page">
       <div class="v2-page-lead">
         <div>
-          <p class="section-kicker">V2 阅读入口</p>
-          <h2>先看案例，再看证据</h2>
-          <p>这里是机器工作库的摘要阅读层；需要判断来源和处理待办时，再进入 V2 验收。</p>
-        </div>
-        <div class="v2-page-actions">
-          <a class="page-link" href="./v2-acceptance.html">进入 V2 验收</a>
+          <p class="section-kicker">统一工作入口</p>
+          <h2>先选择要做的事</h2>
+          <p>日常查阅进入“数据浏览”；需要人工判断进入“待办审校”；数据库结构和来源覆盖只在“质量报告”中查看。</p>
         </div>
       </div>
 
-      <p id="v2Status" class="db-status">正在读取 V2 数据库...</p>
-      <div class="v2-summary-zone">
-        <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
-        <section id="v2Metrics" class="v2-metric-grid"></section>
+      <p id="v2Status" class="db-status">正在读取 V2 工作库...</p>
+
+      <div class="v2-primary-tabs" role="tablist" aria-label="V2 工作库视图">
+        <button id="v2CaseTab" class="v2-primary-tab active" type="button" role="tab" aria-selected="true" aria-controls="v2CaseWorkspace">
+          <strong>数据浏览</strong><span>查找并阅读案例</span>
+        </button>
+        <button id="v2ReviewTab" class="v2-primary-tab" type="button" role="tab" aria-selected="false" aria-controls="v2ReviewWorkspace">
+          <strong>待办审校</strong><span>按顺序处理人工任务</span>
+        </button>
+        <button id="v2QualityTab" class="v2-primary-tab" type="button" role="tab" aria-selected="false" aria-controls="v2QualityWorkspace">
+          <strong>质量报告</strong><span>检查结构与来源边界</span>
+        </button>
       </div>
 
-      <div class="v2-reading-guide" aria-label="阅读方式">
-        <article><strong>1. 搜索</strong><span>按标题、来源和目标典籍筛选。</span></article>
-        <article><strong>2. 分批</strong><span>默认每批 20 条，避免一次铺满。</span></article>
-        <article><strong>3. 深入看</strong><span>选中案例后，到 V2 验收查看完整字段。</span></article>
-      </div>
+      <details class="card v2-quick-guide">
+        <summary><strong>第一次使用？查看简要说明</strong><span>约 1 分钟</span></summary>
+        <div class="v2-quick-guide-content">
+          <article><strong>1 · 查阅案例</strong><p>从“数据浏览”检索来源或标题，选择案例后依次看来源段落、目标典籍、证据和当前状态。</p></article>
+          <article><strong>2 · 处理待办</strong><p>按“外部来源 → 外部段落与引文 → 目标典籍 → 案例整体审校”的顺序推进，避免跳过依赖。</p></article>
+          <article><strong>3 · 理解状态</strong><p>机器草稿、候选命中和结构通过都不是人工认可；只有完成人工审校并满足门槛后才能进入 gold。</p></article>
+        </div>
+      </details>
 
-      <section class="card v2-panel v2-display-queue">
-        <div class="v2-panel-heading v2-case-heading">
-          <div>
-            <p class="section-kicker">案例列表</p>
-            <h2>机器工作库中的案例</h2>
+      <section id="v2CaseWorkspace" class="v2-workspace-pane" role="tabpanel" aria-labelledby="v2CaseTab">
+        <section class="card v2-panel v2-workbench-panel">
+          <div class="v2-panel-heading v2-case-heading">
+            <div>
+              <p class="section-kicker">数据浏览</p>
+              <h2>机器工作库中的案例</h2>
+            </div>
+            <span id="v2CaseCount" class="summary-pill"></span>
           </div>
-          <span id="v2CaseCount" class="summary-pill"></span>
+          <p class="compact-note">先检索并选择案例，再在下方阅读来源、目标、证据和处理状态；内部 JSON 默认折叠。</p>
+
+          <div class="v2-filter-bar">
+            <label class="toolbar-field">
+              <span>检索</span>
+              <input id="v2CaseSearch" type="search" placeholder="案例标题、来源、目标典籍" />
+            </label>
+            <label class="toolbar-field">
+              <span>来源</span>
+              <select id="v2SourceFilter"><option value="all">全部来源</option></select>
+            </label>
+            <label class="toolbar-field">
+              <span>机器状态</span>
+              <select id="v2MachineFilter">
+                <option value="all">全部状态</option>
+                <option value="draft">机器草稿</option>
+                <option value="rejected">结构不合格</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="v2-queue-toolbar">
+            <label class="toolbar-field v2-page-size-field">
+              <span>每批显示</span>
+              <select id="v2CasePageSize">
+                <option value="20" selected>20 条</option>
+                <option value="50">50 条</option>
+                <option value="100">100 条</option>
+              </select>
+            </label>
+            <div class="v2-pagination" aria-label="案例列表分页">
+              <button id="v2PreviousPage" class="pagination-button" type="button">上一批</button>
+              <span id="v2PageStatus" class="pagination-meta">第 1 / 1 批</span>
+              <button id="v2NextPage" class="pagination-button" type="button">下一批</button>
+            </div>
+          </div>
+          <div id="v2CaseTable" class="v2-case-table-wrap"></div>
+        </section>
+      </section>
+
+      <section id="v2ReviewWorkspace" class="card v2-panel v2-workspace-pane" role="tabpanel" aria-labelledby="v2ReviewTab" hidden>
+        <div class="v2-review-task-heading">
+          <div>
+            <p class="section-kicker">待办审校</p>
+            <h2>按依赖顺序处理人工任务</h2>
+          </div>
+          <span id="v2ReviewWriteChip" class="v2-mode-chip">尚未读取</span>
         </div>
+        <p id="v2ReviewSequence" class="v2-review-sequence">推荐审校顺序读取中……</p>
+        <p class="compact-note">任务选择本身不会写库。外部来源与 passage 未确认时，不应提前批准目标典籍或案例。</p>
 
-        <p class="compact-note">这里只保留定位和状态摘要；完整来源段落、证据和过程字段在 V2 验收中按需展开。</p>
-
-        <div class="v2-filter-bar">
+        <div class="v2-review-task-toolbar">
           <label class="toolbar-field">
-            <span>检索</span>
-            <input id="v2CaseSearch" type="search" placeholder="案例标题、王氏著作、目标典籍、词语" />
-          </label>
-          <label class="toolbar-field">
-            <span>来源</span>
-            <select id="v2SourceFilter"><option value="all">全部来源</option></select>
-          </label>
-          <label class="toolbar-field">
-            <span>机器状态</span>
-            <select id="v2MachineFilter">
-              <option value="all">全部状态</option>
-              <option value="draft">machine draft</option>
-              <option value="rejected">rejected</option>
+            <span>任务流</span>
+            <select id="v2ReviewStream">
+              <option value="external_source_resolution">1 · 外部来源与版本</option>
+              <option value="external_passage_resolution">2 · 外部段落与引文</option>
+              <option value="target_work_resolution">3 · 目标典籍确认</option>
+              <option value="case_review">4 · 案例整体审校</option>
             </select>
           </label>
-        </div>
-
-        <div class="v2-queue-toolbar">
-          <label class="toolbar-field v2-page-size-field">
-            <span>每批显示</span>
-            <select id="v2CasePageSize">
+          <label class="toolbar-field">
+            <span>批次</span>
+            <select id="v2ReviewBatch"></select>
+          </label>
+          <label class="toolbar-field">
+            <span>本屏显示</span>
+            <select id="v2ReviewDisplayLimit">
               <option value="20" selected>20 条</option>
               <option value="50">50 条</option>
               <option value="100">100 条</option>
             </select>
           </label>
-          <div class="v2-pagination" aria-label="案例列表分页">
-            <button id="v2PreviousPage" class="pagination-button" type="button">上一批</button>
-            <span id="v2PageStatus" class="pagination-meta">第 1 / 1 批</span>
-            <button id="v2NextPage" class="pagination-button" type="button">下一批</button>
-          </div>
+          <button id="v2ReviewLoadBatch" class="pagination-button" type="button">读取任务批次</button>
         </div>
+        <p id="v2ReviewTaskStatus" class="compact-note">进入本视图后读取第一批任务。</p>
+        <div id="v2ReviewTaskList" class="v2-review-task-list"></div>
+      </section>
 
-        <div id="v2CaseTable" class="v2-case-table-wrap"></div>
-        <p class="v2-display-note">点击案例进入 V2 验收界面。机器草稿仍是 machine draft，人工状态仍是 pending，不代表 gold。</p>
+      <section id="v2QualityWorkspace" class="v2-workspace-pane" role="tabpanel" aria-labelledby="v2QualityTab" hidden>
+        <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
+        <section id="v2Metrics" class="v2-metric-grid"></section>
+
+        <details class="card v2-panel v2-audit-panel">
+          <summary class="v2-audit-summary">
+            <span><span class="section-kicker">详细检查</span><strong>结构门、原典登记与判定依据</strong></span>
+            <span class="v2-mode-chip">按需查看</span>
+          </summary>
+          <div class="v2-audit-content">
+            <section class="v2-audit-section">
+              <div class="v2-panel-heading"><div><p class="section-kicker">验收门</p><h2>数据库能否继续使用</h2></div></div>
+              <div id="v2Checks" class="v2-check-list"></div>
+            </section>
+            <section class="v2-audit-section">
+              <div class="v2-panel-heading"><div><p class="section-kicker">原典登记</p><h2>Canonical 来源</h2></div></div>
+              <div id="v2Sources" class="v2-source-list"></div>
+            </section>
+            <section class="v2-audit-section v2-note-panel">
+              <p class="section-kicker">判定口径</p>
+              <p>绿色只表示结构和入库边界通过；黄色表示仍需人工或外部原典核验，不代表 gold。</p>
+              <p id="v2ReportContext" class="compact-note"></p>
+            </section>
+          </div>
+        </details>
+      </section>
+
+      <section id="v2CaseDetail" class="card v2-panel v2-case-detail" aria-live="polite">
+        <div class="v2-empty-detail">从“数据浏览”选择案例，或从“待办审校”选择任务后，在这里查看所需材料。</div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>V2 数据库 · 展示界面 · 只读；完整来源链和审校字段见 V2 验收界面</p>
+      <p>V2 工作库 · 浏览、审校与质量报告统一入口 · 默认只读，人工决定不自动晋级 gold</p>
     </footer>
 
     <script src="./assets/js/utils.js"></script>

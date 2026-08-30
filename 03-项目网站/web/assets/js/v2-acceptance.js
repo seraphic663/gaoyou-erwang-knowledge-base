@@ -1,5 +1,4 @@
 const V2Acceptance = (() => {
-  const detailedMode = document.body?.dataset.v2View !== 'display';
   const state = {
     summary: null,
     cases: [],
@@ -12,6 +11,7 @@ const V2Acceptance = (() => {
     activeReviewTask: null,
     reviewWriteEnabled: false,
     reviewTaskResponse: null,
+    reviewTasksLoaded: false,
     reviewMessage: '',
   };
 
@@ -35,8 +35,10 @@ const V2Acceptance = (() => {
     caseDetail: document.querySelector('#v2CaseDetail'),
     caseTab: document.querySelector('#v2CaseTab'),
     reviewTab: document.querySelector('#v2ReviewTab'),
+    qualityTab: document.querySelector('#v2QualityTab'),
     caseWorkspace: document.querySelector('#v2CaseWorkspace'),
     reviewWorkspace: document.querySelector('#v2ReviewWorkspace'),
+    qualityWorkspace: document.querySelector('#v2QualityWorkspace'),
     reviewWriteChip: document.querySelector('#v2ReviewWriteChip'),
     reviewStream: document.querySelector('#v2ReviewStream'),
     reviewBatch: document.querySelector('#v2ReviewBatch'),
@@ -48,14 +50,14 @@ const V2Acceptance = (() => {
   };
 
   const labels = {
-    machine_draft: 'machine draft',
-    human_review: 'human review',
+    machine_draft: '机器草稿',
+    human_review: '人工审校',
     gold: 'gold',
-    rejected: 'rejected',
-    draft: 'draft',
-    pending: 'pending',
-    approved: 'approved',
-    uncertain: 'uncertain',
+    rejected: '结构不合格',
+    draft: '机器草稿',
+    pending: '待人工确认',
+    approved: '已确认',
+    uncertain: '有疑问',
     secondary_citation_match: '王氏正文二次命中',
     external_source_pending: '外部原典待登记',
     canonical_source_passage: 'canonical 原典段落',
@@ -97,29 +99,40 @@ const V2Acceptance = (() => {
       .map(([key, item]) => [key, stripInternalIdentityFields(item)]));
   }
 
-  function setWorkspaceMode(mode = 'case') {
-    const reviewMode = mode === 'review';
-    if (elements.caseWorkspace) elements.caseWorkspace.hidden = reviewMode;
+  function setWorkspaceMode(mode = 'browse', { updateUrl = true } = {}) {
+    const selectedMode = ['browse', 'review', 'quality'].includes(mode) ? mode : 'browse';
+    const browseMode = selectedMode === 'browse';
+    const reviewMode = selectedMode === 'review';
+    const qualityMode = selectedMode === 'quality';
+    if (elements.caseWorkspace) elements.caseWorkspace.hidden = !browseMode;
     if (elements.reviewWorkspace) elements.reviewWorkspace.hidden = !reviewMode;
+    if (elements.qualityWorkspace) elements.qualityWorkspace.hidden = !qualityMode;
+    if (elements.caseDetail) elements.caseDetail.hidden = qualityMode;
     if (elements.caseTab) {
-      elements.caseTab.classList.toggle('active', !reviewMode);
-      elements.caseTab.setAttribute('aria-selected', String(!reviewMode));
+      elements.caseTab.classList.toggle('active', browseMode);
+      elements.caseTab.setAttribute('aria-selected', String(browseMode));
     }
     if (elements.reviewTab) {
       elements.reviewTab.classList.toggle('active', reviewMode);
       elements.reviewTab.setAttribute('aria-selected', String(reviewMode));
     }
+    if (elements.qualityTab) {
+      elements.qualityTab.classList.toggle('active', qualityMode);
+      elements.qualityTab.setAttribute('aria-selected', String(qualityMode));
+    }
+    if (updateUrl && window.location.hash !== `#${selectedMode}`) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${selectedMode}`);
+    }
+    if (reviewMode && state.summary && !state.reviewTasksLoaded) loadReviewTasks({ resetBatch: true });
   }
 
   function renderHero() {
     const summary = state.summary;
     if (!summary || !elements.heroMeta) return;
     const cards = [
-      ['工作库', summary.database.display_path],
-      ['来源文献', summary.counts.source_documents],
-      ['候选层', summary.counts.candidate_items],
-      ['案例', summary.counts.annotation_cases],
-      ['总状态', summary.overall_status === 'pass_with_warnings' ? '通过（有待办）' : statusLabel(summary.overall_status)],
+      ['工作状态', summary.overall_status === 'pass_with_warnings' ? '结构通过，有待办' : statusLabel(summary.overall_status)],
+      ['机器案例', summary.counts.annotation_cases],
+      ['人工待办', summary.human_status_counts.pending || 0],
     ];
     elements.heroMeta.innerHTML = cards.map(([label, value]) => `
       <div class="hero-panel-item">
@@ -150,18 +163,11 @@ const V2Acceptance = (() => {
     const taskBatchText = ['case_review', 'target_work_resolution', 'external_source_resolution', 'external_passage_resolution']
       .map((key) => `${key} ${taskCounts[key] || 0}/${taskValidation[key]?.batch_count || 0} 批`)
       .join(' · ');
-    const coreMetrics = detailedMode ? [
-      ['候选层入库', summary.counts.candidate_items, '四部王氏原文机器候选'],
-      ['案例入库', summary.counts.annotation_cases, '机器库记录'],
-      ['机器草稿', summary.machine_status_counts.draft || 0, '结构基本可用，仍待核验'],
-      ['人工 pending', summary.human_status_counts.pending || 0, '尚无 gold 晋级'],
-      ['证据总数', summary.counts.annotation_evidences, '引文记录'],
-      ['外部原典待核验', summary.evidence_counts.source_resolution.external_source_pending || 0, '尚未进入 canonical passage'],
-    ] : [
-      ['案例入库', summary.counts.annotation_cases, '机器工作库记录'],
-      ['人工 pending', summary.human_status_counts.pending || 0, '尚无 gold 晋级'],
-      ['证据总数', summary.counts.annotation_evidences, '引文记录'],
-      ['外部原典待核验', summary.evidence_counts.source_resolution.external_source_pending || 0, '等待外部底本和引文核验'],
+    const coreMetrics = [
+      ['机器案例', summary.counts.annotation_cases, '当前工作库记录'],
+      ['人工待办', summary.human_status_counts.pending || 0, '完成审校前不会进入 gold'],
+      ['外部原典待核验', summary.evidence_counts.source_resolution.external_source_pending || 0, '先确认底本，再确认引文'],
+      ['结构失败项', summary.checks.filter((item) => item.status === 'fail').length, '必须优先处理的数据库问题'],
     ];
     const detailedMetrics = [
       ['候选已生成案例', summary.candidate_output_case_count || 0, `其中 candidate shell ${summary.candidate_shell_case_count || 0} 条`],
@@ -383,7 +389,8 @@ const V2Acceptance = (() => {
   }
 
   async function loadReviewTasks({ resetBatch = false } = {}) {
-    if (!detailedMode || !elements.reviewTaskList) return;
+    if (!elements.reviewTaskList) return;
+    state.reviewTasksLoaded = true;
     const stream = elements.reviewStream?.value || 'case_review';
     const batch = resetBatch ? 1 : Number(elements.reviewBatch?.value || 1);
     elements.reviewTaskStatus.textContent = '正在读取任务批次...';
@@ -398,6 +405,7 @@ const V2Acceptance = (() => {
       elements.reviewTaskStatus.textContent = `${response.stream} · 第 ${response.batch_number}/${response.batch_count} 批 · 本批 ${response.task_count} 条，当前显示前 ${Math.min(displayLimit, response.task_count)} 条 · ${modeText}`;
       renderReviewTaskList();
     } catch (error) {
+      state.reviewTasksLoaded = false;
       elements.reviewTaskStatus.textContent = `任务包读取失败：${error.message}`;
       if (elements.reviewWriteChip) elements.reviewWriteChip.textContent = '任务包不可用';
       elements.reviewTaskList.innerHTML = '<p class="v2-empty-detail">无法读取当前任务包。</p>';
@@ -419,7 +427,7 @@ const V2Acceptance = (() => {
   }
 
   function renderReviewForm(item) {
-    if (!detailedMode || !state.activeReviewTask) return '';
+    if (!state.activeReviewTask) return '';
     const task = state.activeReviewTask;
     const type = task.task_type;
     let body = '';
@@ -594,11 +602,11 @@ const V2Acceptance = (() => {
                 <td>
                   <div class="v2-case-title">
                     <strong>${escapeHtml(item.case_title)}</strong>
-                    <small>${escapeHtml(item.case_id)} · ${escapeHtml(item.source_work)} · ${escapeHtml(item.source_entry_title || '未定位')}</small>
+                    <small>${escapeHtml(item.source_work)} · ${escapeHtml(item.source_entry_title || '未定位')}</small>
                   </div>
                 </td>
-                <td><span class="v2-status-chip ${statusClass(item.machine_status)}">${escapeHtml(statusLabel(item.machine_status))}</span><br /><small>${escapeHtml(item.lifecycle)}</small></td>
-                <td>${escapeHtml(item.target_work || '未明确')}<br /><small>${escapeHtml(item.target_scope?.status || '')}</small></td>
+                <td><span class="v2-status-chip ${statusClass(item.machine_status)}">${escapeHtml(statusLabel(item.machine_status))}</span></td>
+                <td>${escapeHtml(item.target_work || '未明确')}<br /><small>${escapeHtml(statusLabel(item.target_scope?.status || 'uncertain'))}</small></td>
                 <td><div class="v2-evidence-meta">${resolutions || '<span class="v2-resolution-chip unknown">无 evidence</span>'}</div></td>
                 <td><span class="v2-status-chip ${statusClass(item.human_status)}">${escapeHtml(statusLabel(item.human_status))}</span></td>
               </tr>
@@ -609,14 +617,10 @@ const V2Acceptance = (() => {
     `;
     elements.caseTable.querySelectorAll('tr[data-case-id]').forEach((row) => {
       row.addEventListener('click', () => {
-        if (detailedMode) {
-          setWorkspaceMode('case');
-          state.activeReviewTask = null;
-          state.reviewMessage = '';
-          selectCase(row.dataset.caseId);
-        } else {
-          window.location.href = `./v2-acceptance.html?case=${encodeURIComponent(row.dataset.caseId)}`;
-        }
+        setWorkspaceMode('browse');
+        state.activeReviewTask = null;
+        state.reviewMessage = '';
+        selectCase(row.dataset.caseId);
       });
     });
   }
@@ -697,13 +701,12 @@ const V2Acceptance = (() => {
         ${externalText ? `<p class="v2-evidence-note">${escapeHtml(externalText)}</p>` : ''}
         ${candidateQueueText ? `<p class="v2-evidence-note">${escapeHtml(candidateQueueText)}</p>` : ''}
         ${candidatePassagePanel}
-        ${detailedMode ? `<details class="v2-raw-fold"><summary>完整 evidence JSON</summary><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(data), null, 2))}</pre></details>` : ''}
+        <details class="v2-raw-fold"><summary>完整 evidence JSON</summary><pre>${escapeHtml(JSON.stringify(stripInternalIdentityFields(data), null, 2))}</pre></details>
       </article>
     `;
   }
 
   function renderJsonPanel(value, label) {
-    if (!detailedMode) return '';
     return `
       <details class="fold-card v2-raw-panel">
         <summary>${escapeHtml(label)}</summary>
@@ -713,7 +716,6 @@ const V2Acceptance = (() => {
   }
 
   function renderTerms(terms) {
-    if (!detailedMode) return '';
     if (!terms?.length) return '<div class="v2-detail-block"><span class="v2-detail-label">词项关系</span><p>无 annotation_terms 记录。</p></div>';
     return `
       <details class="fold-card v2-raw-panel">
@@ -732,7 +734,6 @@ const V2Acceptance = (() => {
   }
 
   function renderTargetLocations(locations) {
-    if (!detailedMode) return '';
     if (!locations?.length) {
       return '<div class="v2-detail-block"><span class="v2-detail-label">机器目标定位候选</span><p>没有显式《书名》标记；不自动补 target_work。</p></div>';
     }
@@ -764,7 +765,6 @@ const V2Acceptance = (() => {
   }
 
   function renderReviewEvents(events) {
-    if (!detailedMode) return '';
     return `
       <details class="fold-card v2-raw-panel">
         <summary>人工审校事件 · ${escapeHtml(events?.length || 0)} 条</summary>
@@ -776,7 +776,6 @@ const V2Acceptance = (() => {
   }
 
   function renderResolutionEvents(events) {
-    if (!detailedMode) return '';
     return `
       <details class="fold-card v2-raw-panel">
         <summary>外部来源解析事件 · ${escapeHtml(events?.length || 0)} 条</summary>
@@ -954,8 +953,10 @@ const V2Acceptance = (() => {
 
   function bindFilters() {
     let searchTimer = null;
-    elements.caseTab?.addEventListener('click', () => setWorkspaceMode('case'));
+    elements.caseTab?.addEventListener('click', () => setWorkspaceMode('browse'));
     elements.reviewTab?.addEventListener('click', () => setWorkspaceMode('review'));
+    elements.qualityTab?.addEventListener('click', () => setWorkspaceMode('quality'));
+    window.addEventListener('hashchange', () => setWorkspaceMode(window.location.hash.slice(1), { updateUrl: false }));
     elements.search?.addEventListener('input', () => {
       window.clearTimeout(searchTimer);
       searchTimer = window.setTimeout(() => loadCases({ resetPage: true }), 240);
@@ -1051,18 +1052,18 @@ const V2Acceptance = (() => {
       renderReviewSequence();
       populateSourceFilter(cases.source_works || []);
       renderCaseTable();
-      elements.status.textContent = `V2 数据库已连接 · 只读 · ${summary.database.display_path}`;
+      elements.status.textContent = `V2 工作库已连接 · 只读 · ${summary.database.display_path}`;
       if (elements.pageSize) elements.pageSize.value = String(state.pageSize);
       bindFilters();
-      setWorkspaceMode('case');
-      if (detailedMode) loadReviewTasks({ resetBatch: true });
       const initialCaseId = new URLSearchParams(window.location.search).get('case');
-      if (detailedMode && initialCaseId) {
+      const initialMode = initialCaseId ? 'browse' : window.location.hash.slice(1) || 'browse';
+      setWorkspaceMode(initialMode, { updateUrl: false });
+      if (initialCaseId) {
         state.activeReviewTask = null;
         selectCase(initialCaseId);
       }
     } catch (error) {
-      elements.status.textContent = `V2 数据库连接失败：${error.message}`;
+      elements.status.textContent = `V2 工作库连接失败：${error.message}`;
       elements.overall.className = 'v2-overall card fail';
       elements.overall.innerHTML = '<h2>无法读取 V2 工作库</h2><p>请确认本地 Node 服务已启动，并且 v2/data/real_runs/annotation_v2.db 存在。</p>';
     }
