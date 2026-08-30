@@ -194,7 +194,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
     python v2/scripts/build_target_work_resolution_packets.py
 
-该只读命令把当前 target-work 队列的每一条任务扩展为可追溯的机器材料：案例快照、source passage、全部 evidence/quote/source resolution、证据 passage、`work_registry`/`work_aliases`、原典候选壳的 `candidate_target_locations`、外部来源/段落队列以及每个字段的机器边界。当前生成 `7,962` 条 packet，覆盖 `7,577` 个案例，嵌入 `22,616` 条队列上下文 evidence 记录和 `74,171` 条候选定位记录；报告位于 `v2/data/real_runs/target_work_resolution_packets_report.json`，数据位于 `v2/data/real_runs/target_work_resolution_packets.v1.jsonl`。packet 只为人工审校准备，绝不自动写入 `target_work`、`target_passage_id`、quote 状态、人工状态或 gold；`run_v2_validation.py` 会检查 packet 与 pending queue 的逐条覆盖、passage 回链和机器边界。
+该只读命令把当前 target-work 队列的每一条任务整理为可追溯的紧凑机器材料：案例与过程摘要、source/evidence passage 引用、quote/source resolution 摘要、相关 `work_registry`/`work_aliases`、同标签原典候选定位样本、外部来源/段落队列摘要以及每个字段的机器边界。大段原文和完整 evidence/候选集合不在每条 packet 中重复嵌入，而以稳定 ID 和文件引用回链。当前生成 `7,962` 条 packet，覆盖 `7,577` 个案例；报告位于 `v2/data/real_runs/target_work_resolution_packets_report.json`，数据位于 `v2/data/real_runs/target_work_resolution_packets.v1.jsonl`。packet 只为人工审校准备，绝不自动写入 `target_work`、`target_passage_id`、quote 状态、人工状态或 gold；`run_v2_validation.py` 会以流式读取检查 packet 与 pending queue 的逐条覆盖、passage 回链和机器边界。
 
 目标典籍解析 proposal 索引：
 

@@ -121,8 +121,6 @@ def _passage_payload(
         SELECT p.passage_id, p.source_document_id, p.work_key,
                p.document_title, p.section_title, p.entry_title,
                p.entry_kind, p.local_ordinal, p.md_line_start, p.md_line_end,
-               p.raw_text, p.plain_text, p.normalized_text,
-               p.inline_notes_json,
                sd.source_kind, sd.source_file,
                sd.canonical_status AS source_canonical_status,
                sd.metadata_json AS source_metadata_json,
@@ -138,8 +136,12 @@ def _passage_payload(
         cache[passage_id] = None
         return None
     payload = dict(row)
-    payload["inline_notes"] = parse_json(payload.pop("inline_notes_json"), [])
     payload["source_metadata"] = parse_json(payload.pop("source_metadata_json"), {})
+    payload["text_ref"] = {
+        "database_table": "passages",
+        "passage_id": passage_id,
+        "fields": ["raw_text", "plain_text", "normalized_text", "inline_notes_json"],
+    }
     payload["canonical_boundary"] = {
         "source_kind": payload["source_kind"],
         "source_canonical_status": payload["source_canonical_status"],
@@ -193,6 +195,7 @@ def _alias_context(
     # A large canonical alias group (for example repeated legacy source-work
     # mappings) is represented by a complete count and deterministic sample;
     # the database table remains the complete source of record.
+    sample_limit = 10
     sample = [
         {
             "work_key": row["work_key"],
@@ -204,7 +207,7 @@ def _alias_context(
             "source_record_id": row["source_record_id"],
             "metadata": row["metadata"],
         }
-        for row in rows[:100]
+        for row in rows[:sample_limit]
     ]
     return {
         "normalized_label": normalized_label,
@@ -214,8 +217,8 @@ def _alias_context(
         "mapping_method_counts": _compact_counter(methods),
         "work_key_counts": _compact_counter(work_keys),
         "source_record_count": len(source_records),
-        "source_record_id_sample": source_records[:100],
-        "sample_limit": 100,
+        "source_record_id_sample": source_records[:sample_limit],
+        "sample_limit": sample_limit,
         "matches_sample": sample,
         "complete_source": {
             "database_table": "work_aliases",
@@ -261,8 +264,15 @@ def _case_snapshot(
         "evidence_state": row["evidence_state"],
         "target_passage_id": row["target_passage_id"],
         "target_location": row["target_location"],
-        "process_text": row["process_text"],
-        "process_steps": process_steps,
+        "process_step_count": len(process_steps),
+        "process_step_summary": [
+            {
+                "step_index": step.get("step_index"),
+                "field_name": step.get("field_name"),
+                "step_text": step.get("step_text"),
+            }
+            for step in process_steps
+        ],
         "machine_result": row["machine_result"],
         "human_review": row["human_review"],
         "migration_provenance": migration.get("provenance", {}),
@@ -414,14 +424,14 @@ def build_packets(
                    source_passage_id, target_passage_candidate_id,
                    target_passage_match_status, target_passage_candidate_count,
                    evidence_indexes_json, machine_status, human_status,
-                   provenance_json, created_at, updated_at
+                   created_at, updated_at
             FROM candidate_target_locations
             ORDER BY case_id, candidate_target_id
             """
         ).fetchall()
         location_candidate_ids: set[str] = set()
         for row in location_rows:
-            item = _row_with_json(row, ("evidence_indexes_json", "provenance_json"))
+            item = _row_with_json(row, ("evidence_indexes_json",))
             case_id = str(item["case_id"])
             location_by_case[case_id].append(item)
             location_candidate_ids.add(str(item["candidate_id"]))
@@ -432,16 +442,13 @@ def build_packets(
                 connection,
                 """
                 SELECT candidate_id, source_document_id, passage_id, work_key,
-                       source_work, candidate_text, rule_hits_json, risk_flags_json,
-                       candidate_status, origin, output_case_id, provenance_json,
+                       source_work, candidate_status, origin, output_case_id,
                        created_at, updated_at
                 FROM candidate_items WHERE candidate_id IN
                 """,
                 sorted(location_candidate_ids),
             ):
                 item = dict(row)
-                for field in ("rule_hits_json", "risk_flags_json", "provenance_json"):
-                    item[field.removesuffix("_json")] = parse_json(item.pop(field), {})
                 candidate_items_by_id[str(item["candidate_id"])] = item
 
         registry_rows = [dict(row) for row in connection.execute(
@@ -550,7 +557,6 @@ def build_packets(
                     "quote_check": evidence["quote_check"],
                     "source_resolution": evidence["source_resolution"],
                     "source_location": evidence["source_location"],
-                    "evidence": evidence["evidence"],
                 }
                 external_id = evidence.get("external_source_id")
                 if external_id:
@@ -560,9 +566,10 @@ def build_packets(
                     )
                     evidence_item["external_resolution"] = {
                         "external_source_id": external_id,
-                        "registry": external_registry.get(str(external_id)),
-                        "source_queue": external_queue,
-                        "passage_queue": external_passage,
+                        "registry_status": (external_registry.get(str(external_id)) or {}).get("status"),
+                        "source_queue_status": (external_queue or {}).get("queue_status"),
+                        "passage_queue_status": (external_passage or {}).get("queue_status"),
+                        "candidate_passage_ids": (external_passage or {}).get("candidate_passage_ids", []),
                         "evidence_packet_ref": {
                             "path": "v2/data/real_runs/external_evidence_packets.v1.jsonl",
                             "packet_id": f"external-evidence-packet:{external_id}",
@@ -571,37 +578,79 @@ def build_packets(
                     }
                 evidence_context.append(evidence_item)
 
+            normalized_queue_label = str(
+                queue["normalized_label"] or normalize_label(queue["raw_label"])
+            )
+            matching_locations = [
+                row for row in locations
+                if str(row.get("normalized_label") or "") == normalized_queue_label
+            ]
+            location_sample_limit = 20
+            location_sample = [
+                {
+                    key: row.get(key)
+                    for key in (
+                        "candidate_target_id",
+                        "candidate_id",
+                        "raw_label",
+                        "normalized_label",
+                        "candidate_work_key",
+                        "work_identity_status",
+                        "label_start_char",
+                        "label_end_char",
+                        "source_passage_id",
+                        "target_passage_candidate_id",
+                        "target_passage_match_status",
+                        "target_passage_candidate_count",
+                        "machine_status",
+                        "human_status",
+                    )
+                }
+                for row in matching_locations[:location_sample_limit]
+            ]
             location_context = {
                 "count": len(locations),
+                "matching_label_count": len(matching_locations),
                 "status_counts": _compact_counter(Counter(
                     f"{row['work_identity_status']}:{row['target_passage_match_status']}"
-                    for row in locations
+                    for row in matching_locations
                 )),
-                "rows": locations,
-                "candidate_items": [
-                    candidate_items_by_id[candidate_id]
+                "rows_sample": location_sample,
+                "sample_limit": location_sample_limit,
+                "sample_is_not_complete": len(matching_locations) > len(location_sample),
+                "candidate_item_refs": [
+                    {
+                        "candidate_id": candidate_id,
+                        "passage_id": candidate_items_by_id[candidate_id].get("passage_id"),
+                        "source_document_id": candidate_items_by_id[candidate_id].get("source_document_id"),
+                    }
                     for candidate_id in sorted({
-                        str(row["candidate_id"]) for row in locations
+                        str(row["candidate_id"]) for row in matching_locations
                         if str(row["candidate_id"]) in candidate_items_by_id
                     })
                 ],
+                "complete_source": {
+                    "database_table": "candidate_target_locations",
+                    "case_id": case_id,
+                    "normalized_label": normalized_queue_label,
+                },
                 "resolution_boundary": "candidate_target_locations are machine locating candidates; they do not write target_work or target_passage_id",
             }
             work_context = {
                 "requested_label": queue["raw_label"],
-                "normalized_label": queue["normalized_label"] or normalize_label(queue["raw_label"]),
+                "normalized_label": normalized_queue_label,
                 "machine_candidate_work_key": target_key,
                 "registry": registry,
                 "alias_context": _alias_context(
                     aliases_by_label,
-                    str(queue["normalized_label"] or normalize_label(queue["raw_label"])),
+                    normalized_queue_label,
                 ),
                 "source_version_context": _source_version_context(connection, str(target_key)) if target_key in work_registry else None,
                 "external_registry_label_candidates": [
                     dict(value)
                     for value in external_registry.values()
-                    if normalize_label(value.get("normalized_work")) == normalize_label(queue["normalized_label"] or queue["raw_label"])
-                    or normalize_label(value.get("cited_work")) == normalize_label(queue["normalized_label"] or queue["raw_label"])
+                    if normalize_label(value.get("normalized_work")) == normalized_queue_label
+                    or normalize_label(value.get("cited_work")) == normalized_queue_label
                 ],
                 "identity_boundary": "work_registry identity is a machine candidate; it does not establish a target edition or target passage",
             }
@@ -768,17 +817,6 @@ def validate_target_work_resolution_packets(
     packet_path = Path(packet_path or (PROJECT_ROOT / str(report.get("packet_file") or ""))).resolve()
     if not packet_path.is_file():
         return {"valid": False, "errors": ["packet_file_missing"], "counts": {}}
-    packets: list[dict[str, Any]] = []
-    try:
-        for line_number, line in enumerate(packet_path.read_text(encoding="utf-8").splitlines(), start=1):
-            value = json.loads(line)
-            if not isinstance(value, dict):
-                errors.append(f"packet_row_not_object:{line_number}")
-            else:
-                packets.append(value)
-    except (OSError, ValueError) as error:
-        errors.append(f"packet_file_invalid:{type(error).__name__}")
-
     with closing(connect_read_only(database_path)) as connection:
         expected_rows = connection.execute(
             """
@@ -807,51 +845,61 @@ def validate_target_work_resolution_packets(
         }
 
     actual_ids: list[str] = []
-    for packet in packets:
-        queue = packet.get("queue_item") or {}
-        queue_id = str(queue.get("queue_item_id") or "")
-        actual_ids.append(queue_id)
-        if not queue_id:
-            errors.append("packet_queue_item_id_missing")
-        if packet.get("packet_id") != f"target-work-resolution-packet:{queue_id}":
-            errors.append(f"packet_id_mismatch:{queue_id}")
-        if queue_id not in expected_ids:
-            errors.append(f"packet_queue_item_not_pending:{queue_id}")
-        case_id = str(queue.get("case_id") or "")
-        if case_id not in case_ids:
-            errors.append(f"packet_case_missing:{queue_id}")
-        case_snapshot = packet.get("case_snapshot") or {}
-        evidence_context = packet.get("evidence_context") or {}
-        locations = packet.get("candidate_target_location_context") or {}
-        if int(evidence_context.get("count") or 0) != evidence_counts.get(case_id, 0):
-            errors.append(f"packet_evidence_count_mismatch:{queue_id}")
-        if int(locations.get("count") or 0) != location_counts.get(case_id, 0):
-            errors.append(f"packet_location_count_mismatch:{queue_id}")
-        boundary = packet.get("machine_only_boundary") or {}
-        for field in (
-            "database_write_performed",
-            "target_work_mutated",
-            "target_passage_mutated",
-            "quote_check_mutated",
-            "human_status_mutated",
-            "gold_promotion_performed",
-            "canonical_semantic_truth_asserted",
-        ):
-            if boundary.get(field) is not False:
-                errors.append(f"machine_boundary_breach:{queue_id}:{field}")
-        assessment = packet.get("machine_assessment") or {}
-        if assessment.get("automated_target_work_resolution_allowed") is not False:
-            errors.append(f"automated_target_work_boundary_breach:{queue_id}")
-        if assessment.get("automated_target_passage_resolution_allowed") is not False:
-            errors.append(f"automated_target_passage_boundary_breach:{queue_id}")
-        decision_contract = packet.get("decision_contract") or {}
-        if decision_contract.get("promotes_to_gold") is not False:
-            errors.append(f"gold_boundary_breach:{queue_id}")
-        if case_snapshot.get("case_id") != case_id:
-            errors.append(f"case_snapshot_mismatch:{queue_id}")
-        missing_passages = (packet.get("passage_context") or {}).get("missing_passage_ids") or []
-        if missing_passages:
-            errors.append(f"missing_passage_context:{queue_id}:{len(missing_passages)}")
+    packet_count = 0
+    try:
+        with packet_path.open("r", encoding="utf-8") as handle:
+            for line_number, line in enumerate(handle, start=1):
+                packet = json.loads(line)
+                if not isinstance(packet, dict):
+                    errors.append(f"packet_row_not_object:{line_number}")
+                    continue
+                packet_count += 1
+                queue = packet.get("queue_item") or {}
+                queue_id = str(queue.get("queue_item_id") or "")
+                actual_ids.append(queue_id)
+                if not queue_id:
+                    errors.append("packet_queue_item_id_missing")
+                if packet.get("packet_id") != f"target-work-resolution-packet:{queue_id}":
+                    errors.append(f"packet_id_mismatch:{queue_id}")
+                if queue_id not in expected_ids:
+                    errors.append(f"packet_queue_item_not_pending:{queue_id}")
+                case_id = str(queue.get("case_id") or "")
+                if case_id not in case_ids:
+                    errors.append(f"packet_case_missing:{queue_id}")
+                case_snapshot = packet.get("case_snapshot") or {}
+                evidence_context = packet.get("evidence_context") or {}
+                locations = packet.get("candidate_target_location_context") or {}
+                if int(evidence_context.get("count") or 0) != evidence_counts.get(case_id, 0):
+                    errors.append(f"packet_evidence_count_mismatch:{queue_id}")
+                if int(locations.get("count") or 0) != location_counts.get(case_id, 0):
+                    errors.append(f"packet_location_count_mismatch:{queue_id}")
+                boundary = packet.get("machine_only_boundary") or {}
+                for field in (
+                    "database_write_performed",
+                    "target_work_mutated",
+                    "target_passage_mutated",
+                    "quote_check_mutated",
+                    "human_status_mutated",
+                    "gold_promotion_performed",
+                    "canonical_semantic_truth_asserted",
+                ):
+                    if boundary.get(field) is not False:
+                        errors.append(f"machine_boundary_breach:{queue_id}:{field}")
+                assessment = packet.get("machine_assessment") or {}
+                if assessment.get("automated_target_work_resolution_allowed") is not False:
+                    errors.append(f"automated_target_work_boundary_breach:{queue_id}")
+                if assessment.get("automated_target_passage_resolution_allowed") is not False:
+                    errors.append(f"automated_target_passage_boundary_breach:{queue_id}")
+                decision_contract = packet.get("decision_contract") or {}
+                if decision_contract.get("promotes_to_gold") is not False:
+                    errors.append(f"gold_boundary_breach:{queue_id}")
+                if case_snapshot.get("case_id") != case_id:
+                    errors.append(f"case_snapshot_mismatch:{queue_id}")
+                missing_passages = (packet.get("passage_context") or {}).get("missing_passage_ids") or []
+                if missing_passages:
+                    errors.append(f"missing_passage_context:{queue_id}:{len(missing_passages)}")
+    except (OSError, ValueError) as error:
+        errors.append(f"packet_file_invalid:{type(error).__name__}")
 
     actual_set = set(actual_ids)
     if len(actual_ids) != len(actual_set):
@@ -863,7 +911,7 @@ def validate_target_work_resolution_packets(
     report_counts = report.get("counts") or {}
     if int(report_counts.get("queue_count") or 0) != len(expected_ids):
         errors.append("report_queue_count_mismatch")
-    if int(report_counts.get("packet_count") or 0) != len(packets):
+    if int(report_counts.get("packet_count") or 0) != packet_count:
         errors.append("report_packet_count_mismatch")
     if not (report.get("policy") or {}).get("machine_candidate_is_not_resolution"):
         errors.append("report_policy_machine_boundary_missing")
@@ -876,7 +924,7 @@ def validate_target_work_resolution_packets(
         "report_file": relative_path(report_path),
         "counts": {
             "expected_queue_count": len(expected_ids),
-            "packet_count": len(packets),
+            "packet_count": packet_count,
             "unique_packet_queue_item_count": len(actual_set),
             "expected_case_count": len({str(row["case_id"]) for row in expected_rows}),
         },
