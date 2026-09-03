@@ -13,13 +13,23 @@ import argparse
 import json
 import sqlite3
 from collections import Counter
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+import sys
 
 
 V2_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = V2_ROOT.parent
+sys.path.insert(0, str(V2_ROOT / "src"))
+
+from erwang_v2.runtime import (  # noqa: E402
+    connect_read_only,
+    load_json,
+    now,
+    parse_json,
+    relative_path,
+)
+
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_OUTPUT = V2_ROOT / "data/real_runs/automation_gap_report.v1.json"
 DEFAULT_VALIDATION = V2_ROOT / "data/real_runs/v2_validation_report.json"
@@ -28,47 +38,6 @@ DEFAULT_EXTERNAL_PACKET_REPORT = V2_ROOT / "data/real_runs/external_evidence_pac
 DEFAULT_EDITION_CANDIDATE_MANIFEST = V2_ROOT / "data/real_runs/external_edition_candidate_manifest.v1.json"
 DEFAULT_LEGACY_AUDIT = V2_ROOT / "data/real_runs/legacy_dictionary_field_audit.json"
 DEFAULT_SOURCE_INVENTORY = V2_ROOT / "data/real_runs/source_inventory.v1.json"
-
-
-def now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def relative_path(value: str | Path) -> str:
-    path = Path(value)
-    try:
-        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
-    except ValueError:
-        return path.as_posix()
-
-
-def parse_json(value: Any, fallback: Any) -> Any:
-    if isinstance(value, (dict, list)):
-        return value
-    try:
-        parsed = json.loads(value or "")
-    except (TypeError, ValueError):
-        return fallback
-    return parsed
-
-
-def load_json(path: Path) -> dict[str, Any]:
-    if not path.is_file():
-        return {}
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return {}
-    return value if isinstance(value, dict) else {}
-
-
-def connect_read_only(database_path: Path) -> sqlite3.Connection:
-    uri = f"file:{database_path.resolve()}?mode=ro"
-    connection = sqlite3.connect(uri, uri=True)
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA query_only = ON")
-    connection.execute("PRAGMA foreign_keys = ON")
-    return connection
 
 
 def grouped(connection: sqlite3.Connection, query: str) -> dict[str, int]:

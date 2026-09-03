@@ -23,56 +23,32 @@ import sqlite3
 from contextlib import closing
 import unicodedata
 from collections import Counter, defaultdict
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+import sys
 
 
 V2_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = V2_ROOT.parent
+sys.path.insert(0, str(V2_ROOT / "src"))
+
+from erwang_v2.runtime import (  # noqa: E402
+    connect_read_only,
+    now,
+    parse_json,
+    relative_path,
+)
+
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_PACKET = V2_ROOT / "data/real_runs/target_work_resolution_packets.v1.jsonl"
 DEFAULT_REPORT = V2_ROOT / "data/real_runs/target_work_resolution_packets_report.json"
 QUEUE_STATUSES = ("pending", "needs_context", "uncertain")
 
 
-def now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def relative_path(value: str | Path) -> str:
-    path = Path(value)
-    try:
-        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
-    except ValueError:
-        return path.as_posix()
-
-
-def parse_json(value: Any, fallback: Any) -> Any:
-    if isinstance(value, (dict, list)):
-        return value
-    try:
-        parsed = json.loads(value or "")
-    except (TypeError, ValueError):
-        return fallback
-    return parsed
-
-
 def normalize_label(value: Any) -> str:
     text = unicodedata.normalize("NFKC", str(value or "")).strip()
     text = text.strip("《》")
     return " ".join(text.split())
-
-
-def connect_read_only(database_path: Path) -> sqlite3.Connection:
-    if not database_path.is_file():
-        raise FileNotFoundError(f"v2_database_not_found:{database_path}")
-    uri = f"file:{database_path.resolve()}?mode=ro"
-    connection = sqlite3.connect(uri, uri=True)
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA query_only = ON")
-    connection.execute("PRAGMA foreign_keys = ON")
-    return connection
 
 
 def chunked(values: Iterable[str], size: int = 800) -> Iterable[list[str]]:

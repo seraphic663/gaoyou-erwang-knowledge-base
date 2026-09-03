@@ -23,13 +23,21 @@ import sqlite3
 from contextlib import closing
 import sys
 from collections import Counter
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
 
 V2_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT = V2_ROOT.parent
+sys.path.insert(0, str(V2_ROOT / "src"))
+
+from erwang_v2.runtime import (  # noqa: E402
+    connect_read_only,
+    now,
+    parse_json,
+    relative_path,
+)
+
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_OUTPUT_DIR = V2_ROOT / "data/real_runs/review_tasks"
 DEFAULT_MANIFEST = "review_task_manifest.review.v1.json"
@@ -85,38 +93,6 @@ REVIEW_CONTRACT = {
     "approval_requires_complete_evidence_decisions": True,
     "approval_never_comes_from_machine_status": True,
 }
-
-
-def now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def parse_json(value: Any, fallback: Any) -> Any:
-    if isinstance(value, (dict, list)):
-        return value
-    try:
-        return json.loads(value or "")
-    except (TypeError, ValueError):
-        return fallback
-
-
-def relative_path(value: str | Path) -> str:
-    path = Path(value)
-    try:
-        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
-    except ValueError:
-        return path.as_posix()
-
-
-def connect_read_only(database_path: Path) -> sqlite3.Connection:
-    if not database_path.exists():
-        raise FileNotFoundError(f"V2 database not found: {database_path}")
-    uri = f"file:{database_path.resolve()}?mode=ro"
-    connection = sqlite3.connect(uri, uri=True)
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA query_only = ON")
-    connection.execute("PRAGMA foreign_keys = ON")
-    return connection
 
 
 def _json(value: Any) -> str:
