@@ -4,6 +4,9 @@
 .vscode/
 .claude/
 .codex/
+.env
+**/.env
+*.env
 00-项目说明/
 01-项目资料/
 02-数据库/
