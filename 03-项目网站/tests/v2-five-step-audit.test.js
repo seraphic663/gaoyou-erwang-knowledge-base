@@ -1,6 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { buildV2AuditContext, fingerprintV2Case, normalizeDraft, STEPS } = require('../src/v2-five-step-audit');
+const {
+  buildV2AuditContext,
+  fingerprintV2Case,
+  generateFiveStepDraft,
+  normalizeDraft,
+  STEPS,
+} = require('../src/v2-five-step-audit');
 
 function sampleCase() {
   return {
@@ -55,4 +61,13 @@ test('fingerprint changes when source text or evidence changes', () => {
   const original = fingerprintV2Case(item);
   item.source_passage.raw_text = '改动后的段落';
   assert.notEqual(fingerprintV2Case(item), original);
+});
+
+test('returns an actionable response when the DeepSeek audit key is missing', async () => {
+  const result = await generateFiveStepDraft(
+    { DEEPSEEK_ANALYSIS_API_KEY: '' },
+    { case_id: 'case-1', model: 'deepseek-flash', reasoning_effort: 'high' },
+  );
+  assert.equal(result.status, 503);
+  assert.match(result.payload.message, /API key is not configured/);
 });

@@ -289,17 +289,17 @@ function createServer() {
         if (req.method === 'GET') {
           const caseId = parsedUrl.query.case_id || '';
           const payload = await getV2FiveStepAudits(config, caseId);
-          payload.write_enabled = config.V2_REVIEW_WRITE_ENABLED;
+          payload.write_enabled = config.V2_FIVE_STEP_AUDIT_WRITE_ENABLED;
           return sendJson(res, payload.ok === false ? 404 : 200, payload);
         }
         if (!['POST', 'PATCH', 'DELETE'].includes(req.method)) {
           return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
         }
-        if (!config.V2_REVIEW_WRITE_ENABLED) {
+        if (!config.V2_FIVE_STEP_AUDIT_WRITE_ENABLED) {
           return sendJson(res, 403, {
             ok: false,
             write_enabled: false,
-            message: 'V2 audit writes are disabled; set V2_REVIEW_WRITE_ENABLED=1 for an explicit local review session',
+            message: 'V2 five-step audit writes are disabled; set V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1 for an explicit review session',
           });
         }
 

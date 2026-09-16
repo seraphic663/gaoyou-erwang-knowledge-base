@@ -7,9 +7,9 @@
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 首页“数据库”入口提供主数据库、人工标注库、V2 工作库三个选项；三库仍独立存储。
 - 数据库页：统一浏览主库字词、案例和数据库结构。
-- V2 工作库：`v2-database.html` 是案例浏览、人工待办和质量报告的统一入口，三类信息以标签分开呈现；旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放本地人工决定写入。
+- V2 工作库：`v2-database.html` 是案例浏览、人工待办和质量报告的统一入口，三类信息以标签分开呈现；旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1`。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
-- 五步释证：从 V2 案例启动 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。保存受 `V2_REVIEW_WRITE_ENABLED=1` 本地写入开关保护。
+- 五步释证：从 V2 案例启动 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。保存受 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 写入开关保护。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
@@ -141,7 +141,7 @@ npm run sync:annotation
 - `POST /api/v2/review`：受控人工决定写入接口；默认返回 403，只有 `V2_REVIEW_WRITE_ENABLED=1` 的本地服务才开放。它只调用 V2 已有事务 seam，要求稳定 `reviewer` 和唯一 `operation_id`，不会因读取任务或提交 target/source/passage resolution 自动产生 gold。
 - `POST /api/v2/five-step-draft`：读取指定 V2 案例及其来源段落、evidence、来源状态，调用 DeepSeek 输出五步 JSON 草稿。模型只允许 `deepseek-flash` 或 `deepseek-v4-pro`，思考强度只允许 `none/low/high/max`。
 - `GET /api/v2/five-step-audits?case_id=...`：读取该案例最近 50 条五步审计记录及本地写入开关状态，包含版本、被替代和软删除状态。
-- `POST /api/v2/five-step-audits`：默认返回 403；本地设置 `V2_REVIEW_WRITE_ENABLED=1` 后，追加一条含模型配置、AI 草稿、逐步意见、人工文本和 V2 来源指纹的记录；`mode=restore` 可恢复一条软删除记录。此接口不改 `annotation_cases`、`human_status` 或 gold。
+- `POST /api/v2/five-step-audits`：默认返回 403；设置 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 后，追加一条含模型配置、AI 草稿、逐步意见、人工文本和 V2 来源指纹的记录；`mode=restore` 可恢复一条软删除记录。此接口不改 `annotation_cases`、`human_status` 或 gold。
 - `PATCH /api/v2/five-step-audits`：在写入开关打开时修改一条当前版本记录，生成新版本并保留旧记录。
 - `DELETE /api/v2/five-step-audits`：在写入开关打开时软删除一条记录，保留原内容和删除人/时间/原因，页面可恢复。
 - `POST /api/ai/annotation`：AI 释证接口，固定使用 `deepseek-v4-pro`，需要配置 DeepSeek API key。
@@ -157,4 +157,4 @@ AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 �
 5. `data/sqlite-snapshot.json` 和 `data/annotation-snapshot.json` 都是导出产物，不要手工改。
 6. `更新记录.md` 只记录结构、数据链路和展示口径变化，不写日常流水账。
 
-V2 正式人工决定入口与五步审计卡记录分开：现有 review-task 写入仍要求任务绑定并遵循批准门；五步卡记录保存到独立表，修改采用版本链，删除采用可恢复软删除，不改变案例正式状态。服务默认不打开写入，本地审校时使用 `V2_REVIEW_WRITE_ENABLED=1 npm start`。DeepSeek 五步卡默认 `deepseek-flash` + `high`，审校者可改用 `deepseek-v4-pro` 和 `none/low/high/max`，提交记录会保留请求模型、返回模型、effort、草稿、意见和案例指纹。
+V2 正式人工决定入口与五步审计卡记录分开：现有 review-task 写入仍要求任务绑定并遵循批准门；五步卡记录保存到独立表，修改采用版本链，删除采用可恢复软删除，不改变案例正式状态。服务默认不打开正式 review 写入；五步审计卡可单独使用 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1 npm start`。DeepSeek 五步卡默认 `deepseek-flash` + `high`，审校者可改用 `deepseek-v4-pro` 和 `none/low/high/max`，提交记录会保留请求模型、返回模型、effort、草稿、意见和案例指纹。

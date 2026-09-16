@@ -8,20 +8,21 @@
   </head>
   <body>
     <header class="hero">
-      <nav class="nav">
+      <nav class="nav" aria-label="主导航">
         <div class="brand">高邮二王知识库</div>
         <div class="nav-links">
-          <a href="./knowledge.html">训诂知识</a>
+          <a href="./index.html">专题首页</a>
           <div class="database-menu">
-            <a class="database-trigger" href="./database.html?view=terms">数据库</a>
+            <a class="database-trigger" href="./database.html?view=terms" aria-haspopup="true">数据库</a>
             <div class="database-panel" aria-label="选择数据库">
-              <a href="./database.html?view=terms"><span>主数据库</span><small>字词与案例浏览</small></a>
-              <a href="./annotation.html"><span>人工标注库</span><small>人工标注结构化数据</small></a>
-              <a href="./v2-database.html"><span>V2 工作库</span><small>案例浏览与待办审校</small></a>
+              <a href="./database.html?view=terms"><span>主数据库</span><small>词条、案例与证据</small></a>
+              <a href="./annotation.html"><span>人工标注库</span><small>人工标注材料浏览</small></a>
+              <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、待办与质量</small></a>
             </div>
           </div>
           <a href="./ai-annotation.html">AI 释证</a>
           <a href="./annotation-workbench.html">五步释证</a>
+          <a href="./knowledge.html">训诂知识</a>
         </div>
       </nav>
 
@@ -129,6 +130,43 @@
         </div>
         <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
         <div id="dbStats" class="stats-grid"></div>
+      </section>
+
+      <section id="site-map" class="section site-map-section">
+        <div class="section-head">
+          <p class="section-kicker">使用路径</p>
+          <h2>三条入口，分别解决一件事</h2>
+          <p>先查材料，再做辅助释证；需要审校时，从 V2 案例进入五步卡。</p>
+        </div>
+        <div class="site-map-grid">
+          <article class="card site-map-card">
+            <span class="site-map-step">01 · 查阅</span>
+            <h3>数据库</h3>
+            <p>主数据库负责字词、案例和证据检索；人工标注库保留独立的标注材料浏览。</p>
+            <div class="site-map-card-links">
+              <a class="detail-link" href="./database.html?view=terms">主数据库</a>
+              <a class="detail-link detail-link-muted" href="./annotation.html">人工标注库</a>
+            </div>
+          </article>
+          <article class="card site-map-card">
+            <span class="site-map-step">02 · 释证</span>
+            <h3>AI 释证</h3>
+            <p>针对问题或材料生成辅助解释，引用材料可展开核对，不写回数据库。</p>
+            <div class="site-map-card-links">
+              <a class="detail-link" href="./ai-annotation.html">打开 AI 释证</a>
+              <a class="detail-link detail-link-muted" href="./knowledge.html">查看训诂知识</a>
+            </div>
+          </article>
+          <article class="card site-map-card">
+            <span class="site-map-step">03 · 审校</span>
+            <h3>V2 工作库 → 五步释证</h3>
+            <p>先在 V2 工作库选择一个案例，再进入五步卡生成、审查和管理审计记录。</p>
+            <div class="site-map-card-links">
+              <a class="detail-link" href="./v2-database.html#browse">选择 V2 案例</a>
+              <a class="detail-link detail-link-muted" href="./annotation-workbench.html">打开五步释证</a>
+            </div>
+          </article>
+        </div>
       </section>
 
       <section id="case-walkthrough" class="section">

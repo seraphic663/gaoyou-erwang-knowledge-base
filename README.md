@@ -79,7 +79,7 @@ D:\26大创
 - `03-项目网站/data/` 保存旧展示链的 JSON 快照；V2 页面通过 Python bridge 读取独立的 `annotation_v2.db`。
 - `v2/data/` 是运行数据和审校任务区，不进入 Docker 构建上下文；线上必须通过受控 volume 或显式 `V2_DB_FILE` 提供。
 - `04-项目文献/` 保留当前参与阅读、标注和释证的材料；`05-归档文献/` 保存大体量扫描件和历史文件。
-- V2 默认只读；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放本地人工决定写入，并且仍受任务绑定、幂等 operation 和 gold gate 约束。
+- V2 正式人工决定默认只读；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放受任务绑定的 review 写入。五步审计卡使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 开关，不改变案例状态或 gold。
 
 ## 本地运行
 

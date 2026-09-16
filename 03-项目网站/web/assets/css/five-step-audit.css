@@ -113,6 +113,15 @@
   background: var(--card-soft);
 }
 
+.five-step-generation-meta.pending {
+  color: var(--sub);
+}
+
+.five-step-generation-meta.error {
+  color: var(--danger, #9f2f2f);
+  border-left-color: var(--danger, #9f2f2f);
+}
+
 .five-step-cards {
   display: grid;
   gap: 14px;

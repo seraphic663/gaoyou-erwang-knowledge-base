@@ -240,6 +240,6 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 网站的“五步释证”从选中的 V2 案例读取来源段落、evidence、过程字段和来源状态，调用 DeepSeek 生成 `problem_discovery / research_question / evidence_collection / reasoning / conclusion` 草稿。模型可选 `deepseek-flash`（V4.1 Flash，默认）或 `deepseek-v4-pro`；effort 可选 `none / low / high / max`。系统保留 AI 草稿、逐步人工文本、决定、意见、模型请求/响应名、effort、token 用量、提示版本和案例内容指纹。
 
-五步卡保存到 `five_step_audit_records`，与正式人工决定表 `review_events` 分开。它不会更新 `annotation_cases`、人工状态或 gold；提交仍使用本地 `V2_REVIEW_WRITE_ENABLED=1` 写入开关。该审计卡只记录本次 V2 材料上的辅助释证，不代替原典、版本或引文核验。
+五步卡保存到 `five_step_audit_records`，与正式人工决定表 `review_events` 分开。它不会更新 `annotation_cases`、人工状态或 gold；提交使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 写入开关。该审计卡只记录本次 V2 材料上的辅助释证，不代替原典、版本或引文核验。
 
 网站提供基础记录管理：阅读最近记录、修改当前版本、软删除和恢复。修改会生成新的 `record_version` 并把旧记录标为 `superseded`；删除会保留内容并标为 `deleted`，同时保存操作人、时间、原因和幂等 operation。记录管理不更新 `annotation_cases`、`human_status`、`review_events` 或 gold。

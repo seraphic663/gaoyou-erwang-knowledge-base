@@ -190,10 +190,10 @@
         && (!['edited', 'question'].includes(step.status) || step.comment.trim()));
     el.save.disabled = !state.writeEnabled || !state.generation || !reviewer || !decisionsComplete || state.saving;
     if (state.writeEnabled) {
-      el.writeStatus.textContent = '本地 V2 写入已开启；保存只追加审计记录，不更改案例状态。';
+      el.writeStatus.textContent = '五步审计记录写入已开启；保存只追加审计记录，不更改案例状态。';
       el.writeStatus.classList.remove('five-step-write-disabled');
     } else {
-      el.writeStatus.textContent = '当前只读。要保存审计意见，请在本地设置 V2_REVIEW_WRITE_ENABLED=1 后启动服务。';
+      el.writeStatus.textContent = '当前只读。要保存审计意见，请设置 V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1 后启动服务。';
       el.writeStatus.classList.add('five-step-write-disabled');
     }
   }
@@ -282,6 +282,7 @@
     el.reviewer.value = record.reviewer || '';
     el.decision.value = audit.overall_decision || 'reviewed';
     el.overallNote.value = audit.overall_note || '';
+    el.generationMeta.className = 'five-step-generation-meta';
     el.generationMeta.textContent = `正在修改版本 ${record.record_version || 1} · ${generationSummary(state.generation)} · 保存后将生成新版本，原记录保留。`;
     el.generationMeta.hidden = false;
     el.form.hidden = false;
@@ -397,9 +398,13 @@
 
     state.generating = true;
     el.generate.disabled = true;
+    el.generate.setAttribute('aria-busy', 'true');
     el.generate.textContent = '正在生成……';
     el.status.textContent = '正在读取所选 V2 案例并请求 DeepSeek……';
     el.saveMessage.textContent = '';
+    el.generationMeta.className = 'five-step-generation-meta pending';
+    el.generationMeta.textContent = `正在请求 ${el.model.options[el.model.selectedIndex]?.text || el.model.value} · effort ${el.effort.value}；服务器最多等待 90 秒。`;
+    el.generationMeta.hidden = false;
     try {
       const response = await requestJson('/api/v2/five-step-draft', {
         method: 'POST',
@@ -419,15 +424,20 @@
         comment: '',
       }));
       el.generationMeta.textContent = generationSummary(response);
+      el.generationMeta.className = 'five-step-generation-meta';
       el.generationMeta.hidden = false;
       el.form.hidden = false;
       renderSteps();
       el.status.textContent = '五步草稿已生成。请逐步检查措辞、证据编号和来源核验状态。';
     } catch (error) {
       el.status.textContent = `生成失败：${error.message}`;
+      el.generationMeta.className = 'five-step-generation-meta error';
+      el.generationMeta.textContent = `生成失败：${error.message}`;
+      el.generationMeta.hidden = false;
     } finally {
       state.generating = false;
       el.generate.disabled = false;
+      el.generate.removeAttribute('aria-busy');
       el.generate.textContent = '重新生成五步草稿';
     }
   }

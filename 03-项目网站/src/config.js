@@ -102,6 +102,7 @@ module.exports = {
       : path.resolve(ROOT_DIR, process.env.V2_REVIEW_MANIFEST_FILE))
     : path.join(WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'review_tasks', 'review_task_manifest.review.v1.json'),
   V2_REVIEW_WRITE_ENABLED: process.env.V2_REVIEW_WRITE_ENABLED === '1',
+  V2_FIVE_STEP_AUDIT_WRITE_ENABLED: process.env.V2_FIVE_STEP_AUDIT_WRITE_ENABLED === '1',
   DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_MODEL: 'deepseek-v4-pro',

@@ -1055,7 +1055,7 @@ const V2Acceptance = (() => {
       renderReviewSequence();
       populateSourceFilter(cases.source_works || []);
       renderCaseTable();
-      elements.status.textContent = `V2 工作库已连接 · 只读 · ${summary.database.display_path}`;
+      elements.status.textContent = `V2 工作库已连接 · 案例数据只读 · ${summary.database.display_path}`;
       if (elements.pageSize) elements.pageSize.value = String(state.pageSize);
       bindFilters();
       const initialCaseId = new URLSearchParams(window.location.search).get('case');
