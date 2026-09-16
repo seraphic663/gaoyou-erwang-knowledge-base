@@ -888,6 +888,9 @@ const V2Acceptance = (() => {
           <span class="v2-status-chip ${statusClass(item.machine_status)}">${escapeHtml(statusLabel(item.machine_status))}</span>
         </div>
         <p class="compact-note">${escapeHtml(item.case_id)} · ${escapeHtml(item.source_work)} · ${escapeHtml(item.origin)}</p>
+        <div class="toolbar-actions">
+          <a class="page-link" href="./annotation-workbench.html?case=${encodeURIComponent(item.case_id)}">进入五步释证审校</a>
+        </div>
       </div>
       <div class="v2-detail-meta">
         <div class="v2-detail-block"><span class="v2-detail-label">机器状态</span><p>${escapeHtml(item.machine_status)} · lifecycle ${escapeHtml(item.lifecycle)}</p></div>

@@ -479,6 +479,40 @@ CREATE TABLE IF NOT EXISTS review_events (
     FOREIGN KEY(case_id) REFERENCES annotation_cases(case_id) ON DELETE CASCADE
 );
 
+-- Separate, append-only audit-card submissions. These records do not mutate
+-- annotation_cases or imply a human approval / gold transition.
+CREATE TABLE IF NOT EXISTS five_step_audit_records (
+    audit_id TEXT PRIMARY KEY,
+    case_id TEXT NOT NULL,
+    reviewer TEXT NOT NULL,
+    operation_id TEXT NOT NULL UNIQUE,
+    model_requested TEXT NOT NULL CHECK(model_requested IN ('deepseek-flash', 'deepseek-v4-pro')),
+    model_returned TEXT NOT NULL,
+    reasoning_effort TEXT NOT NULL CHECK(reasoning_effort IN ('none', 'low', 'high', 'max')),
+    prompt_version TEXT NOT NULL,
+    case_fingerprint TEXT NOT NULL,
+    generated_at TEXT NOT NULL,
+    submitted_at TEXT NOT NULL,
+    audit_json TEXT NOT NULL,
+    record_version INTEGER NOT NULL DEFAULT 1,
+    supersedes_audit_id TEXT,
+    superseded_by_audit_id TEXT,
+    record_state TEXT NOT NULL DEFAULT 'active'
+        CHECK(record_state IN ('active', 'superseded', 'deleted')),
+    deleted_from_state TEXT,
+    deleted_at TEXT,
+    deleted_by TEXT,
+    delete_reason TEXT,
+    delete_operation_id TEXT,
+    FOREIGN KEY(case_id) REFERENCES annotation_cases(case_id) ON DELETE RESTRICT
+);
+
+CREATE INDEX IF NOT EXISTS idx_five_step_audit_records_case
+    ON five_step_audit_records(case_id, submitted_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_five_step_audit_records_delete_operation
+    ON five_step_audit_records(delete_operation_id)
+    WHERE delete_operation_id IS NOT NULL;
+
 -- Auxiliary human decisions for queue items that do not belong to one
 -- annotation case: external edition/source and external passage resolution.
 -- These events are separate from case lifecycle events so one external source

@@ -1,14 +1,15 @@
 # 高邮二王考据过程知识库网站
 
-`03-项目网站` 是项目的展示、检索和 V2 工作库只读验收入口。它不是单独的数据仓库：旧页面读取 `02-数据库` 导出的 JSON 快照，V2 页面通过 Python bridge 读取独立的 `v2/data/real_runs/annotation_v2.db`。
+`03-项目网站` 是项目的展示、检索和 V2 工作库入口。它不是单独的数据仓库：旧页面读取 `02-数据库` 导出的 JSON 快照，V2 页面通过 Python bridge 读取独立的 `v2/data/real_runs/annotation_v2.db`。
 
 ## 当前定位
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
-- 数据库页：统一浏览字词、案例和数据库结构。
+- 首页“数据库”入口提供主数据库、人工标注库、V2 工作库三个选项；三库仍独立存储。
+- 数据库页：统一浏览主库字词、案例和数据库结构。
 - V2 工作库：`v2-database.html` 是案例浏览、人工待办和质量报告的统一入口，三类信息以标签分开呈现；旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放本地人工决定写入。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
-- 标注工作台：给成员本地填写 `annotation_case.v1`，自动保存浏览器草稿，导出 JSON 文件后走 branch / PR。
+- 五步释证：从 V2 案例启动 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。保存受 `V2_REVIEW_WRITE_ENABLED=1` 本地写入开关保护。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
@@ -99,7 +100,7 @@ npm run sync:annotation
 │  ├─ index.html                   首页
 │  ├─ database.html                统一数据库浏览页
 │  ├─ annotation.html              人工标注库数据库页
-│  ├─ annotation-workbench.html     本地标注工作台，导出 annotation_case JSON
+│  ├─ annotation-workbench.html     五步释证审校卡，从 V2 案例启动
 │  ├─ ai-annotation.html           AI 释证页
 │  ├─ v2-database.html             V2 数据浏览、待办审校和质量报告
 │  ├─ v2-acceptance.html           旧 V2 验收入口的兼容跳转
@@ -117,6 +118,8 @@ npm run sync:annotation
 ├─ data/annotation-snapshot.json   人工标注库灰度快照
 └─ media/step.png                  首页流程图
 ```
+
+五步审计卡的数据库写入 bridge 位于工作区共用 V2 目录：`v2/scripts/v2_five_step_audit_bridge.py`。
 
 ## API
 
@@ -136,6 +139,11 @@ npm run sync:annotation
 - `GET /api/v2/review-tasks?stream=...&batch=...`：按批次读取静态 `review_task.v1` 任务；可选 `case_review`、`target_work_resolution`、`external_source_resolution`、`external_passage_resolution`。
 - `GET /api/v2/review-task?id=任务 ID`：读取单条人工审校任务及其决定契约。
 - `POST /api/v2/review`：受控人工决定写入接口；默认返回 403，只有 `V2_REVIEW_WRITE_ENABLED=1` 的本地服务才开放。它只调用 V2 已有事务 seam，要求稳定 `reviewer` 和唯一 `operation_id`，不会因读取任务或提交 target/source/passage resolution 自动产生 gold。
+- `POST /api/v2/five-step-draft`：读取指定 V2 案例及其来源段落、evidence、来源状态，调用 DeepSeek 输出五步 JSON 草稿。模型只允许 `deepseek-flash` 或 `deepseek-v4-pro`，思考强度只允许 `none/low/high/max`。
+- `GET /api/v2/five-step-audits?case_id=...`：读取该案例最近 50 条五步审计记录及本地写入开关状态，包含版本、被替代和软删除状态。
+- `POST /api/v2/five-step-audits`：默认返回 403；本地设置 `V2_REVIEW_WRITE_ENABLED=1` 后，追加一条含模型配置、AI 草稿、逐步意见、人工文本和 V2 来源指纹的记录；`mode=restore` 可恢复一条软删除记录。此接口不改 `annotation_cases`、`human_status` 或 gold。
+- `PATCH /api/v2/five-step-audits`：在写入开关打开时修改一条当前版本记录，生成新版本并保留旧记录。
+- `DELETE /api/v2/five-step-audits`：在写入开关打开时软删除一条记录，保留原内容和删除人/时间/原因，页面可恢复。
 - `POST /api/ai/annotation`：AI 释证接口，固定使用 `deepseek-v4-pro`，需要配置 DeepSeek API key。
 
 AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 条人工标注案例；若人工库命中不足 3 条，再补充最多 4 条主数据库案例。服务端把这些材料和系统提示一次性发送给 DeepSeek，不保留对话记忆。
@@ -145,8 +153,8 @@ AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 �
 1. 改 SQLite 数据后，必须重新执行 `npm run sync:sqlite`。
 2. 改人工标注库后，必须重新执行 `npm run sync:annotation`。
 3. 改数据库字段后，同时检查 `src/store-definitions.js`、`scripts/sqlite_bridge.py` 和前端渲染脚本。
-4. 改首页或详情页数据库表述时，保持“同一数据库，不同视角”的口径；人工标注库是实验性功能，不叫主库。
+4. 首页入口归并不代表合并数据库；保留主库、人工标注库和 V2 工作库的数据边界，AI 释证与五步释证保持独立入口。
 5. `data/sqlite-snapshot.json` 和 `data/annotation-snapshot.json` 都是导出产物，不要手工改。
 6. `更新记录.md` 只记录结构、数据链路和展示口径变化，不写日常流水账。
 
-V2 人工审校入口的读取和写入分开：任务 JSONL/manifest 是可重建的静态快照，VR 默认每批只显示前 20 条，可切换 50/100 条；提交后要重新运行 `python v2/scripts/build_review_task_batches.py --batch-size 100` 才会按最新队列状态重建任务包。写入 bridge 会把 `task_id`、任务类型、queue item、当前 pending 状态与任务包绑定，不能用任意 ID 绕过任务流。服务默认不打开写入，测试或本地审校时使用 `V2_REVIEW_WRITE_ENABLED=1 npm start`，并只在本地受控环境提交明确决定。
+V2 正式人工决定入口与五步审计卡记录分开：现有 review-task 写入仍要求任务绑定并遵循批准门；五步卡记录保存到独立表，修改采用版本链，删除采用可恢复软删除，不改变案例正式状态。服务默认不打开写入，本地审校时使用 `V2_REVIEW_WRITE_ENABLED=1 npm start`。DeepSeek 五步卡默认 `deepseek-flash` + `high`，审校者可改用 `deepseek-v4-pro` 和 `none/low/high/max`，提交记录会保留请求模型、返回模型、effort、草稿、意见和案例指纹。

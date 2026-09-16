@@ -240,36 +240,33 @@ body::before {
   transform: scaleX(1);
 }
 
-.experiment-menu {
+.database-menu {
   position: relative;
   display: inline-flex;
   align-items: center;
 }
 
-.experiment-trigger {
+.database-trigger {
   display: inline-flex;
   align-items: center;
   min-height: 24px;
 }
 
-.experiment-trigger::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  margin-right: 7px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  box-shadow: 0 0 0 4px rgba(211, 179, 143, 0.16);
+.database-trigger::before {
+  content: "⌄";
+  margin-left: 5px;
+  font-size: 12px;
+  opacity: 0.78;
 }
 
-.experiment-panel {
+.database-panel {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
   z-index: 20;
-  width: min(360px, calc(100vw - 32px));
+  width: min(280px, calc(100vw - 32px));
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 8px;
   padding: 10px;
   border: 1px solid var(--line);
@@ -283,17 +280,17 @@ body::before {
   transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
 }
 
-.experiment-menu:hover .experiment-panel,
-.experiment-menu:focus-within .experiment-panel {
+.database-menu:hover .database-panel,
+.database-menu:focus-within .database-panel {
   opacity: 1;
   visibility: visible;
   transform: translateY(0) scale(1);
 }
 
-.experiment-panel a {
+.database-panel a {
   display: grid;
   gap: 4px;
-  min-height: 82px;
+  min-height: 58px;
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -304,30 +301,24 @@ body::before {
   transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
 }
 
-.experiment-panel a::after {
+.database-panel a::after {
   display: none;
 }
 
-.experiment-panel a:hover {
+.database-panel a:hover {
   transform: translateY(-2px);
   border-color: color-mix(in srgb, var(--accent) 38%, transparent);
   background: var(--card);
 }
 
-.experiment-panel span {
+.database-panel span {
   font-weight: 700;
   color: var(--pri-2);
 }
 
-.experiment-panel small {
+.database-panel small {
   color: var(--sub);
   line-height: 1.45;
-}
-
-.experiment-menu-light .experiment-panel {
-  left: 0;
-  right: auto;
-  transform-origin: top left;
 }
 
 .hero-content {
@@ -3335,13 +3326,12 @@ select,
     align-items: flex-start;
   }
 
-  .experiment-menu,
-  .experiment-trigger {
+  .database-menu,
+  .database-trigger {
     width: 100%;
   }
 
-  .experiment-panel,
-  .experiment-menu-light .experiment-panel {
+  .database-panel {
     left: 0;
     right: auto;
     grid-template-columns: 1fr;

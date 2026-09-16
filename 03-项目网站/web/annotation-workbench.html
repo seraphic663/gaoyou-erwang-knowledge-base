@@ -3,144 +3,147 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>标注工作台 · 高邮二王考据过程知识库</title>
+    <title>五步释证 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="./assets/css/five-step-audit.css" />
   </head>
-  <body data-page="annotation-workbench">
-    <header class="subhero annotation-hero">
+  <body data-page="five-step-audit">
+    <header class="subhero">
       <nav class="nav">
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
-          <a href="./index.html">返回首页</a>
-          <a href="./annotation.html">人工标注库</a>
-          <a href="./database.html?view=cases">主数据库</a>
-          <a href="./knowledge.html">训诂知识</a>
+          <a href="./index.html">专题首页</a>
+          <div class="database-menu">
+            <a class="database-trigger" href="./database.html?view=terms">数据库</a>
+            <div class="database-panel" aria-label="选择数据库">
+              <a href="./database.html?view=terms"><span>主数据库</span><small>字词与案例浏览</small></a>
+              <a href="./annotation.html"><span>人工标注库</span><small>人工标注结构化数据</small></a>
+              <a href="./v2-database.html"><span>V2 工作库</span><small>机器案例与人工审校</small></a>
+            </div>
+          </div>
+          <a href="./ai-annotation.html">AI 释证</a>
+          <a href="./annotation-workbench.html">五步释证</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">本地填写 · 自动保存 · 导出 JSON</p>
-        <h1>标注工作台</h1>
-        <div class="hero-panel workbench-hero-panel">
-          <span>照着 DOCX 填字段</span>
-          <span>浏览器自动保存草稿</span>
-          <span>导出后走 branch / PR</span>
-        </div>
+        <p class="badge">V2 单案例 · AI 起草 · 人工审校</p>
+        <h1>五步释证</h1>
+        <p class="hero-copy">从 V2 工作库选择一个案例，查看 AI 按数据库材料整理的五步草稿，逐步修改并记录审校意见。</p>
       </div>
     </header>
 
-    <main class="section workbench-page">
-      <section class="workbench-start card">
-        <div>
-          <p class="section-kicker">开始前</p>
-          <h2>先打开自己的 DOCX，再在这里填结构化标注</h2>
-          <p>这个页面不会直接写入数据库。它只保存在你的浏览器里，最后导出 `annotation_case.v1` JSON 文件，提交到自己的分支。</p>
-        </div>
-        <div class="workbench-start-actions">
-          <button id="newDraftButton" class="page-link toolbar-button" type="button">新建空白案例</button>
-          <button id="deleteCurrentDraftButton" class="search-clear toolbar-button" type="button">删除当前案例</button>
-          <button id="loadZaozhouButton" class="page-link page-link-muted toolbar-button" type="button">载入“造舟于河”示例</button>
-          <button id="loadPingyuanButton" class="page-link page-link-muted toolbar-button" type="button">载入“平原之隰”示例</button>
-          <label class="page-link page-link-muted toolbar-button file-button">
-            导入已有 JSON
-            <input id="importJsonInput" type="file" accept="application/json,.json" />
-          </label>
-        </div>
+    <main class="section five-step-audit-page">
+      <p id="fiveStepStatus" class="db-status" role="status">正在读取 V2 案例……</p>
+
+      <section id="fiveStepStart" class="card five-step-start" hidden>
+        <p class="section-kicker">先选案例</p>
+        <h2>从 V2 工作库选择要审校的内容</h2>
+        <p>五步草稿只使用选中案例及其 V2 来源段落、证据和来源状态。</p>
+        <a class="page-link" href="./v2-database.html#browse">打开 V2 工作库</a>
       </section>
 
-      <div class="workbench-layout">
-        <aside class="workbench-sidebar">
-          <article class="card sidebar-card">
-            <h3>草稿筛选</h3>
+      <section id="fiveStepCase" class="card five-step-case" hidden>
+        <div class="five-step-case-heading">
+          <div>
+            <p class="section-kicker">当前 V2 案例</p>
+            <h2 id="fiveStepCaseTitle">—</h2>
+            <p id="fiveStepCaseMeta" class="compact-note"></p>
+          </div>
+          <a id="fiveStepBackLink" class="page-link page-link-muted" href="./v2-database.html#browse">返回 V2 工作库</a>
+        </div>
+        <div id="fiveStepSourceContext" class="five-step-source-context"></div>
+      </section>
+
+      <section id="fiveStepControls" class="card five-step-controls" hidden>
+        <div>
+          <p class="section-kicker">生成设置</p>
+          <h2>选择模型与思考强度</h2>
+        </div>
+        <div class="five-step-controls-grid">
+          <label class="toolbar-field">
+            <span>DeepSeek 模型</span>
+            <select id="fiveStepModel">
+              <option value="deepseek-flash" selected>V4.1 Flash · deepseek-flash</option>
+              <option value="deepseek-v4-pro">V4 Pro · deepseek-v4-pro</option>
+            </select>
+          </label>
+          <label class="toolbar-field">
+            <span>思考强度</span>
+            <select id="fiveStepEffort">
+              <option value="none">关闭</option>
+              <option value="low">low</option>
+              <option value="high" selected>high（默认）</option>
+              <option value="max">max</option>
+            </select>
+          </label>
+          <div class="five-step-control-actions">
+            <button id="fiveStepGenerate" class="page-link toolbar-button" type="button">生成五步草稿</button>
+            <button id="fiveStepCancelEdit" class="search-clear toolbar-button" type="button" hidden>退出修改模式</button>
+          </div>
+        </div>
+        <p class="compact-note">模型只接收本条 V2 案例材料。AI 草稿不会改写案例状态；请检查每步引用和来源状态。</p>
+        <p id="fiveStepGenerationMeta" class="five-step-generation-meta" hidden></p>
+      </section>
+
+      <form id="fiveStepForm" class="five-step-form" hidden autocomplete="off">
+        <div class="five-step-form-heading">
+          <div>
+            <p class="section-kicker">五步审计卡</p>
+            <h2>逐步审查 AI 草稿</h2>
+          </div>
+          <span class="summary-pill">AI 建议 ≠ 人工结论</span>
+        </div>
+        <div id="fiveStepCards" class="five-step-cards"></div>
+
+        <section class="card five-step-final-review">
+          <div>
+            <p class="section-kicker">整案意见</p>
+            <h3>记录本次审校结论</h3>
+          </div>
+          <div class="five-step-final-grid">
             <label class="toolbar-field">
-              <span>关键词</span>
-              <input id="draftSearchInput" type="search" placeholder="标题、原文、结论、证据" />
+              <span>审校人</span>
+              <input id="fiveStepReviewer" type="text" placeholder="姓名或稳定 reviewer ID" required />
             </label>
             <label class="toolbar-field">
-              <span>来源 DOCX</span>
-              <select id="draftDocFilter"></select>
-            </label>
-            <label class="toolbar-field">
-              <span>问题类型</span>
-              <select id="draftIssueFilter">
-                <option value="all">全部草稿</option>
-                <option value="missing">缺必填</option>
-                <option value="template">有模板标签</option>
-                <option value="quote">证据需核对</option>
-                <option value="ready">可导出</option>
+              <span>本次意见</span>
+              <select id="fiveStepDecision" required>
+                <option value="reviewed">已审阅，当前文本可留档</option>
+                <option value="needs_revision">退回修改</option>
+                <option value="uncertain">仍有疑问</option>
               </select>
             </label>
-          </article>
-
-          <article class="card sidebar-card">
-            <div class="head-line compact-head">
-              <div>
-                <p class="section-kicker">本机草稿</p>
-                <h3>案例列表</h3>
-              </div>
-              <span id="draftCountPill" class="summary-pill">0</span>
-            </div>
-            <div id="draftList" class="workbench-draft-list"></div>
-          </article>
-
-          <article class="card sidebar-card">
-            <h3>填写顺序</h3>
-            <ol class="workbench-mini-steps">
-              <li>选 DOCX，填标题和提交者。</li>
-              <li>填被解释的原文、字词关系。</li>
-              <li>从 DOCX 复制证据原文到“材料摘录区”。</li>
-              <li>选中文字，一键加入证据。</li>
-              <li>补结论，导出 JSON。</li>
-            </ol>
-          </article>
-        </aside>
-
-        <section class="workbench-main">
-          <section class="card workbench-quality">
-            <div>
-              <p class="section-kicker">当前草稿</p>
-              <h2 id="currentDraftTitle">未命名案例</h2>
-            </div>
-            <div id="qualitySummary" class="workbench-quality-grid"></div>
-          </section>
-
-          <section class="workbench-editor-grid">
-            <article class="card source-panel">
-              <div class="head-line compact-head">
-                <div>
-                  <p class="section-kicker">材料摘录区</p>
-                  <h3>从 DOCX 复制相关段落</h3>
-                </div>
-                <button id="addSelectedQuoteButton" class="search-clear toolbar-button" type="button">选中文字加入证据</button>
-              </div>
-              <textarea id="sourceExcerptInput" class="source-excerpt-input" placeholder="把 DOCX 中和当前案例有关的原文、批注或上下文复制到这里。这里不导出入库，只用于本地核对 quote。"></textarea>
-              <p class="compact-note">技巧：先粘贴原文，再选中一句证据，点“加入证据”。导出时只导出结构化 JSON，不会把整段 DOCX 粘贴内容带走。</p>
-            </article>
-
-            <article class="card workbench-export-panel">
-              <div>
-                <p class="section-kicker">导出</p>
-                <h3>生成成员提交文件</h3>
-              </div>
-              <div id="exportStatus" class="workbench-export-status"></div>
-              <div class="toolbar-actions">
-                <button id="downloadJsonButton" class="page-link toolbar-button" type="button">下载 JSON</button>
-                <button id="copyJsonButton" class="page-link page-link-muted toolbar-button" type="button">复制 JSON</button>
-              </div>
-              <p class="compact-note">推荐保存到 `04-项目文献/D-标注/json/人工标注/你的名字/`，然后 commit 到自己的分支。</p>
-            </article>
-          </section>
-
-          <form id="workbenchForm" class="workbench-form" autocomplete="off"></form>
+            <label class="toolbar-field five-step-final-note">
+              <span>整案审校说明</span>
+              <textarea id="fiveStepOverallNote" rows="3" placeholder="记录总体判断、重要修改依据或下一步待核事项"></textarea>
+            </label>
+          </div>
+          <div class="five-step-save-row">
+            <button id="fiveStepSave" class="page-link toolbar-button" type="submit" disabled>保存本次审计记录</button>
+            <span id="fiveStepWriteStatus" class="compact-note">检查本地审校写入状态……</span>
+          </div>
+          <p class="compact-note">保存内容进入 V2 的独立审计记录表，不修改案例五步、human_status 或 gold 状态。修改会生成新版本，删除是可恢复的软删除。</p>
+          <p id="fiveStepSaveMessage" class="five-step-save-message" role="status"></p>
         </section>
-      </div>
+      </form>
+
+      <section id="fiveStepHistory" class="card five-step-history" hidden>
+        <div class="five-step-form-heading">
+          <div>
+            <p class="section-kicker">历史记录</p>
+            <h2>本案例已提交的五步审计</h2>
+          </div>
+          <span id="fiveStepHistoryCount" class="summary-pill">0 条</span>
+        </div>
+        <div id="fiveStepHistoryList" class="five-step-history-list"></div>
+      </section>
     </main>
 
     <footer class="footer">
-      <p>标注工作台只生成本地 JSON · 正式入库仍需 validator 与人工审校</p>
+      <p>五步释证只生成并记录审校材料 · 人工审计记录不会自动批准案例或晋级 gold</p>
     </footer>
 
-    <script src="./assets/js/utils.js"></script>
-    <script src="./assets/js/annotation-workbench.js"></script>
+    <script src="./assets/js/five-step-audit.js"></script>
   </body>
 </html>

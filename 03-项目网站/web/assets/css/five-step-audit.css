@@ -1,0 +1,298 @@
+.five-step-audit-page {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.five-step-start,
+.five-step-case,
+.five-step-controls,
+.five-step-form,
+.five-step-history {
+  margin-bottom: 18px;
+}
+
+.five-step-start h2,
+.five-step-case h2,
+.five-step-controls h2,
+.five-step-form h2,
+.five-step-history h2 {
+  margin: 0 0 8px;
+}
+
+.five-step-start .page-link {
+  margin-top: 12px;
+}
+
+.five-step-case-heading,
+.five-step-form-heading,
+.five-step-save-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.five-step-source-context {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.five-step-context-block,
+.five-step-ai-draft,
+.five-step-evidence-ref,
+.five-step-history-record {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--card-soft);
+}
+
+.five-step-context-block h3,
+.five-step-history-record h3 {
+  margin: 0 0 8px;
+}
+
+.five-step-context-text {
+  max-height: 250px;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+
+.five-step-context-meta,
+.five-step-generation-meta {
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.five-step-controls-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(180px, 0.8fr) auto;
+  align-items: end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.five-step-control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.five-step-controls-grid .toolbar-field,
+.five-step-final-grid .toolbar-field {
+  display: grid;
+  gap: 6px;
+}
+
+.five-step-controls-grid select,
+.five-step-final-grid input,
+.five-step-final-grid select,
+.five-step-final-grid textarea,
+.five-step-step select,
+.five-step-step textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  background: var(--card);
+  font: inherit;
+}
+
+.five-step-generation-meta {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  background: var(--card-soft);
+}
+
+.five-step-cards {
+  display: grid;
+  gap: 14px;
+  margin: 14px 0 20px;
+}
+
+.five-step-step {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-strong);
+  box-shadow: var(--shadow);
+}
+
+.five-step-step-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.five-step-step-heading h3 {
+  margin: 0;
+}
+
+.five-step-step-number {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.five-step-step-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+
+.five-step-ai-draft {
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.five-step-ai-draft p {
+  margin: 0;
+}
+
+.five-step-review-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.five-step-review-fields label {
+  display: grid;
+  gap: 6px;
+  color: var(--sub);
+  font-size: 13px;
+}
+
+.five-step-review-fields textarea {
+  min-height: 120px;
+  resize: vertical;
+  color: var(--ink);
+}
+
+.five-step-review-fields textarea[data-five-step-comment] {
+  min-height: 70px;
+}
+
+.five-step-evidence-refs {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.five-step-evidence-ref {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.five-step-evidence-ref blockquote {
+  margin: 6px 0 0;
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+
+.five-step-final-review {
+  margin-bottom: 18px;
+}
+
+.five-step-final-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1fr);
+  gap: 12px;
+  margin: 14px 0;
+}
+
+.five-step-final-note {
+  grid-column: 1 / -1;
+}
+
+.five-step-final-grid textarea {
+  resize: vertical;
+}
+
+.five-step-write-disabled,
+.five-step-save-message.error {
+  color: var(--danger, #9f2f2f);
+}
+
+.five-step-save-message {
+  min-height: 1.5em;
+  margin: 10px 0 0;
+}
+
+.five-step-history-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.five-step-history-record summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.five-step-history-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 4px;
+}
+
+.five-step-record-state {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--sub);
+  background: var(--card);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.five-step-record-state.deleted {
+  color: var(--danger, #9f2f2f);
+}
+
+.five-step-record-state.superseded {
+  color: var(--sub);
+}
+
+.five-step-history-step {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.five-step-history-step p {
+  margin: 6px 0;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 760px) {
+  .five-step-source-context,
+  .five-step-step-grid,
+  .five-step-final-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .five-step-controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .five-step-final-note {
+    grid-column: auto;
+  }
+
+  .five-step-case-heading,
+  .five-step-form-heading,
+  .five-step-save-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

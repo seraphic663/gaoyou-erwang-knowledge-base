@@ -71,7 +71,7 @@ D:\26大创
 └─ v2/                 V2 schema、Python 实现、测试、工作数据库和审校任务
 ```
 
-根目录只保留跨模块配置和总说明。成员协作先看 `00-项目说明/06-Git协作指南.md`；使用旧本地 JSON 标注工作台前看 `00-项目说明/07-标注工作台使用流程.md`；参与 V2 审校前以 `00-项目说明/10-V2统一工作流与数据库状态规范.md` 和 `v2/README.md` 为准。
+根目录只保留跨模块配置和总说明。成员协作先看 `00-项目说明/06-Git协作指南.md`；`00-项目说明/07-标注工作台使用流程.md` 是已退役的本地 JSON 工作台存档；当前从 `03-项目网站/annotation-workbench.html` 进入五步释证审校卡。参与 V2 正式审校前以 `00-项目说明/10-V2统一工作流与数据库状态规范.md` 和 `v2/README.md` 为准。
 
 ## 核心边界
 
@@ -98,6 +98,7 @@ npm start
 http://localhost:3000/
 http://localhost:3000/v2-database.html
 http://localhost:3000/annotation-workbench.html
+http://localhost:3000/annotation-workbench.html?case=<V2 case_id>
 ```
 
 常用只读检查：

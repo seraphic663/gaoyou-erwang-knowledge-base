@@ -95,6 +95,7 @@ module.exports = {
     : path.join(WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'annotation_v2.db'),
   V2_ACCEPTANCE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'v2_acceptance_bridge.py'),
   V2_REVIEW_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_review_bridge.py'),
+  V2_FIVE_STEP_AUDIT_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_five_step_audit_bridge.py'),
   V2_REVIEW_MANIFEST_FILE: process.env.V2_REVIEW_MANIFEST_FILE
     ? (path.isAbsolute(process.env.V2_REVIEW_MANIFEST_FILE)
       ? process.env.V2_REVIEW_MANIFEST_FILE
@@ -104,4 +105,5 @@ module.exports = {
   DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_MODEL: 'deepseek-v4-pro',
+  DEEPSEEK_AUDIT_MODEL: process.env.DEEPSEEK_AUDIT_MODEL || 'deepseek-flash',
 };

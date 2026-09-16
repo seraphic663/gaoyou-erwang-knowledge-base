@@ -12,14 +12,22 @@
         <div class="brand">高邮二王考据过程知识库</div>
         <div class="nav-links">
           <a href="./index.html">返回首页</a>
-          <a href="./annotation.html">人工标注库</a>
-          <a href="./database.html?view=cases">主数据库</a>
+          <div class="database-menu">
+            <a class="database-trigger" href="./database.html?view=terms">数据库</a>
+            <div class="database-panel" aria-label="选择数据库">
+              <a href="./database.html?view=terms"><span>主数据库</span><small>字词与案例浏览</small></a>
+              <a href="./annotation.html"><span>人工标注库</span><small>人工标注结构化数据</small></a>
+              <a href="./v2-database.html"><span>V2 工作库</span><small>案例浏览与待办审校</small></a>
+            </div>
+          </div>
+          <a href="./ai-annotation.html">AI 释证</a>
+          <a href="./annotation-workbench.html">五步释证</a>
           <a href="./knowledge.html">训诂知识</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">实验性功能 · AI 释证</p>
+        <p class="badge">AI 辅助 · 独立释证</p>
         <h1>AI 释证</h1>
         <p class="hero-copy">
           优先使用人工标注库，必要时引用主数据库补充，回答内容仅供参考。

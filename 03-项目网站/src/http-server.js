@@ -7,6 +7,23 @@ const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-br
 const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
 const { getV2ReviewTasks, getV2ReviewTask, submitV2Review } = require('./v2-review');
+const {
+  ALLOWED_EFFORTS,
+  ALLOWED_MODELS,
+  PROMPT_VERSION,
+  generateFiveStepDraft,
+  fingerprintV2Case,
+  STEPS,
+  validateReviewedSteps,
+} = require('./v2-five-step-audit');
+const {
+  deleteV2FiveStepAudit,
+  getV2FiveStepAudit,
+  getV2FiveStepAudits,
+  restoreV2FiveStepAudit,
+  reviseV2FiveStepAudit,
+  saveV2FiveStepAudit,
+} = require('./v2-five-step-audit-store');
 
 let v2SummaryCache = null;
 
@@ -34,7 +51,7 @@ function sendJson(res, statusCode, payload) {
     'Cache-Control': 'no-store, no-cache, must-revalidate',
     'Pragma': 'no-cache',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   });
   res.end(JSON.stringify(payload, null, 2));
@@ -257,6 +274,171 @@ function createServer() {
           return sendJson(res, 404, payload);
         }
         return sendJson(res, 200, payload);
+      }
+
+      if (parsedUrl.pathname === '/api/v2/five-step-draft') {
+        if (req.method !== 'POST') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        const body = await readJsonBody(req);
+        const result = await generateFiveStepDraft(config, body);
+        return sendJson(res, result.status, result.payload);
+      }
+
+      if (parsedUrl.pathname === '/api/v2/five-step-audits') {
+        if (req.method === 'GET') {
+          const caseId = parsedUrl.query.case_id || '';
+          const payload = await getV2FiveStepAudits(config, caseId);
+          payload.write_enabled = config.V2_REVIEW_WRITE_ENABLED;
+          return sendJson(res, payload.ok === false ? 404 : 200, payload);
+        }
+        if (!['POST', 'PATCH', 'DELETE'].includes(req.method)) {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        if (!config.V2_REVIEW_WRITE_ENABLED) {
+          return sendJson(res, 403, {
+            ok: false,
+            write_enabled: false,
+            message: 'V2 audit writes are disabled; set V2_REVIEW_WRITE_ENABLED=1 for an explicit local review session',
+          });
+        }
+
+        const body = await readJsonBody(req);
+
+        if (req.method === 'DELETE') {
+          const auditId = String(body.audit_id || '').trim();
+          const deletedBy = String(body.deleted_by || '').trim();
+          const operationId = String(body.operation_id || '').trim();
+          if (!auditId || !deletedBy || !operationId) {
+            return sendJson(res, 400, { ok: false, message: 'audit_id_deleted_by_operation_id_required' });
+          }
+          const payload = await deleteV2FiveStepAudit(config, {
+            audit_id: auditId,
+            deleted_by: deletedBy,
+            operation_id: operationId,
+            delete_reason: String(body.delete_reason || ''),
+          });
+          return sendJson(res, payload.ok === false ? 400 : 200, payload);
+        }
+
+        if (req.method === 'PATCH') {
+          const auditId = String(body.audit_id || '').trim();
+          const caseId = String(body.case_id || '').trim();
+          const reviewer = String(body.reviewer || '').trim();
+          const operationId = String(body.operation_id || '').trim();
+          if (!auditId || !caseId || !reviewer || !operationId) {
+            return sendJson(res, 400, { ok: false, message: 'audit_id_case_id_reviewer_operation_id_required' });
+          }
+          let reviewedSteps;
+          try {
+            reviewedSteps = validateReviewedSteps(body.reviewed_steps);
+          } catch (error) {
+            return sendJson(res, 400, { ok: false, message: error.message });
+          }
+          if (!['reviewed', 'needs_revision', 'uncertain'].includes(body.overall_decision)) {
+            return sendJson(res, 400, { ok: false, message: 'overall_decision_invalid' });
+          }
+          const currentCase = await getV2Acceptance(config, 'case', [caseId]);
+          if (!currentCase?.ok) return sendJson(res, 404, { ok: false, message: 'V2 case not found.' });
+          const sourcePayload = await getV2FiveStepAudit(config, auditId);
+          if (!sourcePayload?.ok || !sourcePayload.record) {
+            return sendJson(res, 404, { ok: false, message: 'Five-step audit record not found.' });
+          }
+          const source = sourcePayload.record;
+          if (source.case_id !== caseId) return sendJson(res, 409, { ok: false, message: 'audit_record_case_mismatch' });
+          if (source.case_fingerprint !== fingerprintV2Case(currentCase)) {
+            return sendJson(res, 409, { ok: false, message: 'V2 case changed after this record was created. Regenerate before editing.' });
+          }
+          const payload = await reviseV2FiveStepAudit(config, {
+            source_audit_id: auditId,
+            case_id: caseId,
+            reviewer,
+            operation_id: operationId,
+            case_fingerprint: source.case_fingerprint,
+            reviewed_steps: reviewedSteps,
+            overall_decision: body.overall_decision,
+            overall_note: String(body.overall_note || ''),
+          });
+          return sendJson(res, payload.ok === false ? 400 : 200, payload);
+        }
+
+        if (body.mode === 'restore') {
+          const auditId = String(body.audit_id || '').trim();
+          const restoredBy = String(body.restored_by || '').trim();
+          const operationId = String(body.operation_id || '').trim();
+          if (!auditId || !restoredBy || !operationId) {
+            return sendJson(res, 400, { ok: false, message: 'audit_id_restored_by_operation_id_required' });
+          }
+          const payload = await restoreV2FiveStepAudit(config, {
+            audit_id: auditId,
+            restored_by: restoredBy,
+            operation_id: operationId,
+          });
+          return sendJson(res, payload.ok === false ? 400 : 200, payload);
+        }
+
+        const caseId = String(body.case_id || '').trim();
+        const reviewer = String(body.reviewer || '').trim();
+        const operationId = String(body.operation_id || '').trim();
+        if (!caseId || !reviewer || !operationId) {
+          return sendJson(res, 400, { ok: false, message: 'case_id_reviewer_operation_id_required' });
+        }
+        if (!ALLOWED_MODELS.has(body.model_requested)
+          || !ALLOWED_EFFORTS.has(body.reasoning_effort)
+          || body.prompt_version !== PROMPT_VERSION
+          || !String(body.model_returned || '').trim()
+          || !String(body.generated_at || '').trim()) {
+          return sendJson(res, 400, { ok: false, message: 'model_effort_prompt_version_and_generation_time_required' });
+        }
+        const currentCase = await getV2Acceptance(config, 'case', [caseId]);
+        if (!currentCase?.ok) return sendJson(res, 404, { ok: false, message: 'V2 case not found.' });
+        if (body.case_fingerprint !== fingerprintV2Case(currentCase)) {
+          return sendJson(res, 409, { ok: false, message: 'V2 case changed after draft generation. Reload the case and regenerate before saving.' });
+        }
+
+        const aiDraft = body.ai_draft;
+        const reviewedSteps = body.reviewed_steps;
+        if (!Array.isArray(aiDraft) || !Array.isArray(reviewedSteps)
+          || aiDraft.length !== STEPS.length || reviewedSteps.length !== STEPS.length
+          || STEPS.some(({ field }, index) => aiDraft[index]?.field !== field || reviewedSteps[index]?.field !== field)) {
+          return sendJson(res, 400, { ok: false, message: 'exactly_five_ordered_steps_required' });
+        }
+        if (aiDraft.some((step) => !String(step.text || '').trim()
+          || !Array.isArray(step.evidence_refs) || !Array.isArray(step.review_questions))) {
+          return sendJson(res, 400, { ok: false, message: 'ai_draft_step_schema_invalid' });
+        }
+        const availableEvidenceIndexes = new Set((currentCase.evidences || []).map((entry) => Number(entry.evidence_index)));
+        if (aiDraft.some((step) => step.evidence_refs.some((index) => !availableEvidenceIndexes.has(Number(index))))) {
+          return sendJson(res, 400, { ok: false, message: 'ai_draft_references_unknown_v2_evidence' });
+        }
+        const reviewStatuses = new Set(['accepted', 'edited', 'question']);
+        if (reviewedSteps.some((step) => !reviewStatuses.has(step.status) || !String(step.text || '').trim()
+          || (['edited', 'question'].includes(step.status) && !String(step.comment || '').trim()))) {
+          return sendJson(res, 400, { ok: false, message: 'each_step_requires_text_and_review_decision' });
+        }
+        if (!['reviewed', 'needs_revision', 'uncertain'].includes(body.overall_decision)) {
+          return sendJson(res, 400, { ok: false, message: 'overall_decision_invalid' });
+        }
+
+        const payload = await saveV2FiveStepAudit(config, {
+          case_id: caseId,
+          reviewer,
+          operation_id: operationId,
+          model_requested: body.model_requested,
+          model_returned: body.model_returned,
+          reasoning_effort: body.reasoning_effort,
+          prompt_version: body.prompt_version,
+          case_fingerprint: body.case_fingerprint,
+          generated_at: body.generated_at,
+          audit_json: {
+            overall_decision: body.overall_decision,
+            overall_note: String(body.overall_note || ''),
+            usage: body.usage || null,
+            ai_draft: aiDraft,
+            reviewed_steps: reviewedSteps,
+          },
+        });
+        return sendJson(res, payload.ok === false ? 400 : 200, payload);
       }
 
       if (parsedUrl.pathname === '/api/v2/review-tasks') {
