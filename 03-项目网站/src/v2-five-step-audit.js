@@ -1,9 +1,27 @@
 const crypto = require('crypto');
 const { getV2Acceptance } = require('./v2-acceptance');
 
-const PROMPT_VERSION = 'v2-five-step-audit.v1';
+const PROMPT_VERSION = 'v2-five-step-audit.v2';
 const ALLOWED_MODELS = new Set(['deepseek-flash', 'deepseek-v4-pro']);
 const ALLOWED_EFFORTS = new Set(['none', 'low', 'high', 'max']);
+// DeepSeek counts reasoning tokens and JSON output against max_tokens. Keep the
+// request bounded so a large legacy case cannot spend the whole budget copying
+// source material, while leaving enough room for the five-step response.
+const PROMPT_LIMITS = Object.freeze({
+  primaryPassageChars: 8000,
+  evidencePassageChars: 1600,
+  targetTextChars: 4000,
+  processStepChars: 1800,
+  termNoteChars: 500,
+  evidenceQuoteChars: 1000,
+  evidenceNoteChars: 600,
+});
+const OUTPUT_TOKEN_BUDGETS = Object.freeze({
+  none: 16384,
+  low: 24576,
+  high: 32768,
+  max: 65536,
+});
 const STEPS = [
   { field: 'problem_discovery', label: '问题发现' },
   { field: 'research_question', label: '研究问题' },
@@ -83,9 +101,9 @@ function boundedText(value, limit = 20000) {
   };
 }
 
-function passageForPrompt(passage) {
+function passageForPrompt(passage, limit = PROMPT_LIMITS.primaryPassageChars) {
   if (!passage) return null;
-  const source = boundedText(passage.raw_text || passage.plain_text || passage.normalized_text || '');
+  const source = boundedText(passage.raw_text || passage.plain_text || passage.normalized_text || '', limit);
   return {
     passage_id: passage.passage_id || null,
     source_document_id: passage.source_document_id || null,
@@ -101,14 +119,28 @@ function passageForPrompt(passage) {
 function buildV2AuditContext(item) {
   const caseData = item.case_data || {};
   const provenance = item.provenance || {};
-  const process = Object.fromEntries((item.process_steps || []).map((step) => [step.field_name, step.step_text || '']));
+  const processByField = new Map((item.process_steps || []).map((step) => [step.field_name, step.step_text || '']));
+  const processTruncated = {};
+  const process = Object.fromEntries(STEPS.map(({ field }) => {
+    const bounded = boundedText(processByField.get(field) || caseData[field] || '', PROMPT_LIMITS.processStepChars);
+    processTruncated[field] = bounded.truncated;
+    return [field, bounded.text];
+  }));
   const evidences = (item.evidences || []).map((evidence) => ({
     evidence_index: Number(evidence.evidence_index),
     source_work: evidence.source_work || evidence.external_cited_work || null,
-    quote: String(evidence.quote || ''),
+    quote: boundedText(evidence.quote || '', PROMPT_LIMITS.evidenceQuoteChars).text,
+    quote_truncated: boundedText(evidence.quote || '', PROMPT_LIMITS.evidenceQuoteChars).truncated,
     quote_check: evidence.quote_check || 'unchecked',
     source_resolution: evidence.data?.source_resolution || 'unknown',
-    evidence_note: evidence.data?.evidence_note || evidence.data?.note || evidence.data?.relation_note || '',
+    evidence_note: boundedText(
+      evidence.data?.evidence_note || evidence.data?.note || evidence.data?.relation_note || '',
+      PROMPT_LIMITS.evidenceNoteChars,
+    ).text,
+    evidence_note_truncated: boundedText(
+      evidence.data?.evidence_note || evidence.data?.note || evidence.data?.relation_note || '',
+      PROMPT_LIMITS.evidenceNoteChars,
+    ).truncated,
     external_source: evidence.external_source_id ? {
       external_source_id: evidence.external_source_id,
       cited_work: evidence.external_cited_work || null,
@@ -119,8 +151,21 @@ function buildV2AuditContext(item) {
       edition_status: evidence.external_edition_status || null,
       passage_status: evidence.external_passage_status || null,
     } : null,
-    source_passage: passageForPrompt(evidence.source_passage),
+    source_passage: passageForPrompt(evidence.source_passage, PROMPT_LIMITS.evidencePassageChars),
   }));
+
+  const targetText = boundedText(item.target_text || '', PROMPT_LIMITS.targetTextChars);
+  const terms = (item.terms || []).map((term) => {
+    const relationNote = boundedText(term.relation_note || '', PROMPT_LIMITS.termNoteChars);
+    return {
+      source_term: term.source_term,
+      target_term: term.target_term,
+      relation_type: term.relation_type,
+      relation_subtype: term.relation_subtype,
+      relation_note: relationNote.text,
+      relation_note_truncated: relationNote.truncated,
+    };
+  });
 
   return {
     record: {
@@ -132,7 +177,8 @@ function buildV2AuditContext(item) {
       source_work: item.source_work,
       source_passage_id: item.source_passage_id || null,
       target_work: item.target_work || null,
-      target_text: item.target_text || '',
+      target_text: targetText.text,
+      target_text_truncated: targetText.truncated,
       target_passage_id: item.target_passage_id || null,
       evidence_state: item.evidence_state || null,
       target_scope_status: item.target_scope?.status || 'unknown',
@@ -142,17 +188,12 @@ function buildV2AuditContext(item) {
         transformation_kind: provenance.transformation_kind || null,
         source_passage_id: provenance.source_passage_id || null,
       },
-      terms: (item.terms || []).map((term) => ({
-        source_term: term.source_term,
-        target_term: term.target_term,
-        relation_type: term.relation_type,
-        relation_subtype: term.relation_subtype,
-        relation_note: term.relation_note,
-      })),
+      terms,
       existing_five_steps: Object.fromEntries(STEPS.map(({ field }) => [
         field,
-        process[field] || caseData[field] || '',
+        process[field],
       ])),
+      existing_five_steps_truncated: processTruncated,
     },
     source_passage: passageForPrompt(item.source_passage),
     target_passage: passageForPrompt(item.target_passage),
@@ -169,6 +210,8 @@ function buildSystemPrompt() {
     '不可补造引文。evidence_refs 只能引用输入中实际存在的 evidence_index；没有足够材料时写明不足，并提出具体待核问题。',
     '严格输出 JSON 对象：{"steps":[{"field":"problem_discovery","text":"...","evidence_refs":[],"review_questions":[]}, ...]}。',
     'steps 必须恰好五项，按 problem_discovery、research_question、evidence_collection、reasoning、conclusion 顺序。每项都要有 text、evidence_refs、review_questions。',
+    '为避免响应被截断，每项 text 控制在 500 个中文字符以内，review_questions 最多 3 条且每条不超过 120 个字符；evidence_refs 只列直接相关编号，每步最多 8 个。不要重复整段原文。',
+    '输入中带有 *_truncated=true 的字段只代表本次提示截取了原字段；不得把截取之外的内容当作已知事实。',
   ].join('\n');
 }
 
@@ -176,8 +219,9 @@ function buildUserPrompt(context) {
   return [
     '请为下列 V2 案例生成五步释证草稿。每步说明材料支持了什么、没有支持什么；区分王氏原文、数据库中的证据摘要和机器推断。',
     '问题发现：从本案材料指出具体疑点。研究问题：写清待回答命题与边界。证据收集：逐项概括 V2 evidence 并说明状态。推理：重建可由所给材料支持的论证，标出跳步。结论：控制结论强度并保留未决项。',
+    '如果来源段落或证据字段被截取，只使用提示中可见部分，并在相应步骤保留待核问题。',
     'JSON 输入如下：',
-    JSON.stringify(context, null, 2),
+    JSON.stringify(context),
   ].join('\n\n');
 }
 
@@ -249,10 +293,11 @@ async function generateFiveStepDraft(config, input = {}) {
 
   const context = buildV2AuditContext(item);
   const validEvidenceIndexes = new Set(context.evidences.map((evidence) => evidence.evidence_index));
+  const maxTokens = OUTPUT_TOKEN_BUDGETS[reasoningEffort];
   const requestBody = {
     model,
     reasoning_effort: reasoningEffort,
-    max_tokens: 8192,
+    max_tokens: maxTokens,
     response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: buildSystemPrompt() },
@@ -264,11 +309,12 @@ async function generateFiveStepDraft(config, input = {}) {
   let response;
   let payload;
   try {
+    const requestTimeoutMs = reasoningEffort === 'max' ? 180000 : 120000;
     response = await fetch('https://api.deepseek.com/chat/completions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(90000),
+      signal: AbortSignal.timeout(requestTimeoutMs),
     });
     payload = await response.json().catch(() => ({}));
   } catch (error) {
@@ -304,6 +350,7 @@ async function generateFiveStepDraft(config, input = {}) {
       model_requested: model,
       model_returned: payload.model || model,
       reasoning_effort: reasoningEffort,
+      max_tokens: maxTokens,
       generated_at: new Date().toISOString(),
       usage: payload.usage || null,
       draft,
@@ -314,7 +361,9 @@ async function generateFiveStepDraft(config, input = {}) {
 module.exports = {
   ALLOWED_EFFORTS,
   ALLOWED_MODELS,
+  OUTPUT_TOKEN_BUDGETS,
   PROMPT_VERSION,
+  PROMPT_LIMITS,
   STEPS,
   buildV2AuditContext,
   fingerprintV2Case,

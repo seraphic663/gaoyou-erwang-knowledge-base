@@ -180,7 +180,8 @@
   function generationSummary(generation) {
     const usage = generation.usage || {};
     const usageText = Number.isFinite(Number(usage.total_tokens)) ? ` · ${usage.total_tokens} tokens` : '';
-    return `请求模型 ${generation.model_requested} · API 返回 ${generation.model_returned} · effort ${generation.reasoning_effort} · ${new Date(generation.generated_at).toLocaleString()}${usageText} · prompt ${generation.prompt_version}`;
+    const budgetText = Number.isFinite(Number(generation.max_tokens)) ? ` · budget ${generation.max_tokens}` : '';
+    return `请求模型 ${generation.model_requested} · API 返回 ${generation.model_returned} · effort ${generation.reasoning_effort}${budgetText} · ${new Date(generation.generated_at).toLocaleString()}${usageText} · prompt ${generation.prompt_version}`;
   }
 
   function updateSaveButton() {
@@ -403,7 +404,8 @@
     el.status.textContent = '正在读取所选 V2 案例并请求 DeepSeek……';
     el.saveMessage.textContent = '';
     el.generationMeta.className = 'five-step-generation-meta pending';
-    el.generationMeta.textContent = `正在请求 ${el.model.options[el.model.selectedIndex]?.text || el.model.value} · effort ${el.effort.value}；服务器最多等待 90 秒。`;
+    const waitSeconds = el.effort.value === 'max' ? 180 : 120;
+    el.generationMeta.textContent = `正在请求 ${el.model.options[el.model.selectedIndex]?.text || el.model.value} · effort ${el.effort.value}；服务器最多等待 ${waitSeconds} 秒。`;
     el.generationMeta.hidden = false;
     try {
       const response = await requestJson('/api/v2/five-step-draft', {
@@ -485,6 +487,7 @@
         reasoning_effort: state.generation.reasoning_effort,
         prompt_version: state.generation.prompt_version,
         generated_at: state.generation.generated_at,
+        output_budget_tokens: state.generation.max_tokens,
         usage: state.generation.usage,
         ai_draft: state.generation.draft,
         reviewed_steps: state.reviewedSteps,

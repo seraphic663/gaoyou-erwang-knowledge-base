@@ -433,6 +433,7 @@ function createServer() {
           audit_json: {
             overall_decision: body.overall_decision,
             overall_note: String(body.overall_note || ''),
+            output_budget_tokens: body.output_budget_tokens || null,
             usage: body.usage || null,
             ai_draft: aiDraft,
             reviewed_steps: reviewedSteps,
