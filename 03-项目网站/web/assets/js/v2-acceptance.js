@@ -8,11 +8,6 @@ const V2Acceptance = (() => {
     pageCount: 1,
     requestId: 0,
     selectedCaseId: null,
-    activeReviewTask: null,
-    reviewWriteEnabled: false,
-    reviewTaskResponse: null,
-    reviewTasksLoaded: false,
-    reviewMessage: '',
   };
 
   const elements = {
@@ -34,19 +29,9 @@ const V2Acceptance = (() => {
     caseTable: document.querySelector('#v2CaseTable'),
     caseDetail: document.querySelector('#v2CaseDetail'),
     caseTab: document.querySelector('#v2CaseTab'),
-    reviewTab: document.querySelector('#v2ReviewTab'),
     qualityTab: document.querySelector('#v2QualityTab'),
     caseWorkspace: document.querySelector('#v2CaseWorkspace'),
-    reviewWorkspace: document.querySelector('#v2ReviewWorkspace'),
     qualityWorkspace: document.querySelector('#v2QualityWorkspace'),
-    reviewWriteChip: document.querySelector('#v2ReviewWriteChip'),
-    reviewStream: document.querySelector('#v2ReviewStream'),
-    reviewBatch: document.querySelector('#v2ReviewBatch'),
-    reviewDisplayLimit: document.querySelector('#v2ReviewDisplayLimit'),
-    reviewLoadBatch: document.querySelector('#v2ReviewLoadBatch'),
-    reviewTaskStatus: document.querySelector('#v2ReviewTaskStatus'),
-    reviewSequence: document.querySelector('#v2ReviewSequence'),
-    reviewTaskList: document.querySelector('#v2ReviewTaskList'),
   };
 
   const labels = {
@@ -100,21 +85,18 @@ const V2Acceptance = (() => {
   }
 
   function setWorkspaceMode(mode = 'browse', { updateUrl = true } = {}) {
-    const selectedMode = ['browse', 'review', 'quality'].includes(mode) ? mode : 'browse';
+    const requestedMode = String(mode || '').trim();
+    const selectedMode = requestedMode === 'review'
+      ? 'browse'
+      : ['browse', 'quality'].includes(requestedMode) ? requestedMode : 'browse';
     const browseMode = selectedMode === 'browse';
-    const reviewMode = selectedMode === 'review';
     const qualityMode = selectedMode === 'quality';
     if (elements.caseWorkspace) elements.caseWorkspace.hidden = !browseMode;
-    if (elements.reviewWorkspace) elements.reviewWorkspace.hidden = !reviewMode;
     if (elements.qualityWorkspace) elements.qualityWorkspace.hidden = !qualityMode;
     if (elements.caseDetail) elements.caseDetail.hidden = qualityMode;
     if (elements.caseTab) {
       elements.caseTab.classList.toggle('active', browseMode);
       elements.caseTab.setAttribute('aria-selected', String(browseMode));
-    }
-    if (elements.reviewTab) {
-      elements.reviewTab.classList.toggle('active', reviewMode);
-      elements.reviewTab.setAttribute('aria-selected', String(reviewMode));
     }
     if (elements.qualityTab) {
       elements.qualityTab.classList.toggle('active', qualityMode);
@@ -123,7 +105,6 @@ const V2Acceptance = (() => {
     if (updateUrl && window.location.hash !== `#${selectedMode}`) {
       window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${selectedMode}`);
     }
-    if (reviewMode && state.summary && !state.reviewTasksLoaded) loadReviewTasks({ resetBatch: true });
   }
 
   function renderHero() {
@@ -132,7 +113,7 @@ const V2Acceptance = (() => {
     const cards = [
       ['工作状态', summary.overall_status === 'pass_with_warnings' ? '结构通过，有待办' : statusLabel(summary.overall_status)],
       ['机器案例', summary.counts.annotation_cases],
-      ['人工待办', summary.human_status_counts.pending || 0],
+      ['待进行五步审校', summary.human_status_counts.pending || 0],
     ];
     elements.heroMeta.innerHTML = cards.map(([label, value]) => `
       <div class="hero-panel-item">
@@ -149,8 +130,8 @@ const V2Acceptance = (() => {
     elements.overall.className = `v2-overall card ${warning ? 'warn' : ''} ${failed ? 'fail' : ''}`;
     elements.overall.innerHTML = `
       <p class="section-kicker">验收结论</p>
-      <h2>${failed ? '当前不能交接' : warning ? '结构验收通过，但还有明确待办' : '可以交接'}</h2>
-      <p>${failed ? '至少有一项数据库结构或引用完整性检查失败，请先处理失败项。' : '数据库可以作为机器工作库继续使用；人工审校、目标典籍补全和外部原典核验仍按待办推进。'}</p>
+      <h2>${failed ? '当前不能交接' : warning ? '结构验收通过，但仍有待核查项' : '可以交接'}</h2>
+      <p>${failed ? '至少有一项数据库结构或引用完整性检查失败，请先处理失败项。' : '数据库可以作为机器工作库继续使用；五步 AI 审校、目标典籍补全和外部原典核验仍待推进。'}</p>
     `;
   }
 
@@ -165,7 +146,7 @@ const V2Acceptance = (() => {
       .join(' · ');
     const coreMetrics = [
       ['机器案例', summary.counts.annotation_cases, '当前工作库记录'],
-      ['人工待办', summary.human_status_counts.pending || 0, '完成审校前不会进入 gold'],
+      ['待进行五步审校', summary.human_status_counts.pending || 0, '从案例详情进入五步 AI 审校'],
       ['外部原典待核验', summary.evidence_counts.source_resolution.external_source_pending || 0, '先确认底本，再确认引文'],
       ['结构失败项', summary.checks.filter((item) => item.status === 'fail').length, '必须优先处理的数据库问题'],
     ];
@@ -181,8 +162,8 @@ const V2Acceptance = (() => {
       ['target_work 消歧队列', summary.counts.target_work_resolution_queue || 0, '机器候选或缺少上下文，待人工确认'],
       ['外部 edition 来源队列', summary.counts.external_source_resolution_queue || 0, '版本选择和底本登记待核'],
       ['外部 passage 引文队列', summary.counts.external_passage_resolution_queue || 0, '逐条 quote / location 待核'],
-      ['人工审校队列', summary.report_context.work_queue_counts?.human_review_queue || summary.human_status_counts.pending || 0, `review_events ${summary.counts.review_events || 0}`],
-      ['分批审校任务包', taskArtifacts.valid ? '覆盖通过' : '待重建', taskBatchText || '尚未生成稳定任务包'],
+      ['历史 review 队列（内部）', summary.report_context.work_queue_counts?.human_review_queue || summary.human_status_counts.pending || 0, `已有 review_events ${summary.counts.review_events || 0}`],
+      ['迁移任务包（内部）', taskArtifacts.valid ? '覆盖通过' : '待重建', taskBatchText || '尚未生成稳定任务包'],
     ];
     const renderMetric = ([label, value, note]) => `
       <article class="card v2-metric">
@@ -249,7 +230,7 @@ const V2Acceptance = (() => {
     const originText = origins ? `候选来源：${origins}` : '';
     const queueCounts = context.work_queue_counts || {};
     const queueText = queueCounts.target_work_queue
-      ? `队列：target_work ${queueCounts.target_work_queue}；external passage ${queueCounts.external_passage_queue}；人工 ${queueCounts.human_review_queue}`
+      ? `内部迁移队列：target_work ${queueCounts.target_work_queue}；external passage ${queueCounts.external_passage_queue}；历史 review ${queueCounts.human_review_queue}`
       : '';
     const taskManifest = context.review_task_manifest || {};
     const taskCounts = taskManifest.counts || {};
@@ -261,315 +242,6 @@ const V2Acceptance = (() => {
     elements.reportContext.textContent = fullJson
       ? `旧 full JSON 上下文命中（仅迁移线索）：${fullJson}；${inventoryText}；${originText}；${queueText}；${taskText}；${locationText}`
       : `${inventoryText}；${originText}；${queueText}；${taskText}；${locationText}。`;
-  }
-
-  function renderReviewSequence() {
-    if (!elements.reviewSequence) return;
-    const sequence = state.summary?.review_task_artifacts?.review_sequence || [];
-    elements.reviewSequence.textContent = sequence.length
-      ? `推荐顺序：${sequence.map((item) => `${item.phase}. ${item.label}`).join(' → ')}。无上下文候选壳自动留到最后，不影响前面可操作批次。`
-      : '推荐顺序：外部来源 → 外部 passage → target_work → 案例字段。';
-  }
-
-  function reviewTaskCaseId(task) {
-    if (task?.case_id) return String(task.case_id);
-    if (task?.detail_ref?.case_id) return String(task.detail_ref.case_id);
-    const evidence = task?.evidence_refs?.[0];
-    return evidence?.case_id ? String(evidence.case_id) : '';
-  }
-
-  function reviewTaskLabel(task) {
-    if (task.task_type === 'case_review') return task.case_title || task.case_id;
-    if (task.task_type === 'target_work_resolution') return `${task.raw_label || '未定书名'} · ${task.case_id || ''}`;
-    if (task.task_type === 'external_source_resolution') return task.cited_work || task.external_source_id;
-    return `${task.cited_work || '外部 passage'} · ${task.quote || ''}`;
-  }
-
-  function renderStandaloneReviewTask(task) {
-    if (!elements.caseDetail) return;
-    const evidenceRefs = task.evidence_refs || [];
-    const caseIds = [...new Set(evidenceRefs.map((entry) => entry.case_id).filter(Boolean))];
-    const visibleEvidenceRefs = evidenceRefs.slice(0, 20);
-    const evidenceMarkup = visibleEvidenceRefs.length
-      ? visibleEvidenceRefs.map((entry) => `
-          <article class="v2-evidence-card">
-            <div class="v2-detail-topline">
-              <strong>${escapeHtml(entry.cited_work || task.cited_work || '外部来源')}</strong>
-              <span class="v2-resolution-chip ${escapeHtml(entry.queue_status || 'pending')}">${escapeHtml(statusLabel(entry.queue_status || 'pending'))}</span>
-            </div>
-            <p class="v2-evidence-note">${escapeHtml(entry.case_id || '未关联案例')} · evidence ${escapeHtml(entry.evidence_index)}</p>
-            <div class="v2-evidence-quote">${escapeHtml(entry.quote || '（无引文）')}</div>
-            <p class="v2-evidence-note">edition ${escapeHtml(entry.edition_status || 'missing')} · passage ${escapeHtml(entry.passage_status || 'missing')}</p>
-          </article>
-        `).join('')
-      : '<p class="v2-empty-detail">该来源任务暂未附关联引文摘要。</p>';
-    const moreEvidenceNote = evidenceRefs.length > visibleEvidenceRefs.length
-      ? `<p class="compact-note">本任务共 ${evidenceRefs.length} 条引文，当前先显示 ${visibleEvidenceRefs.length} 条；完整任务数据仍保留在下方折叠区。</p>`
-      : '';
-    state.selectedCaseId = null;
-    renderCaseTable();
-    elements.caseDetail.innerHTML = `
-      <div class="v2-detail-header">
-        <p class="section-kicker">外部来源任务详情</p>
-        <div class="v2-detail-topline">
-          <h2>${escapeHtml(reviewTaskLabel(task))}</h2>
-          <span class="v2-status-chip ${statusClass(task.queue_status || 'pending')}">${escapeHtml(statusLabel(task.queue_status || 'pending'))}</span>
-        </div>
-        <p class="compact-note">${escapeHtml(task.task_id)} · ${escapeHtml(task.external_source_id || '')}</p>
-      </div>
-      <div class="v2-detail-meta">
-        <div class="v2-detail-block"><span class="v2-detail-label">外部来源</span><p>${escapeHtml(task.cited_work || '未注明典籍')}</p></div>
-        <div class="v2-detail-block"><span class="v2-detail-label">当前状态</span><p>${escapeHtml(task.queue_status || 'pending')} · edition ${escapeHtml(task.edition_status || 'missing')}</p></div>
-        <div class="v2-detail-block"><span class="v2-detail-label">底本文件</span><p>${escapeHtml(task.registered_source?.source_file || '尚未登记')}</p></div>
-        <div class="v2-detail-block"><span class="v2-detail-label">关联案例</span><p>${escapeHtml(caseIds.length ? caseIds.join('、') : '任务级来源，需先完成来源决定')}</p></div>
-      </div>
-      <div class="v2-detail-block">
-        <div class="v2-detail-topline"><h3>关联引文摘要</h3><span class="summary-pill">${escapeHtml(evidenceRefs.length)} 条</span></div>
-        <div class="v2-evidence-list">${evidenceMarkup}</div>
-        ${moreEvidenceNote}
-      </div>
-      ${renderReviewForm({})}
-      ${renderJsonPanel(task, '任务上下文 JSON')}
-    `;
-    elements.caseDetail.querySelector('#v2ReviewSubmit')?.addEventListener('click', submitActiveReview);
-  }
-
-  function renderReviewTaskList() {
-    if (!elements.reviewTaskList || !state.reviewTaskResponse) return;
-    const tasks = state.reviewTaskResponse.tasks || [];
-    if (!tasks.length) {
-      elements.reviewTaskList.innerHTML = '<p class="v2-empty-detail">该批次没有任务。</p>';
-      return;
-    }
-    const limit = Math.max(1, Number(elements.reviewDisplayLimit?.value || 20));
-    const visibleTasks = tasks.slice(0, limit);
-    elements.reviewTaskList.innerHTML = visibleTasks.map((task) => `
-      <article class="v2-review-task-row ${state.activeReviewTask?.task_id === task.task_id ? 'active' : ''}">
-        <span class="v2-review-task-number">${escapeHtml(task.batch_position || '')}</span>
-        <button class="v2-review-task-button" type="button" data-review-task-id="${escapeHtml(task.task_id)}">
-          <strong>${escapeHtml(reviewTaskLabel(task))}</strong>
-          <small>${escapeHtml(task.task_id)} · ${escapeHtml(task.queue_status || task.status?.human_status || '')}</small>
-        </button>
-        <span class="v2-status-chip ${statusClass(task.queue_status || task.status?.human_status || 'pending')}">${escapeHtml(statusLabel(task.queue_status || task.status?.human_status || 'pending'))}</span>
-      </article>
-    `).join('');
-    if (tasks.length > visibleTasks.length) {
-      elements.reviewTaskList.insertAdjacentHTML(
-        'beforeend',
-        `<p class="compact-note v2-review-list-note">本批共 ${tasks.length} 条，当前显示前 ${visibleTasks.length} 条；可调高“本屏显示”后继续查看。</p>`,
-      );
-    }
-    elements.reviewTaskList.querySelectorAll('[data-review-task-id]').forEach((button) => {
-      button.addEventListener('click', () => {
-        const task = tasks.find((item) => item.task_id === button.dataset.reviewTaskId);
-        if (!task) return;
-        setWorkspaceMode('review');
-        state.activeReviewTask = task;
-        state.reviewMessage = '';
-        renderReviewTaskList();
-        const caseId = reviewTaskCaseId(task);
-        if (caseId) {
-          selectCase(caseId);
-        } else if (elements.caseDetail) {
-          renderStandaloneReviewTask(task);
-        }
-      });
-    });
-  }
-
-  function updateReviewBatchOptions(batchCount, selectedBatch) {
-    if (!elements.reviewBatch) return;
-    const count = Math.max(0, Number(batchCount) || 0);
-    elements.reviewBatch.innerHTML = count
-      ? Array.from({ length: count }, (_, index) => {
-        const number = index + 1;
-        return `<option value="${number}"${number === Number(selectedBatch) ? ' selected' : ''}>第 ${number} / ${count} 批</option>`;
-      }).join('')
-      : '<option value="1">无批次</option>';
-  }
-
-  async function loadReviewTasks({ resetBatch = false } = {}) {
-    if (!elements.reviewTaskList) return;
-    state.reviewTasksLoaded = true;
-    const stream = elements.reviewStream?.value || 'case_review';
-    const batch = resetBatch ? 1 : Number(elements.reviewBatch?.value || 1);
-    elements.reviewTaskStatus.textContent = '正在读取任务批次...';
-    try {
-      const response = await requestJson(`/api/v2/review-tasks?stream=${encodeURIComponent(stream)}&batch=${batch}`);
-      state.reviewTaskResponse = response;
-      state.reviewWriteEnabled = Boolean(response.write_enabled);
-      updateReviewBatchOptions(response.batch_count, response.batch_number);
-      const modeText = state.reviewWriteEnabled ? '本地写入开关已开启' : '只读；写入开关关闭';
-      if (elements.reviewWriteChip) elements.reviewWriteChip.textContent = modeText;
-      const displayLimit = Math.max(1, Number(elements.reviewDisplayLimit?.value || 20));
-      elements.reviewTaskStatus.textContent = `${response.stream} · 第 ${response.batch_number}/${response.batch_count} 批 · 本批 ${response.task_count} 条，当前显示前 ${Math.min(displayLimit, response.task_count)} 条 · ${modeText}`;
-      renderReviewTaskList();
-    } catch (error) {
-      state.reviewTasksLoaded = false;
-      elements.reviewTaskStatus.textContent = `任务包读取失败：${error.message}`;
-      if (elements.reviewWriteChip) elements.reviewWriteChip.textContent = '任务包不可用';
-      elements.reviewTaskList.innerHTML = '<p class="v2-empty-detail">无法读取当前任务包。</p>';
-    }
-  }
-
-  function reviewCommonForm(task) {
-    const reviewer = '';
-    const operationId = `review-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    return `
-      <div class="v2-review-form-grid">
-        <label>审校人（必填）<input id="v2ReviewReviewer" type="text" value="${escapeHtml(reviewer)}" placeholder="姓名或稳定 reviewer id" /></label>
-        <label>operation_id（必填）<input id="v2ReviewOperationId" type="text" value="${escapeHtml(operationId)}" /></label>
-        <label>当前任务类型<input type="text" value="${escapeHtml(task.task_type)}" disabled /></label>
-        <label>任务状态<input type="text" value="${escapeHtml(task.queue_status || task.status?.human_status || 'pending')}" disabled /></label>
-      </div>
-      <label>审校说明<textarea id="v2ReviewNote" placeholder="记录本次决定依据；不填写学术结论时不要提交 approved。"></textarea></label>
-    `;
-  }
-
-  function renderReviewForm(item) {
-    if (!state.activeReviewTask) return '';
-    const task = state.activeReviewTask;
-    const type = task.task_type;
-    let body = '';
-    let statuses = [];
-    if (type === 'case_review') {
-      statuses = ['uncertain', 'rejected', 'approved'];
-      const fields = ['source_passage', 'target_work', 'target_passage', 'evidence', 'process', 'conclusion'];
-      const evidence = item.evidences || [];
-      body = `
-        <label>案例审校状态<select id="v2ReviewStatus">${statuses.map((status) => `<option value="${status}">${escapeHtml(statusLabel(status))}</option>`).join('')}</select></label>
-        <div>
-          <p class="v2-detail-label">approved 所需字段决定（逐项勾选）</p>
-          <div class="v2-review-decision-grid">${fields.map((field) => `<label class="v2-review-check"><input type="checkbox" data-review-field="${field}" />${escapeHtml(field)}</label>`).join('')}</div>
-        </div>
-        <div>
-          <p class="v2-detail-label">approved 所需 evidence 决定（逐条勾选）</p>
-          <div class="v2-review-decision-grid">${evidence.length ? evidence.map((entry) => `<label class="v2-review-check"><input type="checkbox" data-review-evidence="${entry.evidence_index}" />证据 ${escapeHtml(entry.evidence_index)}</label>`).join('') : '<span class="compact-note">无 evidence；请保持非 approved，除非你已明确补齐证据。</span>'}</div>
-        </div>
-        <label>案例字段 patch（高级；JSON）<textarea id="v2ReviewCasePatch">{}</textarea></label>
-      `;
-    } else if (type === 'target_work_resolution') {
-      statuses = ['resolved', 'uncertain', 'rejected'];
-      body = `
-        <label>目标解析状态<select id="v2ReviewStatus">${statuses.map((status) => `<option value="${status}">${escapeHtml(statusLabel(status))}</option>`).join('')}</select></label>
-        <label>target_work<input id="v2ReviewTargetWork" type="text" value="${escapeHtml(task.machine_candidate_work_key || '')}" placeholder="人工确认的典籍名" /></label>
-        <label>target_passage_id<input id="v2ReviewTargetPassage" type="text" value="" placeholder="必须是 canonical passage 才能 resolved" /></label>
-        <label>target_scope（JSON）<textarea id="v2ReviewTargetScope">${escapeHtml(JSON.stringify(task.case_context?.target_scope || { status: 'unresolved' }, null, 2))}</textarea></label>
-      `;
-    } else if (type === 'external_source_resolution') {
-      statuses = ['candidate_available', 'no_public_match', 'verified', 'rejected'];
-      const source = task.registered_source || {};
-      body = `
-        <label>外部来源状态<select id="v2ReviewStatus">${statuses.map((status) => `<option value="${status}">${escapeHtml(statusLabel(status))}</option>`).join('')}</select></label>
-        <label>底本文件路径<input id="v2ReviewSourceFile" type="text" value="${escapeHtml(source.source_file || '')}" placeholder="verified 时填写可读取的文件路径" /></label>
-        <label>版本/底本说明<input id="v2ReviewEdition" type="text" value="${escapeHtml(source.edition || '')}" /></label>
-        <label>位置说明<input id="v2ReviewLocationNote" type="text" value="${escapeHtml(source.location_note || '')}" /></label>
-        <p class="compact-note v2-review-inline-note">选择 verified 后，服务端会直接读取该文件并自动完成一致性核对；这里不再手填长串校验值。</p>
-      `;
-    } else {
-      statuses = ['candidate_available', 'no_public_match', 'verified', 'rejected'];
-      body = `
-        <label>外部 passage 状态<select id="v2ReviewStatus">${statuses.map((status) => `<option value="${status}">${escapeHtml(statusLabel(status))}</option>`).join('')}</select></label>
-        <label>selected_passage_id<input id="v2ReviewSelectedPassage" type="text" value="${escapeHtml(task.selected_passage_id || '')}" placeholder="verified 时必须是已核验 canonical passage" /></label>
-      `;
-    }
-    const result = state.reviewMessage ? `<p class="v2-review-result ${state.reviewMessage.kind || ''}">${escapeHtml(state.reviewMessage.text)}</p>` : '';
-    return `
-      <section class="v2-review-form" data-review-task-type="${escapeHtml(type)}">
-        <div class="v2-detail-topline"><h3>受控人工提交</h3><span class="summary-pill">${escapeHtml(task.task_id)}</span></div>
-        <p class="compact-note">这一步只记录明确的人工作业。target/source/passage resolution 不会自动把案例升级为 gold；案例 approved 还必须通过完整字段、目标 passage 和 canonical quote 门。</p>
-        ${reviewCommonForm(task)}
-        <div class="v2-review-form-grid">${body}</div>
-        <div class="v2-review-actions">
-          <button id="v2ReviewSubmit" class="v2-review-submit-button" type="button"${state.reviewWriteEnabled ? '' : ' disabled'}>提交当前人工决定</button>
-          <span class="v2-review-submit-result">${state.reviewWriteEnabled ? '写入开关已开启；提交后会产生 review_event/resolution_event。' : '当前只读；需以 V2_REVIEW_WRITE_ENABLED=1 启动本地服务后才能提交。'}</span>
-        </div>
-        ${result}
-      </section>
-    `;
-  }
-
-  function parseReviewJson(id, fallback = {}) {
-    const element = document.querySelector(`#${id}`);
-    if (!element || !String(element.value || '').trim()) return fallback;
-    return JSON.parse(element.value);
-  }
-
-  async function submitActiveReview() {
-    const task = state.activeReviewTask;
-    if (!task) return;
-    const resultElement = document.querySelector('.v2-review-submit-result');
-    const reviewer = String(document.querySelector('#v2ReviewReviewer')?.value || '').trim();
-    const operationId = String(document.querySelector('#v2ReviewOperationId')?.value || '').trim();
-    const reviewNote = String(document.querySelector('#v2ReviewNote')?.value || '');
-    const reviewStatus = String(document.querySelector('#v2ReviewStatus')?.value || '').trim();
-    let payload;
-    try {
-      payload = {
-        task_type: task.task_type,
-        task_id: task.task_id,
-        reviewer,
-        operation_id: operationId,
-        review_note: reviewNote,
-      };
-      if (task.task_type === 'case_review') {
-        const fieldDecisions = {};
-        document.querySelectorAll('[data-review-field]').forEach((input) => {
-          fieldDecisions[input.dataset.reviewField] = input.checked ? 'approved' : 'pending';
-        });
-        const evidenceDecisions = [];
-        document.querySelectorAll('[data-review-evidence]').forEach((input) => {
-          evidenceDecisions.push({
-            evidence_index: Number(input.dataset.reviewEvidence),
-            status: input.checked ? 'approved' : 'pending',
-          });
-        });
-        payload.case_id = task.case_id;
-        payload.review_status = reviewStatus;
-        payload.case_patch = parseReviewJson('v2ReviewCasePatch', {});
-        payload.review = { field_decisions: fieldDecisions, evidence_decisions: evidenceDecisions };
-      } else if (task.task_type === 'target_work_resolution') {
-        payload.queue_item_id = task.queue_item_id;
-        payload.resolution_status = reviewStatus;
-        payload.target_work = document.querySelector('#v2ReviewTargetWork')?.value || '';
-        payload.target_passage_id = document.querySelector('#v2ReviewTargetPassage')?.value || null;
-        payload.target_scope = parseReviewJson('v2ReviewTargetScope', { status: 'unresolved' });
-      } else if (task.task_type === 'external_source_resolution') {
-        payload.queue_item_id = task.queue_item_id;
-        payload.resolution_status = reviewStatus;
-        payload.source_file = document.querySelector('#v2ReviewSourceFile')?.value || null;
-        payload.edition = document.querySelector('#v2ReviewEdition')?.value || null;
-        payload.location_note = document.querySelector('#v2ReviewLocationNote')?.value || null;
-      } else {
-        payload.queue_item_id = task.queue_item_id;
-        payload.resolution_status = reviewStatus;
-        payload.selected_passage_id = document.querySelector('#v2ReviewSelectedPassage')?.value || null;
-      }
-    } catch (error) {
-      state.reviewMessage = { kind: 'fail', text: `提交未写入：表单 JSON 无效（${error.message}）` };
-      if (resultElement) {
-        resultElement.className = 'v2-review-submit-result fail';
-        resultElement.textContent = state.reviewMessage.text;
-      }
-      return;
-    }
-    try {
-      const response = await requestJson('/api/v2/review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      state.reviewMessage = { kind: 'pass', text: `提交成功：${response.result?.operation_id || operationId}。任务包是静态快照，重建任务包后才会从待办列表移除。` };
-      if (resultElement) resultElement.textContent = state.reviewMessage.text;
-      const caseId = reviewTaskCaseId(task);
-      if (caseId) await selectCase(caseId);
-    } catch (error) {
-      state.reviewMessage = { kind: 'fail', text: `提交未写入：${error.message}` };
-      if (resultElement) {
-        resultElement.className = 'v2-review-submit-result fail';
-        resultElement.textContent = state.reviewMessage.text;
-      }
-    }
   }
 
   function renderCaseTable() {
@@ -618,8 +290,6 @@ const V2Acceptance = (() => {
     elements.caseTable.querySelectorAll('tr[data-case-id]').forEach((row) => {
       row.addEventListener('click', () => {
         setWorkspaceMode('browse');
-        state.activeReviewTask = null;
-        state.reviewMessage = '';
         selectCase(row.dataset.caseId);
       });
     });
@@ -792,7 +462,6 @@ const V2Acceptance = (() => {
 
     const directNodes = Array.from(detail.children);
     const header = directNodes.find((node) => node.classList.contains('v2-detail-header'));
-    const reviewForm = directNodes.find((node) => node.classList.contains('v2-review-form'));
     const meta = directNodes.find((node) => node.classList.contains('v2-detail-meta'));
     const grid = directNodes.find((node) => node.classList.contains('v2-detail-grid'));
     const targetLocations = directNodes.find((node) => (
@@ -847,7 +516,6 @@ const V2Acceptance = (() => {
 
     const assigned = new Set([
       header,
-      reviewForm,
       meta,
       grid,
       targetLocations,
@@ -879,7 +547,6 @@ const V2Acceptance = (() => {
       provenance.legacy_case_id ? `legacy case ${provenance.legacy_case_id}` : '',
       provenance.model ? `model ${provenance.model}` : '',
     ].filter(Boolean).join(' · ');
-    const reviewForm = renderReviewForm(item);
     elements.caseDetail.innerHTML = `
       <div class="v2-detail-header">
         <p class="section-kicker">案例详情</p>
@@ -889,7 +556,7 @@ const V2Acceptance = (() => {
         </div>
         <p class="compact-note">${escapeHtml(item.case_id)} · ${escapeHtml(item.source_work)} · ${escapeHtml(item.origin)}</p>
         <div class="toolbar-actions">
-          <a class="page-link" href="./annotation-workbench.html?case=${encodeURIComponent(item.case_id)}">进入五步释证审校</a>
+          <a class="page-link" href="./annotation-workbench.html?case=${encodeURIComponent(item.case_id)}">开始五步 AI 审校</a>
         </div>
       </div>
       <div class="v2-detail-meta">
@@ -911,8 +578,7 @@ const V2Acceptance = (() => {
           ${targetScope.reason ? `<p class="v2-evidence-note">范围说明：${escapeHtml(targetScope.reason)}</p>` : ''}
         </div>
       </div>
-      ${reviewForm}
-        ${renderTargetLocations(item.target_location_candidates)}
+      ${renderTargetLocations(item.target_location_candidates)}
       <div class="v2-detail-block">
         <div class="v2-detail-topline"><h3>证据层级</h3><span class="summary-pill">${escapeHtml(item.evidences?.length || 0)} 条</span></div>
         <div class="v2-evidence-meta">${evidenceSummary || '<span class="v2-resolution-chip unknown">无 evidence</span>'}</div>
@@ -938,7 +604,6 @@ const V2Acceptance = (() => {
       ${renderJsonPanel(item.case_data, '完整 annotation_case.v1 JSON')}
     `;
     organizeDetailSections(item);
-    elements.caseDetail.querySelector('#v2ReviewSubmit')?.addEventListener('click', submitActiveReview);
   }
 
   async function selectCase(caseId) {
@@ -957,9 +622,11 @@ const V2Acceptance = (() => {
   function bindFilters() {
     let searchTimer = null;
     elements.caseTab?.addEventListener('click', () => setWorkspaceMode('browse'));
-    elements.reviewTab?.addEventListener('click', () => setWorkspaceMode('review'));
     elements.qualityTab?.addEventListener('click', () => setWorkspaceMode('quality'));
-    window.addEventListener('hashchange', () => setWorkspaceMode(window.location.hash.slice(1), { updateUrl: false }));
+    window.addEventListener('hashchange', () => {
+      const mode = window.location.hash.slice(1);
+      setWorkspaceMode(mode, { updateUrl: mode === 'review' });
+    });
     elements.search?.addEventListener('input', () => {
       window.clearTimeout(searchTimer);
       searchTimer = window.setTimeout(() => loadCases({ resetPage: true }), 240);
@@ -983,16 +650,6 @@ const V2Acceptance = (() => {
         loadCases();
       }
     });
-    elements.reviewStream?.addEventListener('change', () => loadReviewTasks({ resetBatch: true }));
-    elements.reviewBatch?.addEventListener('change', () => loadReviewTasks());
-    elements.reviewDisplayLimit?.addEventListener('change', () => {
-      if (state.reviewTaskResponse) {
-        const displayLimit = Math.max(1, Number(elements.reviewDisplayLimit.value || 20));
-        elements.reviewTaskStatus.textContent = `${state.reviewTaskResponse.stream} · 第 ${state.reviewTaskResponse.batch_number}/${state.reviewTaskResponse.batch_count} 批 · 本批 ${state.reviewTaskResponse.task_count} 条，当前显示前 ${Math.min(displayLimit, state.reviewTaskResponse.task_count)} 条 · ${state.reviewWriteEnabled ? '本地写入开关已开启' : '只读；写入开关关闭'}`;
-        renderReviewTaskList();
-      }
-    });
-    elements.reviewLoadBatch?.addEventListener('click', () => loadReviewTasks());
   }
 
   function populateSourceFilter(values) {
@@ -1052,17 +709,16 @@ const V2Acceptance = (() => {
       renderChecks();
       renderSources();
       renderReportContext();
-      renderReviewSequence();
       populateSourceFilter(cases.source_works || []);
       renderCaseTable();
       elements.status.textContent = `V2 工作库已连接 · 案例数据只读 · ${summary.database.display_path}`;
       if (elements.pageSize) elements.pageSize.value = String(state.pageSize);
       bindFilters();
       const initialCaseId = new URLSearchParams(window.location.search).get('case');
-      const initialMode = initialCaseId ? 'browse' : window.location.hash.slice(1) || 'browse';
-      setWorkspaceMode(initialMode, { updateUrl: false });
+      const rawMode = window.location.hash.slice(1);
+      const initialMode = initialCaseId ? 'browse' : rawMode || 'browse';
+      setWorkspaceMode(initialMode, { updateUrl: rawMode === 'review' });
       if (initialCaseId) {
-        state.activeReviewTask = null;
         selectCase(initialCaseId);
       }
     } catch (error) {

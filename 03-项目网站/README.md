@@ -7,7 +7,7 @@
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 首页“数据库”入口提供主数据库、人工标注库、V2 工作库三个选项；三库仍独立存储。
 - 数据库页：统一浏览主库字词、案例和数据库结构。
-- V2 工作库：`v2-database.html` 是案例浏览、人工待办和质量报告的统一入口，三类信息以标签分开呈现；旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1`。
+- V2 工作库：`v2-database.html` 是案例浏览和质量报告的统一入口；选中案例后进入五步 AI 审校，旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1`。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
 - 五步释证：从 V2 案例启动 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。保存受 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 写入开关保护。
 - AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
@@ -102,7 +102,7 @@ npm run sync:annotation
 │  ├─ annotation.html              人工标注库数据库页
 │  ├─ annotation-workbench.html     五步释证审校卡，从 V2 案例启动
 │  ├─ ai-annotation.html           AI 释证页
-│  ├─ v2-database.html             V2 数据浏览、待办审校和质量报告
+│  ├─ v2-database.html             V2 案例浏览和质量报告；案例进入五步 AI 审校
 │  ├─ v2-acceptance.html           旧 V2 验收入口的兼容跳转
 │  ├─ term.html                    字词详情页
 │  ├─ case.html                    案例详情页
@@ -139,6 +139,7 @@ npm run sync:annotation
 - `GET /api/v2/review-tasks?stream=...&batch=...`：按批次读取静态 `review_task.v1` 任务；可选 `case_review`、`target_work_resolution`、`external_source_resolution`、`external_passage_resolution`。
 - `GET /api/v2/review-task?id=任务 ID`：读取单条人工审校任务及其决定契约。
 - `POST /api/v2/review`：受控人工决定写入接口；默认返回 403，只有 `V2_REVIEW_WRITE_ENABLED=1` 的本地服务才开放。它只调用 V2 已有事务 seam，要求稳定 `reviewer` 和唯一 `operation_id`，不会因读取任务或提交 target/source/passage resolution 自动产生 gold。
+- 上述 `review-tasks` / `review` 接口保留给迁移维护和受控试验使用，不在网站主路径展示；网站审校入口是选择案例后进入五步 AI 审校。
 - `POST /api/v2/five-step-draft`：读取指定 V2 案例及其来源段落、evidence、来源状态，调用 DeepSeek 输出五步 JSON 草稿。模型只允许 `deepseek-flash` 或 `deepseek-v4-pro`，思考强度只允许 `none/low/high/max`。
 - `GET /api/v2/five-step-audits?case_id=...`：读取该案例最近 50 条五步审计记录及本地写入开关状态，包含版本、被替代和软删除状态。
 - `POST /api/v2/five-step-audits`：默认返回 403；设置 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 后，追加一条含模型配置、AI 草稿、逐步意见、人工文本和 V2 来源指纹的记录；`mode=restore` 可恢复一条软删除记录。此接口不改 `annotation_cases`、`human_status` 或 gold。

@@ -49,4 +49,13 @@ test('the retired V2 entry redirects into the unified workspace', () => {
   const html = fs.readFileSync(path.join(WEB_DIR, 'v2-acceptance.html'), 'utf8');
   assert.match(html, /v2-database\.html/);
   assert.match(html, /window\.location\.replace/);
+  assert.match(html, /#browse/);
+});
+
+test('V2 case browsing keeps retired migration submissions out of the user path', () => {
+  const html = fs.readFileSync(path.join(WEB_DIR, 'v2-database.html'), 'utf8');
+  const script = fs.readFileSync(path.join(WEB_DIR, 'assets/js/v2-acceptance.js'), 'utf8');
+  assert.doesNotMatch(html, /v2ReviewTab|v2ReviewWorkspace|待办审校/);
+  assert.match(script, /requestedMode === 'review'/);
+  assert.match(script, /annotation-workbench\.html\?case=/);
 });

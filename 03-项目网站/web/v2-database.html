@@ -18,7 +18,7 @@
             <div class="database-panel" aria-label="选择数据库">
               <a href="./database.html?view=terms"><span>主数据库</span><small>词条、案例与证据</small></a>
               <a href="./annotation.html"><span>人工标注库</span><small>人工标注材料浏览</small></a>
-              <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、待办与质量</small></a>
+              <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、五步与质量</small></a>
             </div>
           </div>
           <a href="./ai-annotation.html">AI 释证</a>
@@ -28,9 +28,9 @@
       </nav>
 
       <div class="hero-content">
-        <p class="badge">V2 / VR · 统一工作入口</p>
+        <p class="badge">V2 · 五步 AI 审校入口</p>
         <h1>V2 工作库</h1>
-        <p class="hero-copy">浏览机器案例、处理人工待办、查看质量报告；选中案例后进入五步释证审校。三类信息分开呈现，机器结果不会自动成为 gold。</p>
+        <p class="hero-copy">浏览机器案例、查看质量报告；选中案例后进入五步 AI 审校。机器结果和审校记录分开呈现，不会自动成为 gold。</p>
         <div id="v2HeroMeta" class="hero-panel"></div>
       </div>
     </header>
@@ -40,7 +40,7 @@
         <div>
           <p class="section-kicker">统一工作入口</p>
           <h2>先选择要做的事</h2>
-          <p>日常查阅进入“数据浏览”；需要人工判断进入“待办审校”；数据库结构和来源覆盖只在“质量报告”中查看。</p>
+          <p>日常查阅进入“案例浏览”；需要 AI 审校时先选择案例，再进入“五步释证”；数据库结构和来源覆盖只在“质量报告”中查看。</p>
         </div>
       </div>
 
@@ -48,10 +48,7 @@
 
       <div class="v2-primary-tabs" role="tablist" aria-label="V2 工作库视图">
         <button id="v2CaseTab" class="v2-primary-tab active" type="button" role="tab" aria-selected="true" aria-controls="v2CaseWorkspace">
-          <strong>数据浏览</strong><span>查找并阅读案例</span>
-        </button>
-        <button id="v2ReviewTab" class="v2-primary-tab" type="button" role="tab" aria-selected="false" aria-controls="v2ReviewWorkspace">
-          <strong>待办审校</strong><span>按顺序处理人工任务</span>
+          <strong>案例浏览</strong><span>查找并阅读案例</span>
         </button>
         <button id="v2QualityTab" class="v2-primary-tab" type="button" role="tab" aria-selected="false" aria-controls="v2QualityWorkspace">
           <strong>质量报告</strong><span>检查结构与来源边界</span>
@@ -61,9 +58,9 @@
       <details class="card v2-quick-guide">
         <summary><strong>第一次使用？查看简要说明</strong><span>约 1 分钟</span></summary>
         <div class="v2-quick-guide-content">
-          <article><strong>1 · 查阅案例</strong><p>从“数据浏览”检索来源或标题，选择案例后依次看来源段落、目标典籍、证据和当前状态。</p></article>
-          <article><strong>2 · 处理待办</strong><p>按“外部来源 → 外部段落与引文 → 目标典籍 → 案例整体审校”的顺序推进，避免跳过依赖。</p></article>
-          <article><strong>3 · 理解状态</strong><p>机器草稿、候选命中和结构通过都不是人工认可；只有完成人工审校并满足门槛后才能进入 gold。</p></article>
+          <article><strong>1 · 查阅案例</strong><p>从“案例浏览”检索来源或标题，选择案例后依次看来源段落、目标典籍、证据和当前状态。</p></article>
+          <article><strong>2 · 开始五步审校</strong><p>在案例详情点击“开始五步 AI 审校”，生成五步草稿并在独立页面记录审校意见。</p></article>
+          <article><strong>3 · 理解状态</strong><p>机器草稿、候选命中和结构通过都不是人工认可；五步审校记录也不会自动把案例推进为 gold。</p></article>
         </div>
       </details>
 
@@ -71,7 +68,7 @@
         <section class="card v2-panel v2-workbench-panel">
           <div class="v2-panel-heading v2-case-heading">
             <div>
-              <p class="section-kicker">数据浏览</p>
+              <p class="section-kicker">案例浏览</p>
               <h2>机器工作库中的案例</h2>
             </div>
             <span id="v2CaseCount" class="summary-pill"></span>
@@ -116,45 +113,6 @@
         </section>
       </section>
 
-      <section id="v2ReviewWorkspace" class="card v2-panel v2-workspace-pane" role="tabpanel" aria-labelledby="v2ReviewTab" hidden>
-        <div class="v2-review-task-heading">
-          <div>
-            <p class="section-kicker">待办审校</p>
-            <h2>按依赖顺序处理人工任务</h2>
-          </div>
-          <span id="v2ReviewWriteChip" class="v2-mode-chip">尚未读取</span>
-        </div>
-        <p id="v2ReviewSequence" class="v2-review-sequence">推荐审校顺序读取中……</p>
-        <p class="compact-note">任务选择本身不会写库。外部来源与 passage 未确认时，不应提前批准目标典籍或案例。</p>
-
-        <div class="v2-review-task-toolbar">
-          <label class="toolbar-field">
-            <span>任务流</span>
-            <select id="v2ReviewStream">
-              <option value="external_source_resolution">1 · 外部来源与版本</option>
-              <option value="external_passage_resolution">2 · 外部段落与引文</option>
-              <option value="target_work_resolution">3 · 目标典籍确认</option>
-              <option value="case_review">4 · 案例整体审校</option>
-            </select>
-          </label>
-          <label class="toolbar-field">
-            <span>批次</span>
-            <select id="v2ReviewBatch"></select>
-          </label>
-          <label class="toolbar-field">
-            <span>本屏显示</span>
-            <select id="v2ReviewDisplayLimit">
-              <option value="20" selected>20 条</option>
-              <option value="50">50 条</option>
-              <option value="100">100 条</option>
-            </select>
-          </label>
-          <button id="v2ReviewLoadBatch" class="pagination-button" type="button">读取任务批次</button>
-        </div>
-        <p id="v2ReviewTaskStatus" class="compact-note">进入本视图后读取第一批任务。</p>
-        <div id="v2ReviewTaskList" class="v2-review-task-list"></div>
-      </section>
-
       <section id="v2QualityWorkspace" class="v2-workspace-pane" role="tabpanel" aria-labelledby="v2QualityTab" hidden>
         <section id="v2Overall" class="v2-overall card" aria-live="polite"></section>
         <section id="v2Metrics" class="v2-metric-grid"></section>
@@ -183,12 +141,12 @@
       </section>
 
       <section id="v2CaseDetail" class="card v2-panel v2-case-detail" aria-live="polite">
-        <div class="v2-empty-detail">从“数据浏览”选择案例，或从“待办审校”选择任务后，在这里查看所需材料。</div>
+        <div class="v2-empty-detail">从“案例浏览”选择案例后，在这里查看来源、证据和状态，并进入五步 AI 审校。</div>
       </section>
     </main>
 
     <footer class="footer">
-      <p>V2 工作库 · 浏览、审校与质量报告统一入口 · 默认只读，人工决定不自动晋级 gold</p>
+      <p>V2 工作库 · 案例浏览、五步 AI 审校与质量报告 · 人工记录不自动晋级 gold</p>
     </footer>
 
     <script src="./assets/js/utils.js"></script>
