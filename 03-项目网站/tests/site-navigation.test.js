@@ -72,3 +72,10 @@ test('five-step review uses progressive disclosure with evidence on the right', 
   assert.match(script, /review_view_mode/);
   assert.match(css, /\.five-step-audit-page\[data-view-mode="simple"\] \.five-step-engineering-detail/);
 });
+
+test('main navigation is fixed at the upper right on desktop', () => {
+  const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
+  assert.match(css, /\.nav-links\s*\{[\s\S]*position:\s*fixed/);
+  assert.match(css, /\.nav-links\s*\{[\s\S]*top:\s*16px/);
+  assert.match(css, /\.nav-links\s*\{[\s\S]*right:\s*24px/);
+});
