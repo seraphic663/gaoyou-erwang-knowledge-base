@@ -72,16 +72,25 @@
           <label class="toolbar-field">
             <span>思考强度</span>
             <select id="fiveStepEffort">
-              <option value="none">关闭</option>
-              <option value="low">low</option>
-              <option value="high" selected>high（默认）</option>
-              <option value="max">max</option>
+              <option value="none">不启用思考</option>
+              <option value="low">低</option>
+              <option value="high" selected>高（默认）</option>
+              <option value="max">最高</option>
             </select>
           </label>
           <div class="five-step-control-actions">
             <button id="fiveStepGenerate" class="page-link toolbar-button" type="button">生成五步草稿</button>
             <button id="fiveStepCancelEdit" class="search-clear toolbar-button" type="button" hidden>退出修改模式</button>
           </div>
+        </div>
+        <div class="five-step-view-mode" role="group" aria-label="审校显示模式">
+          <span class="five-step-view-mode-label">审校显示</span>
+          <button type="button" class="five-step-view-mode-button is-active" data-five-step-view-mode="simple" aria-pressed="true">
+            简洁审校<small>推荐</small>
+          </button>
+          <button type="button" class="five-step-view-mode-button" data-five-step-view-mode="detailed" aria-pressed="false">
+            细致审校<small>含来源状态</small>
+          </button>
         </div>
         <p class="compact-note">模型只接收本条 V2 案例材料。AI 草稿不会改写案例状态；请检查每步引用和来源状态。</p>
         <p id="fiveStepGenerationMeta" class="five-step-generation-meta" role="status" aria-live="polite" hidden></p>
@@ -92,9 +101,18 @@
           <div>
             <p class="section-kicker">五步审计卡</p>
             <h2>逐步审查 AI 草稿</h2>
+            <p id="fiveStepProgress" class="compact-note">尚未开始审校</p>
           </div>
-          <span class="summary-pill">AI 建议 ≠ 人工结论</span>
+          <span class="summary-pill">AI 草稿 ≠ 人工结论</span>
         </div>
+        <nav id="fiveStepStepNav" class="five-step-step-nav" aria-label="五步审校进度"></nav>
+        <details id="fiveStepEvidenceOverview" class="five-step-evidence-overview card">
+          <summary>
+            <span>证据总览</span>
+            <span id="fiveStepEvidenceOverviewMeta" class="five-step-summary-meta">生成草稿后查看相关证据</span>
+          </summary>
+          <div id="fiveStepEvidenceOverviewList" class="five-step-evidence-overview-list"></div>
+        </details>
         <div id="fiveStepCards" class="five-step-cards"></div>
 
         <section class="card five-step-final-review">

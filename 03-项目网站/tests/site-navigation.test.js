@@ -59,3 +59,16 @@ test('V2 case browsing keeps retired migration submissions out of the user path'
   assert.match(script, /requestedMode === 'review'/);
   assert.match(script, /annotation-workbench\.html\?case=/);
 });
+
+test('five-step review uses progressive disclosure with evidence on the right', () => {
+  const html = fs.readFileSync(path.join(WEB_DIR, 'annotation-workbench.html'), 'utf8');
+  const script = fs.readFileSync(path.join(WEB_DIR, 'assets/js/five-step-audit.js'), 'utf8');
+  const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/five-step-audit.css'), 'utf8');
+  assert.match(html, /data-five-step-view-mode="simple"/);
+  assert.match(html, /data-five-step-view-mode="detailed"/);
+  assert.match(html, /fiveStepEvidenceOverview/);
+  assert.match(script, /five-step-evidence-panel/);
+  assert.match(script, /认可 AI 草稿/);
+  assert.match(script, /review_view_mode/);
+  assert.match(css, /\.five-step-audit-page\[data-view-mode="simple"\] \.five-step-engineering-detail/);
+});

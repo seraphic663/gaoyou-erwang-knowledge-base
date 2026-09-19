@@ -434,6 +434,7 @@ function createServer() {
             overall_decision: body.overall_decision,
             overall_note: String(body.overall_note || ''),
             output_budget_tokens: body.output_budget_tokens || null,
+            review_view_mode: ['simple', 'detailed'].includes(body.review_view_mode) ? body.review_view_mode : 'simple',
             usage: body.usage || null,
             ai_draft: aiDraft,
             reviewed_steps: reviewedSteps,

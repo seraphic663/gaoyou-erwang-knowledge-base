@@ -173,6 +173,12 @@
   gap: 10px;
 }
 
+.five-step-step-grid > div:first-child > .five-step-review-fields {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
 .five-step-review-fields label {
   display: grid;
   gap: 6px;
@@ -283,11 +289,480 @@
   white-space: pre-wrap;
 }
 
+/* The review card is intentionally progressive: summaries first, raw fields on demand. */
+.five-step-form-heading {
+  align-items: flex-start;
+}
+
+.five-step-form-heading h2 {
+  margin-bottom: 4px;
+}
+
+.five-step-view-mode {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card-soft);
+}
+
+.five-step-controls .five-step-view-mode {
+  width: fit-content;
+  margin-top: 14px;
+  justify-content: flex-start;
+}
+
+.five-step-view-mode-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  color: var(--sub);
+  font-size: 12px;
+}
+
+.five-step-view-mode-button,
+.five-step-step-nav-button,
+.five-step-decision-button {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--sub);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.five-step-view-mode-button {
+  display: grid;
+  gap: 1px;
+  min-width: 106px;
+  padding: 7px 10px;
+  text-align: left;
+  line-height: 1.25;
+}
+
+.five-step-view-mode-button small {
+  color: var(--sub);
+  font-size: 11px;
+}
+
+.five-step-view-mode-button:hover,
+.five-step-view-mode-button:focus-visible,
+.five-step-view-mode-button.is-active {
+  border-color: color-mix(in srgb, var(--accent) 38%, transparent);
+  color: var(--pri-2);
+  background: var(--card);
+}
+
+.five-step-view-mode-button:focus-visible,
+.five-step-step-nav-button:focus-visible,
+.five-step-decision-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  outline-offset: 2px;
+}
+
+.five-step-step-nav {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  margin: 16px 0 10px;
+}
+
+.five-step-step-nav-button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 12px;
+  border-color: var(--line);
+  border-radius: 10px;
+  background: var(--card-soft);
+  text-align: left;
+}
+
+.five-step-step-nav-button:hover,
+.five-step-step-nav-button.is-current {
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+  background: var(--card);
+}
+
+.five-step-step-nav-button.is-complete .five-step-step-nav-number {
+  color: var(--jade);
+}
+
+.five-step-step-nav-number {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.five-step-step-nav-label,
+.five-step-step-nav-status {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.five-step-step-nav-label {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.five-step-step-nav-status {
+  margin-top: 2px;
+  color: var(--sub);
+  font-size: 11px;
+}
+
+.five-step-summary-meta {
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.five-step-evidence-overview {
+  margin: 0 0 14px;
+  padding: 0;
+}
+
+.five-step-evidence-overview > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 700;
+  list-style: none;
+}
+
+.five-step-evidence-overview > summary::-webkit-details-marker,
+.five-step-inline-fold > summary::-webkit-details-marker,
+.five-step-review-questions > summary::-webkit-details-marker {
+  display: none;
+}
+
+.five-step-evidence-overview > summary::after,
+.five-step-inline-fold > summary::after,
+.five-step-review-questions > summary::after {
+  content: "＋";
+  color: var(--accent);
+  font-size: 16px;
+}
+
+.five-step-evidence-overview[open] > summary::after,
+.five-step-inline-fold[open] > summary::after,
+.five-step-review-questions[open] > summary::after {
+  content: "−";
+}
+
+.five-step-evidence-overview-list {
+  display: grid;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+.five-step-evidence-overview-item {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--card-soft);
+}
+
+.five-step-evidence-overview-head,
+.five-step-evidence-ref-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.five-step-evidence-overview-head strong,
+.five-step-evidence-ref-head strong {
+  color: var(--pri-2);
+}
+
+.five-step-evidence-overview-item p,
+.five-step-evidence-ref p {
+  margin: 5px 0 0;
+}
+
+.five-step-evidence-overview-item blockquote,
+.five-step-evidence-ref blockquote {
+  margin: 5px 0 0;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.five-step-evidence-ref blockquote {
+  max-height: 5.2em;
+  overflow: hidden;
+}
+
+.five-step-evidence-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--jade);
+  background: color-mix(in srgb, var(--jade) 12%, transparent);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.five-step-inline-fold,
+.five-step-review-questions {
+  margin-top: 10px;
+  border-top: 1px solid var(--line);
+}
+
+.five-step-inline-fold > summary,
+.five-step-review-questions > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 0 0;
+  color: var(--sub);
+  cursor: pointer;
+  font-size: 12px;
+  list-style: none;
+}
+
+.five-step-inline-fold > summary::after,
+.five-step-review-questions > summary::after {
+  font-size: 14px;
+}
+
+.five-step-full-copy {
+  margin: 8px 0 0;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.five-step-engineering-detail {
+  margin-top: 8px;
+  color: var(--sub);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.five-step-engineering-detail code {
+  color: var(--ink);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 11px;
+}
+
+.five-step-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.five-step-decision-button {
+  padding: 8px 12px;
+  border-color: var(--line);
+  background: var(--card-soft);
+  font-size: 13px;
+}
+
+.five-step-decision-button:hover,
+.five-step-decision-button.is-selected {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--pri-2);
+  background: var(--card);
+}
+
+.five-step-decision-button[data-five-step-decision="question"].is-selected {
+  border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+  color: var(--accent-deep);
+}
+
+.five-step-human-guidance {
+  margin: 0;
+  color: var(--sub);
+  font-size: 12px;
+}
+
+.five-step-step {
+  padding: 0;
+  overflow: hidden;
+}
+
+.five-step-step > summary {
+  display: grid;
+  grid-template-columns: auto minmax(130px, auto) minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 16px 18px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.five-step-step > summary::-webkit-details-marker {
+  display: none;
+}
+
+.five-step-step > summary::after {
+  content: "＋";
+  justify-self: end;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.five-step-step[open] > summary::after {
+  content: "−";
+}
+
+.five-step-step[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.five-step-step-body {
+  padding: 18px;
+}
+
+.five-step-evidence-panel {
+  align-self: start;
+  position: sticky;
+  top: 16px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--card-soft);
+}
+
+.five-step-evidence-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.five-step-evidence-panel-heading h4 {
+  margin: 0;
+}
+
+.five-step-evidence-panel .five-step-evidence-refs {
+  margin-top: 0;
+}
+
+.five-step-evidence-panel .five-step-evidence-ref {
+  padding: 11px;
+  background: var(--card);
+}
+
+.five-step-inline-link {
+  margin-left: 4px;
+  padding: 0;
+  border: 0;
+  color: var(--pri-2);
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.five-step-step-summary-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.five-step-step-summary-title {
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.five-step-step-status {
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--sub);
+  background: var(--card);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.five-step-step-status.accepted {
+  color: var(--jade);
+}
+
+.five-step-step-status.edited,
+.five-step-step-status.question {
+  color: var(--accent-deep);
+}
+
+.five-step-step-summary-snippet {
+  overflow: hidden;
+  color: var(--sub);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.five-step-audit-page[data-view-mode="simple"] .five-step-engineering-detail {
+  display: none;
+}
+
+.five-step-audit-page[data-view-mode="simple"] .five-step-generation-meta .five-step-detailed-copy {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .five-step-step-nav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .five-step-step > summary {
+    grid-template-columns: auto minmax(130px, auto) minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 760px) {
+  .five-step-form-heading {
+    gap: 12px;
+  }
+
+  .five-step-view-mode {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .five-step-view-mode-button {
+    flex: 1 1 140px;
+  }
+
+  .five-step-step-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .five-step-step > summary {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .five-step-step-summary-snippet {
+    grid-column: 2;
+  }
+
   .five-step-source-context,
   .five-step-step-grid,
   .five-step-final-grid {
     grid-template-columns: 1fr;
+  }
+
+  .five-step-evidence-panel {
+    position: static;
   }
 
   .five-step-controls-grid {

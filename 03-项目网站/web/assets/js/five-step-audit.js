@@ -18,6 +18,26 @@
     superseded: '已被新版本替代',
     deleted: '已删除（可恢复）',
   };
+  const VIEW_MODES = {
+    simple: '简洁审校',
+    detailed: '细致审校',
+  };
+  const RAW_STATUS_LABELS = {
+    unchecked: '未核验',
+    pending: '待处理',
+    registered: '已登记',
+    missing: '缺失',
+    unknown: '未知',
+    canonical_active: '原典已登记',
+    candidate_available: '有候选来源',
+    candidate_registered: '候选已登记',
+    candidate_match: '候选命中',
+    search_hit_only: '仅搜索命中',
+    external_source_pending: '外部来源待处理',
+    secondary_citation_match: '二手引文匹配',
+    machine_inferred: '机器推断',
+    draft: '机器草稿',
+  };
   const state = {
     caseId: new URLSearchParams(window.location.search).get('case') || '',
     caseItem: null,
@@ -28,10 +48,13 @@
     editingAuditId: null,
     saving: false,
     generating: false,
+    viewMode: window.localStorage?.getItem('five-step-view-mode') === 'detailed' ? 'detailed' : 'simple',
+    activeStepIndex: 0,
   };
 
   const el = {
     status: document.querySelector('#fiveStepStatus'),
+    page: document.querySelector('.five-step-audit-page'),
     start: document.querySelector('#fiveStepStart'),
     case: document.querySelector('#fiveStepCase'),
     caseTitle: document.querySelector('#fiveStepCaseTitle'),
@@ -45,6 +68,12 @@
     cancelEdit: document.querySelector('#fiveStepCancelEdit'),
     generationMeta: document.querySelector('#fiveStepGenerationMeta'),
     form: document.querySelector('#fiveStepForm'),
+    progress: document.querySelector('#fiveStepProgress'),
+    viewModeButtons: [...document.querySelectorAll('[data-five-step-view-mode]')],
+    stepNav: document.querySelector('#fiveStepStepNav'),
+    evidenceOverview: document.querySelector('#fiveStepEvidenceOverview'),
+    evidenceOverviewMeta: document.querySelector('#fiveStepEvidenceOverviewMeta'),
+    evidenceOverviewList: document.querySelector('#fiveStepEvidenceOverviewList'),
     cards: document.querySelector('#fiveStepCards'),
     reviewer: document.querySelector('#fiveStepReviewer'),
     decision: document.querySelector('#fiveStepDecision'),
@@ -61,6 +90,28 @@
     return String(value ?? '').replace(/[&<>"']/g, (char) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
     })[char]);
+  }
+
+  function humanStatus(value) {
+    const raw = String(value || '').trim();
+    return RAW_STATUS_LABELS[raw] || raw || '未记录';
+  }
+
+  function snippet(value, limit = 180) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    return text.length > limit ? `${text.slice(0, limit)}…` : text;
+  }
+
+  function viewModeLabel() {
+    return VIEW_MODES[state.viewMode] || VIEW_MODES.simple;
+  }
+
+  function effortLabel(value) {
+    return ({ none: '不启用思考', low: '低', high: '高', max: '最高' })[value] || value || '未记录';
+  }
+
+  function selectedDraft(field) {
+    return state.generation?.draft?.find((step) => step.field === field) || null;
   }
 
   async function requestJson(url, options = {}) {
@@ -83,20 +134,35 @@
     const evidenceCount = item.evidences?.length || 0;
     const sourceState = passage?.canonical_status || 'unknown';
     const evidenceSummary = Object.entries(item.evidence_summary || {})
-      .map(([key, count]) => `${key} ${count}`)
+      .map(([key, count]) => `${humanStatus(key)} ${count}`)
       .join(' · ') || '暂无 evidence';
     el.sourceContext.innerHTML = `
       <article class="five-step-context-block">
-        <h3>V2 来源段落</h3>
-        <p class="five-step-context-meta">${escapeHtml(passage?.passage_id || item.source_passage_id || '未关联 passage')} · canonical ${escapeHtml(sourceState)} · ${escapeHtml(provenance.source_file || passage?.source_file || '来源路径未记录')}</p>
-        <p class="five-step-context-text">${escapeHtml(passageText || 'V2 中未关联可展示的来源段落。')}</p>
+        <div class="five-step-evidence-ref-head">
+          <h3>V2 来源段落</h3>
+          <span class="five-step-evidence-tag">原典状态：${escapeHtml(humanStatus(sourceState))}</span>
+        </div>
+        <p class="five-step-context-meta">${escapeHtml(passage?.passage_id || item.source_passage_id || '未关联 passage')} · ${escapeHtml(provenance.source_file || passage?.source_file || '来源路径未记录')}</p>
+        <p class="five-step-context-text">${escapeHtml(snippet(passageText || 'V2 中未关联可展示的来源段落。', 260))}</p>
+        ${passageText.length > 260 ? `<details class="five-step-inline-fold"><summary>展开完整来源段落</summary><p class="five-step-full-copy">${escapeHtml(passageText)}</p></details>` : ''}
+        <div class="five-step-engineering-detail">
+          passage_id: <code>${escapeHtml(passage?.passage_id || item.source_passage_id || 'null')}</code> · canonical_status: <code>${escapeHtml(sourceState)}</code><br />
+          source_file: <code>${escapeHtml(provenance.source_file || passage?.source_file || 'null')}</code>
+        </div>
       </article>
       <article class="five-step-context-block">
-        <h3>证据与状态</h3>
-        <p class="five-step-context-meta">${escapeHtml(evidenceCount)} 条 evidence · ${escapeHtml(evidenceSummary)}</p>
-        <p>机器状态：${escapeHtml(item.machine_status || 'unknown')} · 人工状态：${escapeHtml(item.human_status || 'unknown')}</p>
-        <p>来源：${escapeHtml(item.origin || provenance.source_format || '未记录')} · target_work：${escapeHtml(item.target_work || '未明确')}</p>
-        <p class="compact-note">状态是 V2 当前记录，不代表原文、版本或引文已被人工核实。</p>
+        <div class="five-step-evidence-ref-head">
+          <h3>案例状态</h3>
+          <span class="five-step-evidence-tag">${escapeHtml(evidenceCount)} 条证据</span>
+        </div>
+        <p class="five-step-context-meta">${escapeHtml(evidenceSummary)}</p>
+        <p>机器：${escapeHtml(humanStatus(item.machine_status))} · 人工：${escapeHtml(humanStatus(item.human_status))}</p>
+        <p>来源：${escapeHtml(item.origin || provenance.source_format || '未记录')} · 目标作品：${escapeHtml(item.target_work || '未明确')}</p>
+        <p class="compact-note">当前记录只代表 V2 工作库状态，不代表原文、版本或引文已被人工核实。</p>
+        <div class="five-step-engineering-detail">
+          machine_status: <code>${escapeHtml(item.machine_status || 'null')}</code> · human_status: <code>${escapeHtml(item.human_status || 'null')}</code><br />
+          target_work: <code>${escapeHtml(item.target_work || 'null')}</code> · target_passage_id: <code>${escapeHtml(item.target_passage_id || 'null')}</code>
+        </div>
       </article>
     `;
   }
@@ -104,7 +170,7 @@
   function renderCase(item) {
     state.caseItem = item;
     el.caseTitle.textContent = item.case_title || '未命名案例';
-    el.caseMeta.textContent = `${item.case_id} · ${item.source_work || '来源未注明'} · 机器 ${item.machine_status || 'unknown'} / 人工 ${item.human_status || 'unknown'}`;
+    el.caseMeta.textContent = `${item.case_id} · ${item.source_work || '来源未注明'} · 机器 ${humanStatus(item.machine_status)} / 人工 ${humanStatus(item.human_status)}`;
     el.backLink.href = `./v2-database.html#browse`;
     renderSourceContext(item);
     el.case.hidden = false;
@@ -112,68 +178,137 @@
     el.status.textContent = '已载入 V2 案例。确认所选案例和来源状态后，可生成五步草稿。';
   }
 
+  function evidenceStatus(evidence) {
+    const data = evidence.data || {};
+    return {
+      summary: `${humanStatus(evidence.quote_check)} · ${humanStatus(data.source_resolution)} · ${humanStatus(evidence.source_passage?.canonical_status)}`,
+      raw: `quote_check=${evidence.quote_check || 'null'} · source_resolution=${data.source_resolution || 'null'} · canonical_status=${evidence.source_passage?.canonical_status || 'null'}`,
+    };
+  }
+
+  function renderEvidenceCard(evidence, compact = false) {
+    const index = Number(evidence.evidence_index);
+    const status = evidenceStatus(evidence);
+    const referenced = state.generation?.draft?.some((step) => (step.evidence_refs || []).map(Number).includes(index));
+    const data = evidence.data || {};
+    return `<article class="${compact ? 'five-step-evidence-ref' : 'five-step-evidence-overview-item'}"${compact ? '' : ` id="fiveStepEvidence-${escapeHtml(index)}"`}>
+      <div class="five-step-evidence-ref-head">
+        <strong>证据 ${escapeHtml(index)} · ${escapeHtml(evidence.source_work || evidence.external_cited_work || '来源未注明')}</strong>
+        ${referenced ? '<span class="five-step-evidence-tag">AI 已引用</span>' : ''}
+      </div>
+      <p class="five-step-context-meta">${escapeHtml(status.summary)}</p>
+      <blockquote>${escapeHtml(snippet(evidence.quote || '（无引文）', compact ? 140 : 220))}</blockquote>
+      <div class="five-step-engineering-detail">
+        ${escapeHtml(status.raw)}<br />
+        external_status: <code>${escapeHtml(evidence.external_status || 'null')}</code> · edition_status: <code>${escapeHtml(evidence.external_edition_status || 'null')}</code> · passage_status: <code>${escapeHtml(evidence.external_passage_status || 'null')}</code><br />
+        source_resolution_note: <code>${escapeHtml(data.evidence_note || data.note || data.relation_note || 'null')}</code>
+      </div>
+    </article>`;
+  }
+
   function renderEvidenceRefs(step) {
     const refs = Array.isArray(step.evidence_refs) ? step.evidence_refs : [];
     if (!refs.length) {
-      return '<p class="compact-note">AI 未指定可直接支撑本步的 V2 evidence；请人工判断是否缺证。</p>';
+      return `<p class="compact-note">AI 未指定可直接支撑本步的证据；请人工判断是否缺证。<button type="button" class="five-step-inline-link" data-five-step-open-evidence="overview">查看证据总览</button></p>`;
     }
     const evidenceByIndex = new Map((state.caseItem?.evidences || []).map((item) => [Number(item.evidence_index), item]));
     return `<div class="five-step-evidence-refs">${refs.map((index) => {
       const evidence = evidenceByIndex.get(Number(index));
       if (!evidence) return `<article class="five-step-evidence-ref">证据 ${escapeHtml(index)}：当前案例中找不到该编号，请核查。</article>`;
-      const data = evidence.data || {};
-      const status = [
-        `quote ${evidence.quote_check || 'unchecked'}`,
-        `source ${data.source_resolution || 'unknown'}`,
-        `canonical ${evidence.source_passage?.canonical_status || 'unknown'}`,
-      ].join(' · ');
-      return `<article class="five-step-evidence-ref">
-        <strong>证据 ${escapeHtml(evidence.evidence_index)} · ${escapeHtml(evidence.source_work || evidence.external_cited_work || '来源未注明')}</strong>
-        <div class="five-step-context-meta">${escapeHtml(status)}</div>
-        <blockquote>${escapeHtml(evidence.quote || '（无 quote）')}</blockquote>
-      </article>`;
+      return renderEvidenceCard(evidence, true);
     }).join('')}</div>`;
+  }
+
+  function renderEvidenceOverview() {
+    if (!el.evidenceOverviewList || !state.caseItem) return;
+    const evidences = Array.isArray(state.caseItem.evidences) ? state.caseItem.evidences : [];
+    const referenced = new Set((state.generation?.draft || []).flatMap((step) => step.evidence_refs || []).map(Number));
+    const unresolved = evidences.filter((evidence) => ['unchecked', 'pending', 'missing', 'unknown'].includes(String(evidence.quote_check || ''))).length;
+    el.evidenceOverviewMeta.textContent = `${evidences.length} 条 · AI 已引用 ${referenced.size} 条 · ${unresolved} 条待核`;
+    el.evidenceOverviewList.innerHTML = evidences.length
+      ? evidences.map((evidence) => renderEvidenceCard(evidence)).join('')
+      : '<p class="compact-note">本案例没有可展开的 evidence。</p>';
+  }
+
+  function renderStepNav() {
+    if (!el.stepNav) return;
+    el.stepNav.innerHTML = STEP_DEFINITIONS.map(({ field, label }, index) => {
+      const reviewed = state.reviewedSteps[index] || { status: 'pending' };
+      const status = STATUS_LABELS[reviewed.status] || '待审';
+      const current = index === state.activeStepIndex;
+      const complete = reviewed.status !== 'pending';
+      return `<button type="button" class="five-step-step-nav-button${current ? ' is-current' : ''}${complete ? ' is-complete' : ''}" data-five-step-nav="${index}" aria-current="${current ? 'step' : 'false'}">
+        <span class="five-step-step-nav-number">0${index + 1}</span>
+        <span><span class="five-step-step-nav-label">${escapeHtml(label)}</span><span class="five-step-step-nav-status">${escapeHtml(status)}</span></span>
+      </button>`;
+    }).join('');
   }
 
   function renderSteps() {
     if (!state.generation || !state.reviewedSteps.length) return;
     const draftByField = new Map(state.generation.draft.map((step) => [step.field, step]));
+    renderStepNav();
     el.cards.innerHTML = STEP_DEFINITIONS.map(({ field, label }, index) => {
-      const draft = draftByField.get(field);
-      const reviewed = state.reviewedSteps[index];
+      const draft = draftByField.get(field) || { text: '', evidence_refs: [], review_questions: [] };
+      const reviewed = state.reviewedSteps[index] || { status: 'pending', text: draft.text, comment: '' };
       const questions = draft.review_questions?.length
         ? `<ul>${draft.review_questions.map((question) => `<li>${escapeHtml(question)}</li>`).join('')}</ul>`
         : '<p class="compact-note">AI 未提出单独待核问题。</p>';
+      const status = STATUS_LABELS[reviewed.status] || '待审';
+      const showHumanFields = ['edited', 'question'].includes(reviewed.status);
+      const actionButtons = ['accepted', 'edited', 'question'].map((decision) => `<button type="button" class="five-step-decision-button${reviewed.status === decision ? ' is-selected' : ''}" data-five-step-decision="${decision}" data-five-step-field="${escapeHtml(field)}">${decision === 'accepted' ? '认可 AI 草稿' : decision === 'edited' ? '修改' : '存疑'}</button>`).join('');
+      const resetButton = reviewed.status !== 'pending'
+        ? `<button type="button" class="five-step-decision-button" data-five-step-decision="pending" data-five-step-field="${escapeHtml(field)}">撤回决定</button>`
+        : '';
+      const fullDraft = draft.text.length > 280
+        ? `<details class="five-step-inline-fold"><summary>展开完整 AI 草稿</summary><p class="five-step-full-copy">${escapeHtml(draft.text)}</p></details>`
+        : '';
+      const humanFields = showHumanFields
+        ? `<label>人工确认文本
+            <textarea data-five-step-text="${escapeHtml(field)}" rows="6">${escapeHtml(reviewed.text || draft.text)}</textarea>
+          </label>
+          <label>本步审校意见
+            <textarea data-five-step-comment="${escapeHtml(field)}" rows="3" placeholder="指出保留、修改或存疑的理由">${escapeHtml(reviewed.comment)}</textarea>
+          </label>`
+        : '<p class="five-step-human-guidance">认可时沿用 AI 草稿；只有修改或存疑时才需要补充人工文本和理由。</p>';
       return `
-        <article class="five-step-step" data-step-field="${escapeHtml(field)}">
-          <div class="five-step-step-heading"><span class="five-step-step-number">0${index + 1}</span><h3>${escapeHtml(label)}</h3></div>
-          <div class="five-step-step-grid">
-            <div>
-              <p class="section-kicker">AI 草稿</p>
-              <div class="five-step-ai-draft"><p>${escapeHtml(draft.text)}</p></div>
-              ${renderEvidenceRefs(draft)}
-              <div class="five-step-review-questions"><p class="section-kicker">AI 提醒核查</p>${questions}</div>
-            </div>
-            <div class="five-step-review-fields">
-              <label>审校决定
-                <select data-five-step-status="${escapeHtml(field)}">
-                  <option value="pending"${reviewed.status === 'pending' ? ' selected' : ''}>请选择</option>
-                  <option value="accepted"${reviewed.status === 'accepted' ? ' selected' : ''}>认可</option>
-                  <option value="edited"${reviewed.status === 'edited' ? ' selected' : ''}>已修改</option>
-                  <option value="question"${reviewed.status === 'question' ? ' selected' : ''}>存疑</option>
-                </select>
-              </label>
-              <label>人工确认文本
-                <textarea data-five-step-text="${escapeHtml(field)}" rows="6">${escapeHtml(reviewed.text)}</textarea>
-              </label>
-              <label>本步审校意见
-                <textarea data-five-step-comment="${escapeHtml(field)}" rows="3" placeholder="指出保留、修改或存疑的理由">${escapeHtml(reviewed.comment)}</textarea>
-              </label>
+        <details class="five-step-step" data-step-field="${escapeHtml(field)}"${index === state.activeStepIndex ? ' open' : ''}>
+          <summary>
+            <span class="five-step-step-number">0${index + 1}</span>
+            <span class="five-step-step-summary-label"><span class="five-step-step-summary-title" role="heading" aria-level="3">${escapeHtml(label)}</span><span class="five-step-step-status ${escapeHtml(reviewed.status)}">${escapeHtml(status)}</span></span>
+            <span class="five-step-step-summary-snippet">${escapeHtml(snippet(draft.text, 100))}</span>
+          </summary>
+          <div class="five-step-step-body">
+            <div class="five-step-step-grid">
+              <div>
+                <p class="section-kicker">AI 草稿摘要</p>
+                <div class="five-step-ai-draft"><p>${escapeHtml(snippet(draft.text, 280))}</p>${fullDraft}</div>
+                <details class="five-step-review-questions">
+                  <summary>AI 提醒核查 · ${draft.review_questions?.length || 0} 条</summary>
+                  ${questions}
+                </details>
+                <div class="five-step-review-fields">
+                  <p class="section-kicker">审校决定</p>
+                  <div class="five-step-review-actions">${actionButtons}${resetButton}</div>
+                  ${humanFields}
+                </div>
+              </div>
+              <aside class="five-step-evidence-panel">
+                <div class="five-step-evidence-panel-heading">
+                  <div>
+                    <p class="section-kicker">细致证据</p>
+                    <h4>本步相关材料</h4>
+                  </div>
+                  <span class="five-step-evidence-tag">${(draft.evidence_refs || []).length} 条</span>
+                </div>
+                ${renderEvidenceRefs(draft)}
+              </div>
             </div>
           </div>
-        </article>
+        </details>
       `;
     }).join('');
+    renderEvidenceOverview();
     updateSaveButton();
   }
 
@@ -181,7 +316,36 @@
     const usage = generation.usage || {};
     const usageText = Number.isFinite(Number(usage.total_tokens)) ? ` · ${usage.total_tokens} tokens` : '';
     const budgetText = Number.isFinite(Number(generation.max_tokens)) ? ` · budget ${generation.max_tokens}` : '';
-    return `请求模型 ${generation.model_requested} · API 返回 ${generation.model_returned} · effort ${generation.reasoning_effort}${budgetText} · ${new Date(generation.generated_at).toLocaleString()}${usageText} · prompt ${generation.prompt_version}`;
+    const compact = `模型 ${generation.model_requested} · 思考 ${effortLabel(generation.reasoning_effort)} · ${new Date(generation.generated_at).toLocaleString()}`;
+    if (state.viewMode === 'simple') return compact;
+    return `${compact} · API 返回 ${generation.model_returned}${budgetText}${usageText} · prompt ${generation.prompt_version}`;
+  }
+
+  function renderProgress() {
+    if (!el.progress) return;
+    const reviewed = state.reviewedSteps.filter((step) => step.status !== 'pending').length;
+    el.progress.textContent = state.reviewedSteps.length
+      ? `${reviewed}/${STEP_DEFINITIONS.length} 已完成 · ${viewModeLabel()}`
+      : '尚未开始审校';
+  }
+
+  function applyViewMode(mode = state.viewMode) {
+    state.viewMode = VIEW_MODES[mode] ? mode : 'simple';
+    if (el.page) el.page.dataset.viewMode = state.viewMode;
+    el.viewModeButtons.forEach((button) => {
+      const active = button.dataset.fiveStepViewMode === state.viewMode;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    try {
+      window.localStorage?.setItem('five-step-view-mode', state.viewMode);
+    } catch {
+      // Storage is optional; the page still works when it is unavailable.
+    }
+    if (state.generation && el.generationMeta && !el.generationMeta.classList.contains('pending') && !el.generationMeta.classList.contains('error')) {
+      el.generationMeta.textContent = generationSummary(state.generation);
+    }
+    renderProgress();
   }
 
   function updateSaveButton() {
@@ -190,6 +354,7 @@
       && state.reviewedSteps.every((step) => step.status !== 'pending' && step.text.trim()
         && (!['edited', 'question'].includes(step.status) || step.comment.trim()));
     el.save.disabled = !state.writeEnabled || !state.generation || !reviewer || !decisionsComplete || state.saving;
+    renderProgress();
     if (state.writeEnabled) {
       el.writeStatus.textContent = '五步审计记录写入已开启；保存只追加审计记录，不更改案例状态。';
       el.writeStatus.classList.remove('five-step-write-disabled');
@@ -225,8 +390,8 @@
         <details class="five-step-history-record">
           <summary>${escapeHtml(record.submitted_at)} · ${escapeHtml(record.reviewer)} · ${escapeHtml(label)} · ${escapeHtml(record.model_requested)} / ${escapeHtml(record.reasoning_effort)} <span class="five-step-record-state ${stateClass}">${escapeHtml(stateLabel)}</span></summary>
           <div class="five-step-history-actions">${managementActions}</div>
-          <p class="five-step-context-meta">版本 ${escapeHtml(record.record_version || 1)}${record.supersedes_audit_id ? ` · 修改自 ${escapeHtml(record.supersedes_audit_id)}` : ''}${record.superseded_by_audit_id ? ` · 新版本 ${escapeHtml(record.superseded_by_audit_id)}` : ''}</p>
-          <p class="five-step-context-meta">API 返回 ${escapeHtml(record.model_returned)} · operation ${escapeHtml(record.operation_id)} · 来源指纹 ${escapeHtml(record.case_fingerprint)}</p>
+          <p class="five-step-context-meta five-step-engineering-detail">版本 ${escapeHtml(record.record_version || 1)}${record.supersedes_audit_id ? ` · 修改自 ${escapeHtml(record.supersedes_audit_id)}` : ''}${record.superseded_by_audit_id ? ` · 新版本 ${escapeHtml(record.superseded_by_audit_id)}` : ''}</p>
+          <p class="five-step-context-meta five-step-engineering-detail">API 返回 ${escapeHtml(record.model_returned)} · operation ${escapeHtml(record.operation_id)} · 来源指纹 ${escapeHtml(record.case_fingerprint)}</p>
           ${audit.overall_note ? `<p>${escapeHtml(audit.overall_note)}</p>` : ''}
           ${record.record_state === 'deleted' ? `<p class="five-step-context-meta">删除人：${escapeHtml(record.deleted_by || '未记录')} · ${escapeHtml(record.deleted_at || '')}${record.delete_reason ? ` · 原因：${escapeHtml(record.delete_reason)}` : ''}</p>` : ''}
           ${finalSteps.map((step, index) => `
@@ -250,6 +415,7 @@
       model_requested: record.model_requested,
       model_returned: record.model_returned,
       reasoning_effort: record.reasoning_effort,
+      max_tokens: audit.output_budget_tokens || null,
       generated_at: record.generated_at,
       usage: audit.usage || null,
       draft: Array.isArray(audit.ai_draft) ? audit.ai_draft : [],
@@ -405,7 +571,7 @@
     el.saveMessage.textContent = '';
     el.generationMeta.className = 'five-step-generation-meta pending';
     const waitSeconds = el.effort.value === 'max' ? 180 : 120;
-    el.generationMeta.textContent = `正在请求 ${el.model.options[el.model.selectedIndex]?.text || el.model.value} · effort ${el.effort.value}；服务器最多等待 ${waitSeconds} 秒。`;
+    el.generationMeta.textContent = `正在请求 ${el.model.options[el.model.selectedIndex]?.text || el.model.value} · 思考 ${effortLabel(el.effort.value)}；服务器最多等待 ${waitSeconds} 秒。`;
     el.generationMeta.hidden = false;
     try {
       const response = await requestJson('/api/v2/five-step-draft', {
@@ -419,6 +585,7 @@
       });
       state.generation = response;
       state.editingAuditId = null;
+      state.activeStepIndex = 0;
       state.reviewedSteps = response.draft.map((step) => ({
         field: step.field,
         status: 'pending',
@@ -456,6 +623,46 @@
     updateSaveButton();
   }
 
+  function setStepDecision(field, decision) {
+    const index = STEP_DEFINITIONS.findIndex((item) => item.field === field);
+    const step = state.reviewedSteps[index];
+    if (!step) return;
+    state.activeStepIndex = index;
+    step.status = decision;
+    if (decision === 'accepted') {
+      step.text = selectedDraft(field)?.text || step.text;
+    }
+    renderSteps();
+  }
+
+  function onStepDecision(event) {
+    const button = event.target.closest('[data-five-step-decision]');
+    if (!button) return;
+    event.preventDefault();
+    setStepDecision(button.dataset.fiveStepField, button.dataset.fiveStepDecision);
+  }
+
+  function onStepNavigation(event) {
+    const button = event.target.closest('[data-five-step-nav]');
+    if (!button) return;
+    event.preventDefault();
+    const index = Number(button.dataset.fiveStepNav);
+    const detail = el.cards.querySelectorAll('[data-step-field]')[index];
+    if (!detail) return;
+    state.activeStepIndex = index;
+    detail.open = true;
+    renderStepNav();
+    detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function openEvidenceOverview(event) {
+    const button = event.target.closest('[data-five-step-open-evidence]');
+    if (!button || !el.evidenceOverview) return;
+    event.preventDefault();
+    el.evidenceOverview.open = true;
+    el.evidenceOverview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   async function submitAudit(event) {
     event.preventDefault();
     if (el.save.disabled || !state.generation) return;
@@ -488,6 +695,7 @@
         prompt_version: state.generation.prompt_version,
         generated_at: state.generation.generated_at,
         output_budget_tokens: state.generation.max_tokens,
+        review_view_mode: state.viewMode,
         usage: state.generation.usage,
         ai_draft: state.generation.draft,
         reviewed_steps: state.reviewedSteps,
@@ -539,6 +747,16 @@
   el.cancelEdit?.addEventListener('click', cancelEditMode);
   el.cards?.addEventListener('input', onStepInput);
   el.cards?.addEventListener('change', onStepInput);
+  el.cards?.addEventListener('click', onStepDecision);
+  el.cards?.addEventListener('click', openEvidenceOverview);
+  el.stepNav?.addEventListener('click', onStepNavigation);
+  el.viewModeButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      applyViewMode(button.dataset.fiveStepViewMode);
+      renderEvidenceOverview();
+      renderSteps();
+    });
+  });
   el.historyList?.addEventListener('click', (event) => {
     const button = event.target.closest('[data-audit-action]');
     if (!button) return;
@@ -549,5 +767,6 @@
   el.reviewer?.addEventListener('input', updateSaveButton);
   el.form?.addEventListener('submit', submitAudit);
 
+  applyViewMode(state.viewMode);
   init();
 })();

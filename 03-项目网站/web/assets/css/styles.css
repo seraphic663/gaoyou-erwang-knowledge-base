@@ -153,7 +153,7 @@ body::before {
   margin: 0 auto;
   padding: 18px 20px 14px;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: space-between;
   gap: 12px;
   align-items: center;
@@ -184,8 +184,10 @@ body::before {
 .nav-links {
   display: flex;
   gap: 14px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
 }
 
 .site-map-grid {
@@ -239,6 +241,7 @@ body::before {
   font-size: 14px;
   position: relative;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .nav a::after {
@@ -3340,9 +3343,30 @@ select,
   font-size: 12px;
 }
 
+@media (max-width: 900px) and (min-width: 701px) {
+  .nav {
+    gap: 8px;
+  }
+
+  .nav-links {
+    gap: 10px;
+  }
+
+  .nav a {
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 700px) {
   .nav {
     align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .nav-links {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .flow-branch {
