@@ -7,17 +7,17 @@
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 首页“数据库”入口提供主数据库、人工标注库、V2 工作库三个选项；三库仍独立存储。
 - 数据库页：统一浏览主库字词、案例和数据库结构。
-- V2 工作库：`v2-database.html` 是案例浏览和质量报告的统一入口；选中案例后进入五步 AI 审校，旧 `v2-acceptance.html` 只保留兼容跳转。默认仍只读读取独立的 `v2/data/real_runs/annotation_v2.db`；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1`。
+- V2 工作库：`v2-database.html` 是完整案例库和质量报告入口；`annotation-workbench.html` 无参数时提供轻量案例选择器，有 `case` 参数时进入单案例五步审校。旧 `v2-acceptance.html` 只保留兼容跳转。Railway 自动读取 volume 下的 `v2/data/real_runs/annotation_v2.db`，本地默认读取被忽略的 `v2/data/local_test/annotation_v2.local.db`；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立开关。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
-- 五步释证：从 V2 案例启动 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。保存受 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 写入开关保护。
-- AI 释证：调用 `/api/ai/annotation`，固定使用 `deepseek-v4-pro`；每次请求临时检索人工标注库，必要时用主数据库补充，引用材料默认收起并逐级展开核对。
+- 五步释证：无 `case` 参数时先在页面内选择案例；选中 V2 案例后生成 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。Railway 默认保持只读，本地测试库默认允许保存；仍可用 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=0` 显式关闭。
+- AI 释证：旧的一次性接口仍保留供兼容调用；`ai-annotation.html` 现在跳转到五步释证，网站主流程统一从 V2 案例开始。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。
 - 知识页：解释训诂术语，辅助阅读，不构成独立数据库。
 
 ## 运行方式
 
-需要 Node.js 18+ 和可执行的 Python 3。旧快照页面只依赖 Node；`/api/v2/*` 还需要 Python。Windows 若 `python` 指向 Microsoft Store 别名，请把真实解释器路径设置为 `PYTHON_BIN`，也可以使用 V2 bridge 专用的 `V2_PYTHON_BIN`。
+需要 Node.js 18+ 和可执行的 Python 3。旧快照页面只依赖 Node；`/api/v2/*` 还需要 Python。Windows 若 `python`/`python3` 指向 Microsoft Store 别名，V2 bridge 会跳过 9009 失败并尝试常见安装路径；仍可用 `PYTHON_BIN` 或 `V2_PYTHON_BIN` 明确指定解释器。
 
 PowerShell 示例：
 
@@ -84,7 +84,7 @@ npm run sync:sqlite
   -> 03-项目网站/web/ai-annotation.html
 ```
 
-它不混入主数据库。`annotation.html` 只做人工库数据库浏览，`ai-annotation.html` 承接 AI 释证。更新该库后运行：
+它不混入主数据库。`annotation.html` 只做人工库数据库浏览；旧的 `ai-annotation.html` 只保留兼容跳转。更新该库后运行：
 
 ```bash
 npm run sync:annotation
@@ -101,7 +101,7 @@ npm run sync:annotation
 │  ├─ database.html                统一数据库浏览页
 │  ├─ annotation.html              人工标注库数据库页
 │  ├─ annotation-workbench.html     五步释证审校卡，从 V2 案例启动
-│  ├─ ai-annotation.html           AI 释证页
+│  ├─ ai-annotation.html           旧 AI 入口的兼容跳转页
 │  ├─ v2-database.html             V2 案例浏览和质量报告；案例进入五步 AI 审校
 │  ├─ v2-acceptance.html           旧 V2 验收入口的兼容跳转
 │  ├─ term.html                    字词详情页
@@ -145,16 +145,16 @@ npm run sync:annotation
 - `POST /api/v2/five-step-audits`：默认返回 403；设置 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 后，追加一条含模型配置、AI 草稿、逐步意见、人工文本和 V2 来源指纹的记录；`mode=restore` 可恢复一条软删除记录。此接口不改 `annotation_cases`、`human_status` 或 gold。
 - `PATCH /api/v2/five-step-audits`：在写入开关打开时修改一条当前版本记录，生成新版本并保留旧记录。
 - `DELETE /api/v2/five-step-audits`：在写入开关打开时软删除一条记录，保留原内容和删除人/时间/原因，页面可恢复。
-- `POST /api/ai/annotation`：AI 释证接口，固定使用 `deepseek-v4-pro`，需要配置 DeepSeek API key。
+- `POST /api/ai/annotation`：旧版一次性释证兼容接口，固定使用 `deepseek-v4-pro`，需要配置 DeepSeek API key；网站主页面不再进入此接口。
 
-AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 条人工标注案例；若人工库命中不足 3 条，再补充最多 4 条主数据库案例。服务端把这些材料和系统提示一次性发送给 DeepSeek，不保留对话记忆。
+旧版 AI 释证是 one-shot 调用：每次请求只取当前问题，检索最多 5 条人工标注案例；若人工库命中不足 3 条，再补充最多 4 条主数据库案例。服务端把这些材料和系统提示一次性发送给 DeepSeek，不保留对话记忆。新的 AI 审校主流程使用 V2 五步接口。
 
 ## 维护规则
 
 1. 改 SQLite 数据后，必须重新执行 `npm run sync:sqlite`。
 2. 改人工标注库后，必须重新执行 `npm run sync:annotation`。
 3. 改数据库字段后，同时检查 `src/store-definitions.js`、`scripts/sqlite_bridge.py` 和前端渲染脚本。
-4. 首页入口归并不代表合并数据库；保留主库、人工标注库和 V2 工作库的数据边界，AI 释证与五步释证保持独立入口。
+4. 首页入口归并不代表合并数据库；保留主库、人工标注库和 V2 工作库的数据边界，网站只保留 V2 五步释证这一条 AI 审校主流程。
 5. `data/sqlite-snapshot.json` 和 `data/annotation-snapshot.json` 都是导出产物，不要手工改。
 6. `更新记录.md` 只记录结构、数据链路和展示口径变化，不写日常流水账。
 

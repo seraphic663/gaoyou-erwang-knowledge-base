@@ -21,7 +21,6 @@
               <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、五步与质量</small></a>
             </div>
           </div>
-          <a href="./ai-annotation.html">AI 释证</a>
           <a href="./annotation-workbench.html">五步释证</a>
           <a href="./knowledge.html">训诂知识</a>
         </div>
@@ -38,10 +37,40 @@
       <p id="fiveStepStatus" class="db-status" role="status">正在读取 V2 案例……</p>
 
       <section id="fiveStepStart" class="card five-step-start" hidden>
-        <p class="section-kicker">先选案例</p>
-        <h2>从 V2 工作库选择要审校的内容</h2>
-        <p>五步草稿只使用选中案例及其 V2 来源段落、证据和来源状态。</p>
-        <a class="page-link" href="./v2-database.html#browse">打开 V2 工作库</a>
+        <p class="section-kicker">案例审校入口</p>
+        <h2>选择要审校的案例</h2>
+        <p>先选一条案例，再在同一页面生成五步 AI 草稿。草稿只使用该案例的 V2 来源段落、证据和来源状态。</p>
+
+        <section class="five-step-chooser-block">
+          <div class="five-step-chooser-heading">
+            <div>
+              <p class="section-kicker">推荐或当前可用案例</p>
+              <h3>直接开始</h3>
+            </div>
+            <span class="compact-note">本地测试库只展示少量 fixture</span>
+          </div>
+          <div id="fiveStepRecommended" class="five-step-case-chooser" aria-live="polite"></div>
+        </section>
+
+        <section class="five-step-chooser-block">
+          <div class="five-step-chooser-heading">
+            <div>
+              <p class="section-kicker">搜索全部 V2 案例</p>
+              <h3>查找其他案例</h3>
+            </div>
+          </div>
+          <div class="five-step-chooser-search">
+            <label class="toolbar-field">
+              <span>案例标题、来源或 case_id</span>
+              <input id="fiveStepCaseSearch" type="search" placeholder="例如：平原之隰、读书杂志" />
+            </label>
+            <button id="fiveStepCaseSearchButton" class="page-link toolbar-button" type="button">搜索</button>
+          </div>
+          <p id="fiveStepChooserStatus" class="compact-note" role="status"></p>
+          <div id="fiveStepChooserResults" class="five-step-case-chooser" aria-live="polite"></div>
+        </section>
+
+        <a class="page-link page-link-muted" href="./v2-database.html#browse">查看完整 V2 案例库与质量报告</a>
       </section>
 
       <section id="fiveStepCase" class="card five-step-case" hidden>
@@ -92,7 +121,7 @@
             细致审校<small>含来源状态</small>
           </button>
         </div>
-        <p class="compact-note">模型只接收本条 V2 案例材料。AI 草稿不会改写案例状态；请检查每步引用和来源状态。</p>
+        <p class="compact-note">草稿会根据当前案例材料生成。先看完五步，再逐步作出决定。</p>
         <p id="fiveStepGenerationMeta" class="five-step-generation-meta" role="status" aria-live="polite" hidden></p>
       </section>
 
@@ -103,13 +132,12 @@
             <h2>逐步审查 AI 草稿</h2>
             <p id="fiveStepProgress" class="compact-note">尚未开始审校</p>
           </div>
-          <span class="summary-pill">AI 草稿 ≠ 人工结论</span>
         </div>
         <nav id="fiveStepStepNav" class="five-step-step-nav" aria-label="五步审校进度"></nav>
         <details id="fiveStepEvidenceOverview" class="five-step-evidence-overview card">
           <summary>
-            <span>证据总览</span>
-            <span id="fiveStepEvidenceOverviewMeta" class="five-step-summary-meta">生成草稿后查看相关证据</span>
+            <span>材料总览</span>
+            <span id="fiveStepEvidenceOverviewMeta" class="five-step-summary-meta">生成草稿后查看相关材料</span>
           </summary>
           <div id="fiveStepEvidenceOverviewList" class="five-step-evidence-overview-list"></div>
         </details>
@@ -128,9 +156,9 @@
             <label class="toolbar-field">
               <span>本次意见</span>
               <select id="fiveStepDecision" required>
-                <option value="reviewed">已审阅，当前文本可留档</option>
-                <option value="needs_revision">退回修改</option>
-                <option value="uncertain">仍有疑问</option>
+                <option value="reviewed">认可</option>
+                <option value="needs_revision">修改</option>
+                <option value="uncertain">存疑</option>
               </select>
             </label>
             <label class="toolbar-field five-step-final-note">
@@ -139,10 +167,14 @@
             </label>
           </div>
           <div class="five-step-save-row">
-            <button id="fiveStepSave" class="page-link toolbar-button" type="submit" disabled>保存本次审计记录</button>
+            <label class="five-step-write-toggle">
+              <input id="fiveStepWriteArm" type="checkbox" />
+              <span>允许保存本次审校</span>
+            </label>
+            <button id="fiveStepSave" class="page-link toolbar-button" type="submit" disabled>保存本次审校</button>
             <span id="fiveStepWriteStatus" class="compact-note">检查本地审校写入状态……</span>
           </div>
-          <p class="compact-note">保存内容进入 V2 的独立审计记录表，不修改案例五步、human_status 或 gold 状态。修改会生成新版本，删除是可恢复的软删除。</p>
+          <p class="compact-note">保存后会留下本次审校记录；修改历史会保留。</p>
           <p id="fiveStepSaveMessage" class="five-step-save-message" role="status"></p>
         </section>
       </form>
@@ -151,7 +183,7 @@
         <div class="five-step-form-heading">
           <div>
             <p class="section-kicker">历史记录</p>
-            <h2>本案例已提交的五步审计</h2>
+            <h2>本案例已提交的五步审校</h2>
           </div>
           <span id="fiveStepHistoryCount" class="summary-pill">0 条</span>
         </div>
@@ -160,7 +192,7 @@
     </main>
 
     <footer class="footer">
-      <p>五步释证只生成并记录审校材料 · 人工审计记录不会自动批准案例或晋级 gold</p>
+      <p>五步释证 · 逐步审校并保存本次记录</p>
     </footer>
 
     <script src="./assets/js/utils.js"></script>

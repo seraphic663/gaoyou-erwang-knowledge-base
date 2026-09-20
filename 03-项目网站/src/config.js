@@ -73,6 +73,48 @@ function resolveSourceMode() {
 
 const DATA_DIR = resolveDataDir();
 
+function isRailwayRuntime() {
+  return Boolean(
+    process.env.RAILWAY_ENVIRONMENT
+      || process.env.RAILWAY_PROJECT_ID
+      || process.env.RAILWAY_SERVICE_ID
+      || process.env.RAILWAY_VOLUME_MOUNT_PATH,
+  );
+}
+
+function resolveConfiguredPath(value, fallbackRoot) {
+  if (!value) return null;
+  return path.isAbsolute(value) ? value : path.resolve(fallbackRoot, value);
+}
+
+function resolveV2DbFile() {
+  const explicit = resolveConfiguredPath(process.env.V2_DB_FILE, ROOT_DIR);
+  if (explicit) return explicit;
+
+  const mode = String(process.env.V2_DB_MODE || 'auto').trim().toLowerCase();
+  const useProduction = mode === 'production'
+    || (mode === 'auto' && isRailwayRuntime());
+  if (useProduction) {
+    const dataRoot = process.env.RAILWAY_VOLUME_MOUNT_PATH
+      || path.join(WORKSPACE_ROOT, 'v2', 'data');
+    return path.join(dataRoot, 'real_runs', 'annotation_v2.db');
+  }
+
+  return path.join(WORKSPACE_ROOT, 'v2', 'data', 'local_test', 'annotation_v2.local.db');
+}
+
+const V2_DB_FILE = resolveV2DbFile();
+const V2_DB_DIR = path.dirname(V2_DB_FILE);
+const V2_DB_MODE = String(process.env.V2_DB_MODE || 'auto').trim().toLowerCase();
+const V2_DB_PROFILE = isRailwayRuntime() || V2_DB_MODE === 'production'
+  ? 'production'
+  : 'local-test';
+
+function resolveFlag(name, fallback = false) {
+  if (process.env[name] !== undefined) return process.env[name] === '1';
+  return fallback;
+}
+
 module.exports = {
   ROOT_DIR,
   WORKSPACE_ROOT,
@@ -88,11 +130,10 @@ module.exports = {
   SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'dictionary.db'),
   ANNOTATION_DB_FILE: path.join(WORKSPACE_ROOT, '02-数据库', 'data', 'annotations.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
-  V2_DB_FILE: process.env.V2_DB_FILE
-    ? (path.isAbsolute(process.env.V2_DB_FILE)
-      ? process.env.V2_DB_FILE
-      : path.resolve(ROOT_DIR, process.env.V2_DB_FILE))
-    : path.join(WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'annotation_v2.db'),
+  V2_DB_FILE,
+  V2_DB_DIR,
+  V2_DB_MODE,
+  V2_DB_PROFILE,
   V2_ACCEPTANCE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'v2_acceptance_bridge.py'),
   V2_REVIEW_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_review_bridge.py'),
   V2_FIVE_STEP_AUDIT_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_five_step_audit_bridge.py'),
@@ -100,9 +141,12 @@ module.exports = {
     ? (path.isAbsolute(process.env.V2_REVIEW_MANIFEST_FILE)
       ? process.env.V2_REVIEW_MANIFEST_FILE
       : path.resolve(ROOT_DIR, process.env.V2_REVIEW_MANIFEST_FILE))
-    : path.join(WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'review_tasks', 'review_task_manifest.review.v1.json'),
-  V2_REVIEW_WRITE_ENABLED: process.env.V2_REVIEW_WRITE_ENABLED === '1',
-  V2_FIVE_STEP_AUDIT_WRITE_ENABLED: process.env.V2_FIVE_STEP_AUDIT_WRITE_ENABLED === '1',
+    : path.join(V2_DB_DIR, 'review_tasks', 'review_task_manifest.review.v1.json'),
+  V2_REVIEW_WRITE_ENABLED: resolveFlag('V2_REVIEW_WRITE_ENABLED'),
+  V2_FIVE_STEP_AUDIT_WRITE_ENABLED: resolveFlag(
+    'V2_FIVE_STEP_AUDIT_WRITE_ENABLED',
+    V2_DB_PROFILE === 'local-test',
+  ),
   DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_MODEL: 'deepseek-v4-pro',

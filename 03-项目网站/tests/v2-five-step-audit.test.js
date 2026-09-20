@@ -2,6 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   buildV2AuditContext,
+  buildUserPrompt,
   fingerprintV2Case,
   generateFiveStepDraft,
   normalizeDraft,
@@ -56,6 +57,13 @@ test('builds only the selected V2 case context and keeps source uncertainty visi
   assert.equal(context.evidences[0].quote_check, 'unchecked');
   assert.equal(context.evidences[0].source_passage.canonical_status, 'unknown');
   assert.equal(context.evidences.length, 1);
+});
+
+test('sends readable material cards to the model instead of database status fields', () => {
+  const prompt = buildUserPrompt(buildV2AuditContext(sampleCase()));
+  assert.match(prompt, /引文还没有核对原典/);
+  assert.match(prompt, /来自旧材料整理/);
+  assert.doesNotMatch(prompt, /quote_check|source_resolution|evidence_index/);
 });
 
 test('bounds long prompt fields and marks the omitted portions', () => {

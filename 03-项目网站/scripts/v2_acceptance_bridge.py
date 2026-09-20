@@ -27,6 +27,26 @@ VALIDATION_REPORT_FILE = WORKSPACE_ROOT / "v2" / "data" / "real_runs" / "v2_vali
 CANDIDATE_BATCH_REPORT_DIR = WORKSPACE_ROOT / "v2" / "data" / "real_runs"
 
 
+def artifact_paths(data_dir: Path | None = None) -> dict[str, Path]:
+    base = Path(data_dir) if data_dir is not None else DEFAULT_DB.parent
+    return {
+        "report": base / "unified_ingress_report.json",
+        "batch_report": base / "batch_migration_report.json",
+        "external_inventory": base / "external_source_inventory.json",
+        "work_queue_report": base / "work_queues_report.json",
+        "review_manifest": base / "review_tasks" / "review_task_manifest.review.v1.json",
+        "validation_report": base / "v2_validation_report.json",
+        "candidate_batch_report_dir": base,
+    }
+
+
+def relative_path(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(WORKSPACE_ROOT.resolve())).replace("\\", "/")
+    except ValueError:
+        return str(path.resolve()).replace("\\", "/")
+
+
 def parse_json(value: Any, fallback: Any) -> Any:
     if value is None or value == "":
         return fallback
@@ -57,8 +77,9 @@ def connect(db_path: Path) -> sqlite3.Connection:
     return connection
 
 
-def load_report() -> dict[str, Any]:
-    report_path = UNIFIED_REPORT_FILE if UNIFIED_REPORT_FILE.exists() else REPORT_FILE
+def load_report(data_dir: Path | None = None) -> dict[str, Any]:
+    paths = artifact_paths(data_dir)
+    report_path = paths["report"] if paths["report"].exists() else paths["batch_report"]
     if not report_path.exists():
         return {}
     try:
@@ -67,47 +88,52 @@ def load_report() -> dict[str, Any]:
         return {}
 
 
-def load_batch_report() -> dict[str, Any]:
-    if not REPORT_FILE.exists():
+def load_batch_report(data_dir: Path | None = None) -> dict[str, Any]:
+    report_path = artifact_paths(data_dir)["batch_report"]
+    if not report_path.exists():
         return {}
     try:
-        return json.loads(REPORT_FILE.read_text(encoding="utf-8"))
+        return json.loads(report_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
 
 
-def load_external_inventory() -> dict[str, Any]:
-    if not EXTERNAL_INVENTORY_FILE.exists():
+def load_external_inventory(data_dir: Path | None = None) -> dict[str, Any]:
+    report_path = artifact_paths(data_dir)["external_inventory"]
+    if not report_path.exists():
         return {}
     try:
-        return json.loads(EXTERNAL_INVENTORY_FILE.read_text(encoding="utf-8"))
+        return json.loads(report_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
 
 
-def load_work_queue_report() -> dict[str, Any]:
-    if not WORK_QUEUE_REPORT_FILE.exists():
+def load_work_queue_report(data_dir: Path | None = None) -> dict[str, Any]:
+    report_path = artifact_paths(data_dir)["work_queue_report"]
+    if not report_path.exists():
         return {}
     try:
-        return json.loads(WORK_QUEUE_REPORT_FILE.read_text(encoding="utf-8"))
+        return json.loads(report_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
 
 
-def load_review_task_manifest() -> dict[str, Any]:
-    if not REVIEW_TASK_MANIFEST_FILE.exists():
+def load_review_task_manifest(data_dir: Path | None = None) -> dict[str, Any]:
+    manifest_path = artifact_paths(data_dir)["review_manifest"]
+    if not manifest_path.exists():
         return {}
     try:
-        return json.loads(REVIEW_TASK_MANIFEST_FILE.read_text(encoding="utf-8"))
+        return json.loads(manifest_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
 
 
-def load_validation_report() -> dict[str, Any]:
-    if not VALIDATION_REPORT_FILE.exists():
+def load_validation_report(data_dir: Path | None = None) -> dict[str, Any]:
+    report_path = artifact_paths(data_dir)["validation_report"]
+    if not report_path.exists():
         return {}
     try:
-        return json.loads(VALIDATION_REPORT_FILE.read_text(encoding="utf-8"))
+        return json.loads(report_path.read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return {}
 
@@ -135,14 +161,15 @@ def validation_report_is_current(db_path: Path, report: dict[str, Any]) -> bool:
         return False
 
 
-def load_candidate_batch_reports() -> list[dict[str, Any]]:
+def load_candidate_batch_reports(data_dir: Path | None = None) -> list[dict[str, Any]]:
     reports: list[dict[str, Any]] = []
-    for path in sorted(CANDIDATE_BATCH_REPORT_DIR.glob("candidate_shell_batch_*_report.json")):
+    report_dir = artifact_paths(data_dir)["candidate_batch_report_dir"]
+    for path in sorted(report_dir.glob("candidate_shell_batch_*_report.json")):
         try:
             value = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        value["report_file"] = str(path.relative_to(WORKSPACE_ROOT)).replace("\\", "/")
+        value["report_file"] = relative_path(path)
         reports.append(value)
     return reports
 
@@ -325,13 +352,14 @@ def acceptance_check(
 
 
 def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, Any]:
-    report = load_report()
-    batch_report = load_batch_report()
-    external_inventory = load_external_inventory()
-    work_queue_report = load_work_queue_report()
-    review_task_manifest = load_review_task_manifest()
-    validation_report = load_validation_report()
-    candidate_batch_reports = load_candidate_batch_reports()
+    data_dir = db_path.resolve().parent
+    report = load_report(data_dir)
+    batch_report = load_batch_report(data_dir)
+    external_inventory = load_external_inventory(data_dir)
+    work_queue_report = load_work_queue_report(data_dir)
+    review_task_manifest = load_review_task_manifest(data_dir)
+    validation_report = load_validation_report(data_dir)
+    candidate_batch_reports = load_candidate_batch_reports(data_dir)
     validation_current = validation_report_is_current(db_path, validation_report)
     report_summary = batch_report.get("summary") or {}
     counts = {}
@@ -523,21 +551,24 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
     source_status = "pass" if not conflicts else "fail"
     orphan_status = "pass" if orphan_total == 0 else "fail"
     expected_queue_counts = work_queue_report.get("counts") or {}
-    queue_status = "pass" if (
-        all(orphans.get(key, 0) == 0 for key in (
-            "orphan_target_work_queue_cases",
-            "orphan_external_source_queue_sources",
-            "orphan_external_passage_queue_evidence",
-        ))
-        and queue_counts.get("target_work_resolution_queue") == expected_queue_counts.get("target_work_queue")
-        and queue_counts.get("external_source_resolution_queue") == expected_queue_counts.get("external_source_queue")
-        and queue_counts.get("external_passage_resolution_queue") == expected_queue_counts.get("external_passage_queue")
-    ) else "fail"
+    queue_status = (
+        "warn" if not work_queue_report else "pass"
+        if (
+            all(orphans.get(key, 0) == 0 for key in (
+                "orphan_target_work_queue_cases",
+                "orphan_external_source_queue_sources",
+                "orphan_external_passage_queue_evidence",
+            ))
+            and queue_counts.get("target_work_resolution_queue") == expected_queue_counts.get("target_work_queue")
+            and queue_counts.get("external_source_resolution_queue") == expected_queue_counts.get("external_source_queue")
+            and queue_counts.get("external_passage_resolution_queue") == expected_queue_counts.get("external_passage_queue")
+        ) else "fail"
+    )
     review_task_validation = validation_report.get("review_task_artifact_validation") or {}
     review_task_counts = review_task_manifest.get("counts") or {}
     review_task_coverage = review_task_manifest.get("coverage") or {}
     review_task_artifacts = {
-        "manifest_path": "v2/data/real_runs/review_tasks/review_task_manifest.review.v1.json",
+        "manifest_path": relative_path(artifact_paths(data_dir)["review_manifest"]),
         "generated_at": review_task_manifest.get("generated_at"),
         "batch_size": review_task_manifest.get("batch_size"),
         "review_sequence": review_task_manifest.get("review_sequence") or [],
@@ -575,7 +606,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             severity="high",
             why_it_matters="避免页面加载阻塞，同时防止把旧验收结果误显示为当前数据库状态。",
             next_action="数据库发生写入后重新运行 v2/scripts/run_v2_validation.py，再刷新页面。",
-            evidence_basis="v2/data/real_runs/v2_validation_report.json 的 generated_at 与数据库 mtime",
+            evidence_basis=f"{relative_path(artifact_paths(data_dir)['validation_report'])} 的 generated_at 与数据库 mtime",
         ),
         acceptance_check(
             "integrity",
@@ -755,7 +786,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
         "overall_status": overall,
         "database": {
             "path": str(db_path),
-            "display_path": "v2/data/real_runs/annotation_v2.db",
+            "display_path": relative_path(db_path),
             "schema_version": schema_version_row[0] if schema_version_row else "unknown",
             "read_only": True,
         },
@@ -793,7 +824,7 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             "current": validation_current,
             "generated_at": validation_report.get("generated_at"),
             "status": validation_report.get("status"),
-            "path": "v2/data/real_runs/v2_validation_report.json",
+            "path": relative_path(artifact_paths(data_dir)["validation_report"]),
         },
         "report_context": {
             "report_version": report.get("report_version"),
@@ -802,8 +833,8 @@ def build_summary(connection: sqlite3.Connection, db_path: Path) -> dict[str, An
             "source_file_count": report_summary.get("source_file_count"),
             "external_source_inventory": external_summary,
             "provenance_contract": report.get("provenance_contract", {}),
-            "unified_ingress_report": "v2/data/real_runs/unified_ingress_report.json",
-            "work_queues_report": "v2/data/real_runs/work_queues_report.json",
+            "unified_ingress_report": relative_path(artifact_paths(data_dir)["report"]),
+            "work_queues_report": relative_path(artifact_paths(data_dir)["work_queue_report"]),
             "work_queue_counts": work_queue_report.get("counts", {}),
             "review_task_manifest": review_task_artifacts,
             "candidate_batch_reports": candidate_batch_reports,
@@ -980,6 +1011,147 @@ def list_cases(
     return payload
 
 
+def _related_case_row(row: sqlite3.Row) -> dict[str, Any]:
+    item = dict(row)
+    source_text = " ".join(str(item.pop("source_text", "") or "").split())
+    item["source_excerpt"] = source_text[:360]
+    return item
+
+
+def find_related_materials(
+    connection: sqlite3.Connection,
+    item: dict[str, Any],
+    *,
+    limit: int = 6,
+) -> dict[str, list[dict[str, Any]]]:
+    """Return small, explainable neighbours for the selected case.
+
+    This is deliberately deterministic and conservative.  It is not a
+    replacement for the selected case's evidence: it only adds nearby cases
+    sharing a source work, target work, or annotated term so the model and the
+    reviewer can see where the comparison material came from.
+    """
+
+    case_id = str(item.get("case_id") or "")
+    source_work = str(item.get("source_work") or "").strip()
+    target_work = str(item.get("target_work") or "").strip()
+    target_text = str(item.get("target_text") or "").strip()
+    terms = item.get("terms") or []
+    term_values = sorted({
+        str(value).strip()
+        for term in terms
+        for value in (term.get("source_term"), term.get("target_term"))
+        if str(value or "").strip()
+    })
+
+    candidates: dict[str, dict[str, Any]] = {}
+
+    def add_rows(rows: list[sqlite3.Row], score: int, reason: str) -> None:
+        for row in rows:
+            row_data = _related_case_row(row)
+            candidate_id = str(row_data.get("case_id") or "")
+            if not candidate_id or candidate_id == case_id:
+                continue
+            entry = candidates.setdefault(
+                candidate_id,
+                {"item": row_data, "score": 0, "reasons": []},
+            )
+            entry["score"] += score
+            if reason not in entry["reasons"]:
+                entry["reasons"].append(reason)
+
+    select = """
+        SELECT ac.case_id, ac.case_title, ac.source_work, ac.target_work,
+               ac.target_text, ac.machine_status, ac.human_status,
+               p.raw_text AS source_text
+        FROM annotation_cases ac
+        LEFT JOIN passages p ON p.passage_id = ac.source_passage_id
+    """
+    if source_work:
+        add_rows(
+            connection.execute(
+                select + " WHERE ac.case_id != ? AND ac.source_work = ? ORDER BY ac.case_id LIMIT 160",
+                (case_id, source_work),
+            ).fetchall(),
+            5,
+            f"同一来源：{source_work}",
+        )
+    if target_work:
+        add_rows(
+            connection.execute(
+                select + " WHERE ac.case_id != ? AND ac.target_work = ? ORDER BY ac.case_id LIMIT 160",
+                (case_id, target_work),
+            ).fetchall(),
+            4,
+            f"同一目标典籍：{target_work}",
+        )
+    if target_text:
+        needle = f"%{target_text}%"
+        add_rows(
+            connection.execute(
+                select + " WHERE ac.case_id != ? AND (ac.case_title LIKE ? OR ac.target_text LIKE ?) ORDER BY ac.case_id LIMIT 80",
+                (case_id, needle, needle),
+            ).fetchall(),
+            4,
+            "案例标题或目标文字相近",
+        )
+    if term_values:
+        placeholders = ", ".join("?" for _ in term_values)
+        add_rows(
+            connection.execute(
+                select + f"""
+                JOIN annotation_terms at ON at.case_id = ac.case_id
+                WHERE ac.case_id != ?
+                  AND (at.source_term IN ({placeholders}) OR at.target_term IN ({placeholders}))
+                ORDER BY ac.case_id LIMIT 160
+                """,
+                (case_id, *term_values, *term_values),
+            ).fetchall(),
+            3,
+            "共享词语关系",
+        )
+
+    ranked = sorted(
+        candidates.values(),
+        key=lambda entry: (-int(entry["score"]), str(entry["item"].get("case_id") or "")),
+    )[:limit]
+    related_cases = []
+    for entry in ranked:
+        candidate = entry["item"]
+        related_cases.append({
+            "case_id": candidate.get("case_id"),
+            "case_title": candidate.get("case_title"),
+            "source_work": candidate.get("source_work"),
+            "target_work": candidate.get("target_work"),
+            "target_text": candidate.get("target_text"),
+            "machine_status": candidate.get("machine_status"),
+            "human_status": candidate.get("human_status"),
+            "source_excerpt": candidate.get("source_excerpt"),
+            "relation": "；".join(entry["reasons"]),
+        })
+
+    related_case_ids = [str(case["case_id"]) for case in related_cases]
+    related_terms = []
+    if related_case_ids:
+        term_placeholders = ", ".join("?" for _ in related_case_ids)
+        related_terms = [
+            dict(row)
+            for row in connection.execute(
+                f"""
+                SELECT source_term, target_term, relation_type, relation_subtype,
+                       relation_note, COUNT(DISTINCT case_id) AS case_count
+                FROM annotation_terms
+                WHERE case_id IN ({term_placeholders})
+                GROUP BY source_term, target_term, relation_type, relation_subtype, relation_note
+                ORDER BY case_count DESC, source_term, target_term
+                LIMIT 12
+                """,
+                related_case_ids,
+            ).fetchall()
+        ]
+    return {"related_cases": related_cases, "related_terms": related_terms}
+
+
 def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | None:
     row = connection.execute(
         "SELECT * FROM annotation_cases WHERE case_id = ?",
@@ -1143,6 +1315,7 @@ def get_case(connection: sqlite3.Connection, case_id: str) -> dict[str, Any] | N
     ).fetchall())
     for resolution in item["resolution_events"]:
         resolution["data"] = parse_json(resolution.pop("resolution_json", "{}"), {})
+    item["related_materials"] = find_related_materials(connection, item)
     return item
 
 

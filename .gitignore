@@ -55,3 +55,4 @@ v2/data/external_sources/edition_candidates/**/*.part
 # Rebuild these from source inputs and scripts; do not commit databases,
 # review queues, packets, or other real-run outputs.
 v2/data/real_runs/
+v2/data/local_test/

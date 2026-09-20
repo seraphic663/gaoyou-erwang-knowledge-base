@@ -9,11 +9,11 @@
   const STATUS_LABELS = {
     pending: '待审',
     accepted: '认可',
-    edited: '已修改',
+    edited: '修改',
     question: '存疑',
-    reviewed: '已审阅',
-    needs_revision: '退回修改',
-    uncertain: '仍有疑问',
+    reviewed: '认可',
+    needs_revision: '修改',
+    uncertain: '存疑',
     active: '当前版本',
     superseded: '已被新版本替代',
     deleted: '已删除（可恢复）',
@@ -50,12 +50,19 @@
     generating: false,
     viewMode: window.localStorage?.getItem('five-step-view-mode') === 'detailed' ? 'detailed' : 'simple',
     activeStepIndex: 0,
+    chooserRequestId: 0,
+    writeArmed: false,
   };
 
   const el = {
     status: document.querySelector('#fiveStepStatus'),
     page: document.querySelector('.five-step-audit-page'),
     start: document.querySelector('#fiveStepStart'),
+    recommended: document.querySelector('#fiveStepRecommended'),
+    caseSearch: document.querySelector('#fiveStepCaseSearch'),
+    caseSearchButton: document.querySelector('#fiveStepCaseSearchButton'),
+    chooserStatus: document.querySelector('#fiveStepChooserStatus'),
+    chooserResults: document.querySelector('#fiveStepChooserResults'),
     case: document.querySelector('#fiveStepCase'),
     caseTitle: document.querySelector('#fiveStepCaseTitle'),
     caseMeta: document.querySelector('#fiveStepCaseMeta'),
@@ -79,6 +86,7 @@
     decision: document.querySelector('#fiveStepDecision'),
     overallNote: document.querySelector('#fiveStepOverallNote'),
     save: document.querySelector('#fiveStepSave'),
+    writeArm: document.querySelector('#fiveStepWriteArm'),
     writeStatus: document.querySelector('#fiveStepWriteStatus'),
     saveMessage: document.querySelector('#fiveStepSaveMessage'),
     history: document.querySelector('#fiveStepHistory'),
@@ -95,6 +103,52 @@
   function humanStatus(value) {
     const raw = String(value || '').trim();
     return RAW_STATUS_LABELS[raw] || raw || '未记录';
+  }
+
+  function quoteStatusText(value) {
+    return ({
+      passed: '引文已与原典核对',
+      failed: '引文核对未通过',
+      unchecked: '引文还没核对原典',
+      pending: '引文等待核对',
+      missing: '缺少可核对的引文',
+    })[String(value || '')] || '引文状态未确定';
+  }
+
+  function resolutionStatusText(value) {
+    return ({
+      canonical_source_passage: '已经关联原典段落',
+      legacy_derived_passage: '来自旧材料整理，尚未回到原典',
+      secondary_citation_match: '只在王氏正文中找到二次引文',
+      external_source_pending: '外部来源还没确定',
+      external_source_resolved: '外部来源已登记，版本仍待核对',
+    })[String(value || '')] || '来源还没确定';
+  }
+
+  function canonicalStatusText(value) {
+    return ({
+      canonical_active: '原典段落已登记',
+      candidate: '目前只有候选段落',
+      unknown: '原典段落还没确认',
+    })[String(value || '')] || '原典段落状态未确定';
+  }
+
+  function relationTypeText(value) {
+    return ({
+      synonym: '同义关系',
+      phonetic: '声训或音近关系',
+      loan: '通假关系',
+      variant: '异文或字形关系',
+    })[String(value || '')] || '关系未注明';
+  }
+
+  function caseStatusText(item) {
+    const machine = String(item?.machine_status || '');
+    const human = String(item?.human_status || '');
+    if (machine === 'draft' && human === 'pending') return '机器已整理，人工尚未审校';
+    if (human === 'pending') return '人工尚未审校';
+    if (machine === 'draft') return '机器草稿，等待确认';
+    return '已有审校记录';
   }
 
   function snippet(value, limit = 180) {
@@ -132,17 +186,22 @@
     const provenance = item.provenance || {};
     const passageText = plainText(passage);
     const evidenceCount = item.evidences?.length || 0;
+    const unresolved = (item.evidences || []).filter((evidence) => ['unchecked', 'pending', 'missing', 'unknown'].includes(String(evidence.quote_check || ''))).length;
     const sourceState = passage?.canonical_status || 'unknown';
-    const evidenceSummary = Object.entries(item.evidence_summary || {})
-      .map(([key, count]) => `${humanStatus(key)} ${count}`)
-      .join(' · ') || '暂无 evidence';
+    const sourceLabel = passage?.document_title || passage?.section_title || item.source_work || provenance.source_file || '来源未注明';
+    const evidenceSummary = evidenceCount
+      ? `${evidenceCount} 条引文材料${unresolved ? `，其中 ${unresolved} 条还没核对原典` : '，引文均已完成状态登记'}`
+      : '当前案例没有关联引文材料';
+    const related = item.related_materials || { related_cases: [], related_terms: [] };
+    const relatedCases = related.related_cases || [];
+    const relatedTerms = related.related_terms || [];
     el.sourceContext.innerHTML = `
       <article class="five-step-context-block">
         <div class="five-step-evidence-ref-head">
-          <h3>V2 来源段落</h3>
-          <span class="five-step-evidence-tag">原典状态：${escapeHtml(humanStatus(sourceState))}</span>
+          <h3>来源段落</h3>
+          <span class="five-step-evidence-tag">${escapeHtml(canonicalStatusText(sourceState))}</span>
         </div>
-        <p class="five-step-context-meta">${escapeHtml(passage?.passage_id || item.source_passage_id || '未关联 passage')} · ${escapeHtml(provenance.source_file || passage?.source_file || '来源路径未记录')}</p>
+        <p class="five-step-context-meta">来源：${escapeHtml(sourceLabel)}</p>
         <p class="five-step-context-text">${escapeHtml(snippet(passageText || 'V2 中未关联可展示的来源段落。', 260))}</p>
         ${passageText.length > 260 ? `<details class="five-step-inline-fold"><summary>展开完整来源段落</summary><p class="five-step-full-copy">${escapeHtml(passageText)}</p></details>` : ''}
         <div class="five-step-engineering-detail">
@@ -152,25 +211,40 @@
       </article>
       <article class="five-step-context-block">
         <div class="five-step-evidence-ref-head">
-          <h3>案例状态</h3>
-          <span class="five-step-evidence-tag">${escapeHtml(evidenceCount)} 条证据</span>
+          <h3>材料概况</h3>
+          <span class="five-step-evidence-tag">${escapeHtml(evidenceCount)} 条材料</span>
         </div>
         <p class="five-step-context-meta">${escapeHtml(evidenceSummary)}</p>
-        <p>机器：${escapeHtml(humanStatus(item.machine_status))} · 人工：${escapeHtml(humanStatus(item.human_status))}</p>
-        <p>来源：${escapeHtml(item.origin || provenance.source_format || '未记录')} · 目标作品：${escapeHtml(item.target_work || '未明确')}</p>
-        <p class="compact-note">当前记录只代表 V2 工作库状态，不代表原文、版本或引文已被人工核实。</p>
+        <p>${escapeHtml(caseStatusText(item))}</p>
+        <p>目标典籍：${escapeHtml(item.target_work || '尚未明确')}</p>
         <div class="five-step-engineering-detail">
           machine_status: <code>${escapeHtml(item.machine_status || 'null')}</code> · human_status: <code>${escapeHtml(item.human_status || 'null')}</code><br />
           target_work: <code>${escapeHtml(item.target_work || 'null')}</code> · target_passage_id: <code>${escapeHtml(item.target_passage_id || 'null')}</code>
         </div>
       </article>
+      ${relatedCases.length || relatedTerms.length ? `
+        <article class="five-step-context-block five-step-related-block">
+          <div class="five-step-evidence-ref-head">
+            <h3>相关材料</h3>
+            <span class="five-step-evidence-tag">用于比较</span>
+          </div>
+          <p class="five-step-context-meta">系统根据来源、目标典籍和词语关系找到了相近材料；它们只用于比较，不替代当前案例的引文。</p>
+          ${relatedCases.length ? `<div class="five-step-related-list">${relatedCases.map((relatedCase) => `
+            <a class="five-step-related-case" href="./annotation-workbench.html?case=${encodeURIComponent(relatedCase.case_id)}">
+              <span><strong>${escapeHtml(relatedCase.case_title || '未命名案例')}</strong><small>${escapeHtml(relatedCase.source_work || '来源未注明')} · ${escapeHtml(relatedCase.target_work || '目标典籍未明确')}</small></span>
+              <small>${escapeHtml(relatedCase.relation || '材料相近')} · 打开</small>
+            </a>
+          `).join('')}</div>` : ''}
+          ${relatedTerms.length ? `<div class="five-step-related-terms">${relatedTerms.map((term) => `<span class="five-step-related-term">${escapeHtml(term.source_term || '未注明')} → ${escapeHtml(term.target_term || '未注明')} · ${escapeHtml(relationTypeText(term.relation_type))}</span>`).join('')}</div>` : ''}
+        </article>
+      ` : ''}
     `;
   }
 
   function renderCase(item) {
     state.caseItem = item;
     el.caseTitle.textContent = item.case_title || '未命名案例';
-    el.caseMeta.textContent = `${item.case_id} · ${item.source_work || '来源未注明'} · 机器 ${humanStatus(item.machine_status)} / 人工 ${humanStatus(item.human_status)}`;
+    el.caseMeta.textContent = `${item.source_work || '来源未注明'} · ${item.target_work || '目标典籍未明确'} · ${caseStatusText(item)}`;
     el.backLink.href = `./v2-database.html#browse`;
     renderSourceContext(item);
     el.case.hidden = false;
@@ -178,10 +252,65 @@
     el.status.textContent = '已载入 V2 案例。确认所选案例和来源状态后，可生成五步草稿。';
   }
 
+  function renderCaseChooserItems(root, items, emptyText = '当前没有匹配的案例。') {
+    if (!root) return;
+    if (!items.length) {
+      root.innerHTML = `<p class="compact-note">${escapeHtml(emptyText)}</p>`;
+      return;
+    }
+    root.innerHTML = items.map((item) => `
+      <button type="button" class="five-step-case-option" data-five-step-case-id="${escapeHtml(item.case_id)}">
+        <span class="five-step-case-option-main">
+          <strong>${escapeHtml(item.case_title || '未命名案例')}</strong>
+          <small>${escapeHtml(item.source_work || '来源未注明')} · ${escapeHtml(item.target_work || '目标典籍未明确')}</small>
+        </span>
+        <span class="five-step-case-option-meta">
+          <small>${escapeHtml(caseStatusText(item))}</small>
+          <span>开始审校 →</span>
+        </span>
+      </button>
+    `).join('');
+    root.querySelectorAll('[data-five-step-case-id]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const caseId = button.dataset.fiveStepCaseId;
+        if (caseId) window.location.href = `./annotation-workbench.html?case=${encodeURIComponent(caseId)}`;
+      });
+    });
+  }
+
+  async function loadCaseChooser({ query = '', recommended = false } = {}) {
+    const requestId = ++state.chooserRequestId;
+    const target = recommended ? el.recommended : el.chooserResults;
+    if (!target) return;
+    target.innerHTML = '<p class="compact-note">正在读取可审校案例……</p>';
+    if (el.chooserStatus && !recommended) el.chooserStatus.textContent = '';
+    try {
+      const params = new URLSearchParams({ page: '1', pageSize: '6' });
+      if (query.trim()) params.set('q', query.trim());
+      const payload = await requestJson(`/api/v2/cases?${params.toString()}`);
+      if (requestId !== state.chooserRequestId) return;
+      const items = Array.isArray(payload.items) ? payload.items : [];
+      renderCaseChooserItems(target, items);
+      if (el.chooserStatus && !recommended) {
+        el.chooserStatus.textContent = query.trim()
+          ? `找到 ${payload.total || items.length} 条案例，当前显示前 ${items.length} 条。`
+          : `当前工作库共有 ${payload.total || items.length} 条案例，当前显示前 ${items.length} 条。`;
+      }
+    } catch (error) {
+      if (requestId !== state.chooserRequestId) return;
+      target.innerHTML = `<p class="compact-note">案例读取失败：${escapeHtml(error.message)}</p>`;
+      if (el.chooserStatus && !recommended) el.chooserStatus.textContent = '请检查本地 V2 测试库是否已生成。';
+    }
+  }
+
   function evidenceStatus(evidence) {
     const data = evidence.data || {};
     return {
-      summary: `${humanStatus(evidence.quote_check)} · ${humanStatus(data.source_resolution)} · ${humanStatus(evidence.source_passage?.canonical_status)}`,
+      summary: [
+        quoteStatusText(evidence.quote_check),
+        resolutionStatusText(data.source_resolution),
+        evidence.source_passage ? canonicalStatusText(evidence.source_passage.canonical_status) : '没有关联的原典段落',
+      ].join('；'),
       raw: `quote_check=${evidence.quote_check || 'null'} · source_resolution=${data.source_resolution || 'null'} · canonical_status=${evidence.source_passage?.canonical_status || 'null'}`,
     };
   }
@@ -191,13 +320,15 @@
     const status = evidenceStatus(evidence);
     const referenced = state.generation?.draft?.some((step) => (step.evidence_refs || []).map(Number).includes(index));
     const data = evidence.data || {};
+    const note = data.evidence_note || data.note || data.relation_note || '';
     return `<article class="${compact ? 'five-step-evidence-ref' : 'five-step-evidence-overview-item'}"${compact ? '' : ` id="fiveStepEvidence-${escapeHtml(index)}"`}>
       <div class="five-step-evidence-ref-head">
-        <strong>证据 ${escapeHtml(index)} · ${escapeHtml(evidence.source_work || evidence.external_cited_work || '来源未注明')}</strong>
+        <strong>材料 ${escapeHtml(index)} · ${escapeHtml(evidence.source_work || evidence.external_cited_work || '来源未注明')}</strong>
         ${referenced ? '<span class="five-step-evidence-tag">AI 已引用</span>' : ''}
       </div>
       <p class="five-step-context-meta">${escapeHtml(status.summary)}</p>
       <blockquote>${escapeHtml(snippet(evidence.quote || '（无引文）', compact ? 140 : 220))}</blockquote>
+      ${note ? `<p class="five-step-material-note">${escapeHtml(note)}</p>` : ''}
       <div class="five-step-engineering-detail">
         ${escapeHtml(status.raw)}<br />
         external_status: <code>${escapeHtml(evidence.external_status || 'null')}</code> · edition_status: <code>${escapeHtml(evidence.external_edition_status || 'null')}</code> · passage_status: <code>${escapeHtml(evidence.external_passage_status || 'null')}</code><br />
@@ -224,7 +355,7 @@
     const evidences = Array.isArray(state.caseItem.evidences) ? state.caseItem.evidences : [];
     const referenced = new Set((state.generation?.draft || []).flatMap((step) => step.evidence_refs || []).map(Number));
     const unresolved = evidences.filter((evidence) => ['unchecked', 'pending', 'missing', 'unknown'].includes(String(evidence.quote_check || ''))).length;
-    el.evidenceOverviewMeta.textContent = `${evidences.length} 条 · AI 已引用 ${referenced.size} 条 · ${unresolved} 条待核`;
+    el.evidenceOverviewMeta.textContent = `${evidences.length} 条材料 · AI 已引用 ${referenced.size} 条 · ${unresolved} 条还没核对原典`;
     el.evidenceOverviewList.innerHTML = evidences.length
       ? evidences.map((evidence) => renderEvidenceCard(evidence)).join('')
       : '<p class="compact-note">本案例没有可展开的 evidence。</p>';
@@ -253,50 +384,52 @@
       const reviewed = state.reviewedSteps[index] || { status: 'pending', text: draft.text, comment: '' };
       const questions = draft.review_questions?.length
         ? `<ul>${draft.review_questions.map((question) => `<li>${escapeHtml(question)}</li>`).join('')}</ul>`
-        : '<p class="compact-note">AI 未提出单独待核问题。</p>';
+        : '<p class="compact-note">这一步暂时没有单独的待核问题。</p>';
       const status = STATUS_LABELS[reviewed.status] || '待审';
       const showHumanFields = ['edited', 'question'].includes(reviewed.status);
-      const actionButtons = ['accepted', 'edited', 'question'].map((decision) => `<button type="button" class="five-step-decision-button${reviewed.status === decision ? ' is-selected' : ''}" data-five-step-decision="${decision}" data-five-step-field="${escapeHtml(field)}">${decision === 'accepted' ? '认可 AI 草稿' : decision === 'edited' ? '修改' : '存疑'}</button>`).join('');
-      const resetButton = reviewed.status !== 'pending'
-        ? `<button type="button" class="five-step-decision-button" data-five-step-decision="pending" data-five-step-field="${escapeHtml(field)}">撤回决定</button>`
-        : '';
-      const fullDraft = draft.text.length > 280
-        ? `<details class="five-step-inline-fold"><summary>展开完整 AI 草稿</summary><p class="five-step-full-copy">${escapeHtml(draft.text)}</p></details>`
-        : '';
+      const decisionLabels = { accepted: '认可', edited: '修改', question: '存疑' };
+      const decisionTitles = {
+        accepted: '这一步可以直接采用',
+        edited: '你知道应该怎样改写',
+        question: '材料或解释还没有确认',
+      };
+      const actionButtons = ['accepted', 'edited', 'question'].map((decision) => `<button type="button" title="${escapeHtml(decisionTitles[decision])}" class="five-step-decision-button${reviewed.status === decision ? ' is-selected' : ''}" data-five-step-decision="${decision}" data-five-step-field="${escapeHtml(field)}">${decisionLabels[decision]}</button>`).join('');
+      const humanTextLabel = reviewed.status === 'edited' ? '修改后的文本' : '人工暂定文本';
+      const humanCommentLabel = reviewed.status === 'edited' ? '修改理由' : '存疑理由和待核问题';
+      const humanTextPlaceholder = reviewed.status === 'edited' ? '写下你确认后的替代表述' : '写下目前可以保留的暂定表述';
       const humanFields = showHumanFields
-        ? `<label>人工确认文本
-            <textarea data-five-step-text="${escapeHtml(field)}" rows="6">${escapeHtml(reviewed.text || draft.text)}</textarea>
+        ? `<label>${humanTextLabel}
+            <textarea data-five-step-text="${escapeHtml(field)}" rows="6" placeholder="${escapeHtml(humanTextPlaceholder)}">${escapeHtml(reviewed.text)}</textarea>
           </label>
-          <label>本步审校意见
-            <textarea data-five-step-comment="${escapeHtml(field)}" rows="3" placeholder="指出保留、修改或存疑的理由">${escapeHtml(reviewed.comment)}</textarea>
+          <label>${humanCommentLabel}
+            <textarea data-five-step-comment="${escapeHtml(field)}" rows="3" placeholder="${escapeHtml(humanCommentLabel)}">${escapeHtml(reviewed.comment)}</textarea>
           </label>`
-        : '<p class="five-step-human-guidance">认可时沿用 AI 草稿；只有修改或存疑时才需要补充人工文本和理由。</p>';
+        : '';
       return `
         <details class="five-step-step" data-step-field="${escapeHtml(field)}"${index === state.activeStepIndex ? ' open' : ''}>
           <summary>
             <span class="five-step-step-number">0${index + 1}</span>
             <span class="five-step-step-summary-label"><span class="five-step-step-summary-title" role="heading" aria-level="3">${escapeHtml(label)}</span><span class="five-step-step-status ${escapeHtml(reviewed.status)}">${escapeHtml(status)}</span></span>
-            <span class="five-step-step-summary-snippet">${escapeHtml(snippet(draft.text, 100))}</span>
           </summary>
           <div class="five-step-step-body">
             <div class="five-step-step-grid">
               <div>
-                <p class="section-kicker">AI 草稿摘要</p>
-                <div class="five-step-ai-draft"><p>${escapeHtml(snippet(draft.text, 280))}</p>${fullDraft}</div>
+                <p class="section-kicker">AI 生成内容</p>
+                <div class="five-step-ai-draft"><p>${escapeHtml(draft.text || 'AI 没有生成这一步的文字。')}</p></div>
                 <details class="five-step-review-questions">
-                  <summary>AI 提醒核查 · ${draft.review_questions?.length || 0} 条</summary>
+                  <summary>需要再核对 · ${draft.review_questions?.length || 0} 条</summary>
                   ${questions}
                 </details>
                 <div class="five-step-review-fields">
                   <p class="section-kicker">审校决定</p>
-                  <div class="five-step-review-actions">${actionButtons}${resetButton}</div>
+                  <div class="five-step-review-actions">${actionButtons}</div>
                   ${humanFields}
                 </div>
               </div>
               <aside class="five-step-evidence-panel">
                 <div class="five-step-evidence-panel-heading">
                   <div>
-                    <p class="section-kicker">细致证据</p>
+                  <p class="section-kicker">本步材料</p>
                     <h4>本步相关材料</h4>
                   </div>
                   <span class="five-step-evidence-tag">${(draft.evidence_refs || []).length} 条</span>
@@ -316,9 +449,9 @@
     const usage = generation.usage || {};
     const usageText = Number.isFinite(Number(usage.total_tokens)) ? ` · ${usage.total_tokens} tokens` : '';
     const budgetText = Number.isFinite(Number(generation.max_tokens)) ? ` · budget ${generation.max_tokens}` : '';
-    const compact = `模型 ${generation.model_requested} · 思考 ${effortLabel(generation.reasoning_effort)} · ${new Date(generation.generated_at).toLocaleString()}`;
+    const compact = `已生成五步草稿 · ${new Date(generation.generated_at).toLocaleString()}`;
     if (state.viewMode === 'simple') return compact;
-    return `${compact} · API 返回 ${generation.model_returned}${budgetText}${usageText} · prompt ${generation.prompt_version}`;
+    return `${compact} · 模型 ${generation.model_requested} · 思考强度 ${effortLabel(generation.reasoning_effort)} · API 返回 ${generation.model_returned}${budgetText}${usageText} · prompt ${generation.prompt_version}`;
   }
 
   function renderProgress() {
@@ -353,14 +486,22 @@
     const decisionsComplete = state.reviewedSteps.length === STEP_DEFINITIONS.length
       && state.reviewedSteps.every((step) => step.status !== 'pending' && step.text.trim()
         && (!['edited', 'question'].includes(step.status) || step.comment.trim()));
-    el.save.disabled = !state.writeEnabled || !state.generation || !reviewer || !decisionsComplete || state.saving;
+    const writeReady = state.writeEnabled && state.writeArmed;
+    el.save.disabled = !writeReady || !state.generation || !reviewer || !decisionsComplete || state.saving;
     renderProgress();
-    if (state.writeEnabled) {
-      el.writeStatus.textContent = '五步审计记录写入已开启；保存只追加审计记录，不更改案例状态。';
+    if (!state.writeEnabled) {
+      el.writeStatus.textContent = '当前是只读预览，服务器还没有开放保存。';
+      el.writeStatus.classList.remove('five-step-write-disabled');
+      if (el.writeArm) {
+        el.writeArm.disabled = true;
+        el.writeArm.checked = false;
+      }
+    } else if (!state.writeArmed) {
+      el.writeStatus.textContent = '完成审校后，打开“允许保存本次审校”才能保存。';
       el.writeStatus.classList.remove('five-step-write-disabled');
     } else {
-      el.writeStatus.textContent = '当前只读。要保存审计意见，请设置 V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1 后启动服务。';
-      el.writeStatus.classList.add('five-step-write-disabled');
+      el.writeStatus.textContent = '本次审校已允许保存。';
+      el.writeStatus.classList.remove('five-step-write-disabled');
     }
   }
 
@@ -388,7 +529,7 @@
            <button type="button" class="search-clear toolbar-button" data-audit-action="delete" data-audit-id="${escapeHtml(record.audit_id)}">删除</button>`;
       return `
         <details class="five-step-history-record">
-          <summary>${escapeHtml(record.submitted_at)} · ${escapeHtml(record.reviewer)} · ${escapeHtml(label)} · ${escapeHtml(record.model_requested)} / ${escapeHtml(record.reasoning_effort)} <span class="five-step-record-state ${stateClass}">${escapeHtml(stateLabel)}</span></summary>
+          <summary>${escapeHtml(record.submitted_at)} · ${escapeHtml(record.reviewer)} · ${escapeHtml(label)} <span class="five-step-record-state ${stateClass}">${escapeHtml(stateLabel)}</span></summary>
           <div class="five-step-history-actions">${managementActions}</div>
           <p class="five-step-context-meta five-step-engineering-detail">版本 ${escapeHtml(record.record_version || 1)}${record.supersedes_audit_id ? ` · 修改自 ${escapeHtml(record.supersedes_audit_id)}` : ''}${record.superseded_by_audit_id ? ` · 新版本 ${escapeHtml(record.superseded_by_audit_id)}` : ''}</p>
           <p class="five-step-context-meta five-step-engineering-detail">API 返回 ${escapeHtml(record.model_returned)} · operation ${escapeHtml(record.operation_id)} · 来源指纹 ${escapeHtml(record.case_fingerprint)}</p>
@@ -467,14 +608,16 @@
     el.generate.disabled = false;
     el.generate.textContent = '重新生成五步草稿';
     el.cancelEdit.hidden = true;
-    el.save.textContent = '保存本次审计记录';
+    el.save.textContent = '保存本次审校';
   }
 
   function cancelEditMode() {
     exitEditMode();
-    state.generation = null;
-    state.reviewedSteps = [];
-    el.cards.innerHTML = '';
+          state.generation = null;
+          state.reviewedSteps = [];
+          state.writeArmed = false;
+          if (el.writeArm) el.writeArm.checked = false;
+          el.cards.innerHTML = '';
     el.form.hidden = true;
     el.generationMeta.hidden = true;
     el.saveMessage.textContent = '';
@@ -631,6 +774,8 @@
     step.status = decision;
     if (decision === 'accepted') {
       step.text = selectedDraft(field)?.text || step.text;
+    } else if (step.text === selectedDraft(field)?.text) {
+      step.text = '';
     }
     renderSteps();
   }
@@ -669,7 +814,7 @@
     state.saving = true;
     updateSaveButton();
     el.saveMessage.className = 'five-step-save-message';
-    el.saveMessage.textContent = '正在保存审计记录……';
+    el.saveMessage.textContent = '正在保存本次审校……';
     const operationId = globalThis.crypto?.randomUUID
       ? globalThis.crypto.randomUUID()
       : `five-step-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
@@ -709,8 +854,8 @@
         body: JSON.stringify(body),
       });
       el.saveMessage.textContent = editingAuditId
-        ? `修改已保存为新版本 ${payload.audit_id}。原版本仍保留。`
-        : `已保存审计记录 ${payload.audit_id}。原案例与 human_status 未变。`;
+        ? '修改已保存为新版本，原版本仍保留。'
+        : '本次审校已保存。';
       exitEditMode();
       state.generation = null;
       state.reviewedSteps = [];
@@ -729,8 +874,9 @@
 
   async function init() {
     if (!state.caseId) {
-      el.status.textContent = '请先从 V2 工作库选择要审校的案例。';
+      el.status.textContent = '请选择一个 V2 案例开始审校。';
       el.start.hidden = false;
+      await loadCaseChooser({ recommended: true });
       return;
     }
     try {
@@ -740,10 +886,20 @@
     } catch (error) {
       el.status.textContent = `无法打开该 V2 案例：${error.message}`;
       el.start.hidden = false;
+      await loadCaseChooser({ recommended: true });
     }
   }
 
   el.generate?.addEventListener('click', generateDraft);
+  el.caseSearchButton?.addEventListener('click', () => {
+    loadCaseChooser({ query: el.caseSearch?.value || '' });
+  });
+  el.caseSearch?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      loadCaseChooser({ query: el.caseSearch.value || '' });
+    }
+  });
   el.cancelEdit?.addEventListener('click', cancelEditMode);
   el.cards?.addEventListener('input', onStepInput);
   el.cards?.addEventListener('change', onStepInput);
@@ -765,6 +921,10 @@
     manageHistoryRecord(button.dataset.auditAction, button.dataset.auditId);
   });
   el.reviewer?.addEventListener('input', updateSaveButton);
+  el.writeArm?.addEventListener('change', () => {
+    state.writeArmed = Boolean(el.writeArm.checked && state.writeEnabled);
+    updateSaveButton();
+  });
   el.form?.addEventListener('submit', submitAudit);
 
   applyViewMode(state.viewMode);

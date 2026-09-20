@@ -1,7 +1,45 @@
 const { execFile } = require('child_process');
+const fs = require('fs');
+const path = require('path');
 
 function unique(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function discoverWindowsPythonCandidates() {
+  if (process.platform !== 'win32') return [];
+  const candidates = [];
+  const userProfile = process.env.USERPROFILE || '';
+  const localAppData = process.env.LOCALAPPDATA || '';
+  const programFiles = process.env.ProgramFiles || '';
+  const virtualEnv = process.env.VIRTUAL_ENV || '';
+
+  const addIfExists = (candidate) => {
+    if (candidate && fs.existsSync(candidate)) candidates.push(candidate);
+  };
+
+  addIfExists(path.join(virtualEnv, 'Scripts', 'python.exe'));
+  addIfExists(path.join(userProfile, '.cache', 'codex-runtimes', 'codex-primary-runtime', 'dependencies', 'python', 'python.exe'));
+
+  for (const root of [
+    path.join(localAppData, 'Programs', 'Python'),
+    path.join(programFiles, 'Python'),
+  ]) {
+    try {
+      for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+        if (entry.isDirectory() && /^Python\d+$/i.test(entry.name)) {
+          addIfExists(path.join(root, entry.name, 'python.exe'));
+        }
+      }
+    } catch {
+      // A missing or inaccessible conventional install directory is optional.
+    }
+  }
+  return candidates;
+}
+
+function isUnavailablePythonError(error) {
+  return error && (error.code === 'ENOENT' || error.code === 9009);
 }
 
 /**
@@ -19,6 +57,7 @@ function runPythonJsonBridge(config, {
   const candidates = unique([
     process.env.V2_PYTHON_BIN,
     config.PYTHON_BIN,
+    ...discoverWindowsPythonCandidates(),
     'python3',
     'python',
   ]);
@@ -39,7 +78,7 @@ function runPythonJsonBridge(config, {
           windowsHide: true,
         },
         (error, stdout, stderr) => {
-          if (error && error.code === 'ENOENT') {
+          if (isUnavailablePythonError(error)) {
             attempt(index + 1, error);
             return;
           }

@@ -37,11 +37,12 @@ function fileRevision(filePath) {
 }
 
 function v2SummaryCacheKey(config) {
+  const v2DataDir = path.dirname(config.V2_DB_FILE);
   return [
     config.V2_DB_FILE,
-    path.join(config.WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'v2_validation_report.json'),
-    path.join(config.WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'review_tasks', 'review_task_manifest.review.v1.json'),
-    path.join(config.WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'work_queues_report.json'),
+    path.join(v2DataDir, 'v2_validation_report.json'),
+    path.join(v2DataDir, 'review_tasks', 'review_task_manifest.review.v1.json'),
+    path.join(v2DataDir, 'work_queues_report.json'),
   ].map(fileRevision).join('|');
 }
 
@@ -299,7 +300,7 @@ function createServer() {
           return sendJson(res, 403, {
             ok: false,
             write_enabled: false,
-            message: 'V2 five-step audit writes are disabled; set V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1 for an explicit review session',
+            message: '当前服务处于只读状态，暂时不能保存本次审校。',
           });
         }
 

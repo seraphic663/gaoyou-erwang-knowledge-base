@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI 释证 · 高邮二王考据过程知识库</title>
+    <meta http-equiv="refresh" content="0; url=./annotation-workbench.html" />
+    <title>正在进入五步释证 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="./assets/css/styles.css" />
   </head>
   <body data-page="annotation-ai">
-    <header class="subhero annotation-hero ai-annotation-hero">
+    <header class="subhero">
       <nav class="nav" aria-label="主导航">
         <div class="brand">高邮二王知识库</div>
         <div class="nav-links">
@@ -20,47 +21,33 @@
               <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、五步与质量</small></a>
             </div>
           </div>
-          <a href="./ai-annotation.html">AI 释证</a>
           <a href="./annotation-workbench.html">五步释证</a>
           <a href="./knowledge.html">训诂知识</a>
         </div>
       </nav>
 
       <div class="hero-content">
-        <p class="badge">AI 辅助 · 独立释证</p>
-        <h1>AI 释证</h1>
-        <p class="hero-copy">
-          优先使用人工标注库，必要时引用主数据库补充，回答内容仅供参考。
-        </p>
+        <p class="badge">入口已合并</p>
+        <h1>正在进入五步释证</h1>
+        <p class="hero-copy">AI 释证已经并入 V2 五步审校，请从同一处选择案例、生成草稿和完成审校。</p>
       </div>
     </header>
 
     <main class="section annotation-page">
-      <section class="card annotation-ai-card">
-        <div class="head-line">
-          <div>
-            <p class="section-kicker">释证台</p>
-            <h2>输入问题或者材料</h2>
-          </div>
-          <a class="page-link page-link-muted" href="./annotation.html">打开人工标注库</a>
-        </div>
-        <p class="model-note">当前模型：DeepSeek V4 Pro</p>
-        <label class="toolbar-field annotation-ai-field">
-          <textarea id="annotationAiInput" rows="5" placeholder="畏为什么可以训为敬？或粘贴一段待解析材料"></textarea>
-        </label>
-        <div class="toolbar-actions">
-          <button id="annotationAiButton" class="page-link toolbar-button" type="button">调用 AI 解析</button>
-          <button id="annotationAiClearButton" class="search-clear toolbar-button" type="button">清空</button>
-        </div>
-        <div id="annotationAiResult" class="annotation-ai-result">尚未解析。</div>
+      <section class="card">
+        <p class="section-kicker">统一入口</p>
+        <h2>进入五步释证</h2>
+        <p>你可以先选一个推荐案例，也可以搜索 V2 工作库中的其他案例。</p>
+        <a class="page-link" href="./annotation-workbench.html">进入五步释证</a>
       </section>
     </main>
 
     <footer class="footer">
-      <p>AI 释证 · 结果仅供参考</p>
+      <p>五步释证 · 案例选择、草稿生成和人工审校在同一处完成</p>
     </footer>
 
-    <script src="./assets/js/utils.js"></script>
-    <script src="./assets/js/ai-annotation.js"></script>
+    <script>
+      window.location.replace('./annotation-workbench.html');
+    </script>
   </body>
 </html>

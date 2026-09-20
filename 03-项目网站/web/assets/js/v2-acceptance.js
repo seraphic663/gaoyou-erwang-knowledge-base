@@ -262,7 +262,7 @@ const V2Acceptance = (() => {
     elements.caseTable.innerHTML = `
       <table class="v2-case-table">
         <thead>
-          <tr><th>案例</th><th>机器状态</th><th>目标典籍</th><th>证据</th><th>人工状态</th></tr>
+          <tr><th>案例</th><th>机器状态</th><th>目标典籍</th><th>证据</th><th>人工状态</th><th>下一步</th></tr>
         </thead>
         <tbody>
           ${items.map((item) => {
@@ -281,6 +281,7 @@ const V2Acceptance = (() => {
                 <td>${escapeHtml(item.target_work || '未明确')}<br /><small>${escapeHtml(statusLabel(item.target_scope?.status || 'uncertain'))}</small></td>
                 <td><div class="v2-evidence-meta">${resolutions || '<span class="v2-resolution-chip unknown">无 evidence</span>'}</div></td>
                 <td><span class="v2-status-chip ${statusClass(item.human_status)}">${escapeHtml(statusLabel(item.human_status))}</span></td>
+                <td><a class="v2-case-row-action" href="./annotation-workbench.html?case=${encodeURIComponent(item.case_id)}">开始五步</a></td>
               </tr>
             `;
           }).join('')}
@@ -292,6 +293,9 @@ const V2Acceptance = (() => {
         setWorkspaceMode('browse');
         selectCase(row.dataset.caseId);
       });
+    });
+    elements.caseTable.querySelectorAll('.v2-case-row-action').forEach((link) => {
+      link.addEventListener('click', (event) => event.stopPropagation());
     });
   }
 

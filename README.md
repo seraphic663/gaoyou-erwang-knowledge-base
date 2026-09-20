@@ -42,7 +42,7 @@ V2 工作流和状态的优先解释见 [00-项目说明/10-V2统一工作流与
   -> 02-数据库/data/annotations.db
   -> 03-项目网站/scripts/annotation_bridge.py
   -> 03-项目网站/data/annotation-snapshot.json
-  -> annotation.html / ai-annotation.html
+  -> annotation.html（旧 AI 入口仅保留兼容跳转）
 ```
 
 V2 统一工作链：
@@ -71,26 +71,30 @@ D:\26大创
 └─ v2/                 V2 schema、Python 实现、测试、工作数据库和审校任务
 ```
 
-根目录只保留跨模块配置和总说明。成员协作先看 `00-项目说明/06-Git协作指南.md`；`00-项目说明/07-标注工作台使用流程.md` 是已退役的本地 JSON 工作台存档；当前从 `03-项目网站/annotation-workbench.html` 进入五步释证审校卡。参与 V2 正式审校前以 `00-项目说明/10-V2统一工作流与数据库状态规范.md` 和 `v2/README.md` 为准。
+根目录只保留跨模块配置和总说明。成员协作先看 `00-项目说明/06-Git协作指南.md`；旧本地 JSON 工作台仅保存在 `00-项目说明/07-标注工作台使用流程.md`。当前从 `03-项目网站/annotation-workbench.html` 进入五步释证审校卡。参与 V2 正式审校前以 `00-项目说明/10-V2统一工作流与数据库状态规范.md` 和 `v2/README.md` 为准。
 
 ## 核心边界
 
 - `02-数据库/` 保留旧数据生产链，用于兼容展示、重建、迁移和对照；其中旧状态值不等于人工审校结论。
 - `03-项目网站/data/` 保存旧展示链的 JSON 快照；V2 页面通过 Python bridge 读取独立的 `annotation_v2.db`。
 - `v2/data/` 是运行数据和审校任务区，不进入 Docker 构建上下文；线上必须通过受控 volume 或显式 `V2_DB_FILE` 提供。
+- 本地默认使用被 Git 忽略的轻量测试库 `v2/data/local_test/annotation_v2.local.db`；Railway 自动使用 volume 下的 `v2/data/real_runs/annotation_v2.db`。需要显式切换时可设置 `V2_DB_MODE=local-test|production` 或 `V2_DB_FILE`。
 - `04-项目文献/` 保留当前参与阅读、标注和释证的材料；`05-归档文献/` 保存大体量扫描件和历史文件。
 - V2 正式人工决定默认只读；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放受任务绑定的 review 写入。五步审计卡使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 开关，不改变案例状态或 gold。
 
 ## 本地运行
 
-需要 Node.js 18+ 和可执行的 Python 3。Windows 若 `python` 指向 Microsoft Store 别名，应先把真实解释器路径写入 `PYTHON_BIN`；V2 bridge 也兼容 `V2_PYTHON_BIN`。
+需要 Node.js 18+ 和可执行的 Python 3。Windows 若 `python`/`python3` 指向 Microsoft Store 别名，V2 bridge 会跳过 9009 失败并尝试常见安装路径；仍可用 `PYTHON_BIN` 或 `V2_PYTHON_BIN` 明确指定解释器。
 
 PowerShell 示例：
 
 ```powershell
 $env:PYTHON_BIN = "C:\path\to\python.exe"
+& $env:PYTHON_BIN v2/scripts/create_local_test_db.py
 npm start
 ```
+
+本地测试库只由 `v2/data/fixtures/` 生成，适合生成五步草稿和保存测试审计记录；不会读取或修改 Railway 生产库。重复运行创建脚本会重建该本地测试库。
 
 启动后访问：
 
@@ -130,4 +134,4 @@ python -B -m unittest discover -s v2/tests -p "test_*.py" -v
 - `dictionary.db`、`annotations.db` 和 `annotation_v2.db` 是三个性质不同的数据库，不再统称“两个数据库”或混写为同一主库。
 - 不提交缓存、journal、临时库和其他生成型中间文件。
 - 大体量文献和 `v2/data/` 不进入容器构建上下文；部署数据通过快照或受控持久卷提供。
-- 改动数据结构、API、部署方式或状态口径时，同步检查根 README、相关目录 README、`00-项目说明/08-规范事实表.md`、`09-当前状态与目标V2对照表.md` 和 `一致性检查.md`。
+- 改动数据结构、API、部署方式或状态口径时，同步检查根 README、相关目录 README、`00-项目说明/08-规范事实表.md`、`00-项目说明/09-当前状态与目标V2对照表.md` 和 `一致性检查.md`。
