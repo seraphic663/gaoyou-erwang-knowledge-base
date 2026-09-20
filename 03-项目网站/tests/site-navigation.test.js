@@ -73,9 +73,10 @@ test('five-step review uses progressive disclosure with evidence on the right', 
   assert.match(css, /\.five-step-audit-page\[data-view-mode="simple"\] \.five-step-engineering-detail/);
 });
 
-test('main navigation is fixed at the upper right on desktop', () => {
+test('main navigation stays in the hero flow and keeps its brand on one line', () => {
   const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
-  assert.match(css, /\.nav\s*\{[\s\S]*position:\s*fixed/);
-  assert.match(css, /\.nav\s*\{[\s\S]*inset:\s*12px 20px auto/);
+  assert.match(css, /\.nav\s*\{[\s\S]*position:\s*relative/);
+  assert.match(css, /\.nav\s*\{[\s\S]*max-width:\s*1100px/);
+  assert.match(css, /\.brand\s*\{[\s\S]*white-space:\s*nowrap/);
   assert.match(css, /\.nav-links\s*\{[\s\S]*position:\s*static/);
 });
