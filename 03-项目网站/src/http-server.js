@@ -6,6 +6,7 @@ const { analyzeWithAnnotationAi } = require('./ai-annotation');
 const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-browser');
 const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
+const { retrieveForCase, retrieveFromCorpus } = require('./v2-retrieval');
 const { getV2ReviewTasks, getV2ReviewTask, submitV2Review } = require('./v2-review');
 const {
   ALLOWED_EFFORTS,
@@ -277,6 +278,34 @@ function createServer() {
         return sendJson(res, 200, payload);
       }
 
+      if (parsedUrl.pathname === '/api/v2/retrieve') {
+        if (req.method !== 'GET') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        const caseId = parsedUrl.query.case_id || '';
+        const limit = Number(parsedUrl.query.limit || 8);
+        if (caseId) {
+          const casePayload = await getV2Acceptance(config, 'case', [caseId]);
+          if (!casePayload?.ok) return sendJson(res, 404, casePayload);
+          const retrieval = await retrieveForCase(config, casePayload, { limit });
+          return sendJson(res, 200, {
+            ...retrieval,
+            case_id: caseId,
+            case_title: casePayload.case_title,
+          });
+        }
+        const query = parsedUrl.query.q || '';
+        const workKey = parsedUrl.query.work_key || '';
+        if (!query.trim()) {
+          return sendJson(res, 400, { ok: false, message: 'case_id_or_query_required' });
+        }
+        return sendJson(res, 200, await retrieveFromCorpus(config, {
+          query,
+          workKey,
+          limit,
+        }));
+      }
+
       if (parsedUrl.pathname === '/api/v2/five-step-draft') {
         if (req.method !== 'POST') {
           return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
@@ -437,6 +466,7 @@ function createServer() {
             output_budget_tokens: body.output_budget_tokens || null,
             review_view_mode: ['simple', 'detailed'].includes(body.review_view_mode) ? body.review_view_mode : 'simple',
             usage: body.usage || null,
+            retrieval_materials: body.retrieval_materials || null,
             ai_draft: aiDraft,
             reviewed_steps: reviewedSteps,
           },

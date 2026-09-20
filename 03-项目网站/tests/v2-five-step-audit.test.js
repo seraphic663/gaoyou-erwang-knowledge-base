@@ -66,6 +66,32 @@ test('sends readable material cards to the model instead of database status fiel
   assert.doesNotMatch(prompt, /quote_check|source_resolution|evidence_index/);
 });
 
+test('passes retrieved canonical passages to the model as supplementary material', () => {
+  const item = sampleCase();
+  item.retrieval_materials = {
+    ok: true,
+    query: '造舟于河',
+    work_key: 'jingyi_shuwen',
+    candidate_count: 1,
+    items: [{
+      document_title: '经义述闻',
+      work_key: 'jingyi_shuwen',
+      section_title: '经义述闻卷一',
+      entry_title: '造舟于河',
+      canonical_status: 'canonical_active',
+      match_reason: '完整短语命中',
+      passage_text: '造舟于河，文义相应。',
+      text_truncated: false,
+    }],
+    trace: { canonical_only: true },
+  };
+  const prompt = buildUserPrompt(buildV2AuditContext(item));
+  assert.match(prompt, /检索到的原文段落/);
+  assert.match(prompt, /造舟于河，文义相应/);
+  assert.match(prompt, /补充当前案例/);
+  assert.doesNotMatch(prompt, /corpus_db|source_document_id/);
+});
+
 test('bounds long prompt fields and marks the omitted portions', () => {
   const item = sampleCase();
   item.target_text = '目'.repeat(PROMPT_LIMITS.targetTextChars + 20);

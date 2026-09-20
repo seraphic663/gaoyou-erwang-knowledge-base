@@ -181,6 +181,56 @@
     return passage?.raw_text || passage?.plain_text || passage?.normalized_text || '';
   }
 
+  function renderRetrievalContext(retrieval) {
+    if (!retrieval || retrieval.ok === false) {
+      return `
+        <article class="five-step-context-block five-step-retrieval-block">
+          <div class="five-step-evidence-ref-head">
+            <h3>四部著作检索</h3>
+            <span class="five-step-evidence-tag">未完成</span>
+          </div>
+          <p class="five-step-context-meta">本次原文检索没有完成，草稿不能把检索结果当作依据。</p>
+          <p class="five-step-context-text">${escapeHtml(retrieval?.message || '暂时无法连接原文库。')}</p>
+        </article>
+      `;
+    }
+    const items = Array.isArray(retrieval.items) ? retrieval.items : [];
+    const trace = retrieval.trace || {};
+    const crossWork = trace.fallback_from_work_key;
+    const heading = crossWork ? '跨作品候选参考' : '四部著作检索';
+    const badge = items.length ? `${items.length} 条候选` : '没有命中';
+    const summary = items.length
+      ? (crossWork
+        ? `当前作品没有直接命中，下面是从其他作品补充找到的候选材料，只作参考。`
+        : '这些原文段落会随当前案例一起提供给五步草稿。')
+      : '本次没有找到可展示的原文段落，草稿不会把不存在的命中写成依据。';
+    return `
+      <article class="five-step-context-block five-step-retrieval-block">
+        <div class="five-step-evidence-ref-head">
+          <h3>${escapeHtml(heading)}</h3>
+          <span class="five-step-evidence-tag">${escapeHtml(badge)}</span>
+        </div>
+        <p class="five-step-context-meta">检索词：${escapeHtml(retrieval.query || '未记录')} · ${escapeHtml(summary)}</p>
+        ${items.length ? `<div class="five-step-retrieval-list">${items.map((material, index) => {
+          const title = material.document_title || material.work_key || '作品未注明';
+          const location = [material.section_title, material.entry_title].filter(Boolean).join(' · ') || '篇目未注明';
+          const text = material.passage_text || '没有可展示的原文。';
+          const referenceLabel = crossWork ? '候选参考' : '原文候选';
+          return `
+            <article class="five-step-retrieval-item">
+              <div class="five-step-evidence-ref-head">
+                <strong>${escapeHtml(referenceLabel)} ${index + 1} · ${escapeHtml(title)}</strong>
+                <span class="five-step-evidence-tag">${escapeHtml(canonicalStatusText(material.canonical_status || 'unknown'))}</span>
+              </div>
+              <p class="five-step-context-meta">${escapeHtml(location)} · ${escapeHtml(material.match_reason || '正文片段命中')}</p>
+              <p class="five-step-context-text">${escapeHtml(text)}</p>
+            </article>
+          `;
+        }).join('')}</div>` : ''}
+      </article>
+    `;
+  }
+
   function renderSourceContext(item) {
     const passage = item.source_passage;
     const provenance = item.provenance || {};
@@ -222,6 +272,7 @@
           target_work: <code>${escapeHtml(item.target_work || 'null')}</code> · target_passage_id: <code>${escapeHtml(item.target_passage_id || 'null')}</code>
         </div>
       </article>
+      ${renderRetrievalContext(item.retrieval_materials)}
       ${relatedCases.length || relatedTerms.length ? `
         <article class="five-step-context-block five-step-related-block">
           <div class="five-step-evidence-ref-head">
@@ -559,6 +610,7 @@
       max_tokens: audit.output_budget_tokens || null,
       generated_at: record.generated_at,
       usage: audit.usage || null,
+      retrieval_materials: audit.retrieval_materials || null,
       draft: Array.isArray(audit.ai_draft) ? audit.ai_draft : [],
       source_audit_id: record.audit_id,
     };
@@ -727,6 +779,10 @@
         }),
       });
       state.generation = response;
+      if (response.retrieval_materials) {
+        state.caseItem.retrieval_materials = response.retrieval_materials;
+        renderSourceContext(state.caseItem);
+      }
       state.editingAuditId = null;
       state.activeStepIndex = 0;
       state.reviewedSteps = response.draft.map((step) => ({
@@ -842,6 +898,7 @@
         output_budget_tokens: state.generation.max_tokens,
         review_view_mode: state.viewMode,
         usage: state.generation.usage,
+        retrieval_materials: state.generation.retrieval_materials || state.caseItem?.retrieval_materials || null,
         ai_draft: state.generation.draft,
         reviewed_steps: state.reviewedSteps,
         overall_decision: el.decision.value,
@@ -881,6 +938,11 @@
     }
     try {
       const item = await requestJson(`/api/v2/case?id=${encodeURIComponent(state.caseId)}`);
+      try {
+        item.retrieval_materials = await requestJson(`/api/v2/retrieve?case_id=${encodeURIComponent(state.caseId)}`);
+      } catch (retrievalError) {
+        item.retrieval_materials = { ok: false, message: retrievalError.message };
+      }
       renderCase(item);
       await loadHistory();
     } catch (error) {

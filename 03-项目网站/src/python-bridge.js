@@ -51,6 +51,7 @@ function runPythonJsonBridge(config, {
   bridgeFile,
   command,
   args = [],
+  dbFile = config.V2_DB_FILE,
   errorLabel = 'Python bridge',
   maxBuffer = 8 * 1024 * 1024,
 }) {
@@ -71,7 +72,7 @@ function runPythonJsonBridge(config, {
 
       execFile(
         candidates[index],
-        [bridgeFile, command, ...args, '--db', config.V2_DB_FILE],
+        [bridgeFile, command, ...args, '--db', dbFile],
         {
           cwd: config.WORKSPACE_ROOT,
           maxBuffer,

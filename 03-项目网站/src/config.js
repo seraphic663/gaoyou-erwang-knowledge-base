@@ -105,6 +105,18 @@ function resolveV2DbFile() {
 
 const V2_DB_FILE = resolveV2DbFile();
 const V2_DB_DIR = path.dirname(V2_DB_FILE);
+
+function resolveV2CorpusDbFile() {
+  const explicit = resolveConfiguredPath(process.env.V2_CORPUS_DB_FILE, ROOT_DIR);
+  if (explicit) return explicit;
+  if (isRailwayRuntime()) return V2_DB_FILE;
+
+  const localCorpus = path.join(WORKSPACE_ROOT, 'v2', 'data', 'real_runs', 'annotation_v2.db');
+  if (fs.existsSync(localCorpus)) return localCorpus;
+  return V2_DB_FILE;
+}
+
+const V2_CORPUS_DB_FILE = resolveV2CorpusDbFile();
 const V2_DB_MODE = String(process.env.V2_DB_MODE || 'auto').trim().toLowerCase();
 const V2_DB_PROFILE = isRailwayRuntime() || V2_DB_MODE === 'production'
   ? 'production'
@@ -132,9 +144,11 @@ module.exports = {
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
   V2_DB_FILE,
   V2_DB_DIR,
+  V2_CORPUS_DB_FILE,
   V2_DB_MODE,
   V2_DB_PROFILE,
   V2_ACCEPTANCE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'v2_acceptance_bridge.py'),
+  V2_RETRIEVAL_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_retrieval_bridge.py'),
   V2_REVIEW_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_review_bridge.py'),
   V2_FIVE_STEP_AUDIT_BRIDGE_FILE: path.join(WORKSPACE_ROOT, 'v2', 'scripts', 'v2_five_step_audit_bridge.py'),
   V2_REVIEW_MANIFEST_FILE: process.env.V2_REVIEW_MANIFEST_FILE

@@ -78,7 +78,7 @@ D:\26大创
 - `02-数据库/` 保留旧数据生产链，用于兼容展示、重建、迁移和对照；其中旧状态值不等于人工审校结论。
 - `03-项目网站/data/` 保存旧展示链的 JSON 快照；V2 页面通过 Python bridge 读取独立的 `annotation_v2.db`。
 - `v2/data/` 是运行数据和审校任务区，不进入 Docker 构建上下文；线上必须通过受控 volume 或显式 `V2_DB_FILE` 提供。
-- 本地默认使用被 Git 忽略的轻量测试库 `v2/data/local_test/annotation_v2.local.db`；Railway 自动使用 volume 下的 `v2/data/real_runs/annotation_v2.db`。需要显式切换时可设置 `V2_DB_MODE=local-test|production` 或 `V2_DB_FILE`。
+- 本地案例默认使用被 Git 忽略的轻量测试库 `v2/data/local_test/annotation_v2.local.db`；如果本地存在四部原典库 `v2/data/real_runs/annotation_v2.db`，检索会自动把它作为原文语料库。Railway 的案例库和原文语料库都自动使用 volume 下的 `v2/data/real_runs/annotation_v2.db`。需要显式切换案例库或原文语料库时分别设置 `V2_DB_FILE` 或 `V2_CORPUS_DB_FILE`。
 - `04-项目文献/` 保留当前参与阅读、标注和释证的材料；`05-归档文献/` 保存大体量扫描件和历史文件。
 - V2 正式人工决定默认只读；只有显式设置 `V2_REVIEW_WRITE_ENABLED=1` 才开放受任务绑定的 review 写入。五步审计卡使用独立的 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=1` 开关，不改变案例状态或 gold。
 
@@ -95,6 +95,8 @@ npm start
 ```
 
 本地测试库只由 `v2/data/fixtures/` 生成，适合生成五步草稿和保存测试审计记录；不会读取或修改 Railway 生产库。重复运行创建脚本会重建该本地测试库。
+
+五步草稿的原文检索是只读的：`GET /api/v2/retrieve?case_id=<V2 case_id>` 会先在当前案例所属作品中查找，再在必要时返回跨作品候选参考；`POST /api/v2/five-step-draft` 会把检索到的原文段落一并交给模型，并在响应中保留检索快照。检索库可通过 `V2_CORPUS_DB_FILE` 指向之后上传的四部著作库。
 
 启动后访问：
 
