@@ -10,6 +10,7 @@ const {
   PROMPT_LIMITS,
   STEPS,
 } = require('../src/v2-five-step-audit');
+const { buildRetrievalQuery } = require('../src/v2-retrieval');
 
 function sampleCase() {
   return {
@@ -90,6 +91,32 @@ test('passes retrieved canonical passages to the model as supplementary material
   assert.match(prompt, /造舟于河，文义相应/);
   assert.match(prompt, /补充当前案例/);
   assert.doesNotMatch(prompt, /corpus_db|source_document_id/);
+});
+
+test('builds a usable query without placeholder or markup noise', () => {
+  assert.equal(
+    buildRetrievalQuery({
+      target_text: '乾師頤坎既濟言勿用',
+      case_title: '[候选壳] 经义述闻 · 乾師頤坎既濟言勿用',
+      terms: [{ source_term: '乾師頤坎既濟言勿用', target_term: '未定' }],
+    }),
+    '乾師頤坎既濟言勿用',
+  );
+  assert.equal(
+    buildRetrievalQuery({
+      target_text: '武有六制 <small>至</small> 後動撚之',
+      terms: [],
+    }),
+    '武有六制 至 後動撚之',
+  );
+  assert.equal(
+    buildRetrievalQuery({
+      target_text: 'dushu_zazhi_0002_candidate',
+      case_title: '[候选壳] 读书杂志 · dushu_zazhi_0002_candidate',
+      terms: [{ source_term: '未定', target_term: '未定' }],
+    }),
+    '',
+  );
 });
 
 test('bounds long prompt fields and marks the omitted portions', () => {

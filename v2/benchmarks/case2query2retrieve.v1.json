@@ -1,0 +1,236 @@
+{
+  "benchmark_id": "case2query2retrieve",
+  "version": "v1",
+  "description": "Evaluate case-to-query construction and canonical passage retrieval/ranking against reviewed source passage IDs.",
+  "corpus_policy": "canonical_active_only",
+  "primary_ranker": "normalized_substring_ranked_with_match_window",
+  "ai_rerank": {
+    "enabled": false,
+    "reason": "Keep lexical retrieval recall and any future AI reranking measurable as separate layers."
+  },
+  "primary_cases": [
+    {
+      "sample_id": "dushu-01",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:dushu_zazhi_0007_candidate",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_0007"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "dushu-02",
+      "evaluation": "primary_recall",
+      "class": "markup_cleaning",
+      "case_id": "candidate-shell:dushu_zazhi_0018_candidate",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_0018"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "dushu-03",
+      "evaluation": "primary_recall",
+      "class": "ambiguous_title",
+      "case_id": "candidate-shell:dushu_zazhi_0143_candidate",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_0143"],
+      "hard_negative_ids": ["dushu_zazhi_0148"]
+    },
+    {
+      "sample_id": "dushu-04",
+      "evaluation": "primary_recall",
+      "class": "long_passage",
+      "case_id": "candidate-shell:dushu_zazhi_3036_candidate",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_3036"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "dushu-05",
+      "evaluation": "primary_recall",
+      "class": "known_case_with_long_hard_negative",
+      "case_id": "candidate-shell:dushu_zazhi_1822_candidate",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_1822"],
+      "hard_negative_ids": ["dushu_zazhi_1815"]
+    },
+    {
+      "sample_id": "guangya-01",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:guangya_shuzheng_0003_candidate",
+      "work_key": "guangya_shuzheng",
+      "gold_passage_ids": ["guangya_shuzheng_0003"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "guangya-02",
+      "evaluation": "primary_recall",
+      "class": "ambiguous_title",
+      "case_id": "candidate-shell:guangya_shuzheng_0005_candidate",
+      "work_key": "guangya_shuzheng",
+      "gold_passage_ids": ["guangya_shuzheng_0005"],
+      "hard_negative_ids": ["guangya_shuzheng_0015", "guangya_shuzheng_0109"]
+    },
+    {
+      "sample_id": "guangya-03",
+      "evaluation": "primary_recall",
+      "class": "ambiguous_title_long_passage",
+      "case_id": "candidate-shell:guangya_shuzheng_0109_candidate",
+      "work_key": "guangya_shuzheng",
+      "gold_passage_ids": ["guangya_shuzheng_0109"],
+      "hard_negative_ids": ["guangya_shuzheng_0005", "guangya_shuzheng_0015"]
+    },
+    {
+      "sample_id": "guangya-04",
+      "evaluation": "primary_recall",
+      "class": "markup_cleaning_long_passage",
+      "case_id": "candidate-shell:guangya_shuzheng_0012_candidate",
+      "work_key": "guangya_shuzheng",
+      "gold_passage_ids": ["guangya_shuzheng_0012"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "guangya-05",
+      "evaluation": "primary_recall",
+      "class": "long_case_title",
+      "case_id": "candidate-shell:guangya_shuzheng_0275_candidate",
+      "work_key": "guangya_shuzheng",
+      "gold_passage_ids": ["guangya_shuzheng_0275"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingyi-01",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:jingyi_shuwen_0004_candidate",
+      "work_key": "jingyi_shuwen",
+      "gold_passage_ids": ["jingyi_shuwen_0004"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingyi-02",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:jingyi_shuwen_0018_candidate",
+      "work_key": "jingyi_shuwen",
+      "gold_passage_ids": ["jingyi_shuwen_0018"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingyi-03",
+      "evaluation": "primary_recall",
+      "class": "long_passage",
+      "case_id": "candidate-shell:jingyi_shuwen_0212_candidate",
+      "work_key": "jingyi_shuwen",
+      "gold_passage_ids": ["jingyi_shuwen_0212"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingyi-04",
+      "evaluation": "primary_recall",
+      "class": "traditional_variant_control_case",
+      "case_id": "candidate-shell:jingyi_shuwen_1103_candidate",
+      "work_key": "jingyi_shuwen",
+      "gold_passage_ids": ["jingyi_shuwen_1103"],
+      "hard_negative_ids": ["jingyi_shuwen_1965"]
+    },
+    {
+      "sample_id": "jingyi-05",
+      "evaluation": "primary_recall",
+      "class": "long_passage",
+      "case_id": "candidate-shell:jingyi_shuwen_1956_candidate",
+      "work_key": "jingyi_shuwen",
+      "gold_passage_ids": ["jingyi_shuwen_1956"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingzhuan-01",
+      "evaluation": "primary_recall",
+      "class": "long_passage",
+      "case_id": "candidate-shell:jingzhuan_shici_0002_candidate",
+      "work_key": "jingzhuan_shici",
+      "gold_passage_ids": ["jingzhuan_shici_0002"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingzhuan-02",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:jingzhuan_shici_0008_candidate",
+      "work_key": "jingzhuan_shici",
+      "gold_passage_ids": ["jingzhuan_shici_0008"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingzhuan-03",
+      "evaluation": "primary_recall",
+      "class": "long_passage",
+      "case_id": "candidate-shell:jingzhuan_shici_0018_candidate",
+      "work_key": "jingzhuan_shici",
+      "gold_passage_ids": ["jingzhuan_shici_0018"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingzhuan-04",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:jingzhuan_shici_0025_candidate",
+      "work_key": "jingzhuan_shici",
+      "gold_passage_ids": ["jingzhuan_shici_0025"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "jingzhuan-05",
+      "evaluation": "primary_recall",
+      "class": "exact_title",
+      "case_id": "candidate-shell:jingzhuan_shici_0034_candidate",
+      "work_key": "jingzhuan_shici",
+      "gold_passage_ids": ["jingzhuan_shici_0034"],
+      "hard_negative_ids": []
+    }
+  ],
+  "diagnostic_controls": [
+    {
+      "sample_id": "control-simplified-query",
+      "evaluation": "diagnostic_variant",
+      "class": "simplified_to_traditional",
+      "mode": "query",
+      "query": "造舟于河",
+      "work_key": "jingyi_shuwen",
+      "gold_passage_ids": ["jingyi_shuwen_1103"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "control-markup-query",
+      "evaluation": "diagnostic_variant",
+      "class": "markup_removed_query",
+      "mode": "query",
+      "query": "武有六制 至 後動撚之",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_0018"],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "control-empty-result",
+      "evaluation": "diagnostic_abstain",
+      "class": "no_match",
+      "mode": "query",
+      "query": "不存在的原典片段甲乙丙",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": [],
+      "hard_negative_ids": []
+    },
+    {
+      "sample_id": "control-unsupported-case-fields",
+      "evaluation": "diagnostic_query_quality",
+      "class": "candidate_id_only",
+      "mode": "case",
+      "case_id": "candidate-shell:dushu_zazhi_1815_candidate",
+      "work_key": "dushu_zazhi",
+      "gold_passage_ids": ["dushu_zazhi_1815"],
+      "hard_negative_ids": [],
+      "expected_query_quality": "unsupported_case_fields"
+    }
+  ]
+}

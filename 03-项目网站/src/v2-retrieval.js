@@ -4,12 +4,31 @@ function unique(values) {
   return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
 }
 
+function cleanQueryValue(value) {
+  return String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isUsableQueryValue(value) {
+  const normalized = cleanQueryValue(value);
+  if (!normalized || Array.from(normalized).length < 2) return false;
+  if (/^(?:未定|未明确|unknown|null|undefined)$/i.test(normalized)) return false;
+  if (/^[a-z0-9_]+_candidate$/i.test(normalized)) return false;
+  return true;
+}
+
 function buildRetrievalQuery(item) {
   const terms = (item?.terms || [])
     .flatMap((term) => [term.source_term, term.target_term])
-    .filter((value) => Array.from(String(value || '').trim()).length >= 2);
+    .map(cleanQueryValue)
+    .filter(isUsableQueryValue);
+  const targetText = cleanQueryValue(item?.target_text);
+  const caseLabel = cleanQueryValue(String(item?.case_title || '').split('·').pop());
   return unique([
-    item?.target_text || item?.case_title,
+    ...(isUsableQueryValue(targetText) ? [targetText] : []),
+    ...(isUsableQueryValue(caseLabel) ? [caseLabel] : []),
     ...terms,
   ]).slice(0, 8).join(' ');
 }
@@ -33,12 +52,30 @@ async function retrieveFromCorpus(config, {
     corpus_db: config.V2_CORPUS_DB_FILE,
     work_key: workKey,
     query: query || '',
+    query_quality: query ? 'usable' : 'empty',
   };
 }
 
 async function retrieveForCase(config, item, { limit = 8 } = {}) {
   const query = buildRetrievalQuery(item);
   const workKey = item?.source_passage?.work_key || item?.target_passage?.work_key || '';
+  if (!query) {
+    return {
+      ok: true,
+      query: '',
+      work_key: workKey,
+      corpus_db: config.V2_CORPUS_DB_FILE,
+      candidate_count: 0,
+      returned_count: 0,
+      items: [],
+      query_quality: 'unsupported_case_fields',
+      trace: {
+        canonical_only: true,
+        reason: 'empty_case_query',
+        query_quality: 'unsupported_case_fields',
+      },
+    };
+  }
   const sameWork = await retrieveFromCorpus(config, { query, workKey, limit });
   if (sameWork.items?.length || !workKey) return sameWork;
 

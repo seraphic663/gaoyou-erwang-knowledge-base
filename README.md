@@ -98,6 +98,8 @@ npm start
 
 五步草稿的原文检索是只读的：`GET /api/v2/retrieve?case_id=<V2 case_id>` 会先在当前案例所属作品中查找，再在必要时返回跨作品候选参考；`POST /api/v2/five-step-draft` 会把检索到的原文段落一并交给模型，并在响应中保留检索快照。检索库可通过 `V2_CORPUS_DB_FILE` 指向之后上传的四部著作库。
 
+检索 benchmark 位于 `v2/benchmarks/case2query2retrieve.v1.json`：20 个案例按四部著作平衡抽样，另有简繁转换、无命中和无效 query 控制样本。`v2/scripts/run_retrieval_benchmark.py` 可对本地或 Railway URL 运行同一套 manifest，输出 Recall@k、MRR、hard negative 和范围违规；v1 只测确定性的 lexical rank，不把 AI rerank 混入基础召回指标。
+
 启动后访问：
 
 ```text

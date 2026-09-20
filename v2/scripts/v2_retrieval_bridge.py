@@ -89,6 +89,7 @@ def retrieve(
             "query": normalized_query,
             "work_key": work_key,
             "candidate_count": 0,
+            "returned_count": 0,
             "items": [],
             "trace": {"canonical_only": True, "reason": "empty_query"},
         }
@@ -144,7 +145,7 @@ def retrieve(
                 score += 100 + min(len(token), 12)
                 reasons.append("完整短语命中" if direct_text else "简繁字形转换后命中")
             if direct_title or variant_title:
-                score += 40
+                score += 140 + min(len(token), 12)
                 reasons.append("篇目标题命中")
         if not reasons:
             reasons.append("正文片段命中")
