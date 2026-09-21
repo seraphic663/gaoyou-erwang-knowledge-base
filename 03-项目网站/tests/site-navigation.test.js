@@ -82,6 +82,7 @@ test('five-step review uses progressive disclosure with evidence on the right', 
   assert.match(script, /review_view_mode/);
   assert.match(css, /\.five-step-audit-page\[data-view-mode="simple"\] \.five-step-engineering-detail/);
   assert.match(css, /\.five-step-step-nav\s*\{[\s\S]*display:\s*flex/);
+  assert.match(html, /assets\/js\/five-step-audit\.js\?v=v8/);
 });
 
 test('the retired freeform AI entry redirects into the unified five-step workspace', () => {

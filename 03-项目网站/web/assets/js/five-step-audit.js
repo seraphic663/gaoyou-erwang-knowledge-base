@@ -139,7 +139,7 @@
     };
 
     lines.forEach((line) => {
-      const trimmed = line.trim();
+      const trimmed = safeTrim(line);
       if (!trimmed) {
         flushParagraph();
         flushList();
@@ -155,7 +155,7 @@
           listType = nextType;
           listStart = ordered ? Number(ordered[1]) : 1;
         }
-        listItems.push((ordered || unordered)[2].trim());
+        listItems.push(safeTrim((ordered || unordered)[2]));
         return;
       }
       flushList();
@@ -167,7 +167,7 @@
   }
 
   function humanStatus(value) {
-    const raw = String(value || '').trim();
+    const raw = safeTrim(value);
     return RAW_STATUS_LABELS[raw] || raw || '未记录';
   }
 
@@ -218,7 +218,7 @@
   }
 
   function snippet(value, limit = 180) {
-    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    const text = safeTrim(String(value ?? '').replace(/\s+/g, ' '));
     return text.length > limit ? `${text.slice(0, limit)}…` : text;
   }
 
@@ -738,9 +738,9 @@
   }
 
   function managementActor() {
-    const current = String(el.reviewer?.value || '').trim();
+    const current = safeTrim(el.reviewer?.value);
     if (current) return current;
-    return String(window.prompt('请输入本次操作人姓名或 reviewer ID：') || '').trim();
+    return safeTrim(window.prompt('请输入本次操作人姓名或 reviewer ID：'));
   }
 
   function newOperationId(prefix) {

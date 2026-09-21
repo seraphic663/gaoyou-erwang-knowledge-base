@@ -44,3 +44,11 @@ function runMalformedReviewState() {
 test('does not crash when a legacy review state has missing text fields', () => {
   assert.doesNotThrow(runMalformedReviewState);
 });
+
+test('does not leave naked trim calls in the five-step client', () => {
+  const withoutSafeTrim = CLIENT_SOURCE.replace(
+    /function safeTrim\(value\) \{[\s\S]*?\n  \}/,
+    '',
+  );
+  assert.doesNotMatch(withoutSafeTrim, /\.trim\(\)/);
+});
