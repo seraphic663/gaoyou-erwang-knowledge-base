@@ -63,12 +63,13 @@ test('builds only the selected V2 case context and keeps source uncertainty visi
 });
 
 test('keeps the homepage five-step vocabulary and asks for a clear readable structure', () => {
-  assert.equal(PROMPT_VERSION, 'v2-five-step-audit.v7');
+  assert.equal(PROMPT_VERSION, 'v2-five-step-audit.v8');
   assert.deepEqual(STEPS.map((step) => step.label), ['发疑', '设问', '取证', '释理', '结论']);
   const prompt = buildUserPrompt(buildV2AuditContext(sampleCase()));
   assert.match(prompt, /首页五步/);
   assert.match(prompt, /1\. …/);
-  assert.match(prompt, /第一句必须是明确的完整判断/);
+  assert.match(prompt, /结论第一句直接给判断/);
+  assert.match(prompt, /一条总论证/);
   assert.match(buildSystemPrompt(), /不得依据常识补出姓名/);
 });
 
