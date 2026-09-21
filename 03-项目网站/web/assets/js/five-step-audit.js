@@ -100,6 +100,10 @@
     })[char]);
   }
 
+  function safeTrim(value) {
+    return String(value ?? '').trim();
+  }
+
   function renderInlineMarkdown(value) {
     let html = escapeHtml(value);
     html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
@@ -391,17 +395,18 @@
     const requestId = ++state.chooserRequestId;
     const target = recommended ? el.recommended : el.chooserResults;
     if (!target) return;
+    const searchQuery = safeTrim(query);
     target.innerHTML = '<p class="compact-note">正在读取可审校案例……</p>';
     if (el.chooserStatus && !recommended) el.chooserStatus.textContent = '';
     try {
       const params = new URLSearchParams({ page: '1', pageSize: '6' });
-      if (query.trim()) params.set('q', query.trim());
+      if (searchQuery) params.set('q', searchQuery);
       const payload = await requestJson(`/api/v2/cases?${params.toString()}`);
       if (requestId !== state.chooserRequestId) return;
       const items = Array.isArray(payload.items) ? payload.items : [];
       renderCaseChooserItems(target, items);
       if (el.chooserStatus && !recommended) {
-        el.chooserStatus.textContent = query.trim()
+        el.chooserStatus.textContent = searchQuery
           ? `找到 ${payload.total || items.length} 条案例，当前显示前 ${items.length} 条。`
           : `当前工作库共有 ${payload.total || items.length} 条案例，当前显示前 ${items.length} 条。`;
       }
@@ -589,10 +594,10 @@
   }
 
   function updateSaveButton() {
-    const reviewer = el.reviewer?.value.trim() || '';
+    const reviewer = safeTrim(el.reviewer?.value);
     const decisionsComplete = state.reviewedSteps.length === STEP_DEFINITIONS.length
-      && state.reviewedSteps.every((step) => step.status !== 'pending' && step.text.trim()
-        && (!['edited', 'question'].includes(step.status) || step.comment.trim()));
+      && state.reviewedSteps.every((step) => step.status !== 'pending' && safeTrim(step.text)
+        && (!['edited', 'question'].includes(step.status) || safeTrim(step.comment)));
     const writeReady = state.writeEnabled && state.writeArmed;
     el.save.disabled = !writeReady || !state.generation || !reviewer || !decisionsComplete || state.saving;
     renderProgress();
@@ -935,7 +940,7 @@
       ? {
         audit_id: editingAuditId,
         case_id: state.caseId,
-        reviewer: el.reviewer.value.trim(),
+        reviewer: safeTrim(el.reviewer?.value),
         operation_id: operationId,
         reviewed_steps: state.reviewedSteps,
         overall_decision: el.decision.value,
@@ -943,7 +948,7 @@
       }
       : {
         case_id: state.caseId,
-        reviewer: el.reviewer.value.trim(),
+        reviewer: safeTrim(el.reviewer?.value),
         operation_id: operationId,
         case_fingerprint: state.generation.case_fingerprint,
         model_requested: state.generation.model_requested,
