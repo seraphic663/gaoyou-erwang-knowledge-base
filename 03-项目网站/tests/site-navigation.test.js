@@ -72,10 +72,16 @@ test('five-step review uses progressive disclosure with evidence on the right', 
   assert.match(html, /<option value="reviewed">认可<\/option>/);
   assert.match(html, /<option value="needs_revision">修改<\/option>/);
   assert.match(html, /<option value="uncertain">存疑<\/option>/);
+  assert.match(html, /aria-label="发疑、设问、取证、释理、结论"/);
   assert.match(script, /five-step-evidence-panel/);
+  assert.match(script, /renderMarkdownLite/);
+  assert.match(script, /label: '发疑'/);
+  assert.match(script, /label: '释理'/);
+  assert.doesNotMatch(script, /five-step-step-nav-status/);
   assert.match(script, /认可/);
   assert.match(script, /review_view_mode/);
   assert.match(css, /\.five-step-audit-page\[data-view-mode="simple"\] \.five-step-engineering-detail/);
+  assert.match(css, /\.five-step-step-nav\s*\{[\s\S]*display:\s*flex/);
 });
 
 test('the retired freeform AI entry redirects into the unified five-step workspace', () => {

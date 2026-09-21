@@ -9,6 +9,7 @@ const { getV2Acceptance } = require('./v2-acceptance');
 const { retrieveForCase, retrieveFromCorpus } = require('./v2-retrieval');
 const { getV2ReviewTasks, getV2ReviewTask, submitV2Review } = require('./v2-review');
 const {
+  ACCEPTED_PROMPT_VERSIONS,
   ALLOWED_EFFORTS,
   ALLOWED_MODELS,
   PROMPT_VERSION,
@@ -417,7 +418,7 @@ function createServer() {
         }
         if (!ALLOWED_MODELS.has(body.model_requested)
           || !ALLOWED_EFFORTS.has(body.reasoning_effort)
-          || body.prompt_version !== PROMPT_VERSION
+          || !ACCEPTED_PROMPT_VERSIONS.has(String(body.prompt_version || ''))
           || !String(body.model_returned || '').trim()
           || !String(body.generated_at || '').trim()) {
           return sendJson(res, 400, { ok: false, message: 'model_effort_prompt_version_and_generation_time_required' });

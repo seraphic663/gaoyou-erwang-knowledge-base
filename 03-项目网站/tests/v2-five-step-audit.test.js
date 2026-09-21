@@ -2,12 +2,14 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const {
   buildV2AuditContext,
+  buildSystemPrompt,
   buildUserPrompt,
   fingerprintV2Case,
   generateFiveStepDraft,
   normalizeDraft,
   OUTPUT_TOKEN_BUDGETS,
   PROMPT_LIMITS,
+  PROMPT_VERSION,
   STEPS,
 } = require('../src/v2-five-step-audit');
 const { buildRetrievalQuery } = require('../src/v2-retrieval');
@@ -58,6 +60,16 @@ test('builds only the selected V2 case context and keeps source uncertainty visi
   assert.equal(context.evidences[0].quote_check, 'unchecked');
   assert.equal(context.evidences[0].source_passage.canonical_status, 'unknown');
   assert.equal(context.evidences.length, 1);
+});
+
+test('keeps the homepage five-step vocabulary and asks for a clear readable structure', () => {
+  assert.equal(PROMPT_VERSION, 'v2-five-step-audit.v7');
+  assert.deepEqual(STEPS.map((step) => step.label), ['发疑', '设问', '取证', '释理', '结论']);
+  const prompt = buildUserPrompt(buildV2AuditContext(sampleCase()));
+  assert.match(prompt, /首页五步/);
+  assert.match(prompt, /1\. …/);
+  assert.match(prompt, /第一句必须是明确的完整判断/);
+  assert.match(buildSystemPrompt(), /不得依据常识补出姓名/);
 });
 
 test('sends readable material cards to the model instead of database status fields', () => {

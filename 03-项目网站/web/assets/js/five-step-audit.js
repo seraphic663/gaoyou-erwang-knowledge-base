@@ -1,9 +1,9 @@
 (() => {
   const STEP_DEFINITIONS = [
-    { field: 'problem_discovery', label: '问题发现' },
-    { field: 'research_question', label: '研究问题' },
-    { field: 'evidence_collection', label: '证据收集' },
-    { field: 'reasoning', label: '推理' },
+    { field: 'problem_discovery', label: '发疑' },
+    { field: 'research_question', label: '设问' },
+    { field: 'evidence_collection', label: '取证' },
+    { field: 'reasoning', label: '释理' },
     { field: 'conclusion', label: '结论' },
   ];
   const STATUS_LABELS = {
@@ -100,6 +100,68 @@
     })[char]);
   }
 
+  function renderInlineMarkdown(value) {
+    let html = escapeHtml(value);
+    html = html.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+    html = html.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__([^_\n]+)__/g, '<strong>$1</strong>');
+    html = html.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+    return html;
+  }
+
+  // Deliberately small and safe Markdown subset for AI/user prose. Raw HTML,
+  // links, tables, and code fences stay escaped instead of becoming markup.
+  function renderMarkdownLite(value) {
+    const lines = String(value ?? '').replace(/\r\n?/g, '\n').split('\n');
+    const blocks = [];
+    let paragraph = [];
+    let listType = '';
+    let listStart = 1;
+    let listItems = [];
+
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      blocks.push(`<p>${paragraph.map((line) => renderInlineMarkdown(line)).join('<br />')}</p>`);
+      paragraph = [];
+    };
+    const flushList = () => {
+      if (!listItems.length) return;
+      const tag = listType === 'ordered' ? 'ol' : 'ul';
+      const start = tag === 'ol' && listStart !== 1 ? ` start="${listStart}"` : '';
+      blocks.push(`<${tag}${start}>${listItems.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join('')}</${tag}>`);
+      listType = '';
+      listStart = 1;
+      listItems = [];
+    };
+
+    lines.forEach((line) => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        flushList();
+        return;
+      }
+      const ordered = trimmed.match(/^(\d+)[.)]\s+(.+)$/);
+      const unordered = trimmed.match(/^[-*•]\s+(.+)$/);
+      if (ordered || unordered) {
+        flushParagraph();
+        const nextType = ordered ? 'ordered' : 'unordered';
+        if (listType && listType !== nextType) flushList();
+        if (!listType) {
+          listType = nextType;
+          listStart = ordered ? Number(ordered[1]) : 1;
+        }
+        listItems.push((ordered || unordered)[2].trim());
+        return;
+      }
+      flushList();
+      paragraph.push(trimmed);
+    });
+    flushParagraph();
+    flushList();
+    return blocks.join('');
+  }
+
   function humanStatus(value) {
     const raw = String(value || '').trim();
     return RAW_STATUS_LABELS[raw] || raw || '未记录';
@@ -154,10 +216,6 @@
   function snippet(value, limit = 180) {
     const text = String(value || '').replace(/\s+/g, ' ').trim();
     return text.length > limit ? `${text.slice(0, limit)}…` : text;
-  }
-
-  function viewModeLabel() {
-    return VIEW_MODES[state.viewMode] || VIEW_MODES.simple;
   }
 
   function effortLabel(value) {
@@ -416,12 +474,11 @@
     if (!el.stepNav) return;
     el.stepNav.innerHTML = STEP_DEFINITIONS.map(({ field, label }, index) => {
       const reviewed = state.reviewedSteps[index] || { status: 'pending' };
-      const status = STATUS_LABELS[reviewed.status] || '待审';
       const current = index === state.activeStepIndex;
       const complete = reviewed.status !== 'pending';
-      return `<button type="button" class="five-step-step-nav-button${current ? ' is-current' : ''}${complete ? ' is-complete' : ''}" data-five-step-nav="${index}" aria-current="${current ? 'step' : 'false'}">
+      return `<button type="button" class="five-step-step-nav-button${current ? ' is-current' : ''}${complete ? ' is-complete' : ''}" data-five-step-nav="${index}" aria-current="${current ? 'step' : 'false'}" aria-label="${escapeHtml(`${label}${complete ? '，已完成' : ''}`)}">
         <span class="five-step-step-nav-number">0${index + 1}</span>
-        <span><span class="five-step-step-nav-label">${escapeHtml(label)}</span><span class="five-step-step-nav-status">${escapeHtml(status)}</span></span>
+        <span class="five-step-step-nav-label">${escapeHtml(label)}</span>
       </button>`;
     }).join('');
   }
@@ -436,7 +493,6 @@
       const questions = draft.review_questions?.length
         ? `<ul>${draft.review_questions.map((question) => `<li>${escapeHtml(question)}</li>`).join('')}</ul>`
         : '<p class="compact-note">这一步暂时没有单独的待核问题。</p>';
-      const status = STATUS_LABELS[reviewed.status] || '待审';
       const showHumanFields = ['edited', 'question'].includes(reviewed.status);
       const decisionLabels = { accepted: '认可', edited: '修改', question: '存疑' };
       const decisionTitles = {
@@ -460,13 +516,13 @@
         <details class="five-step-step" data-step-field="${escapeHtml(field)}"${index === state.activeStepIndex ? ' open' : ''}>
           <summary>
             <span class="five-step-step-number">0${index + 1}</span>
-            <span class="five-step-step-summary-label"><span class="five-step-step-summary-title" role="heading" aria-level="3">${escapeHtml(label)}</span><span class="five-step-step-status ${escapeHtml(reviewed.status)}">${escapeHtml(status)}</span></span>
+            <span class="five-step-step-summary-label"><span class="five-step-step-summary-title" role="heading" aria-level="3">${escapeHtml(label)}</span></span>
           </summary>
           <div class="five-step-step-body">
             <div class="five-step-step-grid">
               <div>
                 <p class="section-kicker">AI 生成内容</p>
-                <div class="five-step-ai-draft"><p>${escapeHtml(draft.text || 'AI 没有生成这一步的文字。')}</p></div>
+                <div class="five-step-ai-draft">${renderMarkdownLite(draft.text || 'AI 没有生成这一步的文字。')}</div>
                 <details class="five-step-review-questions">
                   <summary>需要再核对 · ${draft.review_questions?.length || 0} 条</summary>
                   ${questions}
@@ -509,8 +565,8 @@
     if (!el.progress) return;
     const reviewed = state.reviewedSteps.filter((step) => step.status !== 'pending').length;
     el.progress.textContent = state.reviewedSteps.length
-      ? `${reviewed}/${STEP_DEFINITIONS.length} 已完成 · ${viewModeLabel()}`
-      : '尚未开始审校';
+      ? `${reviewed}/${STEP_DEFINITIONS.length}`
+      : '0/5';
   }
 
   function applyViewMode(mode = state.viewMode) {
@@ -589,8 +645,8 @@
           ${finalSteps.map((step, index) => `
             <div class="five-step-history-step">
               <strong>${escapeHtml(STEP_DEFINITIONS[index]?.label || step.field)} · ${escapeHtml(STATUS_LABELS[step.status] || step.status)}</strong>
-              <p>${escapeHtml(step.text)}</p>
-              ${step.comment ? `<p class="five-step-context-meta">审校意见：${escapeHtml(step.comment)}</p>` : ''}
+              <div class="five-step-history-markdown">${renderMarkdownLite(step.text)}</div>
+              ${step.comment ? `<div class="five-step-context-meta">审校意见：${renderMarkdownLite(step.comment)}</div>` : ''}
             </div>
           `).join('')}
         </details>
