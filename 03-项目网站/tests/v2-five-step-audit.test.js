@@ -70,7 +70,9 @@ test('keeps the homepage five-step vocabulary and asks for a clear readable stru
   assert.match(prompt, /1\. …/);
   assert.match(prompt, /结论第一句直接给判断/);
   assert.match(prompt, /一条总论证/);
-  assert.match(buildSystemPrompt(), /不得依据常识补出姓名/);
+  const systemPrompt = buildSystemPrompt();
+  assert.match(systemPrompt, /不得依据常识补出姓名/);
+  assert.doesNotMatch(systemPrompt, /毛传|家大人|有亦取|芣苡|瞻卬/);
 });
 
 test('sends readable material cards to the model instead of database status fields', () => {
