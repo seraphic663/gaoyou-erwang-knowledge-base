@@ -7,7 +7,7 @@
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
 - 首页“数据库”入口提供主数据库、人工标注库、V2 工作库三个选项；三库仍独立存储。
 - 数据库页：统一浏览主库字词、案例和数据库结构。
-- V2 工作库：`v2-database.html` 是完整案例库和质量报告入口；`annotation-workbench.html` 无参数时提供轻量案例选择器，有 `case` 参数时进入单案例五步审校。旧 `v2-acceptance.html` 只保留兼容跳转。Railway 的案例库自动读取 volume 下的 `v2/data/real_runs/annotation_v2.db`；本地案例默认读取被忽略的 `v2/data/local_test/annotation_v2.local.db`，若本地存在 `v2/data/real_runs/annotation_v2.db`，原文检索会自动使用它作为四部著作语料库。之后上传其他语料库时可用 `V2_CORPUS_DB_FILE` 指定；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立开关。
+- V2 工作库：`v2-database.html` 是完整案例库和质量报告入口；`annotation-workbench.html` 无参数时提供轻量案例选择器，有 `case` 参数时进入单案例五步审校。旧 `v2-acceptance.html` 只保留兼容跳转。Railway 的案例库自动读取 volume 下的 `v2/data/real_runs/annotation_v2.db`；本地案例默认读取被忽略的 `v2/data/local_test/annotation_v2.local.db`，若本地存在 `v2/data/real_runs/annotation_v2.db`，原文检索会自动使用它作为四部著作语料库。正文检索的作品范围固定显示为“四部著作”总库和四部作品的单独范围，不把 external candidate 文档伪装成作品选项。之后上传其他语料库时可用 `V2_CORPUS_DB_FILE` 指定；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立开关。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
 - 五步释证：无 `case` 参数时先在页面内选择案例；选中 V2 案例后生成 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。Railway 默认保持只读，本地测试库默认允许保存；仍可用 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=0` 显式关闭。
 - AI 释证：旧的一次性接口仍保留供兼容调用；`ai-annotation.html` 现在跳转到五步释证，网站主流程统一从 V2 案例开始。

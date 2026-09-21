@@ -314,6 +314,11 @@ const V2Acceptance = (() => {
     jingzhuan_shici: '《经传释词》',
   };
 
+  const passageWorkOptions = [
+    { value: 'all', label: '四部著作' },
+    ...Object.entries(passageWorkLabels).map(([value, label]) => ({ value, label })),
+  ];
+
   function passageWorkLabel(workKey) {
     return passageWorkLabels[String(workKey || '')] || text(workKey, '作品未注明');
   }
@@ -397,9 +402,13 @@ const V2Acceptance = (() => {
 
   function populatePassageWorkFilter() {
     if (!elements.passageWork) return;
-    const values = (state.summary?.sources || []).map((source) => source.work_key).filter(Boolean);
-    elements.passageWork.innerHTML = '<option value="all">四部著作</option>' + values
-      .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(passageWorkLabel(value))}</option>`).join('');
+    const [allOption, ...singleWorks] = passageWorkOptions;
+    elements.passageWork.innerHTML = `
+      <option value="${escapeHtml(allOption.value)}">${escapeHtml(allOption.label)}</option>
+      <optgroup label="单独选择">
+        ${singleWorks.map((option) => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`).join('')}
+      </optgroup>
+    `;
   }
 
   function renderPassage(passage, label) {
