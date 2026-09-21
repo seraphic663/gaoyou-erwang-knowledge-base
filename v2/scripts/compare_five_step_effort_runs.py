@@ -160,6 +160,8 @@ def build_report(baseline_dir: Path, candidate_dir: Path, baseline: list[dict[st
     case_id = load_run(candidate_dir, "none").get("case_id")
     baseline_version = baseline[0].get("prompt_version") if baseline else "unknown"
     candidate_version = candidate[0].get("prompt_version") if candidate else "unknown"
+    baseline_label = baseline_version.rsplit('.', 1)[-1] if baseline_version else "baseline"
+    candidate_label = candidate_version.rsplit('.', 1)[-1] if candidate_version else "candidate"
     by_effort = {row["effort"]: row for row in candidate}
     baseline_by_effort = {row["effort"]: row for row in baseline}
     lines = [
@@ -174,9 +176,9 @@ def build_report(baseline_dir: Path, candidate_dir: Path, baseline: list[dict[st
         "",
         markdown_table(candidate),
         "",
-        "## 与 v4 的逐 effort 对比",
+        f"## 与 {baseline_label} 的逐 effort 对比",
         "",
-        "| effort | v4 decisive | v5 decisive | v4 conclusion chars | v5 conclusion chars | v4 questions | v5 questions | v5 新增风险 |",
+        f"| effort | {baseline_label} decisive | {candidate_label} decisive | {baseline_label} conclusion chars | {candidate_label} conclusion chars | {baseline_label} questions | {candidate_label} questions | {candidate_label} 新增风险 |",
         "|---|---:|---:|---:|---:|---:|---:|---|",
     ]
     for effort in EFFORTS:
@@ -201,22 +203,22 @@ def build_report(baseline_dir: Path, candidate_dir: Path, baseline: list[dict[st
         lines.extend([
             f"### {effort}",
             "",
-            "**v4：**",
+            f"**{baseline_label}：**",
             "",
             old["conclusion"],
             "",
-            "**v5：**",
+            f"**{candidate_label}：**",
             "",
             new["conclusion"],
             "",
             f"gold cues：{', '.join(key for key, value in new['gold_cues'].items() if value)}。",
-            f"v5 结论先给主张再给边界：{'是' if new['decisive']['claim_before_boundary'] else '否'}；工程字段泄漏：{'有' if new['decisive']['engineering_language'] else '无'}。",
+            f"{candidate_label} 结论先给主张再给边界：{'是' if new['decisive']['claim_before_boundary'] else '否'}；工程字段泄漏：{'有' if new['decisive']['engineering_language'] else '无'}。",
             "",
         ])
     lines.extend([
         "## 解释",
         "",
-        "v5 的目标不是让模型把未核验的原典说成已核验，而是把“材料明确记载的作者主张”和“项目尚未完成的独立核验”拆开。因而“有亦取也”应先作为王氏所载判断直接写出，随后再交代版本边界。",
+        f"{candidate_label} 的目标不是让模型把未核验的原典说成已核验，而是把“材料明确记载的作者主张”和“项目尚未完成的独立核验”拆开。因而材料明确给出的主张应先直接写出，随后再交代版本边界。",
         "",
         "若出现“家大人（王念孙）”而材料本身没有具名，这属于新增无据身份信息；应在下一版 prompt 中明确禁止自行补名，保留“家大人”或“材料所称家大人”。",
     ])

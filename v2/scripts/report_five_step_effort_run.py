@@ -70,7 +70,7 @@ def build_report(run_dir: Path) -> str:
     model = payloads["none"].get("model_returned") or payloads["none"].get("model_requested") or "—"
 
     lines = [
-        "# v5 prompt 四 effort 细致对比",
+        f"# {prompt_version} 四 effort 细致对比",
         "",
         f"- 案例：`{case_id}`",
         f"- prompt：`{prompt_version}`",
