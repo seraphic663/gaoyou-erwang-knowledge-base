@@ -50,12 +50,13 @@ def retrieval_summary(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 def effort_interpretation(effort: str, metrics: dict[str, Any]) -> str:
+    question_count = metrics["review_question_count"]
     if effort == "none":
-        return "最短且已经完成核心任务：直接说出“有”训“取”，同时保留版本核验边界；每步只有 2 个待核问题，适合快速初筛。它没有显式 reasoning token，解释链仍然足够，但细节最少。"
+        return f"最短且已经完成核心任务：直接说出“有”训“取”，同时保留版本核验边界；共 {question_count} 个待核问题，适合快速初筛。它没有显式 reasoning token，解释链仍然足够，但细节最少。"
     if effort == "low":
-        return "四档中最紧凑的完整版本：五步均覆盖 gold，结论字数最短，但从设问到章次、书证的连接完整。它把人工问题扩展到每步 3 个，适合日常审校和控制成本。"
+        return f"四档中最紧凑的版本：结论短，能把设问、书证和章次连起来，共 {question_count} 个待核问题，适合日常审校和控制成本。"
     if effort == "high":
-        return "细节与克制的平衡最好：取证和释理比 low 更展开，仍只使用材料中的“家大人”称谓，没有新增身份事实。它适合作为默认审校 effort。"
+        return f"细节与克制的平衡最好：取证和释理展开充分，共 {question_count} 个待核问题，仍只使用材料中的“家大人”称谓，没有新增身份事实。它适合作为默认审校 effort。"
     risk = "出现材料未具名的“家大人（王念孙）”身份补全；按本项目证据边界，这是新增无据信息。"
     return f"输出最长、推理 token 最多，能把词汇、对文和章次拆得最细；但有一项明确回归风险：{risk} max 不应因更有时间思考就引入材料外知识。"
 
@@ -98,9 +99,11 @@ def build_report(run_dir: Path) -> str:
             f"{'有' if metric['engineering_language'] else '无'} | "
             f"{'有' if metric['unsupported_identity_risk'] else '无'} |"
         )
+    gold_counts = {effort: sum(cues[effort].values()) for effort in EFFORTS}
+    gold_summary = "；".join(f"{effort} {gold_counts[effort]}/8" for effort in EFFORTS)
     lines.extend([
         "",
-        "解释：四档都达到 8/8 gold，说明 v5 已经解决了 v4 none 的“核心判断被边界说明压住”问题。但 8/8 只是召回指标；max 的身份补全说明，召回高并不代表没有新增无据事实。",
+        f"解释：本次 gold 召回为 {gold_summary}。gold 只是核心点召回指标；即使召回较高，也仍需检查是否有遗漏或新增无据事实。",
         "",
         "## 3. gold 核心点逐项检查",
         "",
