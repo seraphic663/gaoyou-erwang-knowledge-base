@@ -38,7 +38,7 @@
 
 两个库物理独立，架构统一：共享 `lib/` 工具层，产物统一放在 `data/`。
 
-它们与 V2 的关系是：`dictionary.db` 和 `annotations.db` 都可以通过适配器进入 `v2/data/real_runs/annotation_v2.db`，但迁移只保留和规范机器材料，不会把旧 `草稿`、`确定`、`已校对` 等字段自动解释为人工审核。V2 的机器状态、人工状态和 lifecycle 以 `00-项目说明/10-V2统一工作流与数据库状态规范.md` 为准。
+它们与 V2 的关系是：`dictionary.db` 和 `annotations.db` 都可以通过适配器进入 `v2/data/real_runs/annotation_v2.db`，但迁移只保留和规范机器材料，不会把旧 `草稿`、`确定`、`已校对` 等字段自动解释为人工审核。V2 的机器状态、人工状态和 lifecycle 以 `00-项目说明/03-工程、文件包与V2规范.md` 为准。
 
 ## 主库数据链路
 
