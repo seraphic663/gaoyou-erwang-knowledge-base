@@ -24,6 +24,11 @@ node_modules/
 # ---- Personal notes not for repo ----
 note/
 
+# ---- Local analysis / external source workspaces ----
+tmp/
+daizhigev20/
+00-项目说明/archive/
+
 # ---- Archive literature (large PDFs, not for repo) ----
 05-归档文献/*
 !05-归档文献/README.md
