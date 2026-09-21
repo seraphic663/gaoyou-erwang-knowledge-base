@@ -296,6 +296,7 @@ function createServer() {
         }
         const query = parsedUrl.query.q || '';
         const workKey = parsedUrl.query.work_key || '';
+        const includeCases = ['1', 'true', 'yes'].includes(String(parsedUrl.query.include_cases || '').toLowerCase());
         if (!query.trim()) {
           return sendJson(res, 400, { ok: false, message: 'case_id_or_query_required' });
         }
@@ -303,6 +304,7 @@ function createServer() {
           query,
           workKey,
           limit,
+          includeCases,
         }));
       }
 

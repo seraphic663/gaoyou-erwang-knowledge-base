@@ -74,12 +74,97 @@ def excerpt_around_match(text: str, tokens: list[str], limit: int = 2400) -> tup
     return f"{prefix}{text[start:end]}{suffix}", True
 
 
+def attach_related_cases(
+    connection: sqlite3.Connection,
+    items: list[dict[str, Any]],
+) -> None:
+    """Attach lightweight V2 case links without exposing case JSON.
+
+    Passage retrieval remains the ranked operation.  The case links are only
+    a navigation aid for the website: a passage can be linked from a case's
+    source passage, an evidence passage, or both.
+    """
+    passage_ids = [str(item.get("passage_id") or "") for item in items if item.get("passage_id")]
+    if not passage_ids:
+        return
+    tables = {
+        str(row[0])
+        for row in connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('annotation_cases', 'annotation_evidences')"
+        ).fetchall()
+    }
+    if "annotation_cases" not in tables:
+        return
+
+    placeholders = ",".join("?" for _ in passage_ids)
+    if "annotation_evidences" in tables:
+        rows = connection.execute(
+            f"""
+            SELECT c.case_id, c.case_title, c.source_work, c.target_work, c.target_text,
+                   c.machine_status, c.human_status, c.source_passage_id,
+                   e.passage_id AS evidence_passage_id
+            FROM annotation_cases c
+            LEFT JOIN annotation_evidences e ON e.case_id = c.case_id
+            WHERE c.source_passage_id IN ({placeholders})
+               OR e.passage_id IN ({placeholders})
+            ORDER BY c.case_title, c.case_id
+            """,
+            [*passage_ids, *passage_ids],
+        ).fetchall()
+    else:
+        rows = connection.execute(
+            f"""
+            SELECT c.case_id, c.case_title, c.source_work, c.target_work, c.target_text,
+                   c.machine_status, c.human_status, c.source_passage_id,
+                   NULL AS evidence_passage_id
+            FROM annotation_cases c
+            WHERE c.source_passage_id IN ({placeholders})
+            ORDER BY c.case_title, c.case_id
+            """,
+            passage_ids,
+        ).fetchall()
+
+    related: dict[str, dict[str, dict[str, Any]]] = {passage_id: {} for passage_id in passage_ids}
+    for row in rows:
+        record = dict(row)
+        case_id = str(record.get("case_id") or "")
+        if not case_id:
+            continue
+        for passage_id in passage_ids:
+            roles: list[str] = []
+            if record.get("source_passage_id") == passage_id:
+                roles.append("source_passage")
+            if record.get("evidence_passage_id") == passage_id:
+                roles.append("evidence")
+            if not roles:
+                continue
+            current = related[passage_id].setdefault(case_id, {
+                "case_id": case_id,
+                "case_title": record.get("case_title") or "未命名案例",
+                "source_work": record.get("source_work") or "",
+                "target_work": record.get("target_work") or "",
+                "target_text": record.get("target_text") or "",
+                "machine_status": record.get("machine_status") or "",
+                "human_status": record.get("human_status") or "",
+                "relations": [],
+            })
+            current["relations"] = list(dict.fromkeys([*current["relations"], *roles]))
+
+    for item in items:
+        passage_id = str(item.get("passage_id") or "")
+        cases = list(related.get(passage_id, {}).values())
+        for case in cases:
+            case["relations"] = sorted(case["relations"])
+        item["related_cases"] = cases
+
+
 def retrieve(
     connection: sqlite3.Connection,
     *,
     query: str,
     work_key: str = "",
     limit: int = 8,
+    include_cases: bool = False,
 ) -> dict[str, Any]:
     normalized_query = normalize(query)
     tokens = query_tokens(normalized_query)
@@ -162,6 +247,8 @@ def retrieve(
     score_floor = max(0, best_score - 24)
     relevant = [item for item in ranked if int(item["score"]) >= score_floor]
     items = relevant[: max(1, min(int(limit), 20))]
+    if include_cases:
+        attach_related_cases(connection, items)
     return {
         "ok": True,
         "query": normalized_query,
@@ -185,6 +272,7 @@ def main() -> int:
     parser.add_argument("--query", default="")
     parser.add_argument("--work-key", default="")
     parser.add_argument("--limit", type=int, default=8)
+    parser.add_argument("--include-cases", action="store_true")
     args = parser.parse_args()
 
     try:
@@ -195,6 +283,7 @@ def main() -> int:
                 query=args.query,
                 work_key=args.work_key,
                 limit=args.limit,
+                include_cases=args.include_cases,
             )
         finally:
             connection.close()

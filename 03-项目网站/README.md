@@ -136,7 +136,7 @@ npm run sync:annotation
 - `GET /api/v2/summary`：V2 工作库当前验收摘要。
 - `GET /api/v2/cases`：V2 案例队列，支持分页、检索、来源和机器状态筛选；未提供分页参数时默认返回第 1 页、每页 50 条。
 - `GET /api/v2/case?id=编号`：V2 案例完整详情，包括来源 passage、证据、过程、队列和既有事件。
-- `GET /api/v2/retrieve?case_id=编号` 或 `GET /api/v2/retrieve?q=关键词&work_key=作品键`：只读检索当前原文语料库中的 canonical passage；按案例检索时优先查当前作品，必要时标出跨作品候选参考。
+- `GET /api/v2/retrieve?case_id=编号` 或 `GET /api/v2/retrieve?q=关键词&work_key=作品键`：只读检索当前原文语料库中的 canonical passage；按案例检索时优先查当前作品，必要时标出跨作品候选参考。正文检索页面可额外传 `include_cases=1`，在每个段落结果下返回已关联的轻量 V2 case 链接。
 - `GET /api/v2/review-tasks?stream=...&batch=...`：按批次读取静态 `review_task.v1` 任务；可选 `case_review`、`target_work_resolution`、`external_source_resolution`、`external_passage_resolution`。
 - `GET /api/v2/review-task?id=任务 ID`：读取单条人工审校任务及其决定契约。
 - `POST /api/v2/review`：受控人工决定写入接口；默认返回 403，只有 `V2_REVIEW_WRITE_ENABLED=1` 的本地服务才开放。它只调用 V2 已有事务 seam，要求稳定 `reviewer` 和唯一 `operation_id`，不会因读取任务或提交 target/source/passage resolution 自动产生 gold。

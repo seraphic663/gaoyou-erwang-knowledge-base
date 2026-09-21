@@ -74,6 +74,33 @@
           </div>
           <p class="compact-note">先检索并选择案例，再在下方阅读来源、目标、证据和处理状态；内部 JSON 默认折叠。</p>
 
+          <section class="v2-passage-search" aria-labelledby="v2PassageSearchTitle">
+            <div class="v2-passage-search-heading">
+              <div>
+                <p class="section-kicker">正文检索</p>
+                <h3 id="v2PassageSearchTitle">粘贴正文，直接找原文和关联案例</h3>
+                <p>检索四部著作中已经登记的正文；结果按命中程度排序，并列出已经挂到该段落上的 V2 案例。</p>
+              </div>
+              <span class="summary-pill">只读</span>
+            </div>
+            <form id="v2PassageSearchForm" class="v2-passage-search-form">
+              <label class="v2-passage-query-field">
+                <span>正文片段</span>
+                <textarea id="v2PassageSearch" rows="3" placeholder="例如：平原之隰，奚有於高"></textarea>
+              </label>
+              <label class="toolbar-field">
+                <span>作品范围</span>
+                <select id="v2PassageWork"><option value="all">四部著作</option></select>
+              </label>
+              <div class="v2-passage-search-actions">
+                <button id="v2PassageSearchButton" class="page-link toolbar-button" type="submit">检索正文</button>
+                <button id="v2PassageReset" class="search-clear toolbar-button" type="button">清空</button>
+              </div>
+            </form>
+            <p id="v2PassageSearchStatus" class="compact-note" aria-live="polite"></p>
+            <div id="v2PassageResults" class="v2-passage-results" aria-live="polite"></div>
+          </section>
+
           <div class="v2-filter-bar">
             <label class="toolbar-field">
               <span>检索</span>

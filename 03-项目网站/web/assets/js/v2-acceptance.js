@@ -8,6 +8,7 @@ const V2Acceptance = (() => {
     pageCount: 1,
     requestId: 0,
     selectedCaseId: null,
+    passageRequestId: 0,
   };
 
   const elements = {
@@ -28,6 +29,13 @@ const V2Acceptance = (() => {
     caseCount: document.querySelector('#v2CaseCount'),
     caseTable: document.querySelector('#v2CaseTable'),
     caseDetail: document.querySelector('#v2CaseDetail'),
+    passageSearchForm: document.querySelector('#v2PassageSearchForm'),
+    passageSearch: document.querySelector('#v2PassageSearch'),
+    passageWork: document.querySelector('#v2PassageWork'),
+    passageSearchButton: document.querySelector('#v2PassageSearchButton'),
+    passageReset: document.querySelector('#v2PassageReset'),
+    passageSearchStatus: document.querySelector('#v2PassageSearchStatus'),
+    passageResults: document.querySelector('#v2PassageResults'),
     caseTab: document.querySelector('#v2CaseTab'),
     qualityTab: document.querySelector('#v2QualityTab'),
     caseWorkspace: document.querySelector('#v2CaseWorkspace'),
@@ -297,6 +305,101 @@ const V2Acceptance = (() => {
     elements.caseTable.querySelectorAll('.v2-case-row-action').forEach((link) => {
       link.addEventListener('click', (event) => event.stopPropagation());
     });
+  }
+
+  const passageWorkLabels = {
+    dushu_zazhi: '《读书杂志》',
+    guangya_shuzheng: '《广雅疏证》',
+    jingyi_shuwen: '《经义述闻》',
+    jingzhuan_shici: '《经传释词》',
+  };
+
+  function passageWorkLabel(workKey) {
+    return passageWorkLabels[String(workKey || '')] || text(workKey, '作品未注明');
+  }
+
+  function passageRelationLabel(relation) {
+    return relation === 'source_passage' ? '案例来源' : '案例证据';
+  }
+
+  function renderPassageResults(payload) {
+    if (!elements.passageResults) return;
+    const items = Array.isArray(payload?.items) ? payload.items : [];
+    if (!items.length) {
+      elements.passageResults.innerHTML = '<div class="v2-empty-detail">没有找到对应的已登记正文段落。</div>';
+      return;
+    }
+    elements.passageResults.innerHTML = items.map((item, index) => {
+      const location = [item.document_title, item.section_title, item.entry_title]
+        .filter(Boolean).join(' · ') || passageWorkLabel(item.work_key);
+      const cases = Array.isArray(item.related_cases) ? item.related_cases : [];
+      const caseMarkup = cases.length
+        ? `
+          <div class="v2-related-case-block">
+            <div class="v2-detail-topline"><strong>关联案例</strong><span class="summary-pill">${escapeHtml(String(cases.length))} 条</span></div>
+            <div class="v2-related-case-list">
+              ${cases.map((caseItem) => `
+                <a class="v2-related-case" href="./v2-database.html?case=${encodeURIComponent(caseItem.case_id)}#browse">
+                  <span><strong>${escapeHtml(caseItem.case_title || '未命名案例')}</strong><small>${escapeHtml(caseItem.target_work || '目标典籍未明确')} · ${escapeHtml(caseItem.target_text || '目标文字未记录')}</small></span>
+                  <span class="v2-related-case-tags">${(caseItem.relations || []).map((relation) => `<span class="v2-resolution-chip unknown">${escapeHtml(passageRelationLabel(relation))}</span>`).join('')}</span>
+                </a>
+              `).join('')}
+            </div>
+          </div>
+        `
+        : '<p class="v2-evidence-note">当前段落还没有挂接 V2 案例。</p>';
+      return `
+        <article class="v2-passage-result">
+          <div class="v2-detail-topline">
+            <div class="v2-passage-result-title"><span class="v2-passage-rank">${escapeHtml(String(index + 1))}</span><span><strong>${escapeHtml(location)}</strong><small>${escapeHtml(passageWorkLabel(item.work_key))} · ${escapeHtml(item.match_reason || '正文片段命中')}</small></span></div>
+            <span class="v2-status-chip pass">已登记正文</span>
+          </div>
+          <p class="v2-passage-result-text">${escapeHtml(item.passage_text || '没有可展示的正文。')}</p>
+          <p class="v2-passage-result-meta">${escapeHtml(item.passage_id || '')}${item.md_line_start ? ` · 原文行 ${escapeHtml(String(item.md_line_start))}-${escapeHtml(String(item.md_line_end || item.md_line_start))}` : ''}</p>
+          ${caseMarkup}
+        </article>
+      `;
+    }).join('');
+  }
+
+  async function runPassageSearch() {
+    if (!elements.passageSearch || !elements.passageResults) return;
+    const query = String(elements.passageSearch.value || '').trim();
+    const workKey = elements.passageWork?.value || 'all';
+    if (!query) {
+      elements.passageSearchStatus.textContent = '输入一段正文后检索。';
+      elements.passageResults.innerHTML = '';
+      return;
+    }
+    const requestId = ++state.passageRequestId;
+    elements.passageSearchButton.disabled = true;
+    elements.passageSearchStatus.textContent = '正在查找四部著作的正文……';
+    elements.passageResults.innerHTML = '<div class="v2-empty-detail">正在读取正文结果……</div>';
+    const params = new URLSearchParams({ q: query, limit: '8', include_cases: '1' });
+    if (workKey !== 'all') params.set('work_key', workKey);
+    try {
+      const payload = await requestJson(`/api/v2/retrieve?${params.toString()}`);
+      if (requestId !== state.passageRequestId) return;
+      renderPassageResults(payload);
+      const count = Number(payload.returned_count ?? payload.items?.length ?? 0);
+      const caseCount = (payload.items || []).reduce((total, item) => total + (item.related_cases?.length || 0), 0);
+      elements.passageSearchStatus.textContent = count
+        ? `找到 ${count} 段正文；其中 ${caseCount} 条已关联 V2 案例。`
+        : '没有找到对应的已登记正文段落。';
+    } catch (error) {
+      if (requestId !== state.passageRequestId) return;
+      elements.passageResults.innerHTML = `<div class="v2-empty-detail">正文检索失败：${escapeHtml(error.message)}</div>`;
+      elements.passageSearchStatus.textContent = '请稍后重试。';
+    } finally {
+      if (requestId === state.passageRequestId) elements.passageSearchButton.disabled = false;
+    }
+  }
+
+  function populatePassageWorkFilter() {
+    if (!elements.passageWork) return;
+    const values = (state.summary?.sources || []).map((source) => source.work_key).filter(Boolean);
+    elements.passageWork.innerHTML = '<option value="all">四部著作</option>' + values
+      .map((value) => `<option value="${escapeHtml(value)}">${escapeHtml(passageWorkLabel(value))}</option>`).join('');
   }
 
   function renderPassage(passage, label) {
@@ -654,6 +757,16 @@ const V2Acceptance = (() => {
         loadCases();
       }
     });
+    elements.passageSearchForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      runPassageSearch();
+    });
+    elements.passageReset?.addEventListener('click', () => {
+      if (elements.passageSearch) elements.passageSearch.value = '';
+      if (elements.passageWork) elements.passageWork.value = 'all';
+      if (elements.passageSearchStatus) elements.passageSearchStatus.textContent = '输入一段正文后检索。';
+      if (elements.passageResults) elements.passageResults.innerHTML = '';
+    });
   }
 
   function populateSourceFilter(values) {
@@ -714,6 +827,7 @@ const V2Acceptance = (() => {
       renderSources();
       renderReportContext();
       populateSourceFilter(cases.source_works || []);
+      populatePassageWorkFilter();
       renderCaseTable();
       elements.status.textContent = `V2 工作库已连接 · 案例数据只读 · ${summary.database.display_path}`;
       if (elements.pageSize) elements.pageSize.value = String(state.pageSize);

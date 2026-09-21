@@ -32,3 +32,11 @@ Run the same manifest against Railway:
 ```
 
 `Recall@k` and `MRR` are calculated only over `primary_recall`. Controls are reported separately so unsupported case fields do not silently become recall failures.
+
+网站实际使用同一个只读接口，不另造一套搜索逻辑：打开 V2 工作库，在“正文检索”中粘贴正文片段；页面请求 `/api/v2/retrieve?q=...&include_cases=1`，先展示排序后的 canonical 正文，再列出该段落已经关联的 V2 case。直接调用接口时也可以这样查看关联案例：
+
+```text
+GET /api/v2/retrieve?q=平原之隰，奚有於高&work_key=dushu_zazhi&include_cases=1
+```
+
+因此 benchmark 测的是页面背后的检索/排序层，而不是页面的视觉结果；页面中的第 1、2、3 条就是同一 ranker 的返回顺序。当前 v1 不含 AI rerank，后续若加入，必须在同一 manifest 上单独报告 base ranker 与 AI reranker 的差异。

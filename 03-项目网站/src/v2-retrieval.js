@@ -37,9 +37,11 @@ async function retrieveFromCorpus(config, {
   query,
   workKey = '',
   limit = 8,
+  includeCases = false,
 } = {}) {
   const args = ['--query', query || '', '--limit', String(limit)];
   if (workKey) args.push('--work-key', workKey);
+  if (includeCases) args.push('--include-cases');
   const payload = await runPythonJsonBridge(config, {
     bridgeFile: config.V2_RETRIEVAL_BRIDGE_FILE,
     command: 'retrieve',
@@ -53,6 +55,7 @@ async function retrieveFromCorpus(config, {
     work_key: workKey,
     query: query || '',
     query_quality: query ? 'usable' : 'empty',
+    include_cases: Boolean(includeCases),
   };
 }
 
