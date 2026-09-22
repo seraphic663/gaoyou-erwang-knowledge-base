@@ -26,7 +26,6 @@ note/
 
 # ---- Local analysis / external source workspaces ----
 tmp/
-daizhigev20/
 00-项目说明/archive/
 
 # ---- Archive literature (large PDFs, not for repo) ----
@@ -61,3 +60,6 @@ v2/data/external_sources/edition_candidates/**/*.part
 # review queues, packets, or other real-run outputs.
 v2/data/real_runs/
 v2/data/local_test/
+
+# Local virtual environments
+.venv/
