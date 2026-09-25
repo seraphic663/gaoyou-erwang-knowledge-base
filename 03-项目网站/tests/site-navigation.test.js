@@ -101,6 +101,21 @@ test('five-step route provides an in-page case chooser without requiring the ful
   assert.match(script, /\/api\/v2\/cases\?/);
 });
 
+test('annotation browser exposes aligned annotator and origin filters', () => {
+  const html = fs.readFileSync(path.join(WEB_DIR, 'annotation.html'), 'utf8');
+  const script = fs.readFileSync(path.join(WEB_DIR, 'assets/js/annotation.js'), 'utf8');
+  const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
+  assert.match(html, /id="annotationAnnotatorFilter"/);
+  assert.match(html, /id="annotationOriginFilter"/);
+  assert.match(html, /annotation\.js\?v=annotation-filters-v1/);
+  assert.match(script, /annotator: state\.annotator/);
+  assert.match(script, /origin: state\.origin/);
+  assert.match(script, /标注者/);
+  assert.match(script, /出处/);
+  assert.match(css, /\.annotation-filter-grid\s*\{[\s\S]*grid-template-columns:/);
+  assert.match(css, /\.annotation-raw-grid\s*\{[\s\S]*repeat\(4/);
+});
+
 test('main navigation stays in the hero flow and keeps its brand on one line', () => {
   const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
   assert.match(css, /\.nav\s*\{[\s\S]*position:\s*relative/);

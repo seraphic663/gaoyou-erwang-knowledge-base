@@ -1634,6 +1634,64 @@ h2 {
   gap: 18px;
 }
 
+.annotation-toolbar {
+  gap: 16px;
+}
+
+.annotation-toolbar-heading {
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.annotation-filter-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.7fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.annotation-filter-grid .toolbar-field {
+  min-width: 0;
+}
+
+.annotation-filter-grid input,
+.annotation-filter-grid select,
+.annotation-filter-actions .toolbar-button {
+  min-height: 46px;
+}
+
+.annotation-filter-grid input,
+.annotation-filter-grid select {
+  width: 100%;
+}
+
+.annotation-filter-actions {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+
+.annotation-filter-actions .toolbar-button {
+  white-space: nowrap;
+}
+
+.annotation-preset-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 2px;
+  border-top: 1px solid var(--line);
+}
+
+.annotation-preset-row .section-kicker {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+.annotation-preset-row .browser-preset-list {
+  align-items: center;
+}
+
 .annotation-sidebar .sidebar-card {
   gap: 8px;
 }
@@ -1856,7 +1914,7 @@ h2 {
 
 .annotation-raw-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -1867,12 +1925,20 @@ h2 {
   padding: 10px 12px;
   border-radius: 16px;
   background: rgba(92, 102, 82, 0.08);
+  min-width: 0;
+  min-height: 66px;
 }
 
 .annotation-raw-grid strong {
   color: var(--jade);
   font-size: 12px;
   letter-spacing: 0.12em;
+}
+
+.annotation-raw-grid span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
 }
 
 .annotation-fold {
@@ -3381,6 +3447,16 @@ select,
   }
 }
 
+@media (max-width: 900px) {
+  .annotation-filter-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) auto;
+  }
+
+  .annotation-raw-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 700px) {
   .nav {
     width: calc(100% - 20px);
@@ -3537,6 +3613,29 @@ select,
   .browser-search-actions .toolbar-button,
   .annotation-search-actions .toolbar-button {
     flex: 1;
+  }
+
+  .annotation-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .annotation-filter-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .annotation-filter-actions .toolbar-button {
+    width: 100%;
+  }
+
+  .annotation-preset-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .annotation-raw-grid {
+    grid-template-columns: 1fr;
   }
 }
 

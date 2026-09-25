@@ -35,53 +35,52 @@
     <main class="section annotation-page">
       <p id="annotationStatus" class="db-status">正在读取人工标注库...</p>
 
-      <div class="browser-layout">
-        <aside class="browser-sidebar annotation-sidebar">
-          <article class="card sidebar-card">
-            <h3>来源文档</h3>
-            <div id="annotationDocumentFilters" class="sidebar-filter-list"></div>
-          </article>
+      <section class="card browser-toolbar annotation-toolbar">
+        <div class="head-line annotation-toolbar-heading">
+          <div>
+            <p class="section-kicker">案例浏览</p>
+            <h2>人工标注库</h2>
+          </div>
+          <span class="summary-pill">按标注者和出处筛选</span>
+        </div>
+        <p class="compact-note">关键词可以检索案例、方法、原文和标注内容；下面两个筛选只改变案例范围，不会改变原始标注结构。</p>
 
-          <article class="card sidebar-card">
-            <h3>方法标签</h3>
-            <div id="annotationMethodFilters" class="sidebar-filter-list"></div>
-          </article>
+        <div class="annotation-filter-grid">
+          <label class="toolbar-field annotation-query-field">
+            <span>检索</span>
+            <input id="annotationSearchInput" type="search" placeholder="案例、方法、原文或标注关键词" />
+          </label>
+          <label class="toolbar-field">
+            <span>标注者</span>
+            <select id="annotationAnnotatorFilter">
+              <option value="all">全部标注者</option>
+            </select>
+          </label>
+          <label class="toolbar-field">
+            <span>出处</span>
+            <select id="annotationOriginFilter">
+              <option value="all">全部出处</option>
+            </select>
+          </label>
+          <div class="annotation-filter-actions">
+            <button id="annotationSearchButton" class="page-link toolbar-button" type="button">检索</button>
+            <button id="annotationResetButton" class="search-clear toolbar-button" type="button">重置</button>
+          </div>
+        </div>
 
-          <article class="card sidebar-card browser-preset-card">
-            <h3>预设搜索</h3>
-            <div id="annotationPresets" class="browser-preset-list">
-              <button class="preset-chip" type="button" data-annotation-query="平原之隰">平原之隰</button>
-              <button class="preset-chip" type="button" data-annotation-query="误字">误字</button>
-              <button class="preset-chip" type="button" data-annotation-query="集韻">集韻</button>
-              <button class="preset-chip" type="button" data-annotation-query="发疑">发疑</button>
-            </div>
-          </article>
-        </aside>
+        <div class="annotation-preset-row">
+          <span class="section-kicker">快捷检索</span>
+          <div id="annotationPresets" class="browser-preset-list">
+            <button class="preset-chip" type="button" data-annotation-query="平原之隰">平原之隰</button>
+            <button class="preset-chip" type="button" data-annotation-query="误字">误字</button>
+            <button class="preset-chip" type="button" data-annotation-query="集韻">集韻</button>
+            <button class="preset-chip" type="button" data-annotation-query="发疑">发疑</button>
+          </div>
+        </div>
+      </section>
 
-        <section class="browser-main">
-          <section class="card browser-toolbar annotation-toolbar">
-            <div class="head-line">
-              <div>
-                <p class="section-kicker">检索</p>
-                <h2>人工标注库</h2>
-              </div>
-            </div>
-            <div class="annotation-search-row">
-            <label class="toolbar-field annotation-search-field">
-                <input id="annotationSearchInput" type="text" placeholder="输入案例、方法、原文或标注关键词" />
-            </label>
-
-            <div class="toolbar-actions annotation-search-actions">
-                <button id="annotationSearchButton" class="page-link toolbar-button" type="button">检索</button>
-                <button id="annotationResetButton" class="search-clear toolbar-button" type="button">重置</button>
-            </div>
-            </div>
-          </section>
-
-          <div id="annotationSummary" class="search-summary"></div>
-          <div id="annotationList" class="annotation-list"></div>
-        </section>
-      </div>
+      <div id="annotationSummary" class="search-summary"></div>
+      <div id="annotationList" class="annotation-list"></div>
     </main>
 
     <footer class="footer">
@@ -90,6 +89,6 @@
 
     <script src="./assets/js/utils.js"></script>
     <script src="./assets/js/browser-common.js"></script>
-    <script src="./assets/js/annotation.js?v=20260509-ai-json"></script>
+    <script src="./assets/js/annotation.js?v=annotation-filters-v1"></script>
   </body>
 </html>

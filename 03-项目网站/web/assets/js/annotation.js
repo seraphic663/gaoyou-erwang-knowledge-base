@@ -1,8 +1,8 @@
 const annotationHeroMeta = document.querySelector('#annotationHeroMeta');
 const annotationStatus = document.querySelector('#annotationStatus');
 const annotationSearchInput = document.querySelector('#annotationSearchInput');
-const annotationDocumentFilters = document.querySelector('#annotationDocumentFilters');
-const annotationMethodFilters = document.querySelector('#annotationMethodFilters');
+const annotationAnnotatorFilter = document.querySelector('#annotationAnnotatorFilter');
+const annotationOriginFilter = document.querySelector('#annotationOriginFilter');
 const annotationSearchButton = document.querySelector('#annotationSearchButton');
 const annotationResetButton = document.querySelector('#annotationResetButton');
 const annotationSummary = document.querySelector('#annotationSummary');
@@ -12,8 +12,8 @@ const annotationPresets = document.querySelector('#annotationPresets');
 const state = {
   bootstrap: null,
   query: '',
-  document: 'all',
-  method: 'all',
+  annotator: 'all',
+  origin: 'all',
   page: 1,
   pageSize: 50,
 };
@@ -38,18 +38,21 @@ function renderHero() {
   BrowserCommon.renderHeroItems(annotationHeroMeta, items);
 }
 
-function renderFilters() {
-  BrowserCommon.renderChoiceButtons(annotationDocumentFilters, state.bootstrap?.documents || [], {
-    activeValue: state.document,
-    className: 'filter-chip',
-    valueAttribute: 'data-annotation-document',
-  });
+function renderSelectOptions(target, items, fallbackLabel) {
+  if (!target) return;
+  const selected = target.value || 'all';
+  target.innerHTML = (items || []).map((item) => `
+    <option value="${escapeHtml(item.value)}">${escapeHtml(item.label)}${item.value === 'all' ? '' : ` · ${escapeHtml(String(item.count || 0))}`}</option>
+  `).join('') || `<option value="all">${escapeHtml(fallbackLabel)}</option>`;
+  target.value = selected;
+  if (target.value !== selected) target.value = 'all';
+}
 
-  BrowserCommon.renderChoiceButtons(annotationMethodFilters, state.bootstrap?.methods || [], {
-    activeValue: state.method,
-    className: 'filter-chip',
-    valueAttribute: 'data-annotation-method',
-  });
+function renderFilters() {
+  renderSelectOptions(annotationAnnotatorFilter, state.bootstrap?.annotators, '全部标注者');
+  renderSelectOptions(annotationOriginFilter, state.bootstrap?.origins, '全部出处');
+  if (annotationAnnotatorFilter) annotationAnnotatorFilter.value = state.annotator;
+  if (annotationOriginFilter) annotationOriginFilter.value = state.origin;
 }
 
 function isTermGroupCase(item) {
@@ -170,7 +173,8 @@ function renderCase(item) {
       </div>
 
       <div class="annotation-raw-grid">
-        <p><strong>来源著作</strong><span>${escapeHtml(item.source_work || '未标注')}</span></p>
+        <p><strong>出处</strong><span>${escapeHtml(item.origin || item.source_work || '未标注')}</span></p>
+        <p><strong>标注者</strong><span>${escapeHtml(item.annotator || '未标注')}</span></p>
         <p><strong>目标文本</strong><span>${escapeHtml(summarizeText(item.target_text, 90) || '未标注')}</span></p>
         <p><strong>状态</strong><span>${escapeHtml(item.status || '草稿')}</span></p>
       </div>
@@ -235,8 +239,8 @@ function render(result) {
   annotationSummary.innerHTML = `
     <div class="summary-row summary-row-meta">
       <span class="summary-pill">结果：${escapeHtml(result.total || 0)} / ${escapeHtml(state.bootstrap?.counts?.cases || 0)} 条</span>
-      <span class="summary-pill muted">文档：${escapeHtml(state.document === 'all' ? '全部' : state.document)}</span>
-      <span class="summary-pill muted">方法：${escapeHtml(state.method === 'all' ? '全部' : state.method)}</span>
+      <span class="summary-pill muted">标注者：${escapeHtml(state.annotator === 'all' ? '全部' : state.annotator)}</span>
+      <span class="summary-pill muted">出处：${escapeHtml(state.origin === 'all' ? '全部' : state.origin)}</span>
       ${state.query ? `<span class="summary-pill muted">关键词：${escapeHtml(state.query)}</span>` : ''}
     </div>
   `;
@@ -249,8 +253,8 @@ function render(result) {
 async function runAnnotationBrowse() {
   const params = new URLSearchParams({
     q: state.query,
-    document: state.document,
-    method: state.method,
+    annotator: state.annotator,
+    origin: state.origin,
     page: String(state.page),
     pageSize: String(state.pageSize),
   });
@@ -272,17 +276,17 @@ async function init() {
 }
 
 annotationSearchButton?.addEventListener('click', async () => {
-  state.query = annotationSearchInput.value.trim();
+  state.query = String(annotationSearchInput?.value || '').trim();
   state.page = 1;
   await runAnnotationBrowse();
 });
 
 annotationResetButton?.addEventListener('click', async () => {
   state.query = '';
-  state.document = 'all';
-  state.method = 'all';
+  state.annotator = 'all';
+  state.origin = 'all';
   state.page = 1;
-  annotationSearchInput.value = '';
+  if (annotationSearchInput) annotationSearchInput.value = '';
   renderFilters();
   await runAnnotationBrowse();
 });
@@ -293,7 +297,7 @@ annotationPresets?.addEventListener('click', async (event) => {
 
   state.query = trigger.getAttribute('data-annotation-query') || '';
   state.page = 1;
-  annotationSearchInput.value = state.query;
+  if (annotationSearchInput) annotationSearchInput.value = state.query;
   await runAnnotationBrowse();
 });
 
@@ -303,23 +307,15 @@ annotationSearchInput?.addEventListener('keydown', (event) => {
   }
 });
 
-annotationDocumentFilters?.addEventListener('click', async (event) => {
-  const trigger = event.target.closest('[data-annotation-document]');
-  if (!trigger) return;
-
-  state.document = trigger.getAttribute('data-annotation-document') || 'all';
+annotationAnnotatorFilter?.addEventListener('change', async () => {
+  state.annotator = annotationAnnotatorFilter.value || 'all';
   state.page = 1;
-  renderFilters();
   await runAnnotationBrowse();
 });
 
-annotationMethodFilters?.addEventListener('click', async (event) => {
-  const trigger = event.target.closest('[data-annotation-method]');
-  if (!trigger) return;
-
-  state.method = trigger.getAttribute('data-annotation-method') || 'all';
+annotationOriginFilter?.addEventListener('change', async () => {
+  state.origin = annotationOriginFilter.value || 'all';
   state.page = 1;
-  renderFilters();
   await runAnnotationBrowse();
 });
 

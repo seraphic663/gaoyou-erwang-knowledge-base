@@ -237,6 +237,8 @@ function createServer() {
           query: parsedUrl.query.q || '',
           document: parsedUrl.query.document,
           method: parsedUrl.query.method,
+          annotator: parsedUrl.query.annotator,
+          origin: parsedUrl.query.origin,
           page: parsedUrl.query.page,
           pageSize: parsedUrl.query.pageSize,
         }));
