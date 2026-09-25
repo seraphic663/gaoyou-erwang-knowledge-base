@@ -16,7 +16,6 @@ V2 工作流和状态的优先解释见 [00-项目说明/03-工程、文件包�
 ## 部署状态
 
 - Railway：当前线上主展示地址，读取根目录 `railway.toml`，使用根目录 `Dockerfile` 构建并执行 `npm start`。运行镜像包含 Node 服务、网站代码、V2 Python 代码；大体量 `v2/data/` 不进入构建上下文，而是由 Railway volume 挂载到 `/app/v2/data`。
-- CloudBase Run：保留为备用部署方案，同样可使用根目录 `Dockerfile`。当前仓库没有证据证明 CloudBase 已配置 V2 持久卷，因此在完成卷挂载和 `/api/v2/summary` 验证前，只能确认旧快照展示能力，不能声称 V2 在线可用。详见 [03-项目网站/CloudBase-Run-并行部署报告.md](03-%E9%A1%B9%E7%9B%AE%E7%BD%91%E7%AB%99/CloudBase-Run-%E5%B9%B6%E8%A1%8C%E9%83%A8%E7%BD%B2%E6%8A%A5%E5%91%8A.md)。
 - `Dockerfile` 安装 Python 3，复制根目录 `package.json`、`03-项目网站/` 和 `v2/`；根目录没有 `server.js`，实际服务入口是 `03-项目网站/server.js`。
 - `.dockerignore` 与 `.railwayignore` 都排除 `v2/data/`，防止数据库、JSONL、任务包和研究运行产物被打入镜像。
 

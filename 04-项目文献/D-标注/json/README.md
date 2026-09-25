@@ -151,6 +151,17 @@ python 04-项目文献/D-标注/json/run.py --init-db
 
 `--init-db` 只建表，不导入内容。导入必须显式使用 `--import-ai`，不会自动混入主库。
 
+## Markdown 人工整理稿
+
+`04-项目文献/0-当前阅读/archive/md/` 下经双人核验的 Markdown 来源由独立脚本接入人工标注库，不经过 DOCX/DeepSeek 导入链：
+
+```bash
+python 04-项目文献/D-标注/json/import_markdown_manual.py --dry-run
+python 04-项目文献/D-标注/json/import_markdown_manual.py
+```
+
+脚本从 `archive/md/` 读取 8 份来源 Markdown，生成 10 个待导入个案；要求 Agent A、Agent B 的逐案核验报告和 `允` 三义项的复核报告都已落盘。重复的“平原之隰”“譕臣”“敬也”“創也”只登记为已有案例，不重复插入。新增案例统一写入 `草稿/待核`，并把来源 Markdown、字段边界、疑点和双 agent 核验路径保存到 `raw_case_json`。正式导入前会自动生成 `tmp/annotations.db.pre_markdown_ingest.*.bak` 备份，导入后需运行人工库快照同步。
+
 ## 说明
 
 - 脚本会自动校验 `full_json` 的段落数、批注数、文本长度和 checksum。
