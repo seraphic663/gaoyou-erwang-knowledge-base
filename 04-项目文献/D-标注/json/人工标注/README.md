@@ -1,5 +1,7 @@
 # 人工标注 JSON 提交区
 
+本目录只接收旧人工标注工作台导出的 `*.annotation.json` 提交文件，不是中期 pilot 的确认版本目录，也不是 V2 gold 入口。中期案例请使用 v2/research/midterm-pilot/ 文件包。
+
 成员从本地标注工作台导出的 `*.annotation.json` 放在这里。
 
 建议结构：

@@ -2,6 +2,19 @@
 
 `03-项目网站` 是项目的展示、检索和 V2 工作库入口。它不是单独的数据仓库：旧页面读取 `02-数据库` 导出的 JSON 快照，V2 页面通过 Python bridge 读取独立的 `v2/data/real_runs/annotation_v2.db`。
 
+在项目总体路线中，网站是研究操作和成果展示层，不是独立的研究贡献。固定成果页面只能从中期确认版本派生；V2 页面和五步卡提供检索、AI 备料和审计记录，但不把页面标签或五步记录显示成 gold。
+
+## 先定位
+
+| 你要做什么 | 入口 |
+| --- | --- |
+| 看线上或本地网站 | 本文的运行方式和部署说明 |
+| 浏览 V2 案例和质量报告 | v2-database.html |
+| 进入五步 AI 辅助审计 | annotation-workbench.html |
+| 查旧数据库快照 | database.html、annotation.html |
+| 查 API 和数据源 | 本文的 API、数据来源和目录说明 |
+| 查项目级研究口径 | ../00-项目说明/README.md |
+
 ## 当前定位
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
@@ -9,7 +22,7 @@
 - 数据库页：统一浏览主库字词、案例和数据库结构。
 - V2 工作库：`v2-database.html` 是完整案例库和质量报告入口；`annotation-workbench.html` 无参数时提供轻量案例选择器，有 `case` 参数时进入单案例五步审校。旧 `v2-acceptance.html` 只保留兼容跳转。Railway 的案例库自动读取 volume 下的 `v2/data/real_runs/annotation_v2.db`；本地案例默认读取被忽略的 `v2/data/local_test/annotation_v2.local.db`，若本地存在 `v2/data/real_runs/annotation_v2.db`，原文检索会自动使用它作为四部著作语料库。正文检索的作品范围固定显示为“四部著作”总库和四部作品的单独范围，不把 external candidate 文档伪装成作品选项。之后上传其他语料库时可用 `V2_CORPUS_DB_FILE` 指定；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立开关。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
-- 五步释证：无 `case` 参数时先在页面内选择案例；选中 V2 案例后生成 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。Railway 默认保持只读，本地测试库默认允许保存；仍可用 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=0` 显式关闭。
+- 五步释证：无 `case` 参数时先在页面内选择案例；选中 V2 案例后生成 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。它是 AI 辅助审计流程，不等于后续的 domain-specific agent harness。Railway 默认保持只读，本地测试库默认允许保存；仍可用 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=0` 显式关闭。
 - AI 释证：旧的一次性接口仍保留供兼容调用；`ai-annotation.html` 现在跳转到五步释证，网站主流程统一从 V2 案例开始。
 - 字词详情页：展示单个词条的释义、证据和关联案例。
 - 案例详情页：展示单个考据案例的判断过程、证据和相关字词。

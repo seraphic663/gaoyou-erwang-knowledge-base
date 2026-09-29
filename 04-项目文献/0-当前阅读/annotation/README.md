@@ -74,7 +74,7 @@
 ## 数据库去向
 
 - 这批数据以本目录的 48 份个案 Markdown 和对应 JSONL 为准，覆盖旧人工标注库 `02-数据库/data/annotations.db`；按标题和内容归入 39 份来源文档。网站快照由 `npm run sync:annotation` 从旧库导出。
-- 入库为 38 份来源、47 个案、107 个词项、547 条证据和 165 条过程记录。线上人工标注页面已更新并读回这组计数。所有个案仍是草稿/待核，547 条证据均未核验；转换和入库不代表人工审定。
+- 当前 annotations.db 为 39 份来源、48 个案、109 个词项、564 条证据和 170 条过程记录。所有个案仍是草稿/待核，证据均未核验；转换和入库不代表人工审定。具体数量以数据库只读查询和网站快照复核为准。
 - 此前误写入 V2 的 47 个案已从本地和 Railway production 撤回，V2 案例总数恢复为 7,581。撤回前数据库备份、撤回清单见 `v2/data/real_runs/rollback_backups/`；原始导入报告保留并标记为已撤回。
 - 覆盖旧人工库前的数据库和网站快照备份在 `tmp/manual-annotation-overwrite-20260925/`。
 - 转换候选：[JSONL](<manual_annotation_cases.annotation_case.v1.candidates.jsonl>)；字段转换记录见[转换报告](../../../v2/data/real_runs/manual_annotation_ingress/manual_annotation_conversion_report.json)；转换脚本为[Markdown 转 JSONL](../../../v2/scripts/convert_manual_annotation_markdown.py)。

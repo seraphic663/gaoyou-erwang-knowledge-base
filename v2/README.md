@@ -1,6 +1,18 @@
 # V2 统一工作库
 
-这是独立于旧 `dictionary.db` 和 `annotations.db` 的 V2 数据核心目录，包含 schema、实现、测试、机器运行、统一工作数据库、工作队列和人工审校任务。2026-08-30 复核时机器链路已跑通，但全部 7,581 个案例仍为机器草稿和人工待审，gold=0。
+这是独立于旧 dictionary.db 和 annotations.db 的 V2 数据核心目录，包含 schema、实现、测试、机器运行、统一工作数据库、工作队列和人工审校任务。当前验证报告显示，7,581 个案例仍为 machine draft 和 human pending，review_events=0、gold=0。
+
+V2 的项目级定位是可追溯 corpus、检索和后续 agent 研究的基础设施，不是已经完成的人工知识库或端到端 benchmark。
+
+## 先定位
+
+| 你要做什么 | 先看哪里 |
+| --- | --- |
+| 理解 V2 在项目中的角色 | 本文的“定位与工作流”和“在总体研究路线中的位置” |
+| 运行最小测试或验证真实文件 | 本文的“运行最小测试”和“接入真实文件的原则” |
+| 查看当前数据、队列和状态 | 本文后半的运行报告、任务包和五步审计说明 |
+| 查看 retrieval benchmark | v2/benchmarks/README.md |
+| 参加中期人工复核 | 00-项目说明/01-项目与人工审计指南.md 和 v2/research/midterm-pilot/ |
 
 ## 定位与工作流
 
@@ -67,6 +79,14 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 - 引文区分 `canonical_source_passage`、`secondary_citation_match`、`external_source_pending`；后两者都不能当作原典核验通过。
 - `candidate_items` 是原典入口的机器候选层，和 `annotation_cases` 分开；候选只有在明确走 AI 或其他案例适配器后，才生成 `annotation_case.v1`。
 - 每条案例都保留 `_migration.source_layer`、`transformation_kind`、来源文件/记录 ID 和上游 revision。当前来源类型为：`legacy_ai_json_reprocessing`（旧 AI JSON 再加工）、`legacy_dictionary_db_reprocessing`（旧机器库再加工）、`original_markdown_machine_extraction`（原文机器抽取）、`original_markdown_ai`（原文候选经 AI 再加工）。
+
+## 在总体研究路线中的位置
+
+V2 负责保存来源、passage、case、evidence、状态和可重建的人工任务材料。它支持当前的只读检索和五步 AI 草稿，也为后续 benchmark-ready corpus 提供基础对象。
+
+当前 v2/benchmarks/ 中的评价定义主要是 retrieval-layer benchmark。它不评价完整考据答案，不把 machine draft 自动变成 benchmark gold，也不等于 domain-specific agent harness 已经完成。
+
+中期人工确认优先使用 v2/research/midterm-pilot/ 文件包；正式 V2 review 仍受独立 write gate、任务绑定、canonical target passage 和 quote gate 约束。
 
 ## 运行最小测试
 
