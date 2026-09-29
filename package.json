@@ -11,5 +11,8 @@
     "start:web": "npm --prefix 03-项目网站 start",
     "sync:sqlite": "python 03-项目网站/scripts/sqlite_bridge.py export",
     "sync:annotation": "python 03-项目网站/scripts/annotation_bridge.py export"
+  },
+  "dependencies": {
+    "opencc-js": "^1.4.2"
   }
 }

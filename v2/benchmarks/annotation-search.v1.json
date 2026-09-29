@@ -1,0 +1,58 @@
+{
+  "benchmark_id": "annotation_search",
+  "version": "v1",
+  "endpoint": "/api/annotation",
+  "description": "Evaluate exact case-set retrieval for the human annotation browser without relevance or AI ranking.",
+  "order_evaluated": false,
+  "corpus_policy": "annotation_snapshot",
+  "queries": [
+    {
+      "sample_id": "quick-exact-case",
+      "class": "exact_case_title",
+      "query": "薄言有之",
+      "gold_case_ids": ["37"]
+    },
+    {
+      "sample_id": "quick-method",
+      "class": "method_field",
+      "query": "校勘",
+      "gold_case_ids": ["28", "29", "30", "40", "41", "42", "43", "46", "54", "57", "58", "61", "63"]
+    },
+    {
+      "sample_id": "quick-term-family",
+      "class": "term_and_content",
+      "query": "允",
+      "gold_case_ids": ["33", "34", "35", "36"]
+    },
+    {
+      "sample_id": "quick-evidence-work",
+      "class": "evidence_source",
+      "query": "广雅",
+      "gold_case_ids": ["30", "31", "32", "37", "39", "44", "47", "48", "53", "55"]
+    },
+    {
+      "sample_id": "quick-traditional-query",
+      "class": "simplified_traditional",
+      "query": "终风且暴",
+      "gold_case_ids": ["36"]
+    },
+    {
+      "sample_id": "quick-incomplete-content",
+      "class": "annotation_content",
+      "query": "未抽取",
+      "gold_case_ids": ["32", "37", "39", "45", "47", "49", "50", "52", "55", "56", "59"]
+    },
+    {
+      "sample_id": "content-target-work",
+      "class": "target_content",
+      "query": "经义述闻",
+      "gold_case_ids": ["45"]
+    },
+    {
+      "sample_id": "metadata-exclusion-origin",
+      "class": "excluded_case_metadata",
+      "query": "读书杂志",
+      "gold_case_ids": []
+    }
+  ]
+}

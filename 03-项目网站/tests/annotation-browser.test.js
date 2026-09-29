@@ -4,9 +4,11 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const {
+  buildAnnotationSearchIndex,
   buildAnnotationBootstrap,
   browseAnnotations,
   deriveAnnotator,
+  getAnnotationCase,
   normalizeOrigin,
 } = require('../src/annotation-browser');
 
@@ -32,18 +34,23 @@ test('builds and applies annotator and origin filters', () => {
     methodCounts: {},
     cases: [
       {
+        id: 1,
         case_title: '甲',
         source_work: '《经传释词》',
         source_document: { source_file_name: '经传释词第二-甲_李汶灿.docx' },
+        target_text: '经传释词正文',
         method_tags: [],
       },
       {
+        id: 2,
         case_title: '乙',
         source_work: '经传释词',
         source_document: { source_file_name: '004-经传释词-乙-徐健怡.md' },
+        target_text: '经传释词另一条正文',
         method_tags: [],
       },
       {
+        id: 3,
         case_title: '丙',
         source_work: '读书杂志',
         source_document: { source_file_name: '读书杂志-丙-李汶灿.md' },
@@ -54,6 +61,11 @@ test('builds and applies annotator and origin filters', () => {
   const { file, config } = withSnapshot(snapshot);
   try {
     const bootstrap = buildAnnotationBootstrap(config);
+    const searchIndex = buildAnnotationSearchIndex(config);
+    assert.equal(searchIndex.items.length, 3);
+    assert.equal(searchIndex.items[0].evidences, undefined);
+    assert.match(searchIndex.items[0].search_text, /甲/);
+    assert.equal(getAnnotationCase(config, 1).case_title, '甲');
     assert.deepEqual(
       bootstrap.annotators.map((item) => [item.value, item.count]),
       [['all', 3], ['徐健怡', 1], ['李汶灿', 2]],
@@ -70,6 +82,21 @@ test('builds and applies annotator and origin filters', () => {
     const byOrigin = browseAnnotations(config, { origin: '经传释词' });
     assert.equal(byOrigin.total, 2);
     assert.deepEqual(byOrigin.items.map((item) => item.annotator), ['李汶灿', '徐健怡']);
+
+    const byMultiFilter = browseAnnotations(config, {
+      annotators: ['李汶灿', '徐健怡'],
+      origins: ['经传释词', '读书杂志'],
+    });
+    assert.equal(byMultiFilter.total, 3);
+
+    const byTraditionalQuery = browseAnnotations(config, { query: '經傳釋詞' });
+    assert.equal(byTraditionalQuery.total, 2);
+
+    const byContentQuery = browseAnnotations(config, { query: '甲文' });
+    assert.equal(byContentQuery.total, 0);
+
+    const metadataOnlyQuery = browseAnnotations(config, { query: '徐健怡' });
+    assert.equal(metadataOnlyQuery.total, 0);
   } finally {
     fs.rmSync(file, { force: true });
   }

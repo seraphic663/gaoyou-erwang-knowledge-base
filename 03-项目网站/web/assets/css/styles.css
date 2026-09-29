@@ -1315,6 +1315,15 @@ h2 {
   grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
 }
 
+.annotation-browser-layout {
+  align-items: start;
+}
+
+.annotation-browser-layout .browser-main {
+  align-self: start;
+  align-content: start;
+}
+
 .browser-sidebar,
 .browser-main,
 .browser-panel {
@@ -1634,70 +1643,144 @@ h2 {
   gap: 18px;
 }
 
-.annotation-toolbar {
-  gap: 16px;
-}
-
-.annotation-toolbar-heading {
-  align-items: center;
-  margin-bottom: 0;
-}
-
-.annotation-filter-grid {
-  display: grid;
-  grid-template-columns: minmax(280px, 1.7fr) minmax(170px, 0.8fr) minmax(170px, 0.8fr) auto;
-  gap: 12px;
-  align-items: end;
-}
-
-.annotation-filter-grid .toolbar-field {
-  min-width: 0;
-}
-
-.annotation-filter-grid input,
-.annotation-filter-grid select,
-.annotation-filter-actions .toolbar-button {
-  min-height: 46px;
-}
-
-.annotation-filter-grid input,
-.annotation-filter-grid select {
-  width: 100%;
-}
-
-.annotation-filter-actions {
-  display: flex;
-  align-items: end;
-  gap: 8px;
-}
-
-.annotation-filter-actions .toolbar-button {
-  white-space: nowrap;
-}
-
-.annotation-preset-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding-top: 2px;
-  border-top: 1px solid var(--line);
-}
-
-.annotation-preset-row .section-kicker {
-  flex: 0 0 auto;
-  margin: 0;
-}
-
-.annotation-preset-row .browser-preset-list {
-  align-items: center;
-}
-
 .annotation-sidebar .sidebar-card {
   gap: 8px;
 }
 
 .annotation-sidebar h3 {
   font-size: 18px;
+}
+
+.annotation-filter-card {
+  gap: 16px;
+}
+
+.annotation-filter-heading,
+.annotation-origin-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.annotation-filter-heading h3,
+.annotation-filter-section h4,
+.annotation-origin-heading h3 {
+  margin: 0;
+}
+
+.annotation-filter-heading .compact-note {
+  white-space: nowrap;
+}
+
+.annotation-filter-section {
+  display: grid;
+  gap: 8px;
+}
+
+.annotation-filter-section + .annotation-filter-section {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.annotation-filter-list {
+  display: grid;
+  gap: 6px;
+}
+
+.annotation-filter-option {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.annotation-filter-option:hover,
+.annotation-filter-option.is-selected {
+  border-color: var(--line-strong);
+  background: var(--control-bg);
+}
+
+.annotation-filter-option input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.annotation-filter-option-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.annotation-filter-count {
+  min-width: 24px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sub) 12%, transparent);
+  color: var(--sub);
+  font-size: 12px;
+  text-align: center;
+}
+
+.annotation-search-row {
+  align-items: end;
+}
+
+.annotation-search-field {
+  min-width: 0;
+}
+
+.annotation-search-actions {
+  align-self: end;
+}
+
+.annotation-search-actions .toolbar-button {
+  min-height: 46px;
+  white-space: nowrap;
+}
+
+.annotation-quick-searches {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.annotation-quick-search-label {
+  color: var(--sub);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.annotation-quick-search-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-width: 0;
+}
+
+.annotation-quick-search {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card-soft);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+}
+
+.annotation-quick-search:hover,
+.annotation-quick-search:focus-visible {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, var(--card-soft));
 }
 
 .browser-search-row,
@@ -1892,6 +1975,24 @@ h2 {
   gap: 18px;
 }
 
+.annotation-origin-group {
+  display: grid;
+  gap: 10px;
+}
+
+.annotation-origin-heading {
+  padding: 0 2px;
+}
+
+.annotation-origin-heading h3 {
+  color: var(--accent-deep);
+  font-size: 20px;
+}
+
+.annotation-origin-list {
+  gap: 12px;
+}
+
 .annotation-card {
   display: grid;
   gap: 14px;
@@ -1912,16 +2013,9 @@ h2 {
   margin: 4px 0 0;
 }
 
-.annotation-raw-grid {
+.annotation-target-card {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.annotation-raw-grid p {
-  margin: 0;
-  display: grid;
-  gap: 3px;
+  gap: 6px;
   padding: 10px 12px;
   border-radius: 16px;
   background: rgba(92, 102, 82, 0.08);
@@ -1929,13 +2023,13 @@ h2 {
   min-height: 66px;
 }
 
-.annotation-raw-grid strong {
+.annotation-target-card strong {
   color: var(--jade);
   font-size: 12px;
   letter-spacing: 0.12em;
 }
 
-.annotation-raw-grid span {
+.annotation-target-card span {
   min-width: 0;
   overflow-wrap: anywhere;
   line-height: 1.45;
@@ -1949,6 +2043,26 @@ h2 {
 .annotation-fold-body {
   display: grid;
   gap: 18px;
+}
+
+.annotation-detail-content {
+  display: none;
+}
+
+.annotation-fold[data-detail-loaded="true"] .annotation-detail-content {
+  display: grid;
+  gap: 18px;
+}
+
+.annotation-fold[data-detail-loaded="true"] .annotation-detail-placeholder {
+  display: none;
+}
+
+.search-hit {
+  padding: 0 2px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: inherit;
 }
 
 .annotation-fold-body h4 {
@@ -3448,13 +3562,10 @@ select,
 }
 
 @media (max-width: 900px) {
-  .annotation-filter-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.8fr) minmax(150px, 0.8fr) auto;
-  }
-
-  .annotation-raw-grid {
+  .hero-panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
 }
 
 @media (max-width: 700px) {
@@ -3615,28 +3726,6 @@ select,
     flex: 1;
   }
 
-  .annotation-filter-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .annotation-filter-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .annotation-filter-actions .toolbar-button {
-    width: 100%;
-  }
-
-  .annotation-preset-row {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .annotation-raw-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* Theme consistency: shared surfaces and controls must follow the active theme. */
@@ -3679,7 +3768,7 @@ select,
   color: var(--ink);
 }
 
-.annotation-raw-grid p,
+.annotation-target-card,
 .annotation-chip,
 .annotation-step-list li,
 .annotation-quote,

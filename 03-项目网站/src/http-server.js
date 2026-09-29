@@ -3,7 +3,12 @@ const http = require('http');
 const path = require('path');
 const config = require('./config');
 const { analyzeWithAnnotationAi } = require('./ai-annotation');
-const { browseAnnotations, buildAnnotationBootstrap } = require('./annotation-browser');
+const {
+  browseAnnotations,
+  buildAnnotationBootstrap,
+  buildAnnotationSearchIndex,
+  getAnnotationCase,
+} = require('./annotation-browser');
 const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
 const { retrieveForCase, retrieveFromCorpus } = require('./v2-retrieval');
@@ -48,7 +53,7 @@ function v2SummaryCacheKey(config) {
   ].map(fileRevision).join('|');
 }
 
-function sendJson(res, statusCode, payload) {
+function sendJson(res, statusCode, payload, extraHeaders = {}) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store, no-cache, must-revalidate',
@@ -56,6 +61,7 @@ function sendJson(res, statusCode, payload) {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    ...extraHeaders,
   });
   res.end(JSON.stringify(payload, null, 2));
 }
@@ -232,16 +238,48 @@ function createServer() {
         return sendJson(res, 200, buildAnnotationBootstrap(config));
       }
 
+      if (parsedUrl.pathname === '/api/annotation/index') {
+        const startedAt = process.hrtime.bigint();
+        const payload = buildAnnotationSearchIndex(config);
+        const apiTimeMs = Number(process.hrtime.bigint() - startedAt) / 1e6;
+        return sendJson(res, 200, payload, {
+          'X-API-Time-Ms': apiTimeMs.toFixed(3),
+          'Server-Timing': 'annotation-index;dur=' + apiTimeMs.toFixed(3),
+        });
+      }
+
+      if (parsedUrl.pathname === '/api/annotation/detail') {
+        const startedAt = process.hrtime.bigint();
+        const item = getAnnotationCase(config, parsedUrl.query.id);
+        const apiTimeMs = Number(process.hrtime.bigint() - startedAt) / 1e6;
+        if (!item) {
+          return sendJson(res, 404, { ok: false, message: 'annotation_case_not_found' }, {
+            'X-API-Time-Ms': apiTimeMs.toFixed(3),
+            'Server-Timing': 'annotation-detail;dur=' + apiTimeMs.toFixed(3),
+          });
+        }
+        return sendJson(res, 200, { ok: true, item }, {
+          'X-API-Time-Ms': apiTimeMs.toFixed(3),
+          'Server-Timing': 'annotation-detail;dur=' + apiTimeMs.toFixed(3),
+        });
+      }
+
       if (parsedUrl.pathname === '/api/annotation') {
-        return sendJson(res, 200, browseAnnotations(config, {
+        const startedAt = process.hrtime.bigint();
+        const payload = browseAnnotations(config, {
           query: parsedUrl.query.q || '',
           document: parsedUrl.query.document,
           method: parsedUrl.query.method,
-          annotator: parsedUrl.query.annotator,
-          origin: parsedUrl.query.origin,
+          annotators: parsedUrl.queryValues.annotator,
+          origins: parsedUrl.queryValues.origin,
           page: parsedUrl.query.page,
           pageSize: parsedUrl.query.pageSize,
-        }));
+        });
+        const apiTimeMs = Number(process.hrtime.bigint() - startedAt) / 1e6;
+        return sendJson(res, 200, payload, {
+          'X-API-Time-Ms': apiTimeMs.toFixed(3),
+          'Server-Timing': 'annotation-search;dur=' + apiTimeMs.toFixed(3),
+        });
       }
 
       if (parsedUrl.pathname === '/api/v2/summary') {
@@ -569,9 +607,15 @@ function createServer() {
   return http.createServer((req, res) => {
     try {
       const requestUrl = new URL(req.url, 'http://localhost');
+      const queryValues = {};
+      for (const [key, value] of requestUrl.searchParams.entries()) {
+        if (!queryValues[key]) queryValues[key] = [];
+        queryValues[key].push(value);
+      }
       const parsedUrl = {
         pathname: requestUrl.pathname,
         query: Object.fromEntries(requestUrl.searchParams),
+        queryValues,
       };
 
       if (parsedUrl.pathname.startsWith('/api/')) {

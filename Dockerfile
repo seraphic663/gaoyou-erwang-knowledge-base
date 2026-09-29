@@ -5,6 +5,8 @@ WORKDIR /app
 RUN apk add --no-cache python3
 
 COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --omit=dev
 COPY 03-项目网站 ./03-项目网站
 COPY v2 ./v2
 

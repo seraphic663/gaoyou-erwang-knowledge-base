@@ -1,5 +1,28 @@
 # case2query2retrieve benchmark
 
+## 人工标注库关键词检索 benchmark
+
+人工标注库使用另一条接口 /api/annotation。这条 benchmark 不评价相关性排序，也不把 AI 排序混进来；每个 query 只检查返回的案例 ID 集合是否与 gold 完全一致：
+
+    关键词 -> 案例 ID 集合
+
+指标包括：
+
+- exact set accuracy：返回集合是否不多不少；
+- missing / extra / duplicate：分别记录漏召回、多召回和重复；
+- micro precision / recall：跨 query 汇总；
+- roundtrip time：客户端从发起 API 请求到收到 JSON 的时间；
+- server time：API 内部处理时间，由 X-API-Time-Ms 响应头提供。
+
+Manifest 位于 v2/benchmarks/annotation-search.v1.json，包含精确案例、方法、字词、证据出处、简繁转换、待补内容和元数据排除控制样例。
+
+本地或 Railway 运行：
+
+    python v2/scripts/run_annotation_search_benchmark.py --base-url http://localhost:3311 --output tmp/annotation-search-local.json
+    python v2/scripts/run_annotation_search_benchmark.py --base-url https://gaoyou-demo.up.railway.app --output tmp/annotation-search-railway.json
+
+默认每条 query 先 warm-up 1 次，再测 5 次；结果顺序不计分，页面接口固定按案例 id 升序返回。
+
 This benchmark evaluates the retrieval layer only:
 
 ```text

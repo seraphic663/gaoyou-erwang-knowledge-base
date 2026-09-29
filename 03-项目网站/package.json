@@ -11,5 +11,8 @@
     "sync:sqlite": "python scripts/sqlite_bridge.py export",
     "sync:annotation": "python scripts/annotation_bridge.py export"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "opencc-js": "^1.4.2"
+  }
 }
