@@ -24,9 +24,9 @@ from erwang_v2.passage_builder import build_passages
 from erwang_v2.validate_annotation_case import classify_machine_status, validate_case
 
 
-DEFAULT_MARKDOWN = PROJECT_ROOT / "04-项目文献/A-原著原典/读书杂志_王念孙.md"
-DEFAULT_AI_JSON = PROJECT_ROOT / "04-项目文献/D-标注/json/ai_json/读书杂志_平原之隰-譕臣_卢飞宇.json"
-DEFAULT_FULL_JSON = PROJECT_ROOT / "04-项目文献/D-标注/json/full_json/读书杂志_平原之隰-譕臣_卢飞宇.json"
+DEFAULT_MARKDOWN = PROJECT_ROOT / "data/A-原著原典/读书杂志_王念孙.md"
+DEFAULT_AI_JSON = PROJECT_ROOT / "data/D-标注/json/ai_json/读书杂志_平原之隰-譕臣_卢飞宇.json"
+DEFAULT_FULL_JSON = PROJECT_ROOT / "data/D-标注/json/full_json/读书杂志_平原之隰-譕臣_卢飞宇.json"
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 
 

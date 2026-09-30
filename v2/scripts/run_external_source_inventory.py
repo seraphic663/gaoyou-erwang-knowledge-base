@@ -26,11 +26,11 @@ DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_REPORT = V2_ROOT / "data/real_runs/external_source_inventory.json"
 
 TEXT_ROOTS = (
-    PROJECT_ROOT / "04-项目文献/A-原著原典",
-    PROJECT_ROOT / "04-项目文献/B-一级资料",
-    PROJECT_ROOT / "04-项目文献/0-当前阅读",
-    PROJECT_ROOT / "04-项目文献/E-外部原典",
-    PROJECT_ROOT / "02-数据库/main",
+    PROJECT_ROOT / "data/A-原著原典",
+    PROJECT_ROOT / "data/B-一级资料",
+    PROJECT_ROOT / "data/0-当前阅读",
+    PROJECT_ROOT / "data/E-外部原典",
+    PROJECT_ROOT / "solution/legacy-db/main",
 )
 TEXT_SUFFIXES = {".md", ".txt"}
 
@@ -67,13 +67,13 @@ def relative(path: Path) -> str:
 
 def file_role(path: Path) -> str:
     relative_path = relative(path)
-    if relative_path.startswith("04-项目文献/A-原著原典/"):
+    if relative_path.startswith("data/A-原著原典/"):
         return "wang_core_context"
-    if relative_path.startswith("04-项目文献/B-一级资料/"):
+    if relative_path.startswith("data/B-一级资料/"):
         return "first_level_reference_context"
-    if relative_path.startswith("04-项目文献/0-当前阅读/"):
+    if relative_path.startswith("data/0-当前阅读/"):
         return "project_note_context"
-    if relative_path.startswith("04-项目文献/E-外部原典/"):
+    if relative_path.startswith("data/E-外部原典/"):
         return "external_canonical_candidate"
     return "legacy_database_context"
 

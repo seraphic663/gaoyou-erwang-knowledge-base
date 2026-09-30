@@ -41,9 +41,9 @@ from erwang_v2.validate_annotation_case import validate_case
 from run_batch_migration import run_batch
 
 
-LEGACY_DATABASE = PROJECT_ROOT / "02-数据库/data/dictionary.db"
-LEGACY_SOURCE = PROJECT_ROOT / "02-数据库/main/source.txt"
-LEGACY_PARSER = PROJECT_ROOT / "02-数据库/main/parser.py"
+LEGACY_DATABASE = PROJECT_ROOT / "solution/legacy-db/data/dictionary.db"
+LEGACY_SOURCE = PROJECT_ROOT / "solution/legacy-db/main/source.txt"
+LEGACY_PARSER = PROJECT_ROOT / "solution/legacy-db/main/parser.py"
 V2_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 OUTPUT_DIR = V2_ROOT / "data/real_runs/unified_ingress"
 REPORT_FILE = V2_ROOT / "data/real_runs/unified_ingress_report.json"
@@ -51,19 +51,19 @@ REPORT_FILE = V2_ROOT / "data/real_runs/unified_ingress_report.json"
 ORIGINAL_WORKS = {
     "读书杂志": {
         "work_key": "dushu_zazhi",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/读书杂志_王念孙.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/读书杂志_王念孙.md",
     },
     "广雅疏证": {
         "work_key": "guangya_shuzheng",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/广雅疏证_王念孙.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/广雅疏证_王念孙.md",
     },
     "经传释词": {
         "work_key": "jingzhuan_shici",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/经传释词_王引之.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/经传释词_王引之.md",
     },
     "经义述闻": {
         "work_key": "jingyi_shuwen",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/经义述闻_王引之.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/经义述闻_王引之.md",
     },
 }
 
@@ -123,8 +123,8 @@ def _load_env_file(path: Path) -> dict[str, str]:
 
 def _api_settings() -> tuple[str | None, str, str]:
     env = {}
-    env.update(_load_env_file(PROJECT_ROOT / "04-项目文献/D-标注/json/.env"))
-    env.update(_load_env_file(PROJECT_ROOT / "03-项目网站/.env"))
+    env.update(_load_env_file(PROJECT_ROOT / "data/D-标注/json/.env"))
+    env.update(_load_env_file(PROJECT_ROOT / "solution/website/.env"))
     key = os.environ.get("DEEPSEEK_API_KEY") or env.get("DEEPSEEK_API_KEY")
     model = os.environ.get("DEEPSEEK_MODEL") or env.get("DEEPSEEK_MODEL") or DEFAULT_MODEL
     return key, model, env.get("DEEPSEEK_URL", "https://api.deepseek.com/chat/completions")

@@ -23,24 +23,24 @@ DEFAULT_OUTPUT = V2_ROOT / "data/real_runs/source_inventory.v1.json"
 V2_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 
 CANONICAL_MARKDOWN = {
-    "dushu_zazhi": PROJECT_ROOT / "04-项目文献/A-原著原典/读书杂志_王念孙.md",
-    "guangya_shuzheng": PROJECT_ROOT / "04-项目文献/A-原著原典/广雅疏证_王念孙.md",
-    "jingyi_shuwen": PROJECT_ROOT / "04-项目文献/A-原著原典/经义述闻_王引之.md",
-    "jingzhuan_shici": PROJECT_ROOT / "04-项目文献/A-原著原典/经传释词_王引之.md",
+    "dushu_zazhi": PROJECT_ROOT / "data/A-原著原典/读书杂志_王念孙.md",
+    "guangya_shuzheng": PROJECT_ROOT / "data/A-原著原典/广雅疏证_王念孙.md",
+    "jingyi_shuwen": PROJECT_ROOT / "data/A-原著原典/经义述闻_王引之.md",
+    "jingzhuan_shici": PROJECT_ROOT / "data/A-原著原典/经传释词_王引之.md",
 }
 
 LEGACY_ROUTE = {
-    "dictionary_db": PROJECT_ROOT / "02-数据库/data/dictionary.db",
-    "source_txt": PROJECT_ROOT / "02-数据库/main/source.txt",
-    "parser_py": PROJECT_ROOT / "02-数据库/main/parser.py",
-    "importer_py": PROJECT_ROOT / "02-数据库/main/importer.py",
+    "dictionary_db": PROJECT_ROOT / "solution/legacy-db/data/dictionary.db",
+    "source_txt": PROJECT_ROOT / "solution/legacy-db/main/source.txt",
+    "parser_py": PROJECT_ROOT / "solution/legacy-db/main/parser.py",
+    "importer_py": PROJECT_ROOT / "solution/legacy-db/main/importer.py",
 }
 
-AI_JSON_DIR = PROJECT_ROOT / "04-项目文献/D-标注/json/ai_json"
-FULL_JSON_DIR = PROJECT_ROOT / "04-项目文献/D-标注/json/full_json"
+AI_JSON_DIR = PROJECT_ROOT / "data/D-标注/json/ai_json"
+FULL_JSON_DIR = PROJECT_ROOT / "data/D-标注/json/full_json"
 WEBSITE_SNAPSHOTS = {
-    "sqlite_snapshot": PROJECT_ROOT / "03-项目网站/data/sqlite-snapshot.json",
-    "annotation_snapshot": PROJECT_ROOT / "03-项目网站/data/annotation-snapshot.json",
+    "sqlite_snapshot": PROJECT_ROOT / "solution/website/data/sqlite-snapshot.json",
+    "annotation_snapshot": PROJECT_ROOT / "solution/website/data/annotation-snapshot.json",
 }
 
 
@@ -60,8 +60,9 @@ def discover_mysql_named_files() -> list[dict[str, Any]]:
 
     records: list[dict[str, Any]] = []
     pattern = re.compile(r"mysql", re.IGNORECASE)
+    ignored_dirs = {".git", ".venv", "node_modules", "__pycache__"}
     for path in PROJECT_ROOT.rglob("*"):
-        if not path.is_file() or ".git" in path.parts:
+        if not path.is_file() or any(part in ignored_dirs for part in path.parts):
             continue
         if pattern.search(path.name) or path.suffix.lower() in {".sql", ".dump", ".bak"}:
             records.append(
@@ -154,10 +155,10 @@ def build_report() -> dict[str, Any]:
         "canonical_wang_markdown": canonical,
         "legacy_machine_route": {
             "chain": [
-                "02-数据库/main/source.txt",
-                "02-数据库/main/parser.py",
-                "02-数据库/main/importer.py",
-                "02-数据库/data/dictionary.db",
+                "solution/legacy-db/main/source.txt",
+                "solution/legacy-db/main/parser.py",
+                "solution/legacy-db/main/importer.py",
+                "solution/legacy-db/data/dictionary.db",
             ],
             "files": legacy,
             "dictionary_db_observed": sqlite_counts(LEGACY_ROUTE["dictionary_db"]),

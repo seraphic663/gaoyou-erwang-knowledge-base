@@ -32,27 +32,27 @@ from erwang_v2.validate_annotation_case import validate_case
 from erwang_v2.validate_annotation_case import classify_machine_status
 
 
-AI_DIR = PROJECT_ROOT / "04-项目文献/D-标注/json/ai_json"
-FULL_JSON_DIR = PROJECT_ROOT / "04-项目文献/D-标注/json/full_json"
+AI_DIR = PROJECT_ROOT / "data/D-标注/json/ai_json"
+FULL_JSON_DIR = PROJECT_ROOT / "data/D-标注/json/full_json"
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 DEFAULT_REPORT = V2_ROOT / "data/real_runs/batch_migration_report.json"
 
 WORKS = {
     "广雅疏证": {
         "work_key": "guangya_shuzheng",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/广雅疏证_王念孙.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/广雅疏证_王念孙.md",
     },
     "经传释词": {
         "work_key": "jingzhuan_shici",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/经传释词_王引之.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/经传释词_王引之.md",
     },
     "读书杂志": {
         "work_key": "dushu_zazhi",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/读书杂志_王念孙.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/读书杂志_王念孙.md",
     },
     "经义述闻": {
         "work_key": "jingyi_shuwen",
-        "markdown": PROJECT_ROOT / "04-项目文献/A-原著原典/经义述闻_王引之.md",
+        "markdown": PROJECT_ROOT / "data/A-原著原典/经义述闻_王引之.md",
     },
 }
 

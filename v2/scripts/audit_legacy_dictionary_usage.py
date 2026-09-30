@@ -16,7 +16,7 @@ from typing import Any, Iterable
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_MAIN_DB = PROJECT_ROOT / "02-数据库" / "data" / "dictionary.db"
+DEFAULT_MAIN_DB = PROJECT_ROOT / "solution/legacy-db" / "data" / "dictionary.db"
 DEFAULT_V2_DB = PROJECT_ROOT / "v2" / "data" / "real_runs" / "annotation_v2.db"
 DEFAULT_OUTPUT = PROJECT_ROOT / "v2" / "data" / "real_runs" / "legacy_dictionary_field_audit.json"
 

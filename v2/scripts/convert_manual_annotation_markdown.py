@@ -29,7 +29,7 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[2]
 V2_ROOT = ROOT / "v2"
-DEFAULT_SOURCE_DIR = ROOT / "04-项目文献" / "0-当前阅读" / "annotation"
+DEFAULT_SOURCE_DIR = ROOT / "data" / "0-当前阅读" / "annotation"
 DEFAULT_DATABASE = V2_ROOT / "data" / "real_runs" / "annotation_v2.db"
 DEFAULT_OUTPUT_DIR = V2_ROOT / "data" / "real_runs" / "manual_annotation_ingress"
 SCHEMA_PATH = V2_ROOT / "schemas" / "annotation_case.v1.schema.json"

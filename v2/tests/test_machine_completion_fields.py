@@ -32,7 +32,7 @@ class MachineCompletionFieldsTest(unittest.TestCase):
             17: {
                 "text": "甲。心服曰畏。乙。",
                 "paragraph_index": 17,
-                "source_file": "04-项目文献/D-标注/json/full_json/sample.json",
+                "source_file": "data/D-标注/json/full_json/sample.json",
                 "source_schema_version": "annotation_docx_full_json_v1",
             }
         }
@@ -44,8 +44,8 @@ class MachineCompletionFieldsTest(unittest.TestCase):
         self.assertEqual(result["matches"][0]["end_char"], 7)
 
     def test_legacy_ai_mapping_has_all_machine_process_fields(self) -> None:
-        markdown = PROJECT_ROOT / "04-项目文献/A-原著原典/经传释词_王引之.md"
-        ai_json = PROJECT_ROOT / "04-项目文献/D-标注/json/ai_json/经传释词第二-㠯以已_李汶灿.json"
+        markdown = PROJECT_ROOT / "data/A-原著原典/经传释词_王引之.md"
+        ai_json = PROJECT_ROOT / "data/D-标注/json/ai_json/经传释词第二-㠯以已_李汶灿.json"
         passages = build_passages(markdown, "jingzhuan_shici")
         legacy_case = load_legacy_ai_json(ai_json)["cases"][8]
         case = adapt_legacy_case(

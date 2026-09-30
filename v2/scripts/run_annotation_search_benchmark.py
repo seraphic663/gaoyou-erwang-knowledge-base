@@ -17,7 +17,8 @@ from time import perf_counter
 from typing import Any
 
 
-DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "benchmarks" / "annotation-search.v1.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_MANIFEST = PROJECT_ROOT / "research" / "analysis" / "benchmarks" / "annotation-search.v1.json"
 
 
 def percentile(values: list[float], percentage: float) -> float | None:

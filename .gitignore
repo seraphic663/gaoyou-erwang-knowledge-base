@@ -26,34 +26,34 @@ note/
 
 # ---- Local analysis / external source workspaces ----
 tmp/
-00-项目说明/archive/
+docs/project/archive/
 
 # ---- Archive literature (large PDFs, not for repo) ----
-05-归档文献/*
-!05-归档文献/README.md
+archive/literature/*
+!archive/literature/README.md
 
 # ---- Runtime / backup artifacts ----
 **/*.broken.*
 ~$*.docx
 **/cloudflared.exe
 .env
-03-项目网站/.env
+solution/website/.env
 *.db-journal
 *.db-wal
 *.db-shm
-04-项目文献/D-标注/json/.env
-04-项目文献/D-标注/json/annotation_db/
+data/D-标注/json/.env
+data/D-标注/json/annotation_db/
 
 # ---- Generated database intermediates ----
-02-数据库/parsed_data.py
-02-数据库/data/dictionary.empty.db
+solution/legacy-db/parsed_data.py
+solution/legacy-db/data/dictionary.empty.db
 
 # ---- External edition scans (local evidence cache, tracked by manifest/hash only) ----
 v2/data/external_sources/edition_candidates/**/*.pdf
 v2/data/external_sources/edition_candidates/**/*.part
 
 # ---- Optional local generated data (uncomment if needed) ----
-# 03-项目网站/data/*.bak
+# solution/website/data/*.bak
 
 # ---- V2 local working data and generated reports ----
 # Rebuild these from source inputs and scripts; do not commit databases,

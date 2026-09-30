@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(PROJECT_ROOT / "03-项目网站" / "scripts"))
+sys.path.insert(0, str(PROJECT_ROOT / "solution/website" / "scripts"))
 
 from v2_acceptance_bridge import build_summary, get_case, list_cases  # noqa: E402
 

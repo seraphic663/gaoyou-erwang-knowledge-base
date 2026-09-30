@@ -1,0 +1,40 @@
+{
+  "metric": "正文字符数（去除 YAML 头信息和空白）/ exact 命中次数",
+  "ordering": "exact 命中降序；高频10%、中频10%-25%、低频25%-100%",
+  "same_title_counted_once": true,
+  "total_markdown_files": 284,
+  "unique_titles": 252,
+  "exact_positive_titles": 230,
+  "exact_zero_titles": 22,
+  "tiers": {
+    "高频": {
+      "title_count": 26,
+      "exact_zero_titles": 0,
+      "body_chars": 13374241,
+      "exact_hits": 20362,
+      "weighted_chars_per_exact_hit": 656.8235438562027,
+      "mean_title_chars_per_exact_hit": 794.626270583745,
+      "median_title_chars_per_exact_hit": 321.466
+    },
+    "中频": {
+      "title_count": 37,
+      "exact_zero_titles": 0,
+      "body_chars": 15284613,
+      "exact_hits": 3724,
+      "weighted_chars_per_exact_hit": 4104.35365198711,
+      "mean_title_chars_per_exact_hit": 5356.994824723768,
+      "median_title_chars_per_exact_hit": 832.9180327868852
+    },
+    "低频": {
+      "title_count": 189,
+      "exact_zero_titles": 22,
+      "body_chars": 58394133,
+      "exact_hits": 1274,
+      "weighted_chars_per_exact_hit": 45835.269230769234,
+      "mean_title_chars_per_exact_hit": 118928.4277651277,
+      "median_title_chars_per_exact_hit": 18298.666666666668
+    }
+  },
+  "table": "D:\\26大创\\data\\external\\daizhigev20\\analysis\\wang_text_per_exact_hit.tsv",
+  "chart": "D:\\26大创\\data\\external\\daizhigev20\\analysis\\wang_text_per_exact_hit.png"
+}

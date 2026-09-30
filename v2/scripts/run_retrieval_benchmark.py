@@ -13,7 +13,8 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "benchmarks" / "case2query2retrieve.v1.json"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_MANIFEST = PROJECT_ROOT / "research" / "analysis" / "benchmarks" / "case2query2retrieve.v1.json"
 
 
 def fetch_json(base_url: str, params: dict[str, Any], timeout: float) -> dict[str, Any]:

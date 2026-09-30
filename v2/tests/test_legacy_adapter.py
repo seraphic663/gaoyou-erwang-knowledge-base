@@ -18,8 +18,8 @@ from erwang_v2.validate_annotation_case import validate_case
 
 class LegacyAdapterMappingTest(unittest.TestCase):
     def _load(self, work_key: str, markdown_name: str, ai_name: str):
-        markdown = PROJECT_ROOT / "04-项目文献/A-原著原典" / markdown_name
-        ai_json = PROJECT_ROOT / "04-项目文献/D-标注/json/ai_json" / ai_name
+        markdown = PROJECT_ROOT / "data/A-原著原典" / markdown_name
+        ai_json = PROJECT_ROOT / "data/D-标注/json/ai_json" / ai_name
         passages = build_passages(markdown, work_key)
         cases = load_legacy_ai_json(ai_json)["cases"]
         passage_map = {passage["passage_id"]: passage for passage in passages}
@@ -139,9 +139,9 @@ class LegacyAdapterMappingTest(unittest.TestCase):
 
     def test_legacy_dictionary_materialization_binds_all_rows_without_canonical_claim(self) -> None:
         cases, source_passages, target_passages, material = load_legacy_dictionary_material(
-            PROJECT_ROOT / "02-数据库/data/dictionary.db",
-            source_text_path=PROJECT_ROOT / "02-数据库/main/source.txt",
-            parser_path=PROJECT_ROOT / "02-数据库/main/parser.py",
+            PROJECT_ROOT / "solution/legacy-db/data/dictionary.db",
+            source_text_path=PROJECT_ROOT / "solution/legacy-db/main/source.txt",
+            parser_path=PROJECT_ROOT / "solution/legacy-db/main/parser.py",
         )
         self.assertEqual(len(cases), 815)
         self.assertEqual(len(source_passages), 815)

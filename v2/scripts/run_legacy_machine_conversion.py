@@ -32,9 +32,9 @@ from erwang_v2.database import (
 from erwang_v2.legacy_dictionary_adapter import load_legacy_dictionary_material
 
 
-SOURCE_DATABASE = PROJECT_ROOT / "02-数据库/data/dictionary.db"
-SOURCE_TEXT = PROJECT_ROOT / "02-数据库/main/source.txt"
-SOURCE_PARSER = PROJECT_ROOT / "02-数据库/main/parser.py"
+SOURCE_DATABASE = PROJECT_ROOT / "solution/legacy-db/data/dictionary.db"
+SOURCE_TEXT = PROJECT_ROOT / "solution/legacy-db/main/source.txt"
+SOURCE_PARSER = PROJECT_ROOT / "solution/legacy-db/main/parser.py"
 TARGET_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 OUTPUT_DIR = V2_ROOT / "data/real_runs/legacy_machine_conversion"
 REPORT_FILE = V2_ROOT / "data/real_runs/legacy_machine_conversion_report.json"
@@ -306,10 +306,10 @@ def run_conversion(
         "generated_at": _now(),
         "status": "completed_with_explicit_boundaries" if all(checks.values()) else "completed_with_failures",
         "source_lineage": {
-            "database": "02-数据库/data/dictionary.db",
-            "upstream_text": "02-数据库/main/source.txt",
-            "parser": "02-数据库/main/parser.py",
-            "importer": "02-数据库/main/importer.py",
+            "database": "solution/legacy-db/data/dictionary.db",
+            "upstream_text": "solution/legacy-db/main/source.txt",
+            "parser": "solution/legacy-db/main/parser.py",
+            "importer": "solution/legacy-db/main/importer.py",
             "source_kind": "legacy_machine_parser_output",
             "ai_model_called": False,
         },

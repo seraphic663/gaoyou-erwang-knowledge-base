@@ -1,0 +1,18 @@
+{
+  "name": "gaoyou-erwang-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "高邮二王知识库项目工作区",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node ../solution/website/server.js",
+    "start:web": "npm --prefix ../solution/website start",
+    "sync:sqlite": "python ../solution/website/scripts/sqlite_bridge.py export",
+    "sync:annotation": "python ../solution/website/scripts/annotation_bridge.py export"
+  },
+  "dependencies": {
+    "opencc-js": "^1.4.2"
+  }
+}

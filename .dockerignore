@@ -15,12 +15,12 @@ Thumbs.db
 ~$*.docx
 **/cloudflared.exe
 
-01-项目资料
-04-项目文献
-05-归档文献
+docs/management
+data
+archive/literature
 note
 
-02-数据库
+solution/legacy-db
 v2/data
 *.zip
 *.pdf

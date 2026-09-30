@@ -32,7 +32,7 @@ STREAMS = (
     "external_passage_resolution",
 )
 
-# The local Node service launches this file from ``03-项目网站``.  Keep the
+# The local Node service launches this file from ``solution/website``.  Keep the
 # bridge self-contained so the write command can import the existing database
 # writer seam without requiring the caller to preconfigure PYTHONPATH.
 if str(SRC_ROOT) not in sys.path:

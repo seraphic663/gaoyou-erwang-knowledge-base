@@ -62,7 +62,7 @@ class ArchitectureLayerTest(unittest.TestCase):
                         source_file, metadata_json,
                         created_at, updated_at
                     ) VALUES (24, '方言', '', '经部', 'referenced',
-                              '02-数据库/data/dictionary.db', '{}',
+                              'solution/legacy-db/data/dictionary.db', '{}',
                               '2026-01-01T00:00:00+00:00', '2026-01-01T00:00:00+00:00')
                     """
                 )

@@ -266,8 +266,8 @@ def load_legacy_dictionary_cases(
                 "source_passage_id": None,
                 "source_location": {
                     "source_kind": "legacy_machine_database",
-                    "source_file": "02-数据库/main/source.txt",
-                    "database_file": "02-数据库/data/dictionary.db",
+                    "source_file": "solution/legacy-db/main/source.txt",
+                    "database_file": "solution/legacy-db/data/dictionary.db",
                     "legacy_table": "cases",
                     "legacy_case_id": legacy_id,
                     "section_title": legacy.get("section_title"),
@@ -320,9 +320,9 @@ def load_legacy_dictionary_cases(
                     "transformation_kind": "machine_output_reprocessing",
                     "transformation_description": "从旧 dictionary.db 的 cases/terms/evidences 机械映射为 annotation_case.v1，不重新判定学术结论。",
                     "provenance": {
-                        "source_file": "02-数据库/data/dictionary.db",
-                        "source_text_file": "02-数据库/main/source.txt",
-                        "parser_file": "02-数据库/main/parser.py",
+                        "source_file": "solution/legacy-db/data/dictionary.db",
+                        "source_text_file": "solution/legacy-db/main/source.txt",
+                        "parser_file": "solution/legacy-db/main/parser.py",
                         "legacy_table": "cases",
                         "legacy_case_id": legacy_id,
                         "legacy_term_ids": term_ids,
@@ -345,9 +345,9 @@ def load_legacy_dictionary_cases(
             cases.append(case)
         report = {
             "source_kind": "legacy_machine_database",
-            "source_file": "02-数据库/data/dictionary.db",
-            "source_text_file": "02-数据库/main/source.txt",
-            "parser_file": "02-数据库/main/parser.py",
+            "source_file": "solution/legacy-db/data/dictionary.db",
+            "source_text_file": "solution/legacy-db/main/source.txt",
+            "parser_file": "solution/legacy-db/main/parser.py",
             "case_count": len(cases),
             "evidence_count": sum(len(case["evidences"]) for case in cases),
             "term_relation_count": sum(len(case["term_relations"]) for case in cases),

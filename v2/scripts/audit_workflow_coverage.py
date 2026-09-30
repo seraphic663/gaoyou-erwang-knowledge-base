@@ -497,9 +497,9 @@ def build_report(
             "name": "通过本地验收网站检查数据库结果",
             "status": "artifact_ready",
             "artifacts": [
-                "03-项目网站/web/v2-database.html",
-                "03-项目网站/web/v2-acceptance.html",
-                "03-项目网站/src/http-server.js",
+                "solution/website/web/v2-database.html",
+                "solution/website/web/v2-acceptance.html",
+                "solution/website/src/http-server.js",
             ],
             "counts": {"read_only_database": True, "validation_bridge_present": True},
             "boundary": "本报告不把网页是否当前运行冒充数据库验证；网站只读展示和任务分批不改变机器/人工状态。",

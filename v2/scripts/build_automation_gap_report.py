@@ -194,7 +194,7 @@ def build_report(
         "source_policy": {
             "active_canonical_documents": source_policy,
             "mysql10_snapshot_status": ((source_inventory.get("mysql10_snapshot_search") or {}).get("status")),
-            "legacy_machine_route": "02-数据库/data/dictionary.db -> 02-数据库/main/source.txt/parser.py/importer.py -> legacy_* V2 materialization",
+            "legacy_machine_route": "solution/legacy-db/data/dictionary.db -> solution/legacy-db/main/source.txt/parser.py/importer.py -> legacy_* V2 materialization",
         },
         "machine_materialized": {
             "legacy_dictionary_inventory": legacy_inventory,
