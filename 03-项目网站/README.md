@@ -1,6 +1,6 @@
 # 高邮二王考据过程知识库网站
 
-`03-项目网站` 是项目的展示、检索和 V2 工作库入口。它不是单独的数据仓库：旧页面读取 `02-数据库` 导出的 JSON 快照，V2 页面通过 Python bridge 读取独立的 `v2/data/real_runs/annotation_v2.db`。
+`03-项目网站` 是项目的展示、通用语料检索和 V2 工作库入口。它不是单独的数据仓库：旧页面读取 `02-数据库` 导出的 JSON 快照，通用 corpus 和 V2 页面通过只读 bridge 读取当前工作数据库；检索接口与 V2 审校接口分开。
 
 在项目总体路线中，网站是研究操作和成果展示层，不是独立的研究贡献。固定成果页面只能从中期确认版本派生；V2 页面和五步卡提供检索、AI 备料和审计记录，但不把页面标签或五步记录显示成 gold。
 
@@ -9,6 +9,7 @@
 | 你要做什么 | 入口 |
 | --- | --- |
 | 看线上或本地网站 | 本文的运行方式和部署说明 |
+| 检索通用 corpus 正文 | corpus.html |
 | 浏览 V2 案例和质量报告 | v2-database.html |
 | 进入五步 AI 辅助审计 | annotation-workbench.html |
 | 查旧数据库快照 | database.html、annotation.html |
@@ -18,9 +19,10 @@
 ## 当前定位
 
 - 首页：说明研究对象、当前能力、代表性案例和数据库入口。
-- 首页“数据库”入口提供主数据库、人工标注库、V2 工作库三个选项；三库仍独立存储。
+- 首页“数据库”入口提供主数据库、人工标注库、通用语料库和 V2 工作库四个选项；各入口的查询与写入边界仍独立。
 - 数据库页：统一浏览主库字词、案例和数据库结构。
-- V2 工作库：`v2-database.html` 是完整案例库和质量报告入口；`annotation-workbench.html` 无参数时提供轻量案例选择器，有 `case` 参数时进入单案例五步审校。旧 `v2-acceptance.html` 只保留兼容跳转。Railway 的案例库自动读取 volume 下的 `v2/data/real_runs/annotation_v2.db`；本地案例默认读取被忽略的 `v2/data/local_test/annotation_v2.local.db`，若本地存在 `v2/data/real_runs/annotation_v2.db`，原文检索会自动使用它作为四部著作语料库。正文检索的作品范围固定显示为“四部著作”总库和四部作品的单独范围，不把 external candidate 文档伪装成作品选项。之后上传其他语料库时可用 `V2_CORPUS_DB_FILE` 指定；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立开关。
+- 通用语料库：`corpus.html` 和 `/api/corpus/retrieve` 只读检索 canonical passage，显示出处、定位和关联案例；它不显示或修改 V2 质量判定，也不承担人工审校。
+- V2 工作库：`v2-database.html` 是完整案例库和质量报告入口；`annotation-workbench.html` 无参数时提供轻量案例选择器，有 `case` 参数时进入单案例五步审校。旧 `v2-acceptance.html` 只保留兼容跳转。Railway 的工作库自动读取 volume 下的 `v2/data/real_runs/annotation_v2.db`；本地案例默认读取被忽略的 `v2/data/local_test/annotation_v2.local.db`。通用 corpus 可用 `CORPUS_DB_FILE` 指定；正式人工决定写入使用 `V2_REVIEW_WRITE_ENABLED=1`，五步审计卡记录使用独立开关。
 - 人工标注库：展示 `02-数据库/data/annotations.db` 的人工标注与 AI 整理结果，作为主库之外的工作稿数据库入口。
 - 五步释证：无 `case` 参数时先在页面内选择案例；选中 V2 案例后生成 AI 五步草稿，人工逐步修改和记录意见；保存到独立 `five_step_audit_records` 表，不改变案例状态。它是 AI 辅助审计流程，不等于后续的 domain-specific agent harness。Railway 默认保持只读，本地测试库默认允许保存；仍可用 `V2_FIVE_STEP_AUDIT_WRITE_ENABLED=0` 显式关闭。
 - AI 释证：旧的一次性接口仍保留供兼容调用；`ai-annotation.html` 现在跳转到五步释证，网站主流程统一从 V2 案例开始。
@@ -30,7 +32,7 @@
 
 ## 运行方式
 
-需要 Node.js 18+ 和可执行的 Python 3。旧快照页面只依赖 Node；`/api/v2/*` 还需要 Python。Windows 若 `python`/`python3` 指向 Microsoft Store 别名，V2 bridge 会跳过 9009 失败并尝试常见安装路径；仍可用 `PYTHON_BIN` 或 `V2_PYTHON_BIN` 明确指定解释器。
+需要 Node.js 18+ 和可执行的 Python 3。旧快照页面只依赖 Node；`/api/corpus/*` 和 `/api/v2/*` 还需要 Python。Windows 若 `python`/`python3` 指向 Microsoft Store 别名，bridge 会跳过 9009 失败并尝试常见安装路径；仍可用 `PYTHON_BIN` 或 `V2_PYTHON_BIN` 明确指定解释器。
 
 PowerShell 示例：
 
@@ -115,6 +117,7 @@ npm run sync:annotation
 │  ├─ annotation.html              人工标注库数据库页
 │  ├─ annotation-workbench.html     五步释证审校卡，从 V2 案例启动
 │  ├─ ai-annotation.html           旧 AI 入口的兼容跳转页
+│  ├─ corpus.html                  通用 corpus 正文检索入口
 │  ├─ v2-database.html             V2 案例浏览和质量报告；案例进入五步 AI 审校
 │  ├─ v2-acceptance.html           旧 V2 验收入口的兼容跳转
 │  ├─ term.html                    字词详情页
@@ -122,10 +125,13 @@ npm run sync:annotation
 │  ├─ knowledge.html               术语说明页
 │  └─ assets/
 │     ├─ css/styles.css            全站样式
+│     ├─ css/corpus.css             通用 corpus 检索样式
+│     ├─ js/corpus-browser.js       通用 corpus 正文检索
 │     └─ js/                       前端渲染、检索和交互脚本
 ├─ src/                            Node 服务、数据源、结构定义
 ├─ scripts/sqlite_bridge.py        SQLite 快照导出脚本
 ├─ scripts/annotation_bridge.py    人工标注库快照导出脚本
+├─ scripts/corpus_retrieval_bridge.py 通用 corpus 只读检索 bridge
 ├─ scripts/v2_acceptance_bridge.py V2 只读查询 bridge
 ├─ data/sqlite-snapshot.json       网站真实数据快照
 ├─ data/annotation-snapshot.json   人工标注库灰度快照
@@ -146,10 +152,11 @@ npm run sync:annotation
 - `GET /api/cases?q=关键词`：案例列表或案例检索。
 - `GET /api/term?id=编号`：字词详情。
 - `GET /api/case?id=编号`：案例详情。
+- `GET /api/corpus/retrieve?q=关键词&work_key=作品键`：只读检索 canonical passage；可传 `include_cases=1` 返回轻量关联案例链接。
 - `GET /api/v2/summary`：V2 工作库当前验收摘要。
 - `GET /api/v2/cases`：V2 案例队列，支持分页、检索、来源和机器状态筛选；未提供分页参数时默认返回第 1 页、每页 50 条。
 - `GET /api/v2/case?id=编号`：V2 案例完整详情，包括来源 passage、证据、过程、队列和既有事件。
-- `GET /api/v2/retrieve?case_id=编号` 或 `GET /api/v2/retrieve?q=关键词&work_key=作品键`：只读检索当前原文语料库中的 canonical passage；按案例检索时优先查当前作品，必要时标出跨作品候选参考。正文检索页面可额外传 `include_cases=1`，在每个段落结果下返回已关联的轻量 V2 case 链接。
+- `GET /api/corpus/retrieve?q=关键词&work_key=作品键` 或 `GET /api/corpus/retrieve?case_id=编号`：通用 corpus 只读检索接口；正文查询返回 canonical passage，案例查询返回五步释证所需的检索材料。
 - `GET /api/v2/review-tasks?stream=...&batch=...`：按批次读取静态 `review_task.v1` 任务；可选 `case_review`、`target_work_resolution`、`external_source_resolution`、`external_passage_resolution`。
 - `GET /api/v2/review-task?id=任务 ID`：读取单条人工审校任务及其决定契约。
 - `POST /api/v2/review`：受控人工决定写入接口；默认返回 403，只有 `V2_REVIEW_WRITE_ENABLED=1` 的本地服务才开放。它只调用 V2 已有事务 seam，要求稳定 `reviewer` 和唯一 `operation_id`，不会因读取任务或提交 target/source/passage resolution 自动产生 gold。

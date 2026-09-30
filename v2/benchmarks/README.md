@@ -46,11 +46,11 @@ Manifest 是 v2/benchmarks/annotation-search.v1.json，包含精确案例、方�
     python v2/scripts/run_annotation_search_benchmark.py --base-url http://localhost:3311 --output tmp/annotation-search-local.json
     python v2/scripts/run_annotation_search_benchmark.py --base-url https://gaoyou-demo.up.railway.app --output tmp/annotation-search-railway.json
 
-对 V2 retrieval benchmark，先使用只读 V2 数据库启动网站，再运行：
+对 corpus retrieval benchmark，先使用只读工作数据库启动网站，再运行：
 
     python v2/scripts/run_retrieval_benchmark.py --base-url http://localhost:3311 --output tmp/benchmark-local.json
 
-网站和 benchmark 使用同一只读检索接口，不另造一套排序逻辑。
+网站和 benchmark 使用同一条 `/api/corpus/retrieve` 只读检索接口，不另造一套排序逻辑。
 
 ## 5. 后续扩展
 

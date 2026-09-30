@@ -12,7 +12,7 @@ const {
   PROMPT_VERSION,
   STEPS,
 } = require('../src/v2-five-step-audit');
-const { buildRetrievalQuery } = require('../src/v2-retrieval');
+const { buildRetrievalQuery } = require('../src/corpus-retrieval');
 
 function sampleCase() {
   return {

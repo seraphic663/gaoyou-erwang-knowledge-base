@@ -18,6 +18,7 @@
             <div class="database-panel" aria-label="选择数据库">
               <a href="./database.html?view=terms"><span>主数据库</span><small>词条、案例与证据</small></a>
               <a href="./annotation.html"><span>人工标注库</span><small>人工标注材料浏览</small></a>
+              <a href="./corpus.html"><span>通用语料库</span><small>正文、出处与关联案例</small></a>
               <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、五步与质量</small></a>
             </div>
           </div>
@@ -68,43 +69,16 @@
           <div class="v2-panel-heading v2-case-heading">
             <div>
               <p class="section-kicker">案例浏览</p>
-              <h2>机器工作库中的案例</h2>
+              <h2>V2 工作库中的案例</h2>
             </div>
             <span id="v2CaseCount" class="summary-pill"></span>
           </div>
-          <p class="compact-note">先检索并选择案例，再在下方阅读来源、目标、证据和处理状态；内部 JSON 默认折叠。</p>
-
-          <section class="v2-passage-search" aria-labelledby="v2PassageSearchTitle">
-            <div class="v2-passage-search-heading">
-              <div>
-                <p class="section-kicker">正文检索</p>
-                <h3 id="v2PassageSearchTitle">粘贴正文，直接找原文和关联案例</h3>
-                <p>检索四部著作中已经登记的正文；结果按命中程度排序，并列出已经挂到该段落上的 V2 案例。</p>
-              </div>
-              <span class="summary-pill">只读</span>
-            </div>
-            <form id="v2PassageSearchForm" class="v2-passage-search-form">
-              <label class="v2-passage-query-field">
-                <span>正文片段</span>
-                <textarea id="v2PassageSearch" rows="3" placeholder="例如：平原之隰，奚有於高"></textarea>
-              </label>
-              <label class="toolbar-field">
-                <span>作品范围</span>
-                <select id="v2PassageWork"><option value="all">四部著作</option></select>
-              </label>
-              <div class="v2-passage-search-actions">
-                <button id="v2PassageSearchButton" class="page-link toolbar-button" type="submit">检索正文</button>
-                <button id="v2PassageReset" class="search-clear toolbar-button" type="button">清空</button>
-              </div>
-            </form>
-            <p id="v2PassageSearchStatus" class="compact-note" aria-live="polite"></p>
-            <div id="v2PassageResults" class="v2-passage-results" aria-live="polite"></div>
-          </section>
+          <p class="compact-note">仅检索当前 V2 案例库；原典全文检索请进入 <a href="./corpus.html">通用语料库</a>。</p>
 
           <div class="v2-filter-bar">
             <label class="toolbar-field">
-              <span>检索</span>
-              <input id="v2CaseSearch" type="search" placeholder="案例标题、来源、目标典籍" />
+              <span>案例检索</span>
+              <input id="v2CaseSearch" type="search" aria-label="检索当前 V2 案例库" placeholder="标题、来源、目标典籍" />
             </label>
             <label class="toolbar-field">
               <span>来源</span>

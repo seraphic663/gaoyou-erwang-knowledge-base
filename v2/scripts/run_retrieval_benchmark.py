@@ -17,7 +17,7 @@ DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "benchmarks" / "case2qu
 
 
 def fetch_json(base_url: str, params: dict[str, Any], timeout: float) -> dict[str, Any]:
-    url = f"{base_url.rstrip('/')}/api/v2/retrieve?{urllib.parse.urlencode(params)}"
+    url = f"{base_url.rstrip('/')}/api/corpus/retrieve?{urllib.parse.urlencode(params)}"
     request = urllib.request.Request(url, headers={"Accept": "application/json"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:

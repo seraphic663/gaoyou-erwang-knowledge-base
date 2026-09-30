@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>通用语料库 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="./assets/css/corpus.css" />
+  </head>
+  <body data-corpus-view="search">
+    <header class="subhero corpus-hero">
+      <nav class="nav" aria-label="主导航">
+        <div class="brand">高邮二王知识库</div>
+        <div class="nav-links">
+          <a href="./index.html">专题首页</a>
+          <div class="database-menu">
+            <a class="database-trigger" href="./corpus.html" aria-haspopup="true">数据库</a>
+            <div class="database-panel" aria-label="选择数据库">
+              <a href="./database.html?view=terms"><span>主数据库</span><small>词条、案例与证据</small></a>
+              <a href="./annotation.html"><span>人工标注库</span><small>人工标注材料浏览</small></a>
+              <a href="./corpus.html"><span>通用语料库</span><small>正文、出处与关联案例</small></a>
+              <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、五步与质量</small></a>
+            </div>
+          </div>
+          <a href="./annotation-workbench.html">五步释证</a>
+          <a href="./knowledge.html">训诂知识</a>
+        </div>
+      </nav>
+
+      <div class="hero-content">
+        <p class="badge">Corpus · 只读正文检索</p>
+        <h1>通用语料库</h1>
+        <p class="hero-copy">检索已经登记的原典正文，查看出处、定位信息和关联案例。这里是共享 corpus 的检索入口，不承担 V2 人工审校或质量判定。</p>
+      </div>
+    </header>
+
+    <main class="section corpus-page">
+      <div class="corpus-page-lead">
+        <div>
+          <p class="section-kicker">正文检索</p>
+          <h2>从原文进入出处和关联案例</h2>
+          <p>输入一段正文，系统会在已登记的 canonical passage 中检索，并显示匹配原因、原文位置以及可以继续查看的关联案例。</p>
+        </div>
+        <div class="corpus-page-actions">
+          <a class="page-link page-link-muted" href="./v2-database.html#browse">进入 V2 工作库</a>
+        </div>
+      </div>
+
+      <p id="corpusStatus" class="db-status">通用语料库检索只读运行中……</p>
+
+      <section class="card corpus-panel">
+        <div class="corpus-panel-heading">
+          <div>
+            <p class="section-kicker">Canonical passage</p>
+            <h2>粘贴正文，直接找原文</h2>
+          </div>
+          <span id="corpusResultCount" class="summary-pill">尚未检索</span>
+        </div>
+
+        <section class="corpus-search" aria-labelledby="corpusSearchTitle">
+          <div class="corpus-search-heading">
+            <div>
+              <h3 id="corpusSearchTitle">正文片段检索</h3>
+              <p>结果按命中程度排序；关联案例只作为导航线索，不改变语料库的正文检索结果。</p>
+            </div>
+            <span class="summary-pill">只读</span>
+          </div>
+          <form id="corpusSearchForm" class="corpus-search-form">
+            <label class="corpus-query-field">
+              <span>正文片段</span>
+              <textarea id="corpusQuery" rows="4" placeholder="例如：平原之隰，奚有於高"></textarea>
+            </label>
+            <label class="toolbar-field">
+              <span>作品范围</span>
+              <select id="corpusWork"><option value="all">四部著作</option></select>
+            </label>
+            <div class="corpus-search-actions">
+              <button id="corpusSearchButton" class="page-link toolbar-button" type="submit">检索正文</button>
+              <button id="corpusReset" class="search-clear toolbar-button" type="button">清空</button>
+            </div>
+          </form>
+          <p id="corpusSearchStatus" class="compact-note" aria-live="polite">输入一段正文后检索。</p>
+          <div id="corpusResults" class="corpus-results" aria-live="polite"></div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>通用语料库 · canonical 正文检索与出处定位 · V2 状态和人工审校请进入 V2 工作库</p>
+    </footer>
+
+    <script src="./assets/js/utils.js"></script>
+    <script src="./assets/js/corpus-browser.js"></script>
+  </body>
+</html>

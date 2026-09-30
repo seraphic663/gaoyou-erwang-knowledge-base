@@ -1,4 +1,4 @@
-"""Read-only passage retrieval for the V2 corpus.
+"""Read-only passage retrieval for the shared corpus.
 
 The bridge deliberately returns only canonical source passages.  It does not
 turn a match into an evidence approval, and it never writes to the database.
@@ -43,7 +43,7 @@ def traditional_variant(value: str) -> str:
 
 def connect(db_path: Path) -> sqlite3.Connection:
     if not db_path.exists():
-        raise FileNotFoundError(f"V2 corpus database not found: {db_path}")
+        raise FileNotFoundError(f"Corpus database not found: {db_path}")
     connection = sqlite3.connect(f"file:{db_path.resolve()}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA query_only = ON")
@@ -78,7 +78,7 @@ def attach_related_cases(
     connection: sqlite3.Connection,
     items: list[dict[str, Any]],
 ) -> None:
-    """Attach lightweight V2 case links without exposing case JSON.
+    """Attach lightweight case links without exposing case JSON.
 
     Passage retrieval remains the ranked operation.  The case links are only
     a navigation aid for the website: a passage can be linked from a case's

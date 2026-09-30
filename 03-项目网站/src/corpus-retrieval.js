@@ -43,15 +43,15 @@ async function retrieveFromCorpus(config, {
   if (workKey) args.push('--work-key', workKey);
   if (includeCases) args.push('--include-cases');
   const payload = await runPythonJsonBridge(config, {
-    bridgeFile: config.V2_RETRIEVAL_BRIDGE_FILE,
+    bridgeFile: config.CORPUS_RETRIEVAL_BRIDGE_FILE,
     command: 'retrieve',
     args,
-    dbFile: config.V2_CORPUS_DB_FILE,
-    errorLabel: 'V2 passage retrieval API',
+    dbFile: config.CORPUS_DB_FILE,
+    errorLabel: 'corpus passage retrieval API',
   });
   return {
     ...payload,
-    corpus_db: config.V2_CORPUS_DB_FILE,
+    corpus_db: config.CORPUS_DB_FILE,
     work_key: workKey,
     query: query || '',
     query_quality: query ? 'usable' : 'empty',
@@ -67,7 +67,7 @@ async function retrieveForCase(config, item, { limit = 8 } = {}) {
       ok: true,
       query: '',
       work_key: workKey,
-      corpus_db: config.V2_CORPUS_DB_FILE,
+      corpus_db: config.CORPUS_DB_FILE,
       candidate_count: 0,
       returned_count: 0,
       items: [],

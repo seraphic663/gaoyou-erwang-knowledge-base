@@ -1000,7 +1000,7 @@
     try {
       const item = await requestJson(`/api/v2/case?id=${encodeURIComponent(state.caseId)}`);
       try {
-        item.retrieval_materials = await requestJson(`/api/v2/retrieve?case_id=${encodeURIComponent(state.caseId)}`);
+        item.retrieval_materials = await requestJson(`/api/corpus/retrieve?case_id=${encodeURIComponent(state.caseId)}`);
       } catch (retrievalError) {
         item.retrieval_materials = { ok: false, message: retrievalError.message };
       }

@@ -8,6 +8,7 @@ const PAGE_FILES = [
   'index.html',
   'database.html',
   'annotation.html',
+  'corpus.html',
   'v2-database.html',
   'ai-annotation.html',
   'annotation-workbench.html',
@@ -19,6 +20,7 @@ const REQUIRED_NAV_HREFS = [
   './index.html',
   './database.html?view=terms',
   './annotation.html',
+  './corpus.html',
   './v2-database.html#browse',
   './annotation-workbench.html',
   './knowledge.html',
@@ -56,9 +58,24 @@ test('V2 case browsing keeps retired migration submissions out of the user path'
   const html = fs.readFileSync(path.join(WEB_DIR, 'v2-database.html'), 'utf8');
   const script = fs.readFileSync(path.join(WEB_DIR, 'assets/js/v2-acceptance.js'), 'utf8');
   assert.doesNotMatch(html, /v2ReviewTab|v2ReviewWorkspace|待办审校/);
+  assert.doesNotMatch(html, /v2PassageSearch|v2-passage-search/);
+  assert.match(html, /仅检索当前 V2 案例库/);
+  assert.match(html, /id="v2CaseSearch"[^>]*placeholder="标题、来源、目标典籍"/);
+  assert.doesNotMatch(script, /\/api\/v2\/retrieve/);
   assert.match(script, /requestedMode === 'review'/);
   assert.match(script, /annotation-workbench\.html\?case=/);
   assert.match(script, /v2-case-row-action/);
+});
+
+test('generic corpus search is independent from the V2 workspace', () => {
+  const html = fs.readFileSync(path.join(WEB_DIR, 'corpus.html'), 'utf8');
+  const script = fs.readFileSync(path.join(WEB_DIR, 'assets/js/corpus-browser.js'), 'utf8');
+  assert.match(html, /通用语料库/);
+  assert.match(html, /corpusSearchForm/);
+  assert.match(html, /assets\/js\/corpus-browser\.js/);
+  assert.match(script, /\/api\/corpus\/retrieve/);
+  assert.doesNotMatch(script, /\/api\/v2\/retrieve/);
+  assert.doesNotMatch(script, /\/api\/v2\/retrieve/);
 });
 
 test('five-step review uses progressive disclosure with evidence on the right', () => {

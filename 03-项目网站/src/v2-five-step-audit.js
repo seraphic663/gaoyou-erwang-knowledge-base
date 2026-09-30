@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { getV2Acceptance } = require('./v2-acceptance');
-const { retrieveForCase } = require('./v2-retrieval');
+const { retrieveForCase } = require('./corpus-retrieval');
 
 const PROMPT_VERSION = 'v2-five-step-audit.v8';
 const ACCEPTED_PROMPT_VERSIONS = new Set([
@@ -478,7 +478,7 @@ async function generateFiveStepDraft(config, input = {}) {
       status: 502,
       payload: {
         ok: false,
-        message: `V2 passage retrieval failed: ${error.message}`,
+        message: `Corpus passage retrieval failed: ${error.message}`,
       },
     };
   }

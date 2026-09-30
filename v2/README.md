@@ -1,8 +1,8 @@
 # V2 统一工作库
 
-这是独立于旧 dictionary.db 和 annotations.db 的 V2 数据核心目录，包含 schema、实现、测试、机器运行、统一工作数据库、工作队列和人工审校任务。当前验证报告显示，7,581 个案例仍为 machine draft 和 human pending，review_events=0、gold=0。
+这是独立于旧 dictionary.db 和 annotations.db 的 V2 工作库目录，包含 schema、实现、测试、机器运行、统一工作数据库、工作队列和人工审校任务。当前验证报告显示，7,581 个案例仍为 machine draft 和 human pending，review_events=0、gold=0。
 
-V2 的项目级定位是可追溯 corpus、检索和后续 agent 研究的基础设施，不是已经完成的人工知识库或端到端 benchmark。
+V2 负责保存机器案例、证据状态和人工任务材料；通用 corpus 检索由 `03-项目网站/src/corpus-retrieval.js` 和 `/api/corpus/retrieve` 提供。两者共享只读工作数据库，但不再把正文检索写成 V2 工作库功能。
 
 ## 先定位
 
@@ -82,7 +82,7 @@ data/fixtures/ 中只有短小的合成测试片段，用来验证代码结构�
 
 ## 在总体研究路线中的位置
 
-V2 负责保存来源、passage、case、evidence、状态和可重建的人工任务材料。它支持当前的只读检索和五步 AI 草稿，也为后续 benchmark-ready corpus 提供基础对象。
+V2 负责保存来源、passage、case、evidence、状态和可重建的人工任务材料。通用 corpus 服务负责正文检索；V2 在此基础上调用检索材料生成五步 AI 草稿，并不拥有正文检索入口。
 
 当前 v2/benchmarks/ 中的评价定义主要是 retrieval-layer benchmark。它不评价完整考据答案，不把 machine draft 自动变成 benchmark gold，也不等于 domain-specific agent harness 已经完成。
 
@@ -248,7 +248,7 @@ V2 负责保存来源、passage、case、evidence、状态和可重建的人工�
 
 该只读命令把案例、target_work、外部来源版本和外部 passage/quote 分成四条 `review_task.v1` JSONL 流，每条任务有稳定 `task_id`、`batch_id`、核心摘要、detail ref 和对应的 machine-only target/external packet 引用；manifest 会逐条与当前 pending queue 反向比对，任务包不写数据库、不产生 review event。当前生产任务包为案例 7,581 条/76 批、target_work 7,962 条/80 批、外部来源 100 条/1 批、外部 passage 121 条/2 批，批次上限 100；manifest 位于 `v2/data/real_runs/review_tasks/review_task_manifest.review.v1.json`，并由 `run_v2_validation.py` 的 `review_task_artifacts` 与 `target_work_resolution_packets` 检查纳入正式验收。
 
-本地只读工作库：启动 `03-项目网站` 后访问 `/v2-database.html`，在同一入口内按“案例浏览 / 质量报告”切换；选择案例后从详情进入“五步 AI 审校”，旧 `/v2-acceptance.html` 只保留兼容跳转。页面通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取同一个 V2 工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，列表默认只显示案例核心字段，目标定位候选、来源 passage、证据、词条、五步过程、来源记录和完整 JSON 在单条详情中按折叠区展开。质量报告会复用当前 `v2_validation_report.json`，报告过期时显示待重跑提示，不把旧验收结果冒充当前状态；外部候选 passage 在案例证据详情中按“候选、不等于 canonical”折叠展示。
+本地只读工作库：启动 `03-项目网站` 后访问 `/v2-database.html`，在同一入口内按“案例浏览 / 质量报告”切换；正文检索访问 `/corpus.html`，选择案例后从 V2 详情进入“五步 AI 审校”，旧 `/v2-acceptance.html` 只保留兼容跳转。V2 页面通过 `/api/v2/summary`、`/api/v2/cases` 和 `/api/v2/case?id=...` 读取工作库；案例队列支持检索、来源/机器状态筛选、每批 20/50/100 条分页，列表默认只显示案例核心字段，目标定位候选、来源 passage、证据、词条、五步过程、来源记录和完整 JSON 在单条详情中按折叠区展开。质量报告会复用当前 `v2_validation_report.json`，报告过期时显示待重跑提示，不把旧验收结果冒充当前状态；外部候选 passage 在案例证据详情中按“候选、不等于 canonical”折叠展示。
 
 当前 VR 还提供受控的人工审校任务入口：`GET /api/v2/review-tasks` 按四条任务流和批次读取静态 `review_task.v1`，`GET /api/v2/review-task` 读取单条任务，`POST /api/v2/review` 仅在以 `V2_REVIEW_WRITE_ENABLED=1` 启动本地服务时开放。VR 默认每批只显示前 20 条，可切换 50/100 条；提交 bridge 还会把 `task_id`、任务类型、queue item、当前 pending 状态与持久化任务包绑定，不能用任意 queue item 或 stale task 绕过任务流。提交接口只转发到 `apply_case_review_submission()`、`apply_target_work_resolution()`、`apply_external_source_resolution()` 或 `apply_external_passage_resolution()`；任务选择本身不写库，target/source/passage resolution 不晋级 gold，重复 `operation_id` 幂等，案例 `approved` 仍受完整字段决定、canonical target passage 和 quote gate 约束。提交后必须重建任务包，静态 JSONL 不会自行改变。默认启动仍是只读：
 该组接口保留给迁移维护和受控试验使用，不再作为网站首页或 V2 案例浏览的用户入口；网站审校主路径是“选择案例 → 五步 AI 审校”。
