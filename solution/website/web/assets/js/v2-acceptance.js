@@ -12,7 +12,6 @@ const V2Acceptance = (() => {
 
   const elements = {
     status: document.querySelector('#v2Status'),
-    heroMeta: document.querySelector('#v2HeroMeta'),
     overall: document.querySelector('#v2Overall'),
     metrics: document.querySelector('#v2Metrics'),
     checks: document.querySelector('#v2Checks'),
@@ -105,22 +104,6 @@ const V2Acceptance = (() => {
     if (updateUrl && window.location.hash !== `#${selectedMode}`) {
       window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}#${selectedMode}`);
     }
-  }
-
-  function renderHero() {
-    const summary = state.summary;
-    if (!summary || !elements.heroMeta) return;
-    const cards = [
-      ['工作状态', summary.overall_status === 'pass_with_warnings' ? '结构通过，有待办' : statusLabel(summary.overall_status)],
-      ['机器案例', summary.counts.annotation_cases],
-      ['待进行五步审校', summary.human_status_counts.pending || 0],
-    ];
-    elements.heroMeta.innerHTML = cards.map(([label, value]) => `
-      <div class="hero-panel-item">
-        <span class="hero-kicker">${escapeHtml(label)}</span>
-        <strong>${escapeHtml(String(value))}</strong>
-      </div>
-    `).join('');
   }
 
   function renderOverall() {
@@ -707,7 +690,6 @@ const V2Acceptance = (() => {
       state.page = Number(cases.page || 1);
       state.pageSize = Number(cases.page_size || state.pageSize);
       state.pageCount = Number(cases.page_count || Math.max(1, Math.ceil(state.totalCases / state.pageSize)));
-      renderHero();
       renderOverall();
       renderMetrics();
       renderChecks();

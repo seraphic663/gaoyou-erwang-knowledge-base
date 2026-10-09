@@ -1,8 +1,6 @@
 const detailView = document.body.dataset.detailView || '';
 const detailTitle = document.querySelector('#detailTitle');
 const detailLead = document.querySelector('#detailLead');
-const detailMeta = document.querySelector('#detailMeta');
-const detailStatus = document.querySelector('#detailStatus');
 const detailMain = document.querySelector('#detailMain');
 
 function getRequiredId() {
@@ -10,25 +8,7 @@ function getRequiredId() {
   return params.get('id') || '';
 }
 
-function renderMetaCards(items) {
-  if (!detailMeta) return;
-
-  detailMeta.innerHTML = items
-    .map(
-      (item) => `
-        <div class="hero-panel-item">
-          <span class="hero-kicker">${escapeHtml(item.label)}</span>
-          <strong>${escapeHtml(item.value)}</strong>
-        </div>
-      `,
-    )
-    .join('');
-}
-
 function renderDetailNotFound(message) {
-  if (detailStatus) {
-    detailStatus.textContent = message;
-  }
   if (detailMain) {
     detailMain.innerHTML = `
       <article class="card">
@@ -46,17 +26,6 @@ function renderTermDetail(payload) {
   if (detailLead) {
     detailLead.textContent = summarizeText(payload.coreMeaning || payload.notes || '当前字词暂无摘要说明。', 150);
   }
-  renderMetaCards([
-    { label: '类型', value: payload.termType || '未分类' },
-    { label: '类别', value: payload.category || '未分类' },
-    { label: '关联案例', value: `${payload.caseCount || 0} 条` },
-    { label: '关联证据', value: `${payload.evidenceCount || 0} 条` },
-  ]);
-
-  if (detailStatus) {
-    detailStatus.textContent = payload.sourceLabel ? `数据库来源：${payload.sourceLabel}` : '';
-  }
-
   const aliasList = (payload.aliases || [])
     .map((alias) => `<span class="mini-chip">${escapeHtml(alias)}</span>`)
     .join('');
@@ -162,17 +131,6 @@ function renderCaseDetail(payload) {
   if (detailLead) {
     detailLead.textContent = summarizeText(payload.conclusion || payload.problem || '当前案例暂无摘要说明。', 150);
   }
-  renderMetaCards([
-    { label: '方法', value: payload.method || '未标注方法' },
-    { label: '置信度', value: payload.certainty || '未标注置信度' },
-    { label: '状态', value: payload.status || '未标注状态' },
-    { label: '证据', value: `${payload.evidenceCount || 0} 条` },
-  ]);
-
-  if (detailStatus) {
-    detailStatus.textContent = payload.sourceLabel ? `数据库来源：${payload.sourceLabel}` : '';
-  }
-
   const evidenceTypeList = (payload.evidenceTypes || [])
     .map((type) => `<span class="tag">${escapeHtml(type)}</span>`)
     .join('');

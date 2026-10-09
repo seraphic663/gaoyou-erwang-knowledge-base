@@ -1,17 +1,4 @@
 const BrowserCommon = (() => {
-  function renderHeroItems(target, items) {
-    if (!target) return;
-
-    target.innerHTML = items
-      .map((item) => `
-        <div class="hero-panel-item">
-          <span class="hero-kicker">${escapeHtml(item.label)}</span>
-          <strong>${escapeHtml(item.value)}</strong>
-        </div>
-      `)
-      .join('');
-  }
-
   function renderChoiceButtons(target, items, options = {}) {
     if (!target) return;
 
@@ -71,7 +58,6 @@ const BrowserCommon = (() => {
   return {
     includesText,
     renderChoiceButtons,
-    renderHeroItems,
     renderSchemaCards,
   };
 })();

@@ -1,4 +1,3 @@
-const annotationHeroMeta = document.querySelector('#annotationHeroMeta');
 const annotationStatus = document.querySelector('#annotationStatus');
 const annotationSearchInput = document.querySelector('#annotationSearchInput');
 const annotationAnnotatorFilters = document.querySelector('#annotationAnnotatorFilters');
@@ -88,18 +87,6 @@ function buildLocalResult() {
     items: allItems.slice(start, start + state.pageSize),
     counts: state.bootstrap?.counts || {},
   };
-}
-
-function renderHero() {
-  const counts = state.bootstrap?.counts || {};
-  const items = [
-    { label: '来源', value: state.bootstrap?.sourceLabel || '人工标注灰度库' },
-    { label: '文档', value: `${counts.documents || 0} 件` },
-    { label: '案例', value: `${counts.cases || 0} 条` },
-    { label: '证据', value: `${counts.evidences || 0} 条` },
-  ];
-
-  BrowserCommon.renderHeroItems(annotationHeroMeta, items);
 }
 
 function renderMultiFilters(target, items, activeValues, dataAttribute) {
@@ -378,7 +365,6 @@ async function init() {
     state.bootstrap = await requestJson('/api/annotation/index');
     state.indexItems = state.bootstrap.items || [];
     annotationStatus.textContent = '这里只浏览人工标注与 AI 整理后的结构化数据，与主数据库并行。';
-    renderHero();
     renderFilters();
     renderQuickSearches();
     await runAnnotationBrowse();

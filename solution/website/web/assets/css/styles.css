@@ -130,9 +130,14 @@ body::before {
   pointer-events: none;
 }
 
-.hero {
+.hero,
+.subhero {
+  /* Navigation overlays belong to the shared header and may extend below the hero. */
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.hero {
   background: var(--hero-bg);
   color: var(--hero-ink);
   padding-top: 0;
@@ -141,8 +146,6 @@ body::before {
 }
 
 .subhero {
-  position: relative;
-  overflow: hidden;
   background: var(--subhero-bg);
   color: var(--hero-ink);
   padding-top: 0;
@@ -408,10 +411,6 @@ body::before {
   margin: 8px 0;
 }
 
-.subhero .hero-panel {
-  margin-top: 0;
-}
-
 .hero-stage {
   display: grid;
   gap: 26px;
@@ -550,14 +549,6 @@ select {
 .hero-scroll-copy {
   color: color-mix(in srgb, var(--hero-ink) 68%, transparent);
   margin: 0;
-}
-
-.hero-panel {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-  margin-top: 28px;
-  max-width: 860px;
 }
 
 .hero-showcase {
@@ -727,20 +718,6 @@ select {
   color: var(--pri-2);
 }
 
-.hero-panel-item {
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 249, 239, 0.1);
-  border: 1px solid rgba(255, 241, 214, 0.12);
-  backdrop-filter: blur(4px);
-}
-
-.hero-panel-item strong {
-  display: block;
-  font-size: 16px;
-}
-
-.hero-kicker,
 .section-kicker {
   display: block;
   margin-bottom: 6px;
@@ -3299,16 +3276,6 @@ h2 {
   margin-left: 6px;
 }
 
-.hero-panel {
-  gap: 10px;
-  margin-top: 18px;
-}
-
-.hero-panel-item {
-  padding: 11px 13px;
-  border-radius: 14px;
-}
-
 .showcase-shell {
   gap: 12px;
   padding: 16px;
@@ -3370,8 +3337,7 @@ h2 {
   margin-bottom: 12px;
 }
 
-.section-kicker,
-.hero-kicker {
+.section-kicker {
   margin-bottom: 4px;
   font-size: 10px;
   letter-spacing: 0.13em;
@@ -3561,20 +3527,13 @@ select,
   }
 }
 
-@media (max-width: 900px) {
-  .hero-panel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-}
-
 @media (max-width: 700px) {
   .nav {
     width: calc(100% - 20px);
-    padding: 14px 10px 12px;
+    padding: 10px 10px 8px;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: 10px 14px;
+    gap: 6px 10px;
   }
 
   .brand {
@@ -3584,9 +3543,10 @@ select,
   .nav-links {
     flex: 1 0 100%;
     width: 100%;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: flex-start;
-    gap: 8px 14px;
+    gap: 8px 12px;
+    overflow: visible;
   }
 
   .flow-branch {
@@ -3617,7 +3577,8 @@ select,
 
   .database-menu,
   .database-trigger {
-    width: 100%;
+    width: auto;
+    flex: 0 0 auto;
   }
 
   .database-panel {

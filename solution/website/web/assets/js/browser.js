@@ -1,7 +1,6 @@
 const browserNav = document.querySelector('#browserNav');
 const browserFilters = document.querySelector('#browserFilters');
 const browserModeFilters = document.querySelector('#browserModeFilters');
-const browserStatus = document.querySelector('#browserStatus');
 const browserHeading = document.querySelector('#browserHeading');
 const browserSearchInput = document.querySelector('#browserSearchInput');
 const browserSearchButton = document.querySelector('#browserSearchButton');
@@ -13,7 +12,6 @@ const browserListSection = document.querySelector('#browserListSection');
 const browserSchemaSection = document.querySelector('#browserSchemaSection');
 const browserSchemaSummary = document.querySelector('#browserSchemaSummary');
 const browserSchemaGrid = document.querySelector('#browserSchemaGrid');
-const browserHeroMeta = document.querySelector('#browserHeroMeta');
 const browserPagination = document.querySelector('#browserPagination');
 
 const state = {
@@ -67,19 +65,6 @@ function loadUrlState() {
   if (Number.isFinite(page) && page > 0) {
     state.page = page;
   }
-}
-
-function renderHeroMeta() {
-  if (!browserHeroMeta || !state.bootstrap) return;
-
-  const counts = state.bootstrap.counts || {};
-  const items = [
-    { label: '字词', value: `${counts.terms || 0} 条` },
-    { label: '案例', value: `${counts.cases || 0} 条` },
-    { label: '来源', value: state.bootstrap.sourceLabel || '未知' },
-  ];
-
-  BrowserCommon.renderHeroItems(browserHeroMeta, items);
 }
 
 function renderSchema(stores) {
@@ -339,10 +324,6 @@ async function init() {
   loadUrlState();
   const bootstrap = await requestJson('/api/browser/bootstrap');
   state.bootstrap = bootstrap;
-  renderHeroMeta();
-  if (browserStatus) {
-    browserStatus.textContent = `数据库来源：${bootstrap.sourceLabel}`;
-  }
   renderSchema(bootstrap.stores || []);
   await runBrowse();
 }
@@ -471,9 +452,6 @@ browserSearchInput?.addEventListener('keydown', async (event) => {
 });
 
 init().catch((error) => {
-  if (browserStatus) {
-    browserStatus.textContent = '数据库加载失败';
-  }
   if (browserList) {
     browserList.innerHTML = '<article class="card"><h3>无法读取数据库</h3><p>请确认后端服务已启动，再刷新页面。</p></article>';
   }

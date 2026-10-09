@@ -157,3 +157,57 @@ test('main navigation stays in the hero flow and keeps its brand on one line', (
   assert.match(css, /\.brand\s*\{[\s\S]*white-space:\s*nowrap/);
   assert.match(css, /\.nav-links\s*\{[\s\S]*position:\s*static/);
 });
+
+test('shared hero surfaces keep navigation overlays unclipped', () => {
+  const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
+  const heroSurfaceRule = [...css.matchAll(/\.hero,\s*\.subhero\s*\{([\s\S]*?)\n\}/g)]
+    .find((match) => /position:\s*relative/.test(match[1]) && /overflow:\s*visible/.test(match[1]));
+  assert.ok(heroSurfaceRule, 'styles.css must define one shared hero surface rule');
+  assert.match(heroSurfaceRule[1], /position:\s*relative/);
+  assert.match(heroSurfaceRule[1], /overflow:\s*visible/);
+  for (const file of PAGE_FILES) {
+    const html = fs.readFileSync(path.join(WEB_DIR, file), 'utf8');
+    assert.match(html, /class="database-panel"/, `${file} must expose the shared navigation overlay`);
+  }
+});
+
+test('redundant hero summary panels are removed from the user-facing pages', () => {
+  const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
+  assert.doesNotMatch(css, /\.hero-panel(?:-item)?\s*\{/);
+  for (const file of PAGE_FILES) {
+    const html = fs.readFileSync(path.join(WEB_DIR, file), 'utf8');
+    assert.doesNotMatch(html, /class="hero-panel(?:\s|[^"])*"/, `${file} must not render the deleted summary panel`);
+  }
+
+  const scriptFiles = [
+    'assets/js/browser-common.js',
+    'assets/js/browser.js',
+    'assets/js/annotation.js',
+    'assets/js/detail.js',
+    'assets/js/v2-acceptance.js',
+  ];
+  for (const file of scriptFiles) {
+    const script = fs.readFileSync(path.join(WEB_DIR, file), 'utf8');
+    assert.doesNotMatch(script, /renderHeroItems|renderHeroMeta|renderMetaCards|HeroMeta|detailMeta/);
+  }
+});
+
+test('tablet and mobile hero layouts stay compact instead of forcing avoidable wrapping', () => {
+  const css = fs.readFileSync(path.join(WEB_DIR, 'assets/css/styles.css'), 'utf8');
+  assert.doesNotMatch(
+    css,
+    /@media\s*\(max-width:\s*900px\)[\s\S]*?\.hero-panel\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2/,
+    'the 900px breakpoint must not force the hero stats into two rows',
+  );
+  assert.doesNotMatch(css, /@media\s*\(max-width:\s*700px\)[\s\S]*?\.hero-panel\s*\{/);
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*700px\)[\s\S]*?\.nav-links\s*\{[\s\S]*?flex-wrap:\s*nowrap[\s\S]*?overflow:\s*visible/,
+    'mobile navigation must stay on one compact row without clipping overlays',
+  );
+  assert.match(
+    css,
+    /@media\s*\(max-width:\s*700px\)[\s\S]*?\.database-menu,\s*\.database-trigger\s*\{[\s\S]*?width:\s*auto/,
+    'the database menu must not consume a full mobile row',
+  );
+});
