@@ -24,7 +24,7 @@
   }
 
   function relationLabel(relation) {
-    return relation === 'source_passage' ? '案例来源段落' : '案例证据段落';
+    return ({ source_passage: '案例来源段落', target_passage: '案例目标段落', evidence_passage: '案例证据段落' })[relation] || '案例关联段落';
   }
 
   function populateWorkFilter() {
@@ -120,7 +120,9 @@
     runSearch();
   });
   elements.reset?.addEventListener('click', () => {
-    history.replaceState(null,'','/corpus');
+    state.requestId += 1;
+    elements.searchButton.disabled = false;
+    history.replaceState(null, '', '/corpus');
     elements.query.value = '';
     elements.work.value = 'all';
     elements.searchStatus.textContent = '输入一段正文后检索。';
@@ -129,18 +131,38 @@
   });
   populateWorkFilter();
   elements.status.textContent = '原典检索已就绪 · 正文只读';
+  async function loadCasePassages(caseId) {
+    const requestId = ++state.requestId;
+    try {
+      const item = await requestJson('/api/v2/case?id=' + encodeURIComponent(caseId));
+      const retrieval = await requestJson('/api/corpus/retrieve?case_id=' + encodeURIComponent(caseId))
+        .catch(() => ({ items: [], unavailable: true }));
+      if (requestId !== state.requestId) return;
+      const exact = [
+        { passage: item.source_passage, relation: 'source_passage' },
+        { passage: item.target_passage, relation: 'target_passage' },
+      ].filter(entry => entry.passage).map(({ passage, relation }) => ({
+        ...passage,
+        caseLinked: true,
+        passage_text: passage.raw_text,
+        match_reason: '当前案例已关联原文',
+        related_cases: [{ case_id: caseId, case_title: item.case_title, relations: [relation] }],
+      }));
+      const seen = new Set(exact.map(passage => passage.passage_id));
+      renderResults({ items: [...exact, ...(retrieval.items || []).filter(passage => !seen.has(passage.passage_id))] });
+      elements.searchStatus.textContent = '当前案例：' + item.case_title
+        + (retrieval.unavailable ? '。补充检索暂不可用，已展示关联原文。' : '。已关联原文在前；检索匹配只作补充线索。');
+    } catch (error) {
+      if (requestId === state.requestId) elements.searchStatus.textContent = '案例原文读取失败：' + error.message;
+    }
+  }
+
   const initial = new URLSearchParams(location.search);
-  if (initial.has('q')) { elements.query.value = initial.get('q'); if (initial.has('work_key')) elements.work.value=initial.get('work_key'); runSearch(); }
-  else if (initial.has('case_id')) {
-    (async()=>{
-      try {
-        const caseId=initial.get('case_id');
-        const [item,retrieval]=await Promise.all([requestJson('/api/v2/case?id='+encodeURIComponent(caseId)),requestJson('/api/corpus/retrieve?case_id='+encodeURIComponent(caseId))]);
-        const exact=[item.source_passage,item.target_passage].filter(Boolean).map(p=>({...p, caseLinked:true, passage_text:p.raw_text||p.passage_text||p.text||p.content, match_reason:'当前案例已关联原文',related_cases:[{case_id:caseId,case_title:item.case_title,relations:['source_passage']}]}));
-        const seen=new Set(exact.map(p=>p.passage_id));
-        renderResults({items:[...exact,...(retrieval.items||[]).filter(p=>!seen.has(p.passage_id))]});
-        elements.searchStatus.textContent='当前案例：'+item.case_title+'。已关联原文在前；检索匹配只作补充线索。';
-      } catch(error) { elements.searchStatus.textContent='案例原文读取失败：'+error.message; }
-    })();
+  if (initial.has('q')) {
+    elements.query.value = initial.get('q');
+    if (initial.has('work_key')) elements.work.value = initial.get('work_key');
+    runSearch();
+  } else if (initial.has('case_id')) {
+    loadCasePassages(initial.get('case_id'));
   }
 })();

@@ -6,7 +6,6 @@ const clearSearch = document.querySelector('#clearSearch');
 const searchQuick = document.querySelector('#searchQuick');
 const dbStatus = document.querySelector('#dbStatus');
 const dbStats = document.querySelector('#dbStats');
-const schemaGrid = document.querySelector('#schemaGrid');
 const searchSummary = document.querySelector('#searchSummary');
 
 let searchTimer = null;
@@ -57,41 +56,6 @@ function renderStats(counts) {
       `,
     )
     .join('');
-}
-
-function renderSchema(stores) {
-  if (!schemaGrid) return;
-
-  schemaGrid.innerHTML = '';
-  stores.forEach((storeDefinition) => {
-    const card = document.createElement('article');
-    card.className = 'card';
-    const keyMeta = storeDefinition.keyFields
-      .map((field) => `<span class="tag muted">${escapeHtml(field)}</span>`)
-      .join('');
-    const indexMeta = storeDefinition.indexes
-      .map((field) => `<span class="tag">idx:${escapeHtml(field)}</span>`)
-      .join('');
-    const fields = (storeDefinition.fields || [])
-      .map(
-        (field) => `
-          <div class="field-row">
-            <div class="field-name"><code>${escapeHtml(field.name)}</code></div>
-            <div class="field-desc">${escapeHtml(field.description)}</div>
-          </div>
-        `,
-      )
-      .join('');
-
-    card.innerHTML = `
-      <h3>${escapeHtml(storeDefinition.label)}</h3>
-      <p>${escapeHtml(storeDefinition.purpose)}</p>
-      <div class="schema-meta">${keyMeta}${indexMeta}</div>
-      <p class="db-status">当前记录：${storeDefinition.count} 条</p>
-      <div class="field-list">${fields}</div>
-    `;
-    schemaGrid.appendChild(card);
-  });
 }
 
 function renderSearchSummary(result) {
@@ -245,7 +209,6 @@ async function loadBootstrap() {
   }
   const bootstrap = await requestJson('/api/bootstrap');
   renderStats(bootstrap.counts);
-  renderSchema(bootstrap.stores);
   renderQuickSearch(bootstrap);
   if (dbStatus) {
     dbStatus.textContent = `数据库状态：已连接 · ${bootstrap.sourceLabel}（${bootstrap.totalRecords} 条总记录）`;
@@ -273,9 +236,7 @@ async function init() {
     if (dbStats) {
       dbStats.innerHTML = '';
     }
-    if (schemaGrid) {
-      schemaGrid.innerHTML = '<article class="card"><h3>无法加载数据库</h3><p>请使用 <code>node solution/website/server.js</code> 启动服务后再访问。</p></article>';
-    }
+
     if (searchSummary) {
       searchSummary.innerHTML = '';
     }

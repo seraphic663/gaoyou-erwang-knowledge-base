@@ -1,10 +1,9 @@
-const { resolvePage } = require('./site-routes');
+const { resolvePage, renderNavigation } = require('./site-routes');
 const { getAuditTargets } = require('./site-identity');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const config = require('./config');
-const { analyzeWithAnnotationAi } = require('./ai-annotation');
 const {
   browseAnnotations,
   buildAnnotationBootstrap,
@@ -97,7 +96,7 @@ function readJsonBody(req) {
   });
 }
 
-function sendFile(res, filePath) {
+function sendFile(res, filePath, transform = null) {
   const extension = path.extname(filePath).toLowerCase();
   const contentTypes = {
     '.html': 'text/html; charset=utf-8',
@@ -121,7 +120,8 @@ function sendFile(res, filePath) {
       'Cache-Control': 'no-store, no-cache, must-revalidate',
       'Pragma': 'no-cache',
     });
-    res.end(fs.readFileSync(filePath));
+    const content = fs.readFileSync(filePath);
+    res.end(transform ? transform(content.toString('utf8')) : content);
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Not Found');
@@ -151,16 +151,7 @@ function resolveStaticFile(requestPath) {
     return mediaPath || path.join(config.WEB_DIR, '404.not-found');
   }
 
-  if (requestPath.startsWith('/data/')) {
-    const dataPath = safeResolve(config.DATA_DIR, requestPath.slice('/data/'.length));
-    return dataPath || path.join(config.WEB_DIR, '404.not-found');
-  }
-
-  let relativePath = requestPath;
-  if (relativePath.startsWith('/web/')) {
-    relativePath = relativePath.slice('/web'.length);
-  }
-
+  const relativePath = requestPath;
   const staticPath = safeResolve(config.WEB_DIR, relativePath);
   return staticPath || path.join(config.WEB_DIR, '404.not-found');
 }
@@ -594,16 +585,6 @@ function createServer() {
         return sendJson(res, 200, dataSource.getTerms());
       }
 
-      if (parsedUrl.pathname === '/api/ai/annotation') {
-        if (req.method !== 'POST') {
-          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
-        }
-
-        const body = await readJsonBody(req);
-        const result = await analyzeWithAnnotationAi(config, dataSource, body.question || body.text || '');
-        return sendJson(res, result.status, result.payload);
-      }
-
       return sendJson(res, 404, { ok: false, message: 'API not found' });
     } catch (error) {
       return sendJson(res, 500, {
@@ -633,9 +614,15 @@ function createServer() {
       }
 
       const page = resolvePage(requestUrl);
-      if (page?.redirect) { res.writeHead(308, { Location: page.redirect, 'Cache-Control': 'no-store' }); return res.end(); }
-      if (page?.file) return sendFile(res, path.join(config.WEB_DIR, page.file));
-      return sendFile(res, resolveStaticFile(parsedUrl.pathname));
+      if (page?.file) {
+        return sendFile(res, path.join(config.WEB_DIR, page.file), html =>
+          html.replace('<!--site-navigation-->', renderNavigation(parsedUrl.pathname)));
+      }
+      if (parsedUrl.pathname.startsWith('/assets/') || parsedUrl.pathname.startsWith('/media/')) {
+        return sendFile(res, resolveStaticFile(parsedUrl.pathname));
+      }
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('页面不存在');
     } catch (error) {
       return sendJson(res, 500, {
         ok: false,

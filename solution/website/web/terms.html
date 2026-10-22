@@ -1,1 +1,75 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>字词库 · 高邮二王知识库</title><link rel="stylesheet" href="/assets/css/styles.css"><link rel="stylesheet" href="/assets/css/site.css"></head><body><header class="subhero"><nav class="nav" aria-label="主导航"><a class="brand" href="/">高邮二王知识库</a><div class="nav-links"><a href="/">首页</a><a class="audit-entry" href="/audit">释证与审校</a><a href="/cases">案例库</a><a href="/terms">字词库</a><a href="/corpus">原典检索</a><a href="/knowledge">训诂知识</a></div></nav><div class="hero-content"><p class="badge">高邮二王 · 研究工作空间</p><h1 id="detailTitle">字词库</h1><p class="hero-copy">查找字词义项、相关案例和证据。</p></div></header><main class="section"><a id="siteBack" class="site-back" href="/cases">返回案例库</a><form id="termSearch" class="site-search"><label>字词或关键词<input name="q"></label><label>方法类别<select name="category"><option value="all">全部类别</option></select></label><label>检索范围<select name="mode"><option value="entry">字词与义项</option><option value="fulltext">正文与证据</option></select></label><button>检索字词</button></form><div id="termResults"></div></main><footer class="footer">高邮二王知识库 · 来源可追溯，审校记录保留</footer><script src="/assets/js/utils.js"></script><script src="/assets/js/site.js"></script><script src="/assets/js/terms.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>
+      字词库 · 高邮二王知识库
+    </title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <header class="subhero">
+      <!--site-navigation-->
+      <div class="hero-content">
+        <p class="badge">
+          高邮二王 · 研究工作空间
+        </p>
+        <h1 id="detailTitle">
+          字词库
+        </h1>
+        <p class="hero-copy">
+          查找字词义项、相关案例和证据。
+        </p>
+      </div>
+    </header>
+    <main class="section">
+      <a id="siteBack" class="site-back" href="/cases">
+        返回案例库
+      </a>
+      <form id="termSearch" class="site-search">
+        <label>
+          字词或关键词
+          <input name="q">
+        </label>
+        <label>
+          方法类别
+          <select name="category">
+            <option value="all">
+              全部类别
+            </option>
+          </select>
+        </label>
+        <label>
+          检索范围
+          <select name="mode">
+            <option value="entry">
+              字词与义项
+            </option>
+            <option value="fulltext">
+              正文与证据
+            </option>
+          </select>
+        </label>
+        <button>
+          检索字词
+        </button>
+      </form>
+      <p id="termFilterStatus" role="status"></p>
+      <div id="termResults">
+      </div>
+    </main>
+    <footer class="footer">
+      高邮二王知识库 · 来源可追溯，审校记录保留
+    </footer>
+    <script src="/assets/js/utils.js">
+    </script>
+    <script src="/assets/js/page-catalog.js">
+    </script>
+    <script src="/assets/js/site.js">
+    </script>
+    <script src="/assets/js/terms.js">
+    </script>
+  </body>
+</html>

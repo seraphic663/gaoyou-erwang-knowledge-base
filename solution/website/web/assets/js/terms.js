@@ -1,12 +1,54 @@
-(async()=>{
- const p=new URLSearchParams(location.search),form=document.querySelector('#termSearch'),root=document.querySelector('#termResults');
- form.elements.q.value=p.get('q')||'';
- form.onsubmit=e=>{e.preventDefault();location.href='/terms?'+new URLSearchParams(new FormData(form));};
- form.elements.mode.value=p.get('mode')||'fulltext';
- requestJson('/api/browser/bootstrap').then(data=>{form.elements.category.innerHTML=(data.termCategories||[]).map(v=>'<option value="'+escapeHtml(v.value)+'">'+escapeHtml(v.label)+'</option>').join('');form.elements.category.value=p.get('category')||'all';}).catch(()=>{});
- try{
-  const q=new URLSearchParams({view:'terms',mode:p.get('mode')||'fulltext',category:p.get('category')||'all',q:p.get('q')||'',page:p.get('page')||'1',pageSize:'30'});
-  const data=await requestJson('/api/browser?'+q);
-  root.innerHTML='<p>'+data.total+' 条字词</p><div class="grid grid-2">'+data.items.map(item=>'<article class="card"><h2>'+Site.link(Site.url('/term',{id:item.id,return:Site.current()}),item.term)+'</h2><p>'+escapeHtml(item.coreMeaning||item.notes||'')+'</p><div class="site-actions">'+(item.relatedCases||[]).map(c=>Site.link(Site.caseUrl('main',c.id),c.displayTitle||c.title||'关联案例')).join('')+'</div></article>').join('')+'</div><div class="site-actions">'+[data.page>1?[data.page-1,'上一页']:null,data.page<data.totalPages?[data.page+1,'下一页']:null].filter(Boolean).map(([page,label])=>{const next=new URLSearchParams(p);next.set('page',page);return Site.link('/terms?'+next,label);}).join('')+'第 '+data.page+' / '+data.totalPages+' 页</div>';
- }catch(error){root.textContent='字词读取失败：'+error.message;}
+(() => {
+  const params = new URLSearchParams(location.search);
+  const form = document.querySelector('#termSearch');
+  const root = document.querySelector('#termResults');
+
+  function renderTerm(item) {
+    const related = (item.relatedCases || []).map(relatedCase =>
+      Site.link(Site.caseUrl('main', relatedCase.id), relatedCase.displayTitle || relatedCase.title || '关联案例'));
+    return `
+      <article class="card">
+        <h2>${Site.link(Site.url('/term', { id: item.id, return: Site.current() }), item.term)}</h2>
+        <p>${escapeHtml(item.coreMeaning || item.notes || '')}</p>
+        <div class="site-actions">${related.join('')}</div>
+      </article>
+    `;
+  }
+
+  async function loadCategories() {
+    try {
+      const data = await requestJson('/api/browser/bootstrap');
+      form.elements.category.innerHTML = Site.options(data.termCategories || []);
+      form.elements.category.value = params.get('category') || 'all';
+    } catch {
+      document.querySelector('#termFilterStatus').textContent = '类别筛选暂不可用，仍可检索关键词。';
+    }
+  }
+
+  async function loadTerms() {
+    const query = new URLSearchParams({
+      view: 'terms', mode: params.get('mode') || 'fulltext',
+      category: params.get('category') || 'all', q: params.get('q') || '',
+      page: params.get('page') || '1', pageSize: '30',
+    });
+    try {
+      const data = await requestJson('/api/browser?' + query);
+      root.innerHTML = `
+        <p>${data.total} 条字词</p>
+        <div class="grid grid-2">${data.items.map(renderTerm).join('')}</div>
+        ${Site.pagination('/terms', params, data.page, data.totalPages)}
+      `;
+    } catch (error) {
+      root.textContent = '字词读取失败：' + error.message;
+    }
+  }
+
+  form.elements.q.value = params.get('q') || '';
+  form.elements.mode.value = params.get('mode') || 'fulltext';
+  form.onsubmit = event => {
+    event.preventDefault();
+    location.href = '/terms?' + new URLSearchParams(new FormData(form));
+  };
+  loadCategories();
+  loadTerms();
 })();

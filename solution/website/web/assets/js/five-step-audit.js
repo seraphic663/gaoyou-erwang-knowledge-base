@@ -713,6 +713,7 @@
     el.saveMessage.textContent = '';
     renderSteps();
     el.form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    persistDraft();
   }
 
   function exitEditMode() {
@@ -726,12 +727,14 @@
   }
 
   function cancelEditMode() {
+    if (!window.confirm('退出修改会丢弃本次尚未提交的修改。继续吗？')) return;
+    AuditDraft.clear(state.caseId);
     exitEditMode();
-          state.generation = null;
-          state.reviewedSteps = [];
-          state.writeArmed = false;
-          if (el.writeArm) el.writeArm.checked = false;
-          el.cards.innerHTML = '';
+    state.generation = null;
+    state.reviewedSteps = [];
+    state.writeArmed = false;
+    if (el.writeArm) el.writeArm.checked = false;
+    el.cards.innerHTML = '';
     el.form.hidden = true;
     el.generationMeta.hidden = true;
     el.saveMessage.textContent = '';
@@ -883,6 +886,7 @@
     else if (element.dataset.fiveStepComment) step.comment = element.value;
     else step.status = element.value;
     updateSaveButton();
+    persistDraft();
   }
 
   function setStepDecision(field, decision) {
@@ -897,6 +901,7 @@
       step.text = '';
     }
     renderSteps();
+    persistDraft();
   }
 
   function onStepDecision(event) {
@@ -1001,10 +1006,11 @@
       decision: el.decision?.value || '', note: el.overallNote?.value || '',
     });
     if (!ok) el.status.textContent = '浏览器无法暂存草稿；请先提交审校，避免离页丢失。';
+    return ok;
   }
 
   function offerDraftRestore() {
-    const saved = AuditDraft.read(state.caseId);
+    const saved = AuditDraft.read(state.caseId, STEP_DEFINITIONS.map(step => step.field));
     if (!saved?.generation || saved.caseId !== state.caseId) return;
     const notice = document.createElement('div');
     notice.className = 'draft-notice';
@@ -1048,7 +1054,11 @@
         item.retrieval_materials = { ok: false, message: retrievalError.message };
       }
       renderCase(item);
-      await loadHistory();
+      try {
+        await loadHistory();
+      } catch (error) {
+        el.status.textContent = '案例已载入；审校历史暂不可用：' + error.message;
+      }
       offerDraftRestore();
     } catch (error) {
       el.status.textContent = `无法打开该 V2 案例：${error.message}`;
@@ -1094,13 +1104,13 @@
   });
   el.form?.addEventListener('submit', submitAudit);
 
-  document.addEventListener('input', persistDraft);
-  document.addEventListener('change', persistDraft);
-  document.addEventListener('click', () => { queueMicrotask(persistDraft); });
+  el.reviewer?.addEventListener('input', persistDraft);
+  el.overallNote?.addEventListener('input', persistDraft);
+  el.decision?.addEventListener('change', persistDraft);
   window.addEventListener('pagehide', persistDraft);
   window.addEventListener('beforeunload', (event) => {
-    persistDraft();
-    if (state.generating) { event.preventDefault(); event.returnValue = ''; }
+    const stored = persistDraft();
+    if (state.generating || stored === false) { event.preventDefault(); event.returnValue = ''; }
   });
   applyViewMode(state.viewMode);
   init();

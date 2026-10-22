@@ -161,8 +161,6 @@ module.exports = {
     'V2_FIVE_STEP_AUDIT_WRITE_ENABLED',
     V2_DB_PROFILE === 'local-test',
   ),
-  DEEPSEEK_PARSE_API_KEY: process.env.DEEPSEEK_PARSE_API_KEY || process.env.DEEPSEEK_API_KEY || '',
   DEEPSEEK_ANALYSIS_API_KEY: process.env.DEEPSEEK_ANALYSIS_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP || process.env.DEEPSEEK_API_KEY || '',
-  DEEPSEEK_MODEL: 'deepseek-v4-pro',
   DEEPSEEK_AUDIT_MODEL: process.env.DEEPSEEK_AUDIT_MODEL || 'deepseek-flash',
 };

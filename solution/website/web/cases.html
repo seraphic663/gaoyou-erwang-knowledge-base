@@ -1,1 +1,108 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>案例库 · 高邮二王知识库</title><link rel="stylesheet" href="/assets/css/styles.css"><link rel="stylesheet" href="/assets/css/site.css"></head><body><header class="subhero"><nav class="nav" aria-label="主导航"><a class="brand" href="/">高邮二王知识库</a><div class="nav-links"><a href="/">首页</a><a class="audit-entry" href="/audit">释证与审校</a><a href="/cases">案例库</a><a href="/terms">字词库</a><a href="/corpus">原典检索</a><a href="/knowledge">训诂知识</a></div></nav><div class="hero-content"><p class="badge">高邮二王 · 研究工作空间</p><h1 id="detailTitle">案例库</h1><p class="hero-copy">在一个入口查找各来源的案例；保留来源身份，审校入口仅连接有明确对应关系的 V2 记录。</p></div></header><main class="section"><a id="siteBack" class="site-back" href="/cases">返回案例库</a><form id="caseSearch" class="site-search"><label>关键词<input name="q" placeholder="标题、字词、方法或正文"></label><label>来源<select name="source"><option value="all">全部来源</option><option value="main">主库材料</option><option value="annotation">人工标注材料</option><option value="v2">V2 工作材料</option></select></label><label>人工标注者<select name="annotator"><option value="all">全部标注者</option></select></label><label>人工标注出处<select name="origin"><option value="all">全部出处</option></select></label><label>V2 来源<select name="source_work"><option value="">全部来源</option></select></label><label>机器状态<select name="machine_status"><option value="">全部状态</option><option value="draft">机器草稿</option><option value="schema_invalid">结构不合格</option></select></label><button>检索案例</button></form><div class="site-actions"><a href="/quality">质量报告与数据库结构</a></div><div id="caseResults"></div></main><footer class="footer">高邮二王知识库 · 来源可追溯，审校记录保留</footer><script src="/assets/js/utils.js"></script><script src="/assets/js/site.js"></script><script src="/assets/js/cases.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>
+      案例库 · 高邮二王知识库
+    </title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <header class="subhero">
+      <!--site-navigation-->
+      <div class="hero-content">
+        <p class="badge">
+          高邮二王 · 研究工作空间
+        </p>
+        <h1 id="detailTitle">
+          案例库
+        </h1>
+        <p class="hero-copy">
+          在一个入口查找各来源的案例；保留来源身份，审校入口仅连接有明确对应关系的 V2 记录。
+        </p>
+      </div>
+    </header>
+    <main class="section">
+      <a id="siteBack" class="site-back" href="/cases">
+        返回案例库
+      </a>
+      <form id="caseSearch" class="site-search">
+        <label>
+          关键词
+          <input name="q" placeholder="标题、字词、方法或正文">
+        </label>
+        <label>
+          来源
+          <select name="source">
+            <option value="all">全部来源</option>
+          </select>
+        </label>
+        <label>
+          人工标注者
+          <select name="annotator">
+            <option value="all">
+              全部标注者
+            </option>
+          </select>
+        </label>
+        <label>
+          人工标注出处
+          <select name="origin">
+            <option value="all">
+              全部出处
+            </option>
+          </select>
+        </label>
+        <label>
+          V2 来源
+          <select name="source_work">
+            <option value="">
+              全部来源
+            </option>
+          </select>
+        </label>
+        <label>
+          机器状态
+          <select name="machine_status">
+            <option value="">
+              全部状态
+            </option>
+            <option value="draft">
+              机器草稿
+            </option>
+            <option value="schema_invalid">
+              结构不合格
+            </option>
+          </select>
+        </label>
+        <button>
+          检索案例
+        </button>
+      </form>
+      <div class="site-actions">
+        <a href="/quality">
+          质量报告与数据库结构
+        </a>
+      </div>
+      <p id="caseFilterStatus" role="status">
+      </p>
+      <div id="caseResults">
+      </div>
+    </main>
+    <footer class="footer">
+      高邮二王知识库 · 来源可追溯，审校记录保留
+    </footer>
+    <script src="/assets/js/utils.js">
+    </script>
+    <script src="/assets/js/page-catalog.js">
+    </script>
+    <script src="/assets/js/site.js">
+    </script>
+    <script src="/assets/js/case-sources.js">
+    </script>
+    <script src="/assets/js/cases.js">
+    </script>
+  </body>
+</html>
