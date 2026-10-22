@@ -55,10 +55,10 @@
             <div class="corpus-detail-topline"><strong>关联案例</strong><span class="summary-pill">${escapeHtml(String(cases.length))} 条</span></div>
             <div class="corpus-related-list">
               ${cases.map((caseItem) => `
-                <a class="corpus-related-case" href="./v2-database.html?case=${encodeURIComponent(caseItem.case_id)}#browse">
+                <a class="corpus-related-case" href="${escapeHtml(Site.caseUrl('v2',caseItem.case_id))}">
                   <span><strong>${escapeHtml(caseItem.case_title || '未命名案例')}</strong><small>${escapeHtml(caseItem.target_work || '目标典籍未明确')} · ${escapeHtml(caseItem.target_text || '目标文字未记录')}</small></span>
                   <span class="corpus-related-tags">${(caseItem.relations || []).map((relation) => `<span class="corpus-tag">${escapeHtml(relationLabel(relation))}</span>`).join('')}</span>
-                </a>
+                </a>${Site.link(Site.auditUrl(caseItem.case_id), '开始本案释证与审校')}
               `).join('')}
             </div>
           </div>
@@ -68,7 +68,7 @@
         <article class="corpus-result">
           <div class="corpus-detail-topline">
             <div class="corpus-result-title"><span class="corpus-rank">${escapeHtml(String(index + 1))}</span><span><strong>${escapeHtml(location)}</strong><small>${escapeHtml(labelForWork(item.work_key))} · ${escapeHtml(item.match_reason || '正文片段命中')}</small></span></div>
-            <span class="corpus-status-chip">canonical</span>
+            <span class="corpus-status-chip">${item.caseLinked ? '案例关联原文 · 状态需核对' : '已登记原典'}</span>
           </div>
           <p class="corpus-result-text">${escapeHtml(item.passage_text || '没有可展示的正文。')}</p>
           <p class="corpus-result-meta"><code>${escapeHtml(item.passage_id || '')}</code>${item.md_line_start ? ` · 原文行 ${escapeHtml(String(item.md_line_start))}-${escapeHtml(String(item.md_line_end || item.md_line_start))}` : ''}</p>
@@ -93,6 +93,7 @@
     elements.searchStatus.textContent = '正在查找已登记的 canonical 正文……';
     elements.results.innerHTML = '<div class="corpus-empty">正在读取正文结果……</div>';
     const params = new URLSearchParams({ q: query, limit: '8', include_cases: '1' });
+    const address = new URLSearchParams(location.search); address.delete('case_id'); address.set('q',query); address.set('work_key',workKey); history.replaceState(null,'','/corpus?'+address);
     if (workKey !== 'all') params.set('work_key', workKey);
     try {
       const payload = await requestJson(`/api/corpus/retrieve?${params.toString()}`);
@@ -103,7 +104,7 @@
       elements.searchStatus.textContent = count
         ? `找到 ${count} 段正文；其中 ${caseCount} 条带有关联案例。`
         : '没有找到对应的 canonical 正文段落。';
-      elements.status.textContent = `通用语料库已连接 · ${payload.trace?.retrieval_method || '只读正文检索'} · 结果不写入数据库`;
+      elements.status.textContent = `原典检索已连接 · ${payload.trace?.retrieval_method || '只读正文检索'} · 结果不写入数据库`;
     } catch (error) {
       if (requestId !== state.requestId) return;
       elements.results.innerHTML = `<div class="corpus-empty">正文检索失败：${escapeHtml(error.message)}</div>`;
@@ -119,6 +120,7 @@
     runSearch();
   });
   elements.reset?.addEventListener('click', () => {
+    history.replaceState(null,'','/corpus');
     elements.query.value = '';
     elements.work.value = 'all';
     elements.searchStatus.textContent = '输入一段正文后检索。';
@@ -126,5 +128,19 @@
     elements.results.innerHTML = '';
   });
   populateWorkFilter();
-  elements.status.textContent = '通用语料库检索已就绪 · canonical 正文只读';
+  elements.status.textContent = '原典检索已就绪 · 正文只读';
+  const initial = new URLSearchParams(location.search);
+  if (initial.has('q')) { elements.query.value = initial.get('q'); if (initial.has('work_key')) elements.work.value=initial.get('work_key'); runSearch(); }
+  else if (initial.has('case_id')) {
+    (async()=>{
+      try {
+        const caseId=initial.get('case_id');
+        const [item,retrieval]=await Promise.all([requestJson('/api/v2/case?id='+encodeURIComponent(caseId)),requestJson('/api/corpus/retrieve?case_id='+encodeURIComponent(caseId))]);
+        const exact=[item.source_passage,item.target_passage].filter(Boolean).map(p=>({...p, caseLinked:true, passage_text:p.raw_text||p.passage_text||p.text||p.content, match_reason:'当前案例已关联原文',related_cases:[{case_id:caseId,case_title:item.case_title,relations:['source_passage']}]}));
+        const seen=new Set(exact.map(p=>p.passage_id));
+        renderResults({items:[...exact,...(retrieval.items||[]).filter(p=>!seen.has(p.passage_id))]});
+        elements.searchStatus.textContent='当前案例：'+item.case_title+'。已关联原文在前；检索匹配只作补充线索。';
+      } catch(error) { elements.searchStatus.textContent='案例原文读取失败：'+error.message; }
+    })();
+  }
 })();

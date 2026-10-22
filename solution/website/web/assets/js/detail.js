@@ -261,6 +261,14 @@ async function init() {
 
     if (detailView === 'term') {
       renderTermDetail(payload);
+      const related = payload.relatedCases || [];
+      if (related.length) {
+        const target = document.createElement('section'); target.className='card';
+        target.innerHTML='<h2>关联案例释证与审校</h2><p>正在核对来源关系……</p>'; detailMain.append(target);
+        try { const map=await Site.auditLinks('main',related.slice(0,100).map(c=>c.id));
+          target.innerHTML='<h2>关联案例释证与审校</h2>'+related.slice(0,100).map(c=>'<p>'+escapeHtml(c.displayTitle||c.title)+' · '+Site.auditMarkup(map[c.id])+'</p>').join('');
+        } catch { target.textContent='审校关联暂不可用，仍可阅读关联案例。'; }
+      }
       return;
     }
 

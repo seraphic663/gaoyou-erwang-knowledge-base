@@ -1,3 +1,5 @@
+const { resolvePage } = require('./site-routes');
+const { getAuditTargets } = require('./site-identity');
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
@@ -207,6 +209,14 @@ function createServer() {
         return sendJson(res, 204, {});
       }
 
+      if (parsedUrl.pathname === '/api/site/audit-targets') {
+        if (req.method !== 'GET') return sendJson(res, 405, {ok:false});
+        const source = parsedUrl.query.source;
+        if (!['main', 'annotation', 'v2'].includes(source)) return sendJson(res, 400, {ok:false,message:'invalid_source'});
+        const ids = parsedUrl.queryValues.id || [];
+        if (!ids.length || ids.length > 100) return sendJson(res, 400, {ok:false,message:'provide_1_to_100_ids'});
+        return sendJson(res, 200, await getAuditTargets(config, source, ids));
+      }
       if (parsedUrl.pathname === '/api/health') {
         return sendJson(res, 200, dataSource.getHealth());
       }
@@ -622,6 +632,9 @@ function createServer() {
         return handleApi(req, res, parsedUrl);
       }
 
+      const page = resolvePage(requestUrl);
+      if (page?.redirect) { res.writeHead(308, { Location: page.redirect, 'Cache-Control': 'no-store' }); return res.end(); }
+      if (page?.file) return sendFile(res, path.join(config.WEB_DIR, page.file));
       return sendFile(res, resolveStaticFile(parsedUrl.pathname));
     } catch (error) {
       return sendJson(res, 500, {

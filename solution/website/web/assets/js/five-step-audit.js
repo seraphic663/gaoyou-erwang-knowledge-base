@@ -343,7 +343,7 @@
           </div>
           <p class="five-step-context-meta">系统根据来源、目标典籍和词语关系找到了相近材料；它们只用于比较，不替代当前案例的引文。</p>
           ${relatedCases.length ? `<div class="five-step-related-list">${relatedCases.map((relatedCase) => `
-            <a class="five-step-related-case" href="./annotation-workbench.html?case=${encodeURIComponent(relatedCase.case_id)}">
+            <a class="five-step-related-case" href="/audit?case=${encodeURIComponent(relatedCase.case_id)}">
               <span><strong>${escapeHtml(relatedCase.case_title || '未命名案例')}</strong><small>${escapeHtml(relatedCase.source_work || '来源未注明')} · ${escapeHtml(relatedCase.target_work || '目标典籍未明确')}</small></span>
               <small>${escapeHtml(relatedCase.relation || '材料相近')} · 打开</small>
             </a>
@@ -358,7 +358,8 @@
     state.caseItem = item;
     el.caseTitle.textContent = item.case_title || '未命名案例';
     el.caseMeta.textContent = `${item.source_work || '来源未注明'} · ${item.target_work || '目标典籍未明确'} · ${caseStatusText(item)}`;
-    el.backLink.href = `./v2-database.html#browse`;
+    el.backLink.href = Site.caseUrl('v2', state.caseId);
+    const originLink = document.createElement('a'); originLink.className = 'page-link'; originLink.href = Site.url('/corpus', {case_id:state.caseId,return:Site.current()}); originLink.textContent = '核对本案原文'; el.backLink.after(originLink);
     renderSourceContext(item);
     el.case.hidden = false;
     el.controls.hidden = false;
@@ -386,7 +387,7 @@
     root.querySelectorAll('[data-five-step-case-id]').forEach((button) => {
       button.addEventListener('click', () => {
         const caseId = button.dataset.fiveStepCaseId;
-        if (caseId) window.location.href = `./annotation-workbench.html?case=${encodeURIComponent(caseId)}`;
+        if (caseId) window.location.href = `/audit?case=${encodeURIComponent(caseId)}`;
       });
     });
   }
@@ -858,6 +859,7 @@
       el.form.hidden = false;
       renderSteps();
       el.status.textContent = '五步草稿已生成。请逐步检查措辞、证据编号和来源核验状态。';
+      persistDraft();
     } catch (error) {
       el.status.textContent = `生成失败：${error.message}`;
       el.generationMeta.className = 'five-step-generation-meta error';
@@ -974,6 +976,7 @@
       el.saveMessage.textContent = editingAuditId
         ? '修改已保存为新版本，原版本仍保留。'
         : '本次审校已保存。';
+      AuditDraft.clear(state.caseId);
       exitEditMode();
       state.generation = null;
       state.reviewedSteps = [];
@@ -988,6 +991,46 @@
       state.saving = false;
       updateSaveButton();
     }
+  }
+
+  function persistDraft() {
+    if (!state.caseId || !state.generation) return;
+    const ok = AuditDraft.write(state.caseId, {
+      generation: state.generation, reviewedSteps: state.reviewedSteps,
+      editingAuditId: state.editingAuditId, reviewer: el.reviewer?.value || '',
+      decision: el.decision?.value || '', note: el.overallNote?.value || '',
+    });
+    if (!ok) el.status.textContent = '浏览器无法暂存草稿；请先提交审校，避免离页丢失。';
+  }
+
+  function offerDraftRestore() {
+    const saved = AuditDraft.read(state.caseId);
+    if (!saved?.generation || saved.caseId !== state.caseId) return;
+    const notice = document.createElement('div');
+    notice.className = 'draft-notice';
+    notice.innerHTML = '<p>发现此案例尚未提交的浏览器草稿。恢复后仍须核对当前来源；保存时服务器会检查来源指纹。</p><button type="button" data-restore>恢复草稿与意见</button> <button type="button" data-discard>丢弃暂存</button>';
+    el.controls.before(notice);
+    notice.querySelector('[data-restore]').onclick = () => {
+      state.generation = saved.generation;
+      state.reviewedSteps = saved.reviewedSteps || [];
+      state.editingAuditId = saved.editingAuditId || null;
+      el.model.value = saved.generation.model_requested;
+      el.effort.value = saved.generation.reasoning_effort;
+      el.model.disabled = Boolean(state.editingAuditId);
+      el.effort.disabled = Boolean(state.editingAuditId);
+      el.generate.disabled = Boolean(state.editingAuditId);
+      el.cancelEdit.hidden = !state.editingAuditId;
+      el.save.textContent = state.editingAuditId ? '保存修改（生成新版本）' : '保存本次审校';
+      el.reviewer.value = saved.reviewer || '';
+      el.decision.value = saved.decision || 'uncertain';
+      el.overallNote.value = saved.note || '';
+      state.writeArmed = false; el.writeArm.checked = false;
+      el.form.hidden = false;
+      el.generationMeta.hidden = false;
+      el.generationMeta.textContent = generationSummary(state.generation);
+      renderSteps(); updateSaveButton(); notice.remove();
+    };
+    notice.querySelector('[data-discard]').onclick = () => { AuditDraft.clear(state.caseId); notice.remove(); };
   }
 
   async function init() {
@@ -1006,6 +1049,7 @@
       }
       renderCase(item);
       await loadHistory();
+      offerDraftRestore();
     } catch (error) {
       el.status.textContent = `无法打开该 V2 案例：${error.message}`;
       el.start.hidden = false;
@@ -1050,6 +1094,14 @@
   });
   el.form?.addEventListener('submit', submitAudit);
 
+  document.addEventListener('input', persistDraft);
+  document.addEventListener('change', persistDraft);
+  document.addEventListener('click', () => { queueMicrotask(persistDraft); });
+  window.addEventListener('pagehide', persistDraft);
+  window.addEventListener('beforeunload', (event) => {
+    persistDraft();
+    if (state.generating) { event.preventDefault(); event.returnValue = ''; }
+  });
   applyViewMode(state.viewMode);
   init();
 })();

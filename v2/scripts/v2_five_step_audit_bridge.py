@@ -17,6 +17,7 @@ V2_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATABASE = V2_ROOT / "data/real_runs/annotation_v2.db"
 ALLOWED_MODELS = {"deepseek-flash", "deepseek-v4-pro"}
 ALLOWED_EFFORTS = {"none", "low", "high", "max"}
+ACCEPTED_PROMPT_VERSIONS = {"v2-five-step-audit.v1", "v2-five-step-audit.v4", "v2-five-step-audit.v5", "v2-five-step-audit.v6", "v2-five-step-audit.v7", "v2-five-step-audit.v8"}
 RECORD_STATES = {"active", "superseded", "deleted"}
 STEP_FIELDS = (
     "problem_discovery",
@@ -31,10 +32,12 @@ def now_utc() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
-def connect_database(database_path: Path) -> sqlite3.Connection:
+def connect_database(database_path: Path, *, read_only: bool = False) -> sqlite3.Connection:
     if not database_path.is_file():
         raise FileNotFoundError(f"v2_database_not_found:{database_path}")
-    connection = sqlite3.connect(database_path, timeout=60)
+    connection = sqlite3.connect(database_path.resolve().as_uri() + "?mode=ro", uri=True, timeout=60) if read_only else sqlite3.connect(database_path, timeout=60)
+    if read_only:
+        connection.execute("PRAGMA query_only = ON")
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
     connection.execute("PRAGMA busy_timeout = 60000")
@@ -168,7 +171,7 @@ def validate_payload(payload: dict[str, Any]) -> None:
         raise ValueError("reasoning_effort_not_allowed")
     if len(str(payload["case_fingerprint"])) != 64:
         raise ValueError("case_fingerprint_invalid")
-    if str(payload["prompt_version"]) != "v2-five-step-audit.v1":
+    if str(payload["prompt_version"]) not in ACCEPTED_PROMPT_VERSIONS:
         raise ValueError("prompt_version_not_supported")
 
     audit = payload["audit_json"]
@@ -193,6 +196,8 @@ def validate_payload(payload: dict[str, Any]) -> None:
 
 def public_record(row: sqlite3.Row) -> dict[str, Any]:
     result = dict(row)
+    result.setdefault("record_state", "active")
+    result.setdefault("record_version", 1)
     result["audit"] = json.loads(result.pop("audit_json"))
     return result
 
@@ -200,7 +205,7 @@ def public_record(row: sqlite3.Row) -> dict[str, Any]:
 def list_records(database_path: Path, case_id: str) -> dict[str, Any]:
     if not case_id.strip():
         raise ValueError("case_id_required")
-    connection = connect_database(database_path)
+    connection = connect_database(database_path, read_only=True)
     try:
         case = connection.execute(
             "SELECT case_id FROM annotation_cases WHERE case_id = ?",
@@ -213,18 +218,9 @@ def list_records(database_path: Path, case_id: str) -> dict[str, Any]:
         ).fetchone()
         if exists is None:
             return {"ok": True, "case_id": case_id, "records": []}
-        ensure_audit_table(connection)
-        connection.commit()
         rows = connection.execute(
             """
-            SELECT audit_id, case_id, reviewer, operation_id, model_requested,
-                   model_returned, reasoning_effort, prompt_version,
-                   case_fingerprint, generated_at, submitted_at, audit_json,
-                   record_version, supersedes_audit_id, superseded_by_audit_id,
-                   record_state, deleted_from_state, deleted_at, deleted_by,
-                   delete_reason, delete_operation_id, restored_at, restored_by,
-                   restore_operation_id
-            FROM five_step_audit_records
+            SELECT * FROM five_step_audit_records
             WHERE case_id = ?
             ORDER BY submitted_at DESC, audit_id DESC
             LIMIT 50
@@ -240,25 +236,16 @@ def get_record(database_path: Path, audit_id: str) -> dict[str, Any]:
     audit_id = str(audit_id or "").strip()
     if not audit_id:
         raise ValueError("audit_id_required")
-    connection = connect_database(database_path)
+    connection = connect_database(database_path, read_only=True)
     try:
         exists = connection.execute(
             "SELECT 1 FROM sqlite_master WHERE type='table' AND name='five_step_audit_records'"
         ).fetchone()
         if exists is None:
             raise ValueError(f"audit_record_not_found:{audit_id}")
-        ensure_audit_table(connection)
-        connection.commit()
         row = connection.execute(
             """
-            SELECT audit_id, case_id, reviewer, operation_id, model_requested,
-                   model_returned, reasoning_effort, prompt_version,
-                   case_fingerprint, generated_at, submitted_at, audit_json,
-                   record_version, supersedes_audit_id, superseded_by_audit_id,
-                   record_state, deleted_from_state, deleted_at, deleted_by,
-                   delete_reason, delete_operation_id, restored_at, restored_by,
-                   restore_operation_id
-            FROM five_step_audit_records WHERE audit_id = ?
+            SELECT * FROM five_step_audit_records WHERE audit_id = ?
             """,
             (audit_id,),
         ).fetchone()

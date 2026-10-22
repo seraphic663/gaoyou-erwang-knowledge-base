@@ -85,7 +85,9 @@ function runPythonJsonBridge(config, {
           }
 
           if (error) {
-            const detail = String(stderr || error.message || '').trim();
+            let reported = '';
+            try { const body = JSON.parse(String(stdout || '')); if (body.ok === false) reported = body.message || ''; } catch {}
+            const detail = String(reported || stderr || '').trim();
             reject(new Error(detail || `${errorLabel} failed with ${error.code || 'unknown error'}`));
             return;
           }

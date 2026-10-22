@@ -86,6 +86,29 @@ class FiveStepAuditBridgeTests(unittest.TestCase):
         self.assertEqual(result["records"][0]["reasoning_effort"], "high")
         self.assertEqual(len(result["records"][0]["audit"]["reviewed_steps"]), 5)
 
+    def test_history_read_never_changes_schema_or_bytes(self):
+        saved = save_record(self.database_path, sample_payload())
+        before = self.database_path.read_bytes()
+        self.assertEqual(list_records(self.database_path, "case-1")["records"][0]["audit_id"], saved["audit_id"])
+        get_record(self.database_path, saved["audit_id"])
+        self.assertEqual(before, self.database_path.read_bytes())
+
+    def test_empty_history_read_does_not_create_table(self):
+        before = self.database_path.read_bytes()
+        self.assertEqual(list_records(self.database_path, "case-1")["records"], [])
+        self.assertEqual(before, self.database_path.read_bytes())
+
+    def test_current_generator_versions_are_persisted_without_rewriting(self):
+        for version in [4, 5, 6, 7, 8]:
+            payload=sample_payload("version-"+str(version))
+            payload["prompt_version"]="v2-five-step-audit.v"+str(version)
+            saved=save_record(self.database_path,payload)
+            self.assertEqual(get_record(self.database_path,saved["audit_id"])["record"]["prompt_version"],payload["prompt_version"])
+        payload=sample_payload("unsupported-version")
+        payload["prompt_version"]="v2-five-step-audit.v999"
+        with self.assertRaisesRegex(ValueError,"prompt_version_not_supported"):
+            save_record(self.database_path,payload)
+
     def test_rejects_unsupported_model(self):
         payload = sample_payload()
         payload["model_requested"] = "deepseek-v4-flash"

@@ -109,7 +109,7 @@ function renderSection(section) {
             <span class="glossary-index">${escapeHtml(item.number)}</span>
             <h3>${escapeHtml(item.term)}</h3>
           </div>
-          <p class="glossary-definition">${escapeHtml(item.description)}</p>
+          <p class="glossary-definition">${escapeHtml(item.description)}</p><a class="detail-link" href="/cases?q=${encodeURIComponent(item.term)}">查找相关案例</a>
         </article>
       `,
     )

@@ -108,11 +108,11 @@ function splitItems(items, visibleCount) {
 }
 
 function buildTermHref(id) {
-  return `./term.html?id=${encodeURIComponent(String(id))}`;
+  return Site.url('/term', {id, return: Site.current()});
 }
 
 function buildCaseHref(id) {
-  return `./case.html?id=${encodeURIComponent(String(id))}`;
+  return Site.caseUrl('main', id);
 }
 
 async function requestJson(path, options = {}) {

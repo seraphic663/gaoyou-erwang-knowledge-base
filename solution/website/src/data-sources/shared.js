@@ -321,8 +321,8 @@ function buildTermDetail(context, termId) {
     relatedWorks,
     evidenceTypes,
     relatedCases,
-    evidences: evidences.slice(0, 12),
-    evidencesTruncated: evidences.length > 12,
+    evidences,
+    evidencesTruncated: false,
     raw: {
       id: termRecord.id,
       case_ids: caseIds,
@@ -352,8 +352,8 @@ function buildCaseDetail(context, caseId) {
     sourceLabel: context.snapshot.sourceLabel,
     ...detail,
     terms,
-    evidences: evidences.slice(0, 12),
-    evidencesTruncated: evidences.length > 12,
+    evidences,
+    evidencesTruncated: false,
     relatedWorks,
     evidenceTypes,
     raw: {

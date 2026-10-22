@@ -3,38 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>五步释证 · 高邮二王考据过程知识库</title>
-    <link rel="stylesheet" href="./assets/css/styles.css" />
-    <link rel="stylesheet" href="./assets/css/five-step-audit.css" />
-  </head>
+    <title>释证与审校 · 高邮二王考据过程知识库</title>
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+    <link rel="stylesheet" href="/assets/css/five-step-audit.css" />
+  <link rel="stylesheet" href="/assets/css/site.css"></head>
   <body data-page="five-step-audit">
     <header class="subhero">
-      <nav class="nav" aria-label="主导航">
-        <div class="brand">高邮二王知识库</div>
-        <div class="nav-links">
-          <a href="./index.html">专题首页</a>
-          <div class="database-menu">
-            <a class="database-trigger" href="./database.html?view=terms" aria-haspopup="true">数据库</a>
-            <div class="database-panel" aria-label="选择数据库">
-              <a href="./database.html?view=terms"><span>主数据库</span><small>词条、案例与证据</small></a>
-              <a href="./annotation.html"><span>人工标注库</span><small>人工标注材料浏览</small></a>
-              <a href="./corpus.html"><span>通用语料库</span><small>正文、出处与关联案例</small></a>
-              <a href="./v2-database.html#browse"><span>V2 工作库</span><small>案例、五步与质量</small></a>
-            </div>
-          </div>
-          <a href="./annotation-workbench.html">五步释证</a>
-          <a href="./knowledge.html">训诂知识</a>
-        </div>
-      </nav>
+      <nav class="nav" aria-label="主导航"><a class="brand" href="/">高邮二王知识库</a><div class="nav-links"><a href="/">首页</a><a class="audit-entry" href="/audit">释证与审校</a><a href="/cases">案例库</a><a href="/terms">字词库</a><a href="/corpus">原典检索</a><a href="/knowledge">训诂知识</a></div></nav>
 
       <div class="hero-content">
-        <p class="badge">V2 单案例 · AI 起草 · 人工审校</p>
-        <h1>五步释证</h1>
-        <p class="hero-copy">从 V2 工作库选择一个案例，查看 AI 按数据库材料整理的五步草稿，逐步修改并记录审校意见。</p>
+        <p class="badge">单案例 · AI 起草 · 人工审校</p>
+        <h1>释证与审校</h1>
+        <p class="hero-copy">从 案例库选择一个案例，查看 AI 按数据库材料整理的五步草稿，逐步修改并记录审校意见。</p>
       </div>
     </header>
 
-    <main class="section five-step-audit-page">
+    <main class="section five-step-audit-page"><a id="siteBack" class="site-back" href="/cases">返回来时位置</a>
       <p id="fiveStepStatus" class="db-status" role="status">正在读取 V2 案例……</p>
 
       <section id="fiveStepStart" class="card five-step-start" hidden>
@@ -71,17 +55,17 @@
           <div id="fiveStepChooserResults" class="five-step-case-chooser" aria-live="polite"></div>
         </section>
 
-        <a class="page-link page-link-muted" href="./v2-database.html#browse">查看完整 V2 案例库与质量报告</a>
+        <a class="page-link page-link-muted" href="/cases?source=v2">查看案例库</a>
       </section>
 
       <section id="fiveStepCase" class="card five-step-case" hidden>
         <div class="five-step-case-heading">
           <div>
-            <p class="section-kicker">当前 V2 案例</p>
+            <p class="section-kicker">当前案例</p>
             <h2 id="fiveStepCaseTitle">—</h2>
             <p id="fiveStepCaseMeta" class="compact-note"></p>
           </div>
-          <a id="fiveStepBackLink" class="page-link page-link-muted" href="./v2-database.html#browse">返回 V2 工作库</a>
+          <a id="fiveStepBackLink" class="page-link page-link-muted" href="/cases?source=v2">查看当前案例详情</a>
         </div>
         <div id="fiveStepSourceContext" class="five-step-source-context"></div>
       </section>
@@ -129,7 +113,7 @@
       <form id="fiveStepForm" class="five-step-form" hidden autocomplete="off">
         <div class="five-step-form-heading">
           <div>
-            <p class="section-kicker">五步释证</p>
+            <p class="section-kicker">释证与审校</p>
             <h2>五步审校</h2>
             <p id="fiveStepProgress" class="compact-note">0/5</p>
           </div>
@@ -193,10 +177,10 @@
     </main>
 
     <footer class="footer">
-      <p>五步释证 · 逐步审校并保存本次记录</p>
+      <p>释证与审校 · 逐步审校并保存本次记录</p>
     </footer>
 
-    <script src="./assets/js/utils.js"></script>
-    <script src="./assets/js/five-step-audit.js?v=v8"></script>
+    <script src="/assets/js/utils.js"></script><script src="/assets/js/site.js"></script>
+    <script src="/assets/js/audit-draft.js"></script><script src="/assets/js/five-step-audit.js?v=v9"></script>
   </body>
 </html>

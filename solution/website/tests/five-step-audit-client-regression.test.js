@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const CLIENT_SOURCE = fs.readFileSync(
   path.join(__dirname, '..', 'web', 'assets', 'js', 'five-step-audit.js'),
   'utf8',
-);
+).replace(/\r\n/g, '\n');
 
 function runMalformedReviewState() {
   const start = CLIENT_SOURCE.indexOf('  function updateSaveButton()');

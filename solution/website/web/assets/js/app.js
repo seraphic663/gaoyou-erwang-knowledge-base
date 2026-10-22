@@ -18,7 +18,7 @@ function buildDatabaseHref(view, query = '') {
     params.set('q', query);
     params.set('mode', 'fulltext');
   }
-  return `./database.html?${params.toString()}`;
+  params.delete('view'); return (view === 'cases' ? '/cases?source=main&' : '/terms?') + params.toString();
 }
 
 function renderQuickSearch(bootstrap) {
