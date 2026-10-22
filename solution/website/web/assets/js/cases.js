@@ -70,13 +70,26 @@
     }
   }
 
+  function updateFilterVisibility() {
+    const source = form.elements.source.value;
+    form.querySelectorAll('[data-filter-source]').forEach(label => {
+      const visible = source === 'all' || source === label.dataset.filterSource;
+      label.hidden = !visible;
+      label.querySelector('select').disabled = !visible;
+    });
+    document.querySelector('#caseAdvancedFilters').hidden = source === 'main';
+  }
+
   function init() {
+    document.querySelector('#caseAdvancedFilters').open = ['annotator', 'origin', 'source_work', 'machine_status'].some(key => params.get(key) && params.get(key) !== 'all');
     form.elements.q.value = params.get('q') || '';
     form.elements.source.innerHTML = Site.options([
       { value: 'all', label: '全部来源' },
       ...CaseSources.sources.map(source => ({ value: source.id, label: source.label })),
     ]);
     form.elements.source.value = selectedSource;
+    form.elements.source.onchange = updateFilterVisibility;
+    updateFilterVisibility();
     form.elements.machine_status.value = params.get('machine_status') || '';
     form.onsubmit = event => {
       event.preventDefault();

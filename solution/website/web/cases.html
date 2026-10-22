@@ -20,14 +20,12 @@
           案例库
         </h1>
         <p class="hero-copy">
-          在一个入口查找各来源的案例；保留来源身份，审校入口仅连接有明确对应关系的 V2 记录。
+          查找案例、阅读证据，并直接进入对应的释证与审校。不同来源的材料分别列出。
         </p>
       </div>
     </header>
     <main class="section">
-      <a id="siteBack" class="site-back" href="/cases">
-        返回案例库
-      </a>
+      <a id="siteBack" class="site-back" href="/" hidden>返回来时位置</a>
       <form id="caseSearch" class="site-search">
         <label>
           关键词
@@ -39,7 +37,13 @@
             <option value="all">全部来源</option>
           </select>
         </label>
-        <label>
+        <button>
+          检索案例
+        </button>
+        <details class="site-filters" id="caseAdvancedFilters">
+          <summary>更多筛选：标注者、出处与状态</summary>
+          <div class="site-filter-fields">
+        <label data-filter-source="annotation">
           人工标注者
           <select name="annotator">
             <option value="all">
@@ -47,7 +51,7 @@
             </option>
           </select>
         </label>
-        <label>
+        <label data-filter-source="annotation">
           人工标注出处
           <select name="origin">
             <option value="all">
@@ -55,7 +59,7 @@
             </option>
           </select>
         </label>
-        <label>
+        <label data-filter-source="v2">
           V2 来源
           <select name="source_work">
             <option value="">
@@ -63,7 +67,7 @@
             </option>
           </select>
         </label>
-        <label>
+        <label data-filter-source="v2">
           机器状态
           <select name="machine_status">
             <option value="">
@@ -77,9 +81,8 @@
             </option>
           </select>
         </label>
-        <button>
-          检索案例
-        </button>
+          </div>
+        </details>
       </form>
       <div class="site-actions">
         <a href="/quality">

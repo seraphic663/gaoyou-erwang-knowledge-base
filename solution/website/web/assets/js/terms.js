@@ -35,7 +35,7 @@
       const data = await requestJson('/api/browser?' + query);
       root.innerHTML = `
         <p>${data.total} 条字词</p>
-        <div class="grid grid-2">${data.items.map(renderTerm).join('')}</div>
+        <div class="grid grid-2">${data.items.map(renderTerm).join('') || '<p>没有匹配字词，请缩短关键词或更换检索范围。</p>'}</div>
         ${Site.pagination('/terms', params, data.page, data.totalPages)}
       `;
     } catch (error) {

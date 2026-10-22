@@ -18,37 +18,19 @@
       </div>
     </header>
 
-    <main class="section corpus-page"><a id="siteBack" class="site-back" href="/cases">返回来时位置</a>
-      <div class="corpus-page-lead">
-        <div>
-          <p class="section-kicker">正文检索</p>
-          <h2>从原文进入出处和关联案例</h2>
-          <p>输入一段正文，系统会在已登记的 原文段落 中检索，并显示匹配原因、原文位置以及可以继续查看的关联案例。</p>
-        </div>
-        <div class="corpus-page-actions">
-          <a class="page-link page-link-muted" href="/cases?source=v2">进入案例库</a>
-        </div>
-      </div>
-
-      <p id="corpusStatus" class="db-status">原典检索检索只读运行中……</p>
+    <main class="section corpus-page"><a id="siteBack" class="site-back" href="/" hidden>返回来时位置</a>
+      <p id="corpusStatus" class="db-status">正在连接原典检索……</p>
 
       <section class="card corpus-panel">
         <div class="corpus-panel-heading">
           <div>
-            <p class="section-kicker">Canonical passage</p>
-            <h2>粘贴正文，直接找原文</h2>
+
+            <h2>检索正文</h2>
           </div>
           <span id="corpusResultCount" class="summary-pill">尚未检索</span>
         </div>
 
-        <section class="corpus-search" aria-labelledby="corpusSearchTitle">
-          <div class="corpus-search-heading">
-            <div>
-              <h3 id="corpusSearchTitle">正文片段检索</h3>
-              <p>结果按命中程度排序；关联案例只作为导航线索，不改变语料库的正文检索结果。</p>
-            </div>
-            <span class="summary-pill">只读</span>
-          </div>
+        <section class="corpus-search" aria-label="正文片段检索">
           <form id="corpusSearchForm" class="corpus-search-form">
             <label class="corpus-query-field">
               <span>正文片段</span>
@@ -70,7 +52,7 @@
     </main>
 
     <footer class="footer">
-      <p>原典检索 · canonical 正文检索与出处定位 · V2 状态和人工审校请进入案例库</p>
+      <p>原典检索 · 查看原文出处，追溯关联案例</p>
     </footer>
 
     <script src="/assets/js/utils.js"></script><script src="/assets/js/page-catalog.js"></script>

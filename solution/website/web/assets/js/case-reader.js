@@ -5,7 +5,7 @@
   const root = document.querySelector('#caseReader');
   const title = document.querySelector('#detailTitle');
 
-  const section = (heading, content) => `<section class="card"><h2>${heading}</h2>${content}</section>`;
+  const section = (heading, content, id = "") => `<section class="card"${id ? ` id="${id}"` : ""}><h2>${heading}</h2>${content}</section>`;
   const paragraph = value => `<p class="detail-paragraph">${escapeHtml(value || '未记录')}</p>`;
   const field = (label, value) => `<div class="detail-block"><h3>${label}</h3>${paragraph(value)}</div>`;
   const rawFields = value => `
@@ -50,15 +50,19 @@
         ${Site.link(Site.url('/corpus', { ...model.corpusQuery, return: Site.current() }), model.corpusLabel)}
         ${Site.link(Site.url('/knowledge', { return: Site.current() }), '查看训诂方法')}
       </div>
+      <nav class="site-jump-links" aria-label="案例内容">
+        <a href="#case-judgment">问题与判断</a><a href="#case-provenance">出处与状态</a>
+        <a href="#case-terms">相关字词</a><a href="#case-evidence">证据</a><a href="#case-process">考据过程</a>
+      </nav>
       ${section('问题与判断', field('目标文字', model.targetText) + field('问题', model.problem)
-        + field('主张 / 设问', model.claim) + field('结论', model.conclusion))}
+        + field('主张 / 设问', model.claim) + field('结论', model.conclusion), 'case-judgment')}
       ${passages}
       ${section('出处与状态', field('材料来源', model.origin) + field('来源位置', model.sourceLocation)
         + field('目标典籍与位置', model.targetLocation) + field('材料状态', model.status)
-        + (model.methods ? field('方法', model.methods) : ''))}
-      ${section('相关字词', model.terms.map(renderTerm).join('') || paragraph('未记录'))}
-      ${section('证据', model.evidence.map(renderEvidence).join('') || paragraph('未记录'))}
-      ${section('考据过程', model.steps.map(step => field(escapeHtml(step.label), step.text)).join('') || paragraph('未记录'))}
+        + (model.methods ? field('方法', model.methods) : ''), 'case-provenance')}
+      ${section('相关字词', `<div class="site-term-grid">${model.terms.map(renderTerm).join('') || paragraph('未记录')}</div>`, 'case-terms')}
+      ${section('证据', model.evidence.map(renderEvidence).join('') || paragraph('未记录'), 'case-evidence')}
+      ${section('考据过程', model.steps.map(step => field(escapeHtml(step.label), step.text)).join('') || paragraph('未记录'), 'case-process')}
       ${related ? section('相关案例', related) : ''}
       ${rawFields(model.raw)}
     `;

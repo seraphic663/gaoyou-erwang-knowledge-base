@@ -23,7 +23,7 @@ function renderTermDetail(payload) {
     detailTitle.textContent = payload.term || '未命名字词';
   }
   if (detailLead) {
-    detailLead.textContent = summarizeText(payload.coreMeaning || payload.notes || '当前字词暂无摘要说明。', 150);
+    detailLead.textContent = '查阅字词义项、证据出处与关联案例。';
   }
   const aliasList = (payload.aliases || [])
     .map((alias) => `<span class="mini-chip">${escapeHtml(alias)}</span>`)

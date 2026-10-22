@@ -41,7 +41,7 @@
     const items = Array.isArray(payload?.items) ? payload.items : [];
     elements.resultCount.textContent = items.length ? `找到 ${items.length} 段` : '没有结果';
     if (!items.length) {
-      elements.results.innerHTML = '<div class="corpus-empty">没有找到对应的 canonical 正文段落。</div>';
+      elements.results.innerHTML = '<div class="corpus-empty">没有找到对应的原典正文段落。</div>';
       return;
     }
 
@@ -90,7 +90,7 @@
 
     const requestId = ++state.requestId;
     elements.searchButton.disabled = true;
-    elements.searchStatus.textContent = '正在查找已登记的 canonical 正文……';
+    elements.searchStatus.textContent = '正在查找已登记的原典正文……';
     elements.results.innerHTML = '<div class="corpus-empty">正在读取正文结果……</div>';
     const params = new URLSearchParams({ q: query, limit: '8', include_cases: '1' });
     const address = new URLSearchParams(location.search); address.delete('case_id'); address.set('q',query); address.set('work_key',workKey); history.replaceState(null,'','/corpus?'+address);
@@ -102,9 +102,9 @@
       const count = Number(payload.returned_count ?? payload.items?.length ?? 0);
       const caseCount = (payload.items || []).reduce((total, item) => total + (item.related_cases?.length || 0), 0);
       elements.searchStatus.textContent = count
-        ? `找到 ${count} 段正文；其中 ${caseCount} 条带有关联案例。`
-        : '没有找到对应的 canonical 正文段落。';
-      elements.status.textContent = `原典检索已连接 · ${payload.trace?.retrieval_method || '只读正文检索'} · 结果不写入数据库`;
+        ? `找到 ${count} 段正文；提供 ${caseCount} 处关联案例入口。`
+        : '没有找到对应的原典正文段落。';
+      elements.status.textContent = '原典检索已连接 · 可查看原文出处与关联案例';
     } catch (error) {
       if (requestId !== state.requestId) return;
       elements.results.innerHTML = `<div class="corpus-empty">正文检索失败：${escapeHtml(error.message)}</div>`;

@@ -36,7 +36,7 @@
   }
 
   function mountThemeToggle() {
-    document.querySelectorAll('.nav-links').forEach((navLinks) => {
+    document.querySelectorAll('.nav').forEach((navLinks) => {
       if (navLinks.querySelector('[data-theme-toggle]')) return;
       const button = document.createElement('button');
       button.className = 'theme-toggle';

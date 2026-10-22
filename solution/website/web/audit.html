@@ -14,17 +14,30 @@
       <div class="hero-content">
         <p class="badge">单案例 · AI 起草 · 人工审校</p>
         <h1>释证与审校</h1>
-        <p class="hero-copy">从案例库选择一个案例，查看 AI 按数据库材料整理的五步草稿，逐步修改并记录审校意见。</p>
+        <p class="hero-copy">在下方选择案例，生成五步 AI 草稿，逐步核对证据并记录审校意见。</p>
       </div>
     </header>
 
-    <main class="section five-step-audit-page"><a id="siteBack" class="site-back" href="/cases">返回来时位置</a>
+    <main class="section five-step-audit-page"><a id="siteBack" class="site-back" href="/" hidden>返回来时位置</a>
       <p id="fiveStepStatus" class="db-status" role="status">正在读取 V2 案例……</p>
 
       <section id="fiveStepStart" class="card five-step-start" hidden>
         <p class="section-kicker">案例审校入口</p>
         <h2>选择要审校的案例</h2>
-        <p>先选一条案例，再在同一页面生成五步 AI 草稿。草稿只使用该案例的 V2 来源段落、证据和来源状态。</p>
+
+
+        <section class="five-step-chooser-block">
+
+          <div class="five-step-chooser-search">
+            <label class="toolbar-field">
+              <span>案例标题、来源或编号</span>
+              <input id="fiveStepCaseSearch" type="search" placeholder="例如：平原之隰、读书杂志" />
+            </label>
+            <button id="fiveStepCaseSearchButton" class="page-link toolbar-button" type="button">搜索</button>
+          </div>
+          <p id="fiveStepChooserStatus" class="compact-note" role="status"></p>
+          <div id="fiveStepChooserResults" class="five-step-case-chooser" aria-live="polite"></div>
+        </section>
 
         <section class="five-step-chooser-block">
           <div class="five-step-chooser-heading">
@@ -32,27 +45,9 @@
               <p class="section-kicker">推荐或当前可用案例</p>
               <h3>直接开始</h3>
             </div>
-            <span class="compact-note">本地测试库只展示少量 fixture</span>
+
           </div>
           <div id="fiveStepRecommended" class="five-step-case-chooser" aria-live="polite"></div>
-        </section>
-
-        <section class="five-step-chooser-block">
-          <div class="five-step-chooser-heading">
-            <div>
-              <p class="section-kicker">搜索全部 V2 案例</p>
-              <h3>查找其他案例</h3>
-            </div>
-          </div>
-          <div class="five-step-chooser-search">
-            <label class="toolbar-field">
-              <span>案例标题、来源或 case_id</span>
-              <input id="fiveStepCaseSearch" type="search" placeholder="例如：平原之隰、读书杂志" />
-            </label>
-            <button id="fiveStepCaseSearchButton" class="page-link toolbar-button" type="button">搜索</button>
-          </div>
-          <p id="fiveStepChooserStatus" class="compact-note" role="status"></p>
-          <div id="fiveStepChooserResults" class="five-step-case-chooser" aria-live="polite"></div>
         </section>
 
         <a class="page-link page-link-muted" href="/cases?source=v2">查看案例库</a>
@@ -67,7 +62,10 @@
           </div>
           <a id="fiveStepBackLink" class="page-link page-link-muted" href="/cases?source=v2">查看当前案例详情</a>
         </div>
-        <div id="fiveStepSourceContext" class="five-step-source-context"></div>
+        <details class="five-step-source-fold">
+          <summary>查看来源段落、材料状态与相关案例</summary>
+          <div id="fiveStepSourceContext" class="five-step-source-context"></div>
+        </details>
       </section>
 
       <section id="fiveStepControls" class="card five-step-controls" hidden>

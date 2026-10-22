@@ -19,7 +19,7 @@
       `<dt>${escapeHtml(key)}</dt><dd>${escapeHtml(value)}</dd>`).join('');
     return `
       <section class="card">
-        ${heading}${status}<dl>${counts}</dl>
+        ${heading}${status}<dl class="quality-counts">${counts}</dl>
         <details>
           <summary>完整报告与字段</summary>
           <pre class="site-raw">${escapeHtml(JSON.stringify(data, null, 2))}</pre>

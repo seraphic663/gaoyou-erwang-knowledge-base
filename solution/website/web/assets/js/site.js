@@ -60,8 +60,11 @@ window.Site = (() => {
   const back = document.querySelector('#siteBack');
   if (back) {
     const previous = safeReturn(params.get('return'));
-    back.href = previous || '/cases';
-    back.textContent = previous ? '返回来时位置' : '返回案例库';
+    if (previous && previous !== current()) {
+      back.href = previous;
+      back.textContent = '返回来时位置';
+      back.hidden = false;
+    }
   }
 
   return { url, safeReturn, current, caseUrl, auditUrl, link, options, pagination, auditLinks, auditMarkup };
