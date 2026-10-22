@@ -106,7 +106,7 @@ button:disabled { cursor: default; opacity: .65; }
   color: var(--ink);
 }
 
-.site-search > button { width: auto; background: var(--accent-button-bg); color: #fff4df; }
+.site-search > button { width: auto; background: var(--control-bg); color: var(--ink); }
 
 .site-filters { flex-basis: 100%; }
 

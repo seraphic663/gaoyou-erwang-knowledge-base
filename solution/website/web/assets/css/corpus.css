@@ -7,10 +7,6 @@
   gap: 14px;
 }
 
-.corpus-panel {
-  padding: 22px;
-}
-
 .corpus-panel-heading,
 .corpus-detail-topline {
   display: flex;
@@ -77,12 +73,13 @@
   gap: 12px;
   margin-top: 16px;
 }
-
 .corpus-result {
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--card);
+
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  padding: 1rem 0;
 }
 
 .corpus-result-title {
@@ -103,29 +100,23 @@
   color: var(--sub);
   font-size: 13px;
 }
-
 .corpus-rank {
   display: inline-grid;
   width: 26px;
   height: 26px;
   place-items: center;
-  border-radius: 50%;
-  color: var(--pri-2);
-  background: var(--accent-soft);
-  font-weight: 700;
-}
 
+  font-weight: 700;
+
+}
 .corpus-status-chip,
 .corpus-tag {
   display: inline-flex;
   align-items: center;
   padding: 4px 8px;
-  border: 1px solid color-mix(in srgb, var(--jade) 42%, var(--line));
-  border-radius: 999px;
-  color: var(--jade);
-  background: color-mix(in srgb, var(--jade) 14%, var(--card));
+
   font-size: 12px;
-  white-space: nowrap;
+
 }
 
 .corpus-result-text {
@@ -151,24 +142,22 @@
   gap: 8px;
   margin-top: 8px;
 }
-
 .corpus-related-case {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+
   color: inherit;
-  background: var(--card-soft);
+
   text-decoration: none;
+
 }
 
 .corpus-related-case:hover,
 .corpus-related-case:focus-visible {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 14%, var(--card));
+  background: var(--card-soft);
 }
 
 .corpus-related-tags {
@@ -191,14 +180,27 @@
 .corpus-search-form .toolbar-field { flex: 1 1 12rem; min-width: 0; }
 
 .corpus-search-actions { flex-wrap: wrap; }
-
 .corpus-panel-heading,
-.corpus-detail-topline,
-.corpus-related-case { flex-wrap: wrap; }
+.corpus-detail-topline { flex-wrap: wrap; }
+.corpus-related-case { flex-wrap: wrap;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  padding: 1rem 0;
+}
 
 .corpus-panel { padding: clamp(1rem, 2vw, 1.5rem); }
-
-.corpus-rank { flex: 0 0 auto; }
-
+.corpus-rank { flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--sub);
+}
 .corpus-status-chip,
-.corpus-tag { white-space: normal; }
+.corpus-tag { white-space: normal;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--sub);
+}

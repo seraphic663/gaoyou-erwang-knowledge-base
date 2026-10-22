@@ -71,11 +71,14 @@
   outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent);
   outline-offset: 2px;
 }
-
-.five-step-case-option-main,
+.five-step-case-option-main {
+  display: grid;
+  gap: 3px;
+}
 .five-step-case-option-meta {
   display: grid;
   gap: 3px;
+
 }
 
 .five-step-case-option-main small,
@@ -83,17 +86,15 @@
   color: var(--sub);
   font-size: 12px;
 }
-
 .five-step-case-option-meta {
   flex: 0 0 auto;
-  justify-items: end;
-  color: var(--accent);
+
   font-size: 13px;
   font-weight: 700;
+
 }
 
 .five-step-chooser-search {
-  display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: end;
   gap: 10px;
@@ -123,15 +124,21 @@
   gap: 12px;
   margin-top: 16px;
 }
-
-.five-step-context-block,
-.five-step-ai-draft,
-.five-step-evidence-ref,
 .five-step-history-record {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--card-soft);
+}
+.five-step-context-block,
+.five-step-ai-draft,
+.five-step-evidence-ref {
+
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 0;
 }
 
 .five-step-context-block h3,
@@ -183,13 +190,14 @@
   gap: 6px;
   margin-top: 10px;
 }
-
 .five-step-related-term {
   padding: 4px 8px;
-  border-radius: 999px;
-  color: var(--sub);
-  background: var(--card);
+
   font-size: 12px;
+
+  background: transparent;
+  color: var(--sub);
+  border-radius: 0;
 }
 
 .five-step-context-text {
@@ -253,7 +261,7 @@
 .five-step-generation-meta {
   margin: 12px 0 0;
   padding: 10px 12px;
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--line-strong);
   background: var(--card-soft);
 }
 
@@ -273,16 +281,16 @@
 }
 
 .five-step-step {
-  padding: 18px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--card-strong);
-  box-shadow: var(--shadow);
 }
-
 .five-step-step-number {
-  color: var(--accent);
   font-weight: 800;
+
+  background: transparent;
+  color: var(--sub);
+  border-radius: 0;
 }
 
 .five-step-step-grid {
@@ -290,10 +298,15 @@
   grid-template-columns: repeat(auto-fit, minmax(min(25rem, 100%), 1fr));
   gap: 14px;
 }
-
 .five-step-ai-draft {
   line-height: 1.7;
   overflow-wrap: anywhere;
+
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 0;
 }
 
 .five-step-ai-draft p {
@@ -364,10 +377,15 @@
   gap: 8px;
   margin-top: 10px;
 }
-
 .five-step-evidence-ref {
   font-size: 13px;
   line-height: 1.55;
+
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 0;
 }
 
 .five-step-evidence-ref blockquote {
@@ -437,16 +455,17 @@
   gap: 8px;
   margin: 12px 0 4px;
 }
-
 .five-step-record-state {
   display: inline-block;
   margin-left: 6px;
   padding: 2px 7px;
-  border-radius: 999px;
-  color: var(--sub);
-  background: var(--card);
+
   font-size: 12px;
   font-weight: 600;
+
+  background: transparent;
+  color: var(--sub);
+  border-radius: 0;
 }
 
 .five-step-record-state.deleted {
@@ -485,17 +504,15 @@
 .five-step-form-heading h2 {
   margin-bottom: 4px;
 }
-
 .five-step-view-mode {
   display: flex;
   align-items: stretch;
   flex-wrap: wrap;
-  justify-content: flex-end;
+
   gap: 6px;
-  padding: 4px;
-  border: 1px solid var(--line);
+
   border-radius: 12px;
-  background: var(--card-soft);
+
 }
 
 .five-step-controls .five-step-view-mode {
@@ -554,7 +571,7 @@
 
 .five-step-step-nav {
   display: flex;
-  flex-wrap: nowrap;
+
   gap: 8px;
   overflow-x: auto;
   margin: 16px 0 10px;
@@ -563,7 +580,7 @@
 
 .five-step-step-nav-button {
   display: flex;
-  flex: 1 1 0;
+
   gap: 8px;
   align-items: center;
   min-width: 0;
@@ -584,10 +601,12 @@
 .five-step-step-nav-button.is-complete .five-step-step-nav-number {
   color: var(--jade);
 }
-
 .five-step-step-nav-number {
-  color: var(--accent);
   font-weight: 800;
+
+  background: transparent;
+  color: var(--sub);
+  border-radius: 0;
 }
 
 .five-step-step-nav-label {
@@ -652,12 +671,13 @@
   gap: 8px;
   padding: 0 16px 16px;
 }
-
 .five-step-evidence-overview-item {
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--card-soft);
+
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 0;
 }
 
 .five-step-evidence-ref-head {
@@ -688,16 +708,13 @@
   max-height: 5.2em;
   overflow: hidden;
 }
-
 .five-step-evidence-tag {
   display: inline-flex;
   align-items: center;
   padding: 2px 7px;
-  border-radius: 999px;
-  color: var(--jade);
-  background: color-mix(in srgb, var(--jade) 12%, transparent);
+
   font-size: 11px;
-  white-space: nowrap;
+
 }
 
 .five-step-inline-fold,
@@ -807,15 +824,11 @@
 .five-step-step-body {
   padding: 18px;
 }
-
 .five-step-evidence-panel {
   align-self: start;
-  position: sticky;
+
   top: 16px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: var(--card-soft);
+
 }
 
 .five-step-evidence-panel-heading {
@@ -833,10 +846,13 @@
 .five-step-evidence-panel .five-step-evidence-refs {
   margin-top: 0;
 }
-
 .five-step-evidence-panel .five-step-evidence-ref {
-  padding: 11px;
-  background: var(--card);
+
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 0;
 }
 
 .five-step-inline-link {
@@ -879,8 +895,11 @@
 .five-step-chooser-heading { flex-wrap: wrap; }
 
 .five-step-case-option-main { flex: 1 1 18rem; min-width: 0; }
-
-.five-step-case-option-meta { justify-items: start; }
+.five-step-case-option-meta { justify-items: start;
+  background: transparent;
+  color: var(--sub);
+  border-radius: 0;
+}
 
 .five-step-chooser-search { display: flex; flex-wrap: wrap; }
 
@@ -895,13 +914,24 @@
 .five-step-evidence-ref-head,
 .five-step-step-summary-label,
 .five-step-evidence-panel-heading { flex-wrap: wrap; }
-
-.five-step-evidence-tag { white-space: normal; }
+.five-step-evidence-tag { white-space: normal;
+  background: transparent;
+  color: var(--sub);
+  border-radius: 0;
+}
 
 .five-step-review-fields,
 .five-step-controls-grid > *,
 .five-step-final-grid > * { min-width: 0; }
-
-.five-step-view-mode { justify-content: flex-start; }
-
-.five-step-evidence-panel { position: static; }
+.five-step-view-mode { justify-content: flex-start;
+  background: transparent;
+  border: 0;
+  padding: 0;
+}
+.five-step-evidence-panel { position: static;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  padding: 12px 0;
+}
