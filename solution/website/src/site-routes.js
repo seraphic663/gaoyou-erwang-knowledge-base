@@ -4,8 +4,7 @@ const PAGES = Object.freeze(Object.fromEntries(PAGE_CATALOG.map(page => [page.pa
 function renderNavigation(activePath) {
   const links = PAGE_CATALOG.filter(page => page.navigation).map(page => {
     const active = page.path === activePath ? ' aria-current="page"' : '';
-    const emphasis = page.path === '/audit' ? ' class="audit-entry"' : '';
-    return `<a href="${page.path}"${emphasis}${active}>${page.label}</a>`;
+    return `<a href="${page.path}"${active}>${page.label}</a>`;
   });
   return `<nav class="nav" aria-label="主导航">
     <a class="brand" href="/">高邮二王知识库</a>

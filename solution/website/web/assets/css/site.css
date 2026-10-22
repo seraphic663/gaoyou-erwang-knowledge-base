@@ -68,10 +68,6 @@ button:disabled { cursor: default; opacity: .65; }
 
 .nav-links a[aria-current=page] { text-decoration: underline; text-underline-offset: 6px; }
 
-.nav-links .audit-entry { background: #9f4829; color: #fff4df; }
-
-.nav-links .audit-entry:hover { background: #b55a32; }
-
 .theme-toggle {
   flex: 0 0 auto;
   width: 40px;
