@@ -5,6 +5,7 @@
 本目录保存可复核的分析定义、评价 manifest 和结果解释，不保存主数据库，也不把检索层 benchmark 写成端到端考据 gold。
 
 - [`benchmarks/`](benchmarks/)：当前检索层 benchmark 的版本化定义和说明。
+- [外部典籍 RAG：16条开发试审与最小实现协议](external-corpus-pilot16-and-mvp_2026-10-23.md)：已暴露诊断集、反案例优化规则、人工标注隔离评测与原著标准化计划；尚未实施或运行模型，不能作为盲测结果。
 - 外部文献命中分析仍与其来源数据一起保留在 [`data/daizhigev20/analysis/`](../../data/daizhigev20/analysis/)。
 
 生成结果应能回到明确的输入、脚本和版本；需要运行 V2 校验时使用 [`v2/scripts/`](../../v2/scripts/)。

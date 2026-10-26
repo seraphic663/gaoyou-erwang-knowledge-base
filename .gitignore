@@ -67,5 +67,20 @@ v2/data/external_sources/edition_candidates/**/*.part
 v2/data/real_runs/
 v2/data/local_test/
 
+# ---- Private reading files and superseded local work ----
+# Source documents and their archive copy are retained locally, not published.
+data/0-当前阅读/archive/20261007/
+data/0-当前阅读/archive/20261007.zip
+# Dated scope note was superseded by current project status docs.
+research/next-step-scope-review_2026-10-10.md
+# Old harness release and one-off database cleanup package are historical workspaces.
+solution/reading-harness-20261025/
+solution/small-cleanup-20261025/
+# Prototype remains available locally; server logs and dated deployment captures are outputs.
+demos/navigation-architecture/*.log
+solution/reading-harness-20261026/*-DEPLOYMENT.md
+solution/reading-harness-20261026/*.png
+solution/reading-harness-20261026/*.json
+
 # Local virtual environments
 .venv/

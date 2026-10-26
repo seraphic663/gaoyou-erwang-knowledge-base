@@ -24,4 +24,4 @@
 - 本地浏览器完成多选正文检索、来源折叠、邻接原文展开和引用高亮检查；首页和全站导航测试覆盖实验入口。
 - 原文及现有标注数据库未改动，外典仍为 284 份来源、193,314 个文段。
 
-完整请求与响应：`real-session.json`；调用摘要：`real-summary.json`；重放结果：`replay-validation.json`。失败记录保留在 `first-real-response.json`。线上状态与部署 ID 见 `DEPLOYMENT.md`。
+原始请求、响应、重放 JSON 与预览截图是本地验收附件，按仓库忽略规则保留在工作区，不随源码公开；本 README 只保留汇总结论。线上状态与部署 ID 见 `DEPLOYMENT.md`。
