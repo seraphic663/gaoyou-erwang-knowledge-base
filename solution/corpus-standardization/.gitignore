@@ -1,0 +1,10 @@
+generated/
+__pycache__/
+tests/__pycache__/
+*.pyc
+
+# Local evaluation records include exposed labels, blind keys, response payloads,
+# and run outputs. Keep protocols, scripts, reports, and UI source versioned.
+evaluation/**/*.json
+evaluation/**/*.jsonl
+evaluation/**/*.png

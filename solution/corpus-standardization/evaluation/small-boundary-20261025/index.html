@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>边界样本标签消融 · 结果查看</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, "Microsoft YaHei", sans-serif; color: #25313a; background: #f5f6f3; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    header, main { max-width: 1180px; margin: auto; padding: 22px 24px; }
+    header { padding-bottom: 8px; }
+    h1 { font-size: 1.55rem; margin: 0 0 8px; }
+    h2 { font-size: 1.2rem; margin: 30px 0 8px; }
+    h3 { font-size: 1rem; margin: 0; }
+    p { line-height: 1.55; margin: 6px 0; }
+    .muted { color: #60717c; font-size: .91rem; }
+    .notice { border-left: 4px solid #698576; padding: 8px 12px; background: #eaf0eb; }
+    .notice.alert { border-color: #b35b48; background: #fff0eb; color: #783c31; font-weight: 600; }
+    .metrics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 20px 0 10px; }
+    .metric, .case, .condition, .source, .controls { background: white; border: 1px solid #dce3df; border-radius: 8px; }
+    .metric { padding: 12px; }
+    .metric strong { display: block; font-size: 1.38rem; margin-top: 5px; font-variant-numeric: tabular-nums; }
+    .metric span { color: #5b6d76; font-size: .82rem; }
+    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; padding: 14px; margin: 18px 0; }
+    label { display: inline-flex; align-items: center; gap: 6px; font-size: .93rem; }
+    select { font: inherit; max-width: 100%; padding: 5px 8px; border: 1px solid #aebbb6; border-radius: 5px; background: white; }
+    input[type="checkbox"] { accent-color: #326b53; }
+    .count { margin-left: auto; font-variant-numeric: tabular-nums; }
+    .case { padding: 18px; margin: 14px 0; }
+    .case-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; margin-bottom: 12px; }
+    .case-head h3 { margin-right: auto; }
+    .badge { display: inline-block; border-radius: 4px; padding: 3px 7px; background: #eaf0ee; color: #315646; font-size: .79rem; }
+    .badge.alert { background: #fbe9e6; color: #9b4039; }
+    .source { background: #fbfcfa; padding: 12px; margin-bottom: 14px; }
+    .source pre, .answer, .reason { white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+    .source pre { margin: 8px 0 0; font: inherit; line-height: 1.6; }
+    details { margin-top: 9px; }
+    summary { cursor: pointer; color: #35684e; }
+    .comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .condition { padding: 12px; min-width: 0; }
+    .condition > h3 { margin-bottom: 9px; }
+    .repeat { border-top: 1px solid #e1e8e4; padding: 10px 0 2px; }
+    .repeat:first-of-type { border-top: 0; padding-top: 0; }
+    .repeat-title { font-weight: 600; margin: 0 0 5px; }
+    .answer { background: #f7f9f7; border-radius: 5px; padding: 9px; line-height: 1.6; margin: 7px 0; }
+    .score { font-size: .85rem; color: #465760; line-height: 1.5; }
+    .reason, .issues { font-size: .86rem; color: #53646c; margin: 6px 0; }
+    .empty { color: #7a8588; font-style: italic; }
+    #status { color: #9b4039; }
+    #rawSummary { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .82rem; }
+    @media (max-width: 850px) { .metrics { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 650px) { header, main { padding-left: 14px; padding-right: 14px; } .comparison { grid-template-columns: 1fr; } .metrics { grid-template-columns: repeat(2, 1fr); } .count { margin-left: 0; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>边界样本标签消融 · 结果查看</h1>
+    <p class="muted">固定 18 例与 3 例裸短困难层；每例并排查看带标签、去标签各两次原答与评分。</p>
+    <p class="notice">参考答案由 AI 拟定并经复核，不是专家 gold。原文保持不变；此页只展示 <code>results.json</code> 的记录，不给出研究结论。</p>
+  </header>
+  <main>
+    <p id="status" role="status"></p>
+    <section class="metrics" id="metrics" aria-label="结果汇总"></section>
+    <p id="otherNote" class="notice alert" hidden></p>
+    <details><summary>查看完整 summary JSON</summary><pre id="rawSummary"></pre></details>
+    <div class="controls" aria-label="筛选案例">
+      <label>层次 <select id="layer"><option value="all">全部</option><option value="fixed">固定 18 例</option><option value="short">裸短困难层 3 例</option><option value="extra">额外案例</option></select></label>
+      <label>类别 <select id="category"><option value="all">全部类别</option></select></label>
+      <label><input type="checkbox" id="regression">仅退步</label>
+      <label><input type="checkbox" id="critical">仅中心小注误引</label>
+      <span class="count muted" id="count"></span>
+    </div>
+    <p class="muted">“退步”筛选指同轮去标签的三项得分之和低于带标签，或去标签新增严重错误；仅供定位案例。缺少可比较的得分时不作推断。</p>
+    <div id="cases"></div>
+  </main>
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    let cases = [];
+    const text = (value, fallback = '—') => value === null || value === undefined || value === '' ? fallback : String(value);
+    const el = (tag, className, value) => {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (value !== undefined) node.textContent = text(value);
+      return node;
+    };
+    const layerOf = index => index < 18 ? 'fixed' : index < 21 ? 'short' : 'extra';
+    const layerName = layer => ({ fixed: '固定 18 例', short: '裸短困难层 3 例', extra: '额外案例' })[layer];
+    const asVariants = item => Array.isArray(item.variants) ? item.variants : [];
+    const variant = (item, condition, repeat) => asVariants(item).find(v => v.condition === condition && Number(v.repeat) === repeat);
+    const isCritical = v => v && (v.score?.critical_error === true || v.score?.critical_error === 1 || v.score?.critical_error === 'true');
+    const scoreTotal = v => {
+      const s = v?.score;
+      if (!s) return null;
+      const values = [s.role_score, s.attachment_score, s.quotation_score];
+      if (values.some(x => x === null || x === undefined || x === '' || !Number.isFinite(Number(x)))) return null;
+      return values.reduce((sum, x) => sum + Number(x), 0);
+    };
+    const regressed = item => [1, 2].some(repeat => {
+      const tagged = variant(item, 'tagged', repeat), untagged = variant(item, 'untagged', repeat);
+      if (!tagged || !untagged) return false;
+      const a = scoreTotal(tagged), b = scoreTotal(untagged);
+      return (a !== null && b !== null && b < a) || (!isCritical(tagged) && isCritical(untagged));
+    });
+    function metric(label, value) {
+      const box = el('div', 'metric');
+      box.append(el('span', '', label), el('strong', '', value));
+      return box;
+    }
+    function showSummary(summary) {
+      const fields = [
+        ['案例数', 'cases'], ['请求数', 'requests'],
+        ['带标签三项均正确（次）', 'tagged_correct'], ['去标签三项均正确（次）', 'untagged_correct'],
+        ['带标签中心小注误引', 'tagged_critical'], ['去标签中心小注误引', 'untagged_critical']
+      ];
+      $('metrics').replaceChildren(...fields.map(([label, key]) => metric(label,
+        key.endsWith('_correct') ? `${text(summary?.[key])}/${text(summary?.requests_per_condition, '42')}` : summary?.[key]
+      )));
+      const note = $('otherNote');
+      note.textContent = `其他案语误当底本：带标签 ${text(summary?.tagged_other_commentary_as_body)} 次，去标签 ${text(summary?.untagged_other_commentary_as_body)} 次（SOL03）。这与中心小注误引分开统计。`;
+      note.hidden = false;
+      $('rawSummary').textContent = JSON.stringify(summary ?? {}, null, 2);
+    }
+    function showVariant(parent, v, repeat) {
+      const block = el('div', 'repeat');
+      block.append(el('p', 'repeat-title', `第 ${repeat} 次`));
+      if (!v) { block.append(el('p', 'empty', '尚无记录')); parent.append(block); return; }
+      block.append(el('div', 'answer', v.answer));
+      const s = v.score || {};
+      const critical = s.critical_error === undefined || s.critical_error === null ? '未评分' : isCritical(v) ? '是' : '否';
+      block.append(el('div', 'score', `角色 ${text(s.role_score)} · 归属 ${text(s.attachment_score)} · 引文 ${text(s.quotation_score)} · 中心小注误引 ${critical}`));
+      if (v.other_commentary_as_body) block.append(el('p', 'badge alert', '其他案语误当底本：是（非中心小注误引）'));
+      if (s.reason) block.append(el('p', 'reason', `评分理由：${s.reason}`));
+      if (v.format_issues && (Array.isArray(v.format_issues) ? v.format_issues.length : true)) {
+        block.append(el('p', 'issues', `格式问题：${Array.isArray(v.format_issues) ? v.format_issues.join('；') : v.format_issues}`));
+      }
+      parent.append(block);
+    }
+    function showCase(item, index) {
+      const card = el('article', 'case');
+      const head = el('div', 'case-head');
+      head.append(el('h3', '', `${index + 1}. ${text(item.id, '未命名案例')}`));
+      head.append(el('span', 'badge', layerName(layerOf(index))));
+      head.append(el('span', 'badge', text(item.category, '未分类')));
+      if (regressed(item)) head.append(el('span', 'badge alert', '退步'));
+      if (asVariants(item).some(isCritical)) head.append(el('span', 'badge alert', '严重错误'));
+      card.append(head);
+      const source = el('section', 'source');
+      source.append(el('p', 'muted', `来源：${text(item.path)}${item.line === undefined || item.line === null ? '' : ':' + item.line}　目标：${text(item.target)}`));
+      source.append(el('pre', '', item.text));
+      const reference = el('details');
+      reference.append(el('summary', '', '展开 AI 参考答案（已复核）'), el('div', 'answer', item.reference));
+      source.append(reference);
+      card.append(source);
+      const comparison = el('div', 'comparison');
+      for (const [condition, label] of [['tagged', '带标签'], ['untagged', '去标签']]) {
+        const column = el('section', 'condition');
+        column.append(el('h3', '', label));
+        for (const repeat of [1, 2]) showVariant(column, variant(item, condition, repeat), repeat);
+        comparison.append(column);
+      }
+      card.append(comparison);
+      return card;
+    }
+    function render() {
+      const selectedLayer = $('layer').value, selectedCategory = $('category').value;
+      const selected = cases.map((item, index) => ({ item, index })).filter(({ item, index }) =>
+        (selectedLayer === 'all' || layerOf(index) === selectedLayer) &&
+        (selectedCategory === 'all' || text(item.category, '未分类') === selectedCategory) &&
+        (!$('regression').checked || regressed(item)) &&
+        (!$('critical').checked || asVariants(item).some(isCritical))
+      );
+      $('count').textContent = `显示 ${selected.length} / ${cases.length} 例`;
+      const root = $('cases'); root.replaceChildren();
+      if (!selected.length) { root.append(el('p', 'empty', '当前筛选下没有案例。')); return; }
+      let lastLayer = '';
+      for (const { item, index } of selected) {
+        const layer = layerOf(index);
+        if (layer !== lastLayer) root.append(el('h2', '', layerName(layer)));
+        root.append(showCase(item, index));
+        lastLayer = layer;
+      }
+    }
+    async function load() {
+      try {
+        const response = await fetch('./results.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (!Array.isArray(data.cases)) throw new Error('缺少 cases 数组');
+        cases = data.cases;
+        showSummary(data.summary);
+        const categories = [...new Set(cases.map(item => text(item.category, '未分类')))].sort((a, b) => a.localeCompare(b, 'zh-CN'));
+        $('category').append(...categories.map(category => {
+          const option = el('option', '', category); option.value = category; return option;
+        }));
+        $('status').textContent = '';
+        render();
+      } catch (error) {
+        $('status').textContent = `尚未读取到 results.json：${error.message}。文件生成后，在本目录启动本地 HTTP 服务并刷新页面。`;
+      }
+    }
+    for (const id of ['layer', 'category', 'regression', 'critical']) $(id).addEventListener('change', render);
+    load();
+  </script>
+</body>
+</html>

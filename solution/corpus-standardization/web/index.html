@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>原著结构化审阅</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/comparison.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div><p class="eyebrow">高邮二王 · 本地文献工作台</p><h1>原著结构化审阅</h1><p class="intro">从书目到原字，逐段核对结构、位置与文本变换。</p></div>
+    <div class="header-note"><span class="status-dot"></span>原文与切分对照<p>查看出处、字形和上下文。</p></div>
+  </header>
+  <section id="release-status" class="release-status" role="status" aria-live="polite"><strong>正在读取发布状态…</strong></section>
+  <section class="overview" aria-label="全库概览" id="overview"><p>正在读取构建概览…</p></section>
+  <nav class="view-nav" aria-label="工作区"><button id="browse-tab" class="active" aria-current="page">书目与原文</button><button id="quality-tab">质量核验</button><button id="comparison-tab">切分对比</button><span id="build-label"></span></nav>
+  <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+  <main id="browse-view" class="workspace">
+    <aside class="catalog">
+      <div class="catalog-heading"><h2>书目</h2><span id="source-count" class="muted"></span></div>
+      <label for="search">查找书名或路径</label><input id="search" type="search" placeholder="例如：管子、尔雅" autocomplete="off">
+      <div class="filters"><div><label for="collection">来源集合</label><select id="collection"><option value="">全部集合</option><option value="external">外部典籍</option><option value="wang">二王原著</option></select></div><div><label for="flag-filter">本页标记</label><select id="flag-filter"><option value="">全部</option><option value="flagged">有质量标记</option><option value="clear">无质量标记</option></select></div></div>
+      <div id="source-list" class="source-list" aria-label="书目列表"></div>
+      <div class="pager"><button id="sources-prev" aria-label="上一页书目">上一页</button><span id="sources-page"></span><button id="sources-next" aria-label="下一页书目">下一页</button></div>
+    </aside>
+    <section class="document-area" aria-label="文献审阅">
+      <div id="empty-state" class="empty-state"><span class="book-mark" aria-hidden="true">册</span><h2>选择一部文献</h2><p>查看来源、切分位置和原字。所有内容来自本地构建结果。</p></div>
+      <div id="source-workspace" hidden>
+        <section id="source-detail" class="source-detail"></section>
+        <div class="reading-layout">
+          <aside class="chunks-panel"><div class="chunk-heading"><h3>检索块</h3><span id="chunk-count" class="muted"></span></div><p class="helper">检索块用于召回；阅读窗口可含相邻文字。</p><div id="chunk-list" class="chunk-list"></div><div class="pager"><button id="chunks-prev" aria-label="上一页检索块">上一页</button><span id="chunks-page"></span><button id="chunks-next" aria-label="下一页检索块">下一页</button></div></aside>
+          <section class="reader" aria-label="文本与映射">
+            <div id="chunk-detail" class="chunk-detail"><p class="helper">选择一个检索块，加载对应阅读窗口。</p></div>
+            <div id="reader-content" hidden>
+              <div class="text-tabs" role="tablist" aria-label="文本视图"><button role="tab" id="raw-tab" aria-controls="raw-panel" aria-selected="true" class="active" data-panel="raw">原文阅读</button><button role="tab" id="normalized-tab" aria-controls="normalized-panel" aria-selected="false" data-panel="normalized">规范化文本</button><button role="tab" id="mapping-tab" aria-controls="mapping-panel" aria-selected="false" data-panel="mapping">字符映射</button></div>
+              <section id="raw-panel" role="tabpanel" aria-labelledby="raw-tab"><div class="legend"><span><i class="legend-chunk"></i>检索块</span><span><i class="legend-selection"></i>映射选区</span><span><i class="legend-glyph"></i>缺字 / 私用区 / 罕见字</span></div><p id="raw-range" class="helper"></p><pre id="raw-text" class="source-text"></pre></section>
+              <section id="normalized-panel" role="tabpanel" aria-labelledby="normalized-tab" hidden><p class="helper">点击文字定位对应原文区间。规范化文本只用于检索，不替代引用原文。</p><div id="normalized-text" class="source-text normalized-text"></div></section>
+              <section id="mapping-panel" role="tabpanel" aria-labelledby="mapping-tab" hidden><p class="helper">规范化位置为块内偏移；原文位置为源文件 codepoint 偏移。区间均为 [开始, 结束)。</p><div id="mapping-list"></div><div class="pager"><button id="mapping-prev">上一页</button><span id="mapping-page"></span><button id="mapping-next">下一页</button></div></section>
+              <div id="selection-detail" class="selection-detail" hidden></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+  <main id="quality-view" class="quality-view" hidden><div class="quality-heading"><div><h2>质量核验</h2><p class="helper">查看全库检查结果，再抽读原文判断切分是否合适。字形提示不等于错误。</p></div><button id="quality-refresh">刷新报告</button></div><div id="quality-content"></div></main>
+  <main id="comparison-view" class="comparison-view" hidden>
+    <div class="quality-heading"><div><h2>切分对比</h2><p class="helper">逐项对照同一处原文、检索块与阅读窗口。区分匿名初评与复核；这不是人工金标准或下游检索效果评估。</p></div></div>
+    <div id="comparison-content"><p class="helper">正在读取对比文件…</p></div>
+  </main>
+  <footer>本地原文对照 · 保留原字与位置 · 位置以 Unicode codepoint 计数</footer>
+</body>
+</html>
