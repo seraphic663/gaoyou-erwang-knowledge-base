@@ -16,11 +16,9 @@
     sourceLocation: $('labSourceLocation'),
   };
   const evidence = {
+    panel: $('labEvidencePanel'),
     status: $('labEvidenceStatus'),
     list: $('labEvidence'),
-    button: $('labRetrieve'),
-    previewStatus: $('labPreviewStatus'),
-    previewList: $('labPreviewEvidence'),
   };
   const sides = {
     v1: { status: $('labV1Status'), output: $('labV1Output'), button: $('labRunV1'), serial: 0, snapshot: null, citationCards: new Map(), citationLibraryCards: null },
@@ -37,14 +35,12 @@
   const state = {
     records: [],
     actual: null,
-    preview: null,
     actualTargets: new Map(),
-    retrieveSerial: 0,
     citationReturn: null,
     viewMode: 'all',
     currentStepIndex: 0,
   };
-  const stepOrderLabels = ['发疑', '设问', '取证', '释理', '结论'];
+  const stepOrderLabels = ['发疑', '设问', '取证', '释理', '结论', '思考'];
   const stepLabels = {
     problem_discovery: '发疑',
     research_question: '设问',
@@ -122,7 +118,7 @@
     presentation.all.setAttribute('aria-pressed', String(!isStepView));
     presentation.steps.setAttribute('aria-pressed', String(isStepView));
     presentation.navigation.hidden = !isStepView;
-    presentation.position.textContent = `${state.currentStepIndex + 1}/5 · ${stepOrderLabels[state.currentStepIndex]}`;
+    presentation.position.textContent = `${state.currentStepIndex + 1}/${stepOrderLabels.length} · ${stepOrderLabels[state.currentStepIndex]}`;
     presentation.previous.disabled = state.currentStepIndex === 0;
     presentation.next.disabled = state.currentStepIndex === stepOrderLabels.length - 1;
   }
@@ -240,12 +236,6 @@
     if (Array.isArray(value)) return value.map(fieldText).join('；');
     return typeof value === 'string' ? value : JSON.stringify(value);
   }
-  function addSection(container, title, value, className = '') {
-    const section = el('section', `lab-output-section ${className}`.trim());
-    section.append(el('h4', '', title), el('p', 'lab-input-text', fieldText(value)));
-    container.append(section);
-    return section;
-  }
   function highlightLiteral(node, textValue, quote) {
     if (!quote) return null;
     const start = textValue.indexOf(quote);
@@ -346,7 +336,6 @@
       groups.get(key).push({ item, index });
     });
 
-    let groupIndex = 0;
     for (const entries of groups.values()) {
       const source = entries[0].item;
       const group = el('details', 'lab-source-group');
@@ -385,9 +374,7 @@
         if (targets) registerMaterialTarget(targets, item, { group, card, nearby, pre, excerpt: excerptNode });
       });
       group.append(body);
-      if (groupIndex === 0) group.open = true;
       container.append(group);
-      groupIndex += 1;
     }
     return items.length;
   }
@@ -419,6 +406,7 @@
   function locateMaterial(evidenceId, quote, card) {
     const target = state.actualTargets.get(String(evidenceId || ''));
     if (!target) return;
+    evidence.panel.open = true;
     target.group.open = true;
     target.nearby.open = true;
     showCitationReturn(card, 'material');
@@ -613,30 +601,6 @@
     const prefix = partial ? '本次运行检索并送出的材料' : '本次实际送入模型的材料';
     status(evidence.status, `${prefix}共 ${count} 段，按书名或来源归组。`);
   }
-  async function retrievePreview() {
-    const value = snapshot();
-    const invalid = validate(value);
-    if (invalid) { status($('labInputStatus'), invalid, 'error'); return; }
-    status($('labInputStatus'), '输入已就绪。');
-    const serial = ++state.retrieveSerial;
-    evidence.button.disabled = true;
-    status(evidence.previewStatus, '正在预览检索结果……');
-    try {
-      const data = await request('/retrieve', { method: 'POST', body: value });
-      if (serial !== state.retrieveSerial) return;
-      state.preview = { input: value, data };
-      const count = renderMaterials(data, evidence.previewList);
-      status(evidence.previewStatus, count
-        ? `预览到 ${count} 段候选材料；v2 运行时会重新检索。`
-        : data?.message || '预览检索没有命中材料。');
-      $('labPreview').open = true;
-    } catch (error) {
-      if (serial === state.retrieveSerial) status(evidence.previewStatus, errorText(error), 'error');
-    } finally {
-      if (serial === state.retrieveSerial) evidence.button.disabled = false;
-    }
-  }
-
   function displayResult(mode, data, inputAtRun) {
     const side = sides[mode];
     const returnTarget = state.citationReturn;
@@ -692,6 +656,27 @@
       if (referencedIds.some(id => groups.has(id))) section.append(el('div', 'lab-step-citation-cards'));
       side.output.append(section);
     });
+    const thinkingValue = result.uncertainties;
+    const hasThinking = typeof thinkingValue === 'string' ? Boolean(thinkingValue.trim())
+      : Array.isArray(thinkingValue) ? thinkingValue.length > 0
+        : thinkingValue && typeof thinkingValue === 'object' ? Object.keys(thinkingValue).length > 0
+          : Boolean(thinkingValue);
+    const thinkingText = hasThinking ? fieldText(thinkingValue) : '暂无补充思考。';
+    const thinking = el('section', 'lab-output-section lab-step lab-thinking-page');
+    thinking.dataset.stepIndex = String(stepOrderLabels.length - 1);
+    thinking.dataset.citationIds = '[]';
+    const thinkingTitle = el('h4', 'lab-step-title');
+    thinkingTitle.append(
+      el('span', 'lab-step-number', `${stepOrderLabels.length}.`),
+      document.createTextNode(` ${stepOrderLabels[stepOrderLabels.length - 1]} `),
+      el('span', 'lab-thinking-note', '补充提醒'),
+    );
+    const thinkingBody = el('p', 'lab-step-text');
+    const thinkingCitations = renderStepText(thinkingBody, thinkingText, groups, mode);
+    thinking.dataset.citationIds = JSON.stringify([...thinkingCitations]);
+    thinking.append(thinkingTitle, thinkingBody);
+    if ([...thinkingCitations].some(id => groups.has(id))) thinking.append(el('div', 'lab-step-citation-cards'));
+    side.output.append(thinking);
     const library = el('section', 'lab-output-section lab-citation-library');
     library.append(el('h4', '', `${mode} · 【引用依据】（${groups.size} 条）`));
     if (groups.size) {
@@ -707,7 +692,6 @@
       library.append(el('p', 'lab-note', '本次响应没有提供引用卡。'));
     }
     side.output.append(library);
-    if (result.uncertainties) addSection(side.output, '未决问题', result.uncertainties);
     updatePresentation();
     side.snapshot = inputAtRun;
     status(side.status, `已完成 · ${data.model_returned || data.model_requested || 'DeepSeek'}${data.elapsed_ms ? ` · ${(data.elapsed_ms / 1000).toFixed(1)} 秒` : ''}`);
@@ -739,7 +723,6 @@
     if (!sides[mode].button.disabled) generate(mode, value);
   }
 
-  evidence.button.addEventListener('click', retrievePreview);
   presentation.all.addEventListener('click', () => {
     state.viewMode = 'all';
     updatePresentation();
@@ -763,7 +746,6 @@
     const value = snapshot();
     const invalid = validate(value);
     if (invalid) { status($('labInputStatus'), invalid, 'error'); return; }
-    status($('labInputStatus'), '两侧按同一份输入发起请求。');
     generate('v1', value);
     generate('v2', value);
   });

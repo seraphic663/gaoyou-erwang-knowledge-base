@@ -59,10 +59,12 @@ test('v1 sends only original and question; it never invokes corpus bridge', asyn
   assert.equal(sent.max_tokens, 32768);
   assert.deepEqual(outcome.payload.evidence, []);
   assert.equal(outcome.payload.citation_checks[0].valid, true);
-  assert.equal(outcome.payload.prompt_version, 'reading-harness.collation.v4');
-  assert.match(sent.messages[0].content, /uncertainties（字符串/);
+  assert.equal(outcome.payload.prompt_version, 'reading-harness.collation.v5');
+  assert.match(sent.messages[0].content, /uncertainties（集中未决问题与后续思考的字符串/);
   assert.match(sent.messages[0].content, /可选 rationale（若提供必须为字符串）/);
   assert.match(sent.messages[0].content, /五步各写增量信息/);
+  assert.match(sent.messages[0].content, /前五步正文不要重复列未决问题、后续提醒/);
+  assert.match(sent.messages[0].content, /uncertainties 供辅助第六页展示，不要增添第六个 step/);
   assert.match(sent.messages[0].content, /一个判断涉及两条证据时写 \[C1\]\[C2\]/);
   assert.equal(outcome.payload.result.steps.length, 5);
   assert.equal(outcome.payload.result.conclusion_type, 'keep_text');
@@ -263,7 +265,7 @@ test('bare citation IDs and Chinese range wording resolve to the same cards', as
   assert.deepEqual(outcome.payload.result.steps[2].citation_ids, ['C4', 'C1', 'C2', 'C3', 'C5']);
   assert.deepEqual(outcome.payload.result.steps[2].citation_indexes, [3, 0, 1, 2, 4]);
   assert.equal(outcome.payload.provider_output.content, JSON.stringify(result));
-  assert.equal(outcome.payload.prompt_version, 'reading-harness.collation.v4');
+  assert.equal(outcome.payload.prompt_version, 'reading-harness.collation.v5');
 });
 
 test('unknown body citation marker fails with raw provider output and no retry', async () => {
