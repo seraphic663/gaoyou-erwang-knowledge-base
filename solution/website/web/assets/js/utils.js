@@ -69,6 +69,10 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
+function plainTextFromMarkup(value) {
+  return String(value ?? '').replace(/<\/?[A-Za-z][^>]*>/g, '');
+}
+
 function summarizeText(value, maxLength = 120) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (!text) return '';

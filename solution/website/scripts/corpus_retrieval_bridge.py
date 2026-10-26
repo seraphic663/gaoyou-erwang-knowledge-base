@@ -165,7 +165,10 @@ def retrieve(
     work_key: str = "",
     limit: int = 8,
     include_cases: bool = False,
+    search_mode: str = "unified",
 ) -> dict[str, Any]:
+    if search_mode not in {"unified", "body", "title"}:
+        raise ValueError("invalid_search_mode")
     normalized_query = normalize(query)
     tokens = query_tokens(normalized_query)
     if not tokens:
@@ -173,7 +176,9 @@ def retrieve(
             "ok": True,
             "query": normalized_query,
             "work_key": work_key,
+            "search_mode": search_mode,
             "candidate_count": 0,
+            "candidate_count_capped": False,
             "returned_count": 0,
             "items": [],
             "trace": {"canonical_only": True, "reason": "empty_query"},
@@ -183,9 +188,17 @@ def retrieve(
     conditions = []
     condition_parameters: list[Any] = []
     for token in search_tokens:
-        conditions.append("(p.normalized_text LIKE ? OR p.plain_text LIKE ? OR p.entry_title LIKE ?)")
         needle = f"%{token}%"
-        condition_parameters.extend([needle, needle, needle])
+        fields = []
+        if search_mode in {"unified", "body"}:
+            fields.extend(["p.normalized_text LIKE ?", "p.plain_text LIKE ?"])
+            condition_parameters.extend([needle, needle])
+        if search_mode in {"unified", "title"}:
+            fields.extend([
+                "p.document_title LIKE ?", "p.section_title LIKE ?", "p.entry_title LIKE ?",
+            ])
+            condition_parameters.extend([needle, needle, needle])
+        conditions.append("(" + " OR ".join(fields) + ")")
     parameters: list[Any] = []
     work_clause = ""
     if work_key:
@@ -214,18 +227,20 @@ def retrieve(
     for row in rows:
         item = dict(row)
         text = normalize(item.get("normalized_text") or item.get("plain_text"))
-        entry_title = normalize(item.get("entry_title"))
+        title = normalize(" ".join(filter(None, [
+            item.get("document_title"), item.get("section_title"), item.get("entry_title"),
+        ])))
         text_variant = traditional_variant(text)
-        entry_title_variant = traditional_variant(entry_title)
+        title_variant = traditional_variant(title)
         score = 0
         reasons: list[str] = []
         for token in tokens:
             if not token:
                 continue
-            direct_text = token in text
-            variant_text = traditional_variant(token) in text_variant
-            direct_title = token in entry_title
-            variant_title = traditional_variant(token) in entry_title_variant
+            direct_text = search_mode != "title" and token in text
+            variant_text = search_mode != "title" and traditional_variant(token) in text_variant
+            direct_title = search_mode != "body" and token in title
+            variant_title = search_mode != "body" and traditional_variant(token) in title_variant
             if direct_text or variant_text:
                 score += 100 + min(len(token), 12)
                 reasons.append("完整短语命中" if direct_text else "简繁字形转换后命中")
@@ -253,7 +268,9 @@ def retrieve(
         "ok": True,
         "query": normalized_query,
         "work_key": work_key,
+        "search_mode": search_mode,
         "candidate_count": len(rows),
+        "candidate_count_capped": len(rows) >= 500,
         "returned_count": len(items),
         "items": items,
         "trace": {
@@ -273,6 +290,7 @@ def main() -> int:
     parser.add_argument("--work-key", default="")
     parser.add_argument("--limit", type=int, default=8)
     parser.add_argument("--include-cases", action="store_true")
+    parser.add_argument("--search-mode", choices=("unified", "body", "title"), default="unified")
     args = parser.parse_args()
 
     try:
@@ -284,6 +302,7 @@ def main() -> int:
                 work_key=args.work_key,
                 limit=args.limit,
                 include_cases=args.include_cases,
+                search_mode=args.search_mode,
             )
         finally:
             connection.close()

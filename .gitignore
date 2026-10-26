@@ -41,6 +41,12 @@ solution/website/.env
 *.db-journal
 *.db-wal
 *.db-shm
+solution/website/runtime/
+solution/website/runtime-release/
+# Docker needs the compressed corpus input; ignore other generated bundle files.
+!solution/website/runtime-bundle/
+solution/website/runtime-bundle/*
+!solution/website/runtime-bundle/harness_corpus.jsonl.xz
 data/D-标注/json/.env
 data/D-标注/json/annotation_db/
 

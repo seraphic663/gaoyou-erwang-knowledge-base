@@ -6,7 +6,7 @@
   const title = document.querySelector('#detailTitle');
 
   const section = (heading, content, id = "") => `<section class="card"${id ? ` id="${id}"` : ""}><h2>${heading}</h2>${content}</section>`;
-  const paragraph = value => `<p class="detail-paragraph">${escapeHtml(value || '未记录')}</p>`;
+  const paragraph = value => `<p class="detail-paragraph">${escapeHtml(plainTextFromMarkup(value || '未记录'))}</p>`;
   const field = (label, value) => `<div class="detail-block"><h3>${label}</h3>${paragraph(value)}</div>`;
   const rawFields = value => `
     <details class="fold-card">
@@ -42,7 +42,7 @@
       passage.label,
       paragraph(passage.location) + paragraph(passage.text) + rawFields(passage.raw),
     )).join('');
-    const related = model.relatedCases.map(item => Site.link(Site.caseUrl(item.source, item.id), item.title)).join(' ');
+    const related = model.relatedCases.map(item => Site.link(Site.caseUrl(item.source, item.id), plainTextFromMarkup(item.title))).join(' ');
     return `
       <div class="site-actions">
         <span class="tag">${escapeHtml(model.sourceLabel)}</span>
@@ -72,7 +72,7 @@
     if (!id) throw new Error('缺少案例编号');
     const payload = await requestJson(CaseSources.detailUrl(source, id));
     const model = CaseSources.detail(source, payload);
-    title.textContent = model.title;
+    title.textContent = plainTextFromMarkup(model.title);
     root.innerHTML = renderCase(model);
     try {
       const targets = await Site.auditLinks(source, [id]);

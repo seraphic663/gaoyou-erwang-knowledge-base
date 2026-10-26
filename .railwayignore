@@ -10,10 +10,13 @@
 docs/project/
 docs/management/
 solution/legacy-db/
-data/
+/data/
 archive/literature/
 v2/data/
 v2/tests/
+solution/website/runtime/
+solution/website/runtime-release/
+solution/website/runtime-bundle/*.partial
 research/external-source/
 v2/schemas/
 *.pdf
@@ -22,6 +25,7 @@ v2/schemas/
 *.caj
 *.zip
 *.pyc
+solution/website/runtime/harness_corpus.sqlite3
 __pycache__/
 **/__pycache__/
 node_modules/

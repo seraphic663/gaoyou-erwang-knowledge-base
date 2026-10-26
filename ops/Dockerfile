@@ -8,6 +8,13 @@ COPY ops/package.json ./package.json
 COPY ops/package-lock.json ./package-lock.json
 RUN npm ci --omit=dev
 COPY solution/website ./solution/website
+RUN test -s /app/solution/website/data/sqlite-snapshot.json \
+    && test -s /app/solution/website/data/annotation-snapshot.json \
+    && test -s /app/solution/website/runtime-bundle/harness_corpus.jsonl.xz
+RUN python3 -B /app/solution/website/scripts/harness_bundle.py unpack \
+    --bundle /app/solution/website/runtime-bundle/harness_corpus.jsonl.xz \
+    --output /app/solution/website/runtime-release \
+    && test -s /app/solution/website/runtime-release/harness_corpus.sqlite3
 COPY v2 ./v2
 
 ENV NODE_ENV=production

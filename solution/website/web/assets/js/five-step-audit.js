@@ -344,7 +344,7 @@
           <p class="five-step-context-meta">系统根据来源、目标典籍和词语关系找到了相近材料；它们只用于比较，不替代当前案例的引文。</p>
           ${relatedCases.length ? `<div class="five-step-related-list">${relatedCases.map((relatedCase) => `
             <a class="five-step-related-case" href="/audit?case=${encodeURIComponent(relatedCase.case_id)}">
-              <span><strong>${escapeHtml(relatedCase.case_title || '未命名案例')}</strong><small>${escapeHtml(relatedCase.source_work || '来源未注明')} · ${escapeHtml(relatedCase.target_work || '目标典籍未明确')}</small></span>
+              <span><strong>${escapeHtml(plainTextFromMarkup(relatedCase.case_title || '未命名案例'))}</strong><small>${escapeHtml(relatedCase.source_work || '来源未注明')} · ${escapeHtml(relatedCase.target_work || '目标典籍未明确')}</small></span>
               <small>${escapeHtml(relatedCase.relation || '材料相近')} · 打开</small>
             </a>
           `).join('')}</div>` : ''}
@@ -356,7 +356,7 @@
 
   function renderCase(item) {
     state.caseItem = item;
-    el.caseTitle.textContent = item.case_title || '未命名案例';
+    el.caseTitle.textContent = plainTextFromMarkup(item.case_title || '未命名案例');
     el.caseMeta.textContent = `${item.source_work || '来源未注明'} · ${item.target_work || '目标典籍未明确'} · ${caseStatusText(item)}`;
     el.backLink.href = Site.caseUrl('v2', state.caseId);
     const originLink = document.createElement('a'); originLink.className = 'page-link'; originLink.href = Site.url('/corpus', {case_id:state.caseId,return:Site.current()}); originLink.textContent = '核对本案原文'; el.backLink.after(originLink);
@@ -375,7 +375,7 @@
     root.innerHTML = items.map((item) => `
       <button type="button" class="five-step-case-option" data-five-step-case-id="${escapeHtml(item.case_id)}">
         <span class="five-step-case-option-main">
-          <strong>${escapeHtml(item.case_title || '未命名案例')}</strong>
+          <strong>${escapeHtml(plainTextFromMarkup(item.case_title || '未命名案例'))}</strong>
           <small>${escapeHtml(item.source_work || '来源未注明')} · ${escapeHtml(item.target_work || '目标典籍未明确')}</small>
         </span>
         <span class="five-step-case-option-meta">

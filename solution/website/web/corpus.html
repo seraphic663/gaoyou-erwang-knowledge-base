@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>原典检索 · 高邮二王考据过程知识库</title>
+    <title>典籍检索 · 高邮二王考据过程知识库</title>
     <link rel="stylesheet" href="/assets/css/styles.css" />
     <link rel="stylesheet" href="/assets/css/corpus.css" />
   <link rel="stylesheet" href="/assets/css/site.css"></head>
@@ -12,47 +12,61 @@
       <!--site-navigation-->
 
       <div class="hero-content">
-        <p class="badge">Corpus · 只读正文检索</p>
-        <h1>原典检索</h1>
-        <p class="hero-copy">检索已经登记的原典正文，查看出处、定位信息和关联案例。可从命中原文直接查看关联案例或进入审校。</p>
+        <p class="badge">Corpus · 原典与外典统一检索</p>
+        <h1>典籍检索</h1>
+        <p class="hero-copy">在二王原典与外典正文间检索，查看书名、命中文段、来源位置和邻接原文。正文结果来自现有检索索引，书名命中会单独标出。</p>
+        <p><a class="page-link" href="/reading-lab">试用校读对照实验 →</a></p>
       </div>
     </header>
 
     <main class="section corpus-page"><a id="siteBack" class="site-back" href="/" hidden>返回来时位置</a>
-      <p id="corpusStatus" class="db-status">正在连接原典检索……</p>
+      <p id="corpusStatus" class="db-status">正在连接典籍检索……</p>
 
       <section class="card corpus-panel">
         <div class="corpus-panel-heading">
           <div>
 
-            <h2>检索正文</h2>
+            <h2>统一检索</h2>
           </div>
           <span id="corpusResultCount" class="summary-pill">尚未检索</span>
         </div>
 
-        <section class="corpus-search" aria-label="正文片段检索">
+        <section class="corpus-search" aria-label="典籍检索">
           <form id="corpusSearchForm" class="corpus-search-form">
             <label class="corpus-query-field">
-              <span>正文片段</span>
-              <textarea id="corpusQuery" rows="4" placeholder="例如：平原之隰，奚有於高"></textarea>
+              <span>检索词或正文片段</span>
+              <textarea id="corpusQuery" rows="4" placeholder="可输入书名、篇名或正文片段"></textarea>
             </label>
             <label class="toolbar-field">
-              <span>作品范围</span>
+              <span>二王原典作品</span>
               <select id="corpusWork"><option value="all">四部著作</option></select>
             </label>
+            <fieldset class="corpus-filter-group corpus-mode-group">
+              <legend>检索模式</legend>
+              <label><input type="radio" name="corpusMode" value="unified" checked /> 统一（正文 + 书名）</label>
+              <label><input type="radio" name="corpusMode" value="body" /> 仅正文</label>
+              <label><input type="radio" name="corpusMode" value="title" /> 仅书名</label>
+            </fieldset>
+            <fieldset class="corpus-filter-group corpus-collections">
+              <legend>典籍范围（可多选）</legend>
+              <label><input type="checkbox" name="corpusCollection" value="original" checked /> 二王原典</label>
+              <label><input type="checkbox" name="corpusCollection" value="external_high" checked /> 外典·高频</label>
+              <label><input type="checkbox" name="corpusCollection" value="external_mid" checked /> 外典·中频</label>
+              <label><input type="checkbox" name="corpusCollection" value="external_low" checked /> 外典·低频</label>
+            </fieldset>
             <div class="corpus-search-actions">
-              <button id="corpusSearchButton" class="page-link toolbar-button" type="submit">检索正文</button>
+              <button id="corpusSearchButton" class="page-link toolbar-button" type="submit">检索典籍</button>
               <button id="corpusReset" class="search-clear toolbar-button" type="button">清空</button>
             </div>
           </form>
-          <p id="corpusSearchStatus" class="compact-note" aria-live="polite">输入一段正文后检索。</p>
+          <p id="corpusSearchStatus" class="compact-note" aria-live="polite">全选默认检索二王原典和外典三组；书名命中与正文命中会分别标注。</p>
           <div id="corpusResults" class="corpus-results" aria-live="polite"></div>
         </section>
       </section>
     </main>
 
     <footer class="footer">
-      <p>原典检索 · 查看原文出处，追溯关联案例</p>
+      <p>典籍检索 · 查看原文出处与邻接文段</p>
     </footer>
 
     <script src="/assets/js/utils.js"></script><script src="/assets/js/page-catalog.js"></script>

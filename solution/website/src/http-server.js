@@ -4,6 +4,7 @@ const fs = require('fs');
 const http = require('http');
 const path = require('path');
 const config = require('./config');
+const readingHarness = require('./reading-harness');
 const {
   browseAnnotations,
   buildAnnotationBootstrap,
@@ -13,6 +14,7 @@ const {
 const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
 const { retrieveForCase, retrieveFromCorpus } = require('./corpus-retrieval');
+const { runPythonJsonBridge } = require('./python-bridge');
 const { getV2ReviewTasks, getV2ReviewTask, submitV2Review } = require('./v2-review');
 const {
   ACCEPTED_PROMPT_VERSIONS,
@@ -34,6 +36,24 @@ const {
 } = require('./v2-five-step-audit-store');
 
 let v2SummaryCache = null;
+
+async function retrieveOriginalForUnifiedSearch(config, {
+  query,
+  workKey = '',
+  limit = 8,
+  searchMode = 'unified',
+} = {}) {
+  const args = ['--query', query, '--limit', String(limit), '--search-mode', searchMode];
+  if (workKey) args.push('--work-key', workKey);
+  args.push('--include-cases');
+  return runPythonJsonBridge(config, {
+    bridgeFile: config.CORPUS_RETRIEVAL_BRIDGE_FILE,
+    command: 'retrieve',
+    args,
+    dbFile: config.CORPUS_DB_FILE,
+    errorLabel: 'unified original corpus retrieval',
+  });
+}
 
 function fileRevision(filePath) {
   try {
@@ -69,17 +89,22 @@ function sendJson(res, statusCode, payload, extraHeaders = {}) {
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
-    let body = '';
+    const chunks = [];
+    let bytes = 0;
+    let tooLarge = false;
 
     req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 128000) {
-        reject(new Error('Request body too large'));
-        req.destroy();
-      }
+      bytes += chunk.length;
+      if (bytes > 128000) tooLarge = true;
+      else if (!tooLarge) chunks.push(chunk);
     });
 
     req.on('end', () => {
+      if (tooLarge) {
+        reject(new Error('Request body too large'));
+        return;
+      }
+      const body = Buffer.concat(chunks).toString('utf8');
       if (!body.trim()) {
         resolve({});
         return;
@@ -200,6 +225,32 @@ function createServer() {
         return sendJson(res, 204, {});
       }
 
+      if (parsedUrl.pathname.startsWith('/api/reading-harness/')) {
+        const command = parsedUrl.pathname.slice('/api/reading-harness/'.length);
+        if (['summary', 'sources', 'chunks', 'chunk'].includes(command)) {
+          if (req.method !== 'GET') return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+          const checked = readingHarness.validateBrowseInput(command, parsedUrl.query);
+          if (checked.error) return sendJson(res, 400, { ok: false, message: checked.error });
+          try {
+            const data = await readingHarness.runCorpusBridge(config, command, checked.input);
+            return sendJson(res, 200, { ok: true, data });
+          } catch (error) {
+            return sendJson(res, 502, { ok: false, message: `external_corpus_failed: ${error.message}` });
+          }
+        }
+        if (['retrieve', 'generate'].includes(command)) {
+          if (req.method !== 'POST') return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+          let body;
+          try { body = await readJsonBody(req); }
+          catch (error) { return sendJson(res, 400, { ok: false, message: error.message }); }
+          const outcome = command === 'retrieve'
+            ? await readingHarness.retrieve(config, body)
+            : await readingHarness.generate(config, body);
+          return sendJson(res, outcome.status, outcome.payload);
+        }
+        return sendJson(res, 404, { ok: false, message: 'API not found' });
+      }
+
       if (parsedUrl.pathname === '/api/site/audit-targets') {
         if (req.method !== 'GET') return sendJson(res, 405, {ok:false});
         const source = parsedUrl.query.source;
@@ -288,6 +339,195 @@ function createServer() {
           return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
         }
         return sendJson(res, 200, await getCachedV2Summary(config));
+      }
+
+      if (parsedUrl.pathname === '/api/corpus/unified-search') {
+        if (req.method !== 'POST') {
+          return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        }
+        let body;
+        try { body = await readJsonBody(req); }
+        catch (error) { return sendJson(res, 400, { ok: false, message: error.message }); }
+        const query = typeof body.query === 'string' ? body.query.trim() : '';
+        if (!query) return sendJson(res, 400, { ok: false, message: 'query_required' });
+        if (Array.from(query).length > 1000) {
+          return sendJson(res, 400, { ok: false, message: 'query_exceeds_1000_characters' });
+        }
+        const allowedCollections = new Set([
+          'original', 'external_high', 'external_mid', 'external_low',
+        ]);
+        let collections = body.collections;
+        if (collections === undefined) collections = ['original', 'external_high', 'external_mid', 'external_low'];
+        if (!Array.isArray(collections) || collections.some((value) => typeof value !== 'string')) {
+          return sendJson(res, 400, { ok: false, message: 'collections_must_be_string_array' });
+        }
+        collections = [...new Set(collections)];
+        if (collections.some((value) => !allowedCollections.has(value))) {
+          return sendJson(res, 400, { ok: false, message: 'invalid_collection' });
+        }
+        if (!collections.length) return sendJson(res, 400, { ok: false, message: 'no_collection_selected' });
+        const mode = String(body.mode || 'unified');
+        if (!['unified', 'body', 'title'].includes(mode)) {
+          return sendJson(res, 400, { ok: false, message: 'invalid_search_mode' });
+        }
+        const requestedLimit = Number(body.limit ?? 8);
+        const titleOffset = Number(body.title_offset ?? 0);
+        if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 20
+          || !Number.isInteger(titleOffset) || titleOffset < 0 || titleOffset > 100000) {
+          return sendJson(res, 400, { ok: false, message: 'invalid_pagination' });
+        }
+        const workKey = typeof body.work_key === 'string' ? body.work_key.slice(0, 100) : '';
+        const includeOriginal = collections.includes('original');
+        const externalCollections = collections.filter((value) => value.startsWith('external_'));
+        const includeBody = mode !== 'title';
+        const includeTitle = mode !== 'body';
+        const workLabels = {
+          dushu_zazhi: '《读书杂志》',
+          guangya_shuzheng: '《广雅疏证》',
+          jingyi_shuwen: '《经义述闻》',
+          jingzhuan_shici: '《经传释词》',
+        };
+        const collectionLabels = {
+          external_high: '外典·高频',
+          external_mid: '外典·中频',
+          external_low: '外典·低频',
+        };
+        const tasks = [];
+        if (includeOriginal) {
+          tasks.push((async () => {
+            const data = await retrieveOriginalForUnifiedSearch(config, {
+              query,
+              workKey,
+              limit: Math.min(requestedLimit, 20),
+              searchMode: mode,
+            });
+            const items = (data.items || []).map((item) => {
+              const reason = String(item.match_reason || '');
+              const titleHit = reason.includes('篇目标题命中');
+              const bodyHit = /完整短语命中|简繁字形转换后命中|正文片段命中/.test(reason);
+              const matchScope = titleHit && bodyHit ? 'both' : titleHit ? 'title' : 'body';
+              return {
+                ...item,
+                kind: 'original_passage',
+                collection: 'original',
+                collection_label: '二王原典',
+                match_scope: matchScope,
+                match_label: matchScope === 'both' ? '书名与正文命中'
+                  : matchScope === 'title' ? '书名命中' : '正文命中',
+                source_title: item.document_title || workLabels[item.work_key] || item.work_key || '原典',
+                matched_text: item.passage_text || '',
+                result_id: item.passage_id,
+                location: [item.document_title, item.section_title, item.entry_title]
+                  .filter(Boolean).join(' · ') || workLabels[item.work_key] || item.work_key || '篇目未注明',
+              };
+            });
+            return {
+              kind: 'original',
+              items,
+              candidate_count: data.candidate_count || 0,
+              candidate_count_capped: Boolean(data.candidate_count_capped),
+              returned_count: data.returned_count || (data.items || []).length,
+            };
+          })());
+        }
+        if (externalCollections.length && includeBody) {
+          tasks.push((async () => {
+            const outcome = await readingHarness.retrieve(config, {
+              original_text: query,
+              question: query,
+              collections: externalCollections,
+            });
+            if (outcome.status !== 200 || !outcome.payload?.ok) {
+              throw new Error(outcome.payload?.message || 'external_retrieval_failed');
+            }
+            const data = outcome.payload.data || {};
+            const items = (data.items || []).map((item) => ({
+              ...item,
+              kind: 'external_chunk',
+              match_scope: 'body',
+              match_label: '正文命中',
+              collection_label: collectionLabels[item.collection] || item.collection,
+              source_title: item.source_title || '外典书名未注明',
+              matched_text: item.full_text || item.context_text || '',
+              result_id: item.chunk_id,
+              location: [item.source_title, item.chapter, `第${item.ordinal}段`]
+                .filter(Boolean).join(' · '),
+            }));
+            return {
+              kind: 'external_body',
+              items,
+              candidate_count: data.candidate_count || 0,
+              returned_count: data.hit_count || items.length,
+              collections: data.collections || externalCollections,
+              reason: data.reason || '',
+            };
+          })());
+        }
+        if (externalCollections.length && includeTitle) {
+          tasks.push((async () => {
+            const data = await readingHarness.runCorpusBridge(config, 'sources', {
+              query,
+              collections: externalCollections,
+              limit: Math.min(requestedLimit, 100),
+              offset: titleOffset,
+            });
+            const items = (data.items || []).map((item) => {
+              const titleHit = String(item.title || '').normalize('NFKC').includes(query.normalize('NFKC'));
+              const relpathHit = String(item.relpath || '').normalize('NFKC').includes(query.normalize('NFKC'));
+              return {
+                ...item,
+                kind: 'external_source',
+                match_scope: titleHit ? 'title' : 'path',
+                match_label: titleHit ? '书名命中' : relpathHit ? '路径命中' : '来源信息命中',
+                collection_label: collectionLabels[item.collection] || item.collection,
+                source_title: item.title || '外典书名未注明',
+                matched_text: titleHit ? item.title : item.relpath,
+                result_id: `source:${item.source_id}`,
+                location: item.relpath || '',
+              };
+            });
+            return {
+              kind: 'external_title',
+              items,
+              total: data.total || 0,
+              returned_count: items.length,
+              offset: data.offset || 0,
+              limit: data.limit || requestedLimit,
+            };
+          })());
+        }
+        try {
+          const parts = await Promise.all(tasks);
+          const byKind = Object.fromEntries(parts.map((part) => [part.kind, part]));
+          const items = parts.flatMap((part) => part.items || []);
+          return sendJson(res, 200, {
+            ok: true,
+            query,
+            mode,
+            collections,
+            items,
+            counts: {
+              original: {
+                candidate_count: byKind.original?.candidate_count || 0,
+                candidate_count_capped: Boolean(byKind.original?.candidate_count_capped),
+                returned_count: byKind.original?.returned_count || 0,
+              },
+              external_body: {
+                candidate_count: byKind.external_body?.candidate_count || 0,
+                returned_count: byKind.external_body?.returned_count || 0,
+                result_limit: byKind.external_body ? 6 : 0,
+              },
+              external_title: {
+                total: byKind.external_title?.total || 0,
+                returned_count: byKind.external_title?.returned_count || 0,
+                offset: byKind.external_title?.offset || 0,
+                limit: byKind.external_title?.limit || requestedLimit,
+              },
+            },
+          });
+        } catch (error) {
+          return sendJson(res, 502, { ok: false, message: `corpus_search_failed: ${error.message}` });
+        }
       }
 
       if (parsedUrl.pathname === '/api/corpus/retrieve') {

@@ -8,8 +8,8 @@
   function renderCard(item, index) {
     return `
       <article class="card site-case">
-        <h3>${escapeHtml(item.title)}</h3>
-        <p>${escapeHtml(item.summary)}</p>
+        <h3>${escapeHtml(plainTextFromMarkup(item.title))}</h3>
+        <p>${escapeHtml(plainTextFromMarkup(item.summary))}</p>
         <p class="compact-note">${escapeHtml(item.origin)} · ${escapeHtml(item.status)}</p>
         <div class="site-actions">
           ${Site.link(Site.caseUrl(item.source, item.id), '查看案例')}

@@ -15,7 +15,7 @@ test('canonical pages load directly, with absolute assets and one consistent nav
       assert.equal(response.status,200,route);
       const html = await response.text();
       const nav = html.match(/<nav class="nav"[\s\S]*?<\/nav>/)[0];
-      for (const target of ['/', '/audit','/cases','/terms','/corpus','/knowledge']) assert.ok(nav.includes('href="'+target+'"'),route+target);
+      for (const target of ['/', '/audit','/cases','/terms','/corpus','/reading-lab','/knowledge']) assert.ok(nav.includes('href="'+target+'"'),route+target);
       assert.doesNotMatch(html,/src="\.\/|href="\.\//);
       for (const m of html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) assert.equal((await fetch(base+m[1])).status,200,m[1]);
     }

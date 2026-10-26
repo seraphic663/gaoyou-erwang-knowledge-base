@@ -10,6 +10,7 @@ __pycache__
 *.pyc
 *.db-journal
 *.broken.*
+solution/website/runtime/harness_corpus.sqlite3
 Thumbs.db
 .DS_Store
 ~$*.docx
