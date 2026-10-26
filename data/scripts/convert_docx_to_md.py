@@ -17,7 +17,7 @@ WP = "{http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing}"
 TITLE_NOTE_A = (
     "\u672c\u6587\u4ef6\u7531 `{source}` \u62bd\u53d6\u7eaf\u6587\u672c\u751f\u6210\uff1b"
     "\u4fdd\u7559\u53ef\u590d\u5236\u6587\u5b57\uff0c\u672a\u505a\u6821\u52d8\u3002"
-    "\u5c0f\u5b57\u4ee5 `<small>` \u6807\u8bb0\uff1b"
+    "\u539f DOCX \u7684\u5c0f\u5b57\u6587\u5b57\u5df2\u4fdd\u7559\uff0c\u5b57\u53f7\u5c42\u7ea7\u672a\u4fdd\u7559\uff1b"
     "\u76ee\u5f55\u3001\u5185\u90e8\u8df3\u8f6c\u3001\u4e66\u7b7e\u548c\u56fe\u7247\u7248\u5f0f\u4ee5\u539f DOCX \u4e3a\u51c6\u3002"
 )
 TITLE_NOTE_B = (
@@ -131,17 +131,6 @@ def run_size(run: ET.Element, styles: StyleInfo, paragraph_style: str) -> int | 
     return styles.paragraph_sizes.get(paragraph_style)
 
 
-def is_small_size(size: int | None) -> bool:
-    return size is not None and size <= 18
-
-
-def wrap_small(text: str) -> str:
-    text = clean_text(text)
-    if not text:
-        return ""
-    return f"<small>{text}</small>"
-
-
 def paragraph_style(paragraph: ET.Element) -> str:
     ppr = paragraph.find(qname("pPr"))
     if ppr is None:
@@ -155,7 +144,7 @@ def paragraph_style(paragraph: ET.Element) -> str:
 def paragraph_to_text(paragraph: ET.Element, styles: StyleInfo) -> tuple[str, str, list[int]]:
     p_style = paragraph_style(paragraph)
     plain_parts: list[str] = []
-    md_parts: list[tuple[bool, str]] = []
+    markdown_parts: list[str] = []
     sizes: list[int] = []
 
     for run in paragraph.iter(qname("r")):
@@ -181,29 +170,14 @@ def paragraph_to_text(paragraph: ET.Element, styles: StyleInfo) -> tuple[str, st
         size = run_size(run, styles, p_style)
         if size is not None:
             sizes.append(size)
-        small = is_small_size(size)
         plain_parts.append(text)
-        md_parts.append((small, text))
+        markdown_parts.append(text)
 
     plain = clean_text("".join(plain_parts))
     if not plain:
         return "", "", sizes
 
-    # Merge adjacent runs that share the same small/normal state before wrapping.
-    merged: list[tuple[bool, str]] = []
-    for small, text in md_parts:
-        if merged and merged[-1][0] == small:
-            merged[-1] = (small, merged[-1][1] + text)
-        else:
-            merged.append((small, text))
-
-    rendered: list[str] = []
-    for small, text in merged:
-        part = clean_text(text)
-        if not part:
-            continue
-        rendered.append(wrap_small(part) if small else part)
-    markdown = clean_text(" ".join(rendered))
+    markdown = clean_text("".join(markdown_parts))
     return plain, markdown, sizes
 
 
@@ -438,10 +412,7 @@ def render_markdown(title: str, source: str, paragraphs: list[Paragraph], notes:
                 lines.extend([f"{'#' * level} {p.markdown_text}", ""])
                 continue
 
-        if p.markdown_text.startswith("<small>") and p.markdown_text.endswith("</small>"):
-            lines.extend([p.markdown_text, ""])
-        else:
-            lines.extend([p.markdown_text, ""])
+        lines.extend([p.markdown_text, ""])
 
     if notes:
         lines.extend(["## \u811a\u6ce8", ""])
@@ -482,7 +453,6 @@ def convert_file(path: Path, kind: str) -> tuple[Path, Counter]:
     out_path.write_text(md, encoding="utf-8")
     stats["output_chars"] = len(md)
     stats["headings"] = len(re.findall(r"^#{2,6} ", md, flags=re.MULTILINE))
-    stats["small_tags"] = md.count("<small>")
     return out_path, stats
 
 
@@ -609,7 +579,7 @@ def main() -> int:
         print(
             f"{path} -> {out_path} | "
             f"paragraphs={stats['paragraphs']} headings={stats['headings']} "
-            f"small={stats['small_tags']} notes={stats['notes']} "
+            f"notes={stats['notes']} "
             f"hyperlink_paragraphs={stats['hyperlink_paragraphs']} "
             f"drawing_paragraphs={stats['drawing_paragraphs']} "
             f"drawing_only={stats['drawing_only_paragraphs']}"

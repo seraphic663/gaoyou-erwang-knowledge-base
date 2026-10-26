@@ -61,11 +61,7 @@ def normalize_work_name(value: str | None) -> str:
 def _compact_title(value: str | None) -> str:
     """Remove markup and punctuation for conservative heading comparison."""
 
-    # Pronunciation/variant notes inside <small> are not lexical heading
-    # tokens.  Remove the whole run before comparing a legacy title with a
-    # Markdown heading.
-    text = re.sub(r"<small\b[^>]*>.*?</small>", "", value or "", flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"<[^>]+>", "", value or "")
     text = normalize_for_match(text)
     return "".join(
         char
@@ -338,10 +334,17 @@ def adapt_legacy_case(
     passage_list = list(passages)
     target_text = legacy_case.get("target_text", "")
     preferred_passage_id = _preferred_source_passage_id(legacy_case, passage_list)
-    source_match = _choose_match(
-        find_passage_matches(target_text, passage_list),
-        preferred_title=legacy_case.get("case_title"),
-        preferred_passage_id=preferred_passage_id,
+    source_matches = find_passage_matches(target_text, passage_list)
+    # A short target can occur in many entries. Without a source-entry hint,
+    # choosing the shortest passage would assert an unsupported location.
+    source_match = (
+        _choose_match(
+            source_matches,
+            preferred_title=legacy_case.get("case_title"),
+            preferred_passage_id=preferred_passage_id,
+        )
+        if preferred_passage_id or len(source_matches) == 1
+        else None
     )
     if source_match is None and preferred_passage_id:
         hinted_passage = next(

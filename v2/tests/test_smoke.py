@@ -16,14 +16,13 @@ from erwang_v2.validate_annotation_case import load_passages_jsonl, validate_cas
 
 
 class V2SmokeTest(unittest.TestCase):
-    def test_passage_builder_preserves_small_text_and_note(self) -> None:
+    def test_passage_builder_preserves_text_without_font_size_note(self) -> None:
         source = V2_ROOT / "data/fixtures/sources/jingyi_shuwen.sample.md"
         passages = build_passages(source, "jingyi_shuwen")
         self.assertEqual(len(passages), 1)
         passage = passages[0]
         self.assertIn("户瓜反", passage["plain_text"])
-        self.assertEqual(len(passage["inline_notes"]), 1)
-        self.assertEqual(passage["inline_notes"][0]["text"], "户瓜反")
+        self.assertEqual(passage["inline_notes"], [])
 
     def test_candidate_and_audit_layers(self) -> None:
         source = V2_ROOT / "data/fixtures/sources/jingyi_shuwen.sample.md"

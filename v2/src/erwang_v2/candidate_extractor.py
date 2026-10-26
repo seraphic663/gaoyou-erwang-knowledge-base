@@ -17,8 +17,6 @@ def extract_candidates(passages: Iterable[dict[str, Any]]) -> dict[str, list[dic
         text = passage.get("plain_text", "")
         rule_hits = [term for term in SIGNAL_TERMS if term in text]
         risk_flags: list[str] = []
-        if passage.get("inline_notes"):
-            risk_flags.append("has_small_notes")
         if len(text) > 800:
             risk_flags.append("long_passage")
 

@@ -55,7 +55,7 @@ class LegacyAdapterMappingTest(unittest.TestCase):
         self.assertEqual(no_citation["evidences"], [])
         self.assertIn("source_has_no_citation", validate_case(no_citation, passage_map))
 
-    def test_guangya_cases_use_the_case_blocks_not_short_quote_matches(self) -> None:
+    def test_guangya_ambiguous_source_stays_unresolved(self) -> None:
         markdown, ai_json, passages, cases, _ = self._load(
             "guangya_shuzheng",
             "广雅疏证_王念孙.md",
@@ -77,7 +77,11 @@ class LegacyAdapterMappingTest(unittest.TestCase):
             case_index=1,
         )
         self.assertEqual(first["source_passage_id"], "guangya_shuzheng_0008")
-        self.assertEqual(second["source_passage_id"], "guangya_shuzheng_0011")
+        # The old heading match discarded font-size text. With all heading
+        # characters retained, a short target occurs in many passages and
+        # cannot safely identify this case's source block.
+        self.assertIsNone(second["source_passage_id"])
+        self.assertIsNone(second["source_location"])
         self.assertTrue(
             all(
                 evidence["passage_id"] is None

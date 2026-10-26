@@ -51,13 +51,6 @@ def build_passages(
             for item in (current_document, current_section, current_entry)
             if item
         ]
-        notes = []
-        for index, note in enumerate(processed["inline_notes"], start=1):
-            note = dict(note)
-            note["note_id"] = f"{passage_id}_note_{index:02d}"
-            note["passage_id"] = passage_id
-            notes.append(note)
-
         passages.append(
             {
                 "passage_id": passage_id,
@@ -74,7 +67,7 @@ def build_passages(
                 "plain_text": processed["plain_text"],
                 "normalized_text": processed["normalized_text"],
                 "source_file": str(path),
-                "inline_notes": notes,
+                "inline_notes": processed["inline_notes"],
             }
         )
         body_start = None
