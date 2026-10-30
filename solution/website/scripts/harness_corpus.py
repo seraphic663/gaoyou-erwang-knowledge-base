@@ -150,9 +150,23 @@ def sources(db, payload):
     params = list(collections)
     query = str(payload.get("query") or "").strip()
     if query:
-        clauses.append("(title LIKE ? ESCAPE '\\' OR relpath LIKE ? ESCAPE '\\')")
-        escaped = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-        params.extend([f"%{escaped}%", f"%{escaped}%"])
+        query_match = str(payload.get("query_match") or "any")
+        if query_match not in {"all", "any"}:
+            raise ValueError("invalid_query_match")
+        terms = list(dict.fromkeys(normalized_runs(query))) or [query]
+        escaped_terms = [term.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") for term in terms]
+        if query_match == "all":
+            title_clause = " AND ".join("title LIKE ? ESCAPE '\\'" for _ in terms)
+            path_clause = " AND ".join("relpath LIKE ? ESCAPE '\\'" for _ in terms)
+            clauses.append(f"(({title_clause}) OR ({path_clause}))")
+            params.extend([f"%{term}%" for term in escaped_terms])
+            params.extend([f"%{term}%" for term in escaped_terms])
+        else:
+            clauses.append("(" + " OR ".join(
+                "(title LIKE ? ESCAPE '\\' OR relpath LIKE ? ESCAPE '\\')" for _ in terms
+            ) + ")")
+            for term in escaped_terms:
+                params.extend([f"%{term}%", f"%{term}%"])
     where = " AND ".join(clauses)
     total = db.execute(f"SELECT count(*) FROM sources WHERE {where}", params).fetchone()[0]
     rows = db.execute(f"""
@@ -215,6 +229,27 @@ def query_terms(value: str):
     return terms
 
 
+def query_match_groups(value: str, variants: list[str] | None = None):
+    values = list(dict.fromkeys([value, *(variants or [])]))
+    run_lists = [list(normalized_runs(candidate)) for candidate in values]
+    groups = []
+    for index in range(max((len(runs) for runs in run_lists), default=0)):
+        alternatives = set()
+        for runs in run_lists:
+            if index >= len(runs):
+                continue
+            run = runs[index]
+            if len(run) >= 2:
+                alternatives.add(run)
+        if alternatives:
+            groups.append(alternatives)
+    return groups
+
+
+def query_group_index_terms(group):
+    return set().union(*(query_terms(variant) for variant in group)) if group else set()
+
+
 def search_terms(value: str) -> str:
     """The same FTS token stream used by the release builder and bundle importer."""
     return " ".join(sorted(query_terms(value)))
@@ -248,9 +283,11 @@ def query_inputs(payload, original: str, question: str):
     return collect("original_text", original), collect("question", question)
 
 
-def candidate_terms(db, originals: list[str], questions: list[str], collections: list[str]):
+def candidate_terms(db, originals: list[str], questions: list[str], collections: list[str], query_match="any"):
     original_terms = set().union(*(query_terms(value) for value in originals))
     question_terms = set().union(*(query_terms(value) for value in questions))
+    primary_values = originals or questions
+    required_groups = query_match_groups(primary_values[0], primary_values) if query_match == "all" and primary_values else []
     def sample(terms, maximum):
         ordered = sorted(terms)
         if len(ordered) <= maximum:
@@ -258,6 +295,13 @@ def candidate_terms(db, originals: list[str], questions: list[str], collections:
         return [ordered[index * len(ordered) // maximum] for index in range(maximum)]
 
     all_terms = set(sample(original_terms, 120)) | set(sample(question_terms, 40))
+    if query_match == "all":
+        for group in required_groups:
+            ordered = sorted(query_group_index_terms(group))
+            if len(ordered) <= 8:
+                all_terms.update(ordered)
+            else:
+                all_terms.update(ordered[index * len(ordered) // 8] for index in range(8))
     if not collections:
         return []
     placeholders = collection_placeholders(collections)
@@ -276,6 +320,17 @@ def candidate_terms(db, originals: list[str], questions: list[str], collections:
         if count:
             frequencies.append((count, 0 if term in original_terms else 1, term))
     frequencies.sort()
+    if query_match == "all":
+        selected = {}
+        for group in required_groups:
+            group_candidates = [item for item in frequencies if item[2] in query_group_index_terms(group)]
+            if group_candidates:
+                selected[group_candidates[0][2]] = group_candidates[0]
+        for item in frequencies:
+            if len(selected) >= 12:
+                break
+            selected.setdefault(item[2], item)
+        return sorted(selected.values())
     return frequencies[:12]
 
 
@@ -283,6 +338,9 @@ def retrieve(db, payload):
     original = str(payload.get("original_text") or "")
     question = str(payload.get("question") or "")
     originals, questions = query_inputs(payload, original, question)
+    query_match = str(payload.get("query_match") or "any")
+    if query_match not in {"all", "any"}:
+        raise ValueError("invalid_query_match")
     limit = integer(payload.get("limit"), 6, 1, 6)
     max_chars = integer(payload.get("max_chars"), 6000, 1, 6000)
     collections = selected_collections(payload)
@@ -295,7 +353,7 @@ def retrieve(db, payload):
         SELECT COALESCE(SUM(chunk_count),0) FROM sources
         WHERE collection IN ({collection_sql})
     """, collections).fetchone()[0]
-    terms = candidate_terms(db, originals, questions, collections)
+    terms = candidate_terms(db, originals, questions, collections, query_match)
     if not any(value.strip() for value in [*originals, *questions]):
         return {"items": [], "context": "", "hit_count": 0, "reason": "empty_query"}
     if not terms:
@@ -306,6 +364,16 @@ def retrieve(db, payload):
 
     scores = defaultdict(float)
     matched = defaultdict(int)
+    required_groups = (
+        query_match_groups(original, originals) if original.strip()
+        else query_match_groups(question, questions)
+    )
+    group_terms = [query_group_index_terms(group) for group in required_groups]
+    term_groups = defaultdict(set)
+    for group_index, index_terms in enumerate(group_terms):
+        for term in index_terms:
+            term_groups[term].add(group_index)
+    matched_groups = defaultdict(set)
     for count, origin_rank, term in terms:
         weight = math.log1p(total_chunks / count) * (1.35 if origin_rank == 0 else 1.0)
         # Iterate the complete postings list. Capping by rowid loses later
@@ -318,11 +386,23 @@ def retrieve(db, payload):
         """, (fts_literal(term), *collections)):
             scores[row[0]] += weight
             matched[row[0]] += 1
+            matched_groups[row[0]].update(term_groups.get(term, set()))
     if not scores:
         return {"items": [], "context": "", "hit_count": 0,
                 "reason": "no_match", "message": "当前检索未找到匹配线索，不代表全库无相关材料。"}
 
-    ranked_ids = sorted(scores, key=lambda rid: (-matched[rid], -scores[rid], rid))[:500]
+    query_candidates = list(scores)
+    if query_match == "all" and required_groups:
+        query_candidates = [
+            rid for rid in query_candidates
+            if len(matched_groups[rid]) == len(required_groups)
+        ]
+    if not query_candidates:
+        return {"items": [], "context": "", "hit_count": 0, "reason": "no_match",
+                "candidate_count": 0, "candidate_count_capped": False,
+                "collections": collections, "query_match": query_match,
+                "message": "所有检索词未在同一段中命中。" if query_match == "all" else "未找到匹配线索。"}
+    ranked_ids = sorted(query_candidates, key=lambda rid: (-matched[rid], -scores[rid], rid))[:500]
     phrase_inputs = [value for value in originals if value.strip()] or [value for value in questions if value.strip()]
     phrases = set().union(*(query_phrases(value) for value in phrase_inputs))
     placeholders = ",".join("?" for _ in ranked_ids)
@@ -339,6 +419,10 @@ def retrieve(db, payload):
             record = chunk_record(row, source, raw)
             # Prefer multiple independent lexical matches; never infer authority.
             chunk_runs = " ".join(normalized_runs(record["full_text"]))
+            if query_match == "all" and required_groups and not all(
+                any(variant in chunk_runs for variant in group) for group in required_groups
+            ):
+                continue
             matched_terms = sum(1 for _, _, term in terms if term in chunk_runs)
             phrase_hits = sum(1 for phrase in phrases if phrase in chunk_runs)
             lexical_score = scores[rid] + matched_terms * 4 + min(phrase_hits, 8) * 5
@@ -347,6 +431,11 @@ def retrieve(db, payload):
                                     "status": "lexical_match_only"}
             candidates.append((lexical_score, record))
         del raw, source
+    if query_match == "all" and required_groups and not candidates:
+        return {"items": [], "context": "", "hit_count": 0, "reason": "no_match",
+                "candidate_count": 0, "candidate_count_capped": len(query_candidates) > 500,
+                "collections": collections, "query_match": query_match,
+                "message": "所有检索词未在同一段中命中。"}
     candidates.sort(key=lambda pair: (-pair[0], pair[1]["chunk_id"]))
 
     picked = []
@@ -376,8 +465,9 @@ def retrieve(db, payload):
     context = "\n\n".join(section for _, _, _, section in spans)
     return {"items": picked, "context": context, "hit_count": len(picked),
             "reason": "matched" if picked else "context_budget_too_small",
-            "candidate_count": len(scores), "candidate_count_capped": len(scores) > 500,
+            "candidate_count": len(candidates), "candidate_count_capped": len(query_candidates) > 500,
             "collections": collections,
+            "query_match": query_match,
             "terms_used": [term for _, _, term in terms],
             "retrieval_status": "lexical_match_only",
             "query_variant_count": {"original_text": len(originals), "question": len(questions)}}

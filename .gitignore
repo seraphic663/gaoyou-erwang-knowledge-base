@@ -47,6 +47,8 @@ solution/website/runtime-release/
 !solution/website/runtime-bundle/
 solution/website/runtime-bundle/*
 !solution/website/runtime-bundle/harness_corpus.jsonl.xz
+!solution/website/runtime-bundle/machine-library.sqlite3.xz
+!solution/website/runtime-bundle/machine-library.manifest.json
 data/D-标注/json/.env
 data/D-标注/json/annotation_db/
 

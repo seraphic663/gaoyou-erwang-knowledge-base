@@ -8,7 +8,8 @@
   },
   "scripts": {
     "start": "node server.js",
-    "sync:sqlite": "python scripts/sqlite_bridge.py export",
+    "machine:build": "python scripts/machine_library.py build",
+    "machine:pack": "python scripts/machine_bundle.py pack --db runtime-bundle/machine-library.sqlite3 --bundle runtime-bundle/machine-library.sqlite3.xz --manifest runtime-bundle/machine-library.manifest.json",
     "sync:annotation": "python scripts/annotation_bridge.py export"
   },
   "license": "UNLICENSED",

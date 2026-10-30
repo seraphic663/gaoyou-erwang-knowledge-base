@@ -36,12 +36,19 @@ function buildRetrievalQuery(item) {
 async function retrieveFromCorpus(config, {
   query,
   workKey = '',
+  workKeys = [],
   limit = 8,
+  offset = 0,
   includeCases = false,
+  allowSingleCharacter = false,
 } = {}) {
-  const args = ['--query', query || '', '--limit', String(limit)];
-  if (workKey) args.push('--work-key', workKey);
+  const selectedWorkKeys = Array.isArray(workKeys) ? workKeys : [];
+  const resolvedWorkKeys = selectedWorkKeys.length ? selectedWorkKeys : (workKey ? [workKey] : []);
+  const args = ['--query', query || '', '--limit', String(limit), '--offset', String(offset)];
+  if (selectedWorkKeys.length) args.push('--work-keys', selectedWorkKeys.join(','));
+  else if (workKey) args.push('--work-key', workKey);
   if (includeCases) args.push('--include-cases');
+  if (allowSingleCharacter) args.push('--allow-single-character');
   const payload = await runPythonJsonBridge(config, {
     bridgeFile: config.CORPUS_RETRIEVAL_BRIDGE_FILE,
     command: 'retrieve',
@@ -52,10 +59,12 @@ async function retrieveFromCorpus(config, {
   return {
     ...payload,
     corpus_db: config.CORPUS_DB_FILE,
-    work_key: workKey,
+    work_key: workKey || (resolvedWorkKeys.length === 1 ? resolvedWorkKeys[0] : ''),
+    work_keys: resolvedWorkKeys,
     query: query || '',
     query_quality: query ? 'usable' : 'empty',
     include_cases: Boolean(includeCases),
+    allow_single_character: Boolean(allowSingleCharacter),
   };
 }
 

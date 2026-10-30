@@ -15,6 +15,7 @@ const { createDataSource } = require('./data-source');
 const { getV2Acceptance } = require('./v2-acceptance');
 const { retrieveForCase, retrieveFromCorpus } = require('./corpus-retrieval');
 const { runPythonJsonBridge } = require('./python-bridge');
+const { machineQuery, getMachineLibrary, searchMachineLibrary } = require('./machine-library');
 const { getV2ReviewTasks, getV2ReviewTask, submitV2Review } = require('./v2-review');
 const {
   ACCEPTED_PROMPT_VERSIONS,
@@ -37,14 +38,34 @@ const {
 
 let v2SummaryCache = null;
 
+function isSingleHanQuery(value) {
+  const normalized = String(value || '').normalize('NFKC').trim();
+  return Array.from(normalized).length === 1 && /^\p{Script=Han}$/u.test(normalized);
+}
+
+function corpusQueryTerms(value) {
+  const normalized = String(value || '').normalize('NFKC').trim();
+  return [...new Set(normalized.split(/[\s,，。；;、？！!?：:/|]+/u).filter(Boolean))].slice(0, 12);
+}
+
+function hasSingleHanTerm(value) {
+  return corpusQueryTerms(value).some((term) => isSingleHanQuery(term));
+}
+
 async function retrieveOriginalForUnifiedSearch(config, {
   query,
   workKey = '',
+  workKeys = [],
   limit = 8,
+  offset = 0,
   searchMode = 'unified',
+  allowSingleCharacter = false,
+  queryMatch = 'all',
 } = {}) {
-  const args = ['--query', query, '--limit', String(limit), '--search-mode', searchMode];
-  if (workKey) args.push('--work-key', workKey);
+  const args = ['--query', query, '--limit', String(limit), '--offset', String(offset), '--search-mode', searchMode, '--query-match', queryMatch];
+  if (Array.isArray(workKeys) && workKeys.length) args.push('--work-keys', workKeys.join(','));
+  else if (workKey) args.push('--work-key', workKey);
+  if (allowSingleCharacter) args.push('--allow-single-character');
   args.push('--include-cases');
   return runPythonJsonBridge(config, {
     bridgeFile: config.CORPUS_RETRIEVAL_BRIDGE_FILE,
@@ -353,6 +374,18 @@ function createServer() {
         if (Array.from(query).length > 1000) {
           return sendJson(res, 400, { ok: false, message: 'query_exceeds_1000_characters' });
         }
+        if (body.allow_single_character !== undefined && typeof body.allow_single_character !== 'boolean') {
+          return sendJson(res, 400, { ok: false, message: 'allow_single_character_must_be_boolean' });
+        }
+        const allowSingleCharacter = body.allow_single_character === true;
+        const queryHasSingleHanTerm = hasSingleHanTerm(query);
+        if (queryHasSingleHanTerm && !allowSingleCharacter) {
+          return sendJson(res, 400, { ok: false, message: 'single_character_search_disabled' });
+        }
+        const queryMatch = String(body.query_match || 'all');
+        if (!['all', 'any'].includes(queryMatch)) {
+          return sendJson(res, 400, { ok: false, message: 'invalid_query_match' });
+        }
         const allowedCollections = new Set([
           'original', 'external_high', 'external_mid', 'external_low',
         ]);
@@ -366,17 +399,39 @@ function createServer() {
           return sendJson(res, 400, { ok: false, message: 'invalid_collection' });
         }
         if (!collections.length) return sendJson(res, 400, { ok: false, message: 'no_collection_selected' });
+        if (queryHasSingleHanTerm) {
+          if (!collections.includes('original')) {
+            return sendJson(res, 400, { ok: false, message: 'single_character_requires_original_collection' });
+          }
+          collections = ['original'];
+        }
         const mode = String(body.mode || 'unified');
         if (!['unified', 'body', 'title'].includes(mode)) {
           return sendJson(res, 400, { ok: false, message: 'invalid_search_mode' });
         }
         const requestedLimit = Number(body.limit ?? 8);
+        const originalOffset = Number(body.original_offset ?? 0);
         const titleOffset = Number(body.title_offset ?? 0);
         if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > 20
+          || !Number.isInteger(originalOffset) || originalOffset < 0 || originalOffset > 100000
           || !Number.isInteger(titleOffset) || titleOffset < 0 || titleOffset > 100000) {
           return sendJson(res, 400, { ok: false, message: 'invalid_pagination' });
         }
         const workKey = typeof body.work_key === 'string' ? body.work_key.slice(0, 100) : '';
+        const allowedWorkKeys = new Set([
+          'dushu_zazhi', 'guangya_shuzheng', 'jingyi_shuwen', 'jingzhuan_shici',
+        ]);
+        if (workKey && workKey !== 'all' && !allowedWorkKeys.has(workKey)) {
+          return sendJson(res, 400, { ok: false, message: 'invalid_work_key' });
+        }
+        if (body.work_keys !== undefined && (!Array.isArray(body.work_keys)
+          || body.work_keys.length > allowedWorkKeys.size
+          || body.work_keys.some((value) => typeof value !== 'string' || !allowedWorkKeys.has(value)))) {
+          return sendJson(res, 400, { ok: false, message: 'invalid_work_keys' });
+        }
+        const workKeys = body.work_keys === undefined
+          ? (workKey && workKey !== 'all' ? [workKey] : [])
+          : [...new Set(body.work_keys)];
         const includeOriginal = collections.includes('original');
         const externalCollections = collections.filter((value) => value.startsWith('external_'));
         const includeBody = mode !== 'title';
@@ -397,9 +452,13 @@ function createServer() {
           tasks.push((async () => {
             const data = await retrieveOriginalForUnifiedSearch(config, {
               query,
-              workKey,
+              workKey: workKeys.length === 1 ? workKeys[0] : '',
+              workKeys,
               limit: Math.min(requestedLimit, 20),
+              offset: originalOffset,
               searchMode: mode,
+              allowSingleCharacter,
+              queryMatch,
             });
             const items = (data.items || []).map((item) => {
               const reason = String(item.match_reason || '');
@@ -426,6 +485,9 @@ function createServer() {
               items,
               candidate_count: data.candidate_count || 0,
               candidate_count_capped: Boolean(data.candidate_count_capped),
+              result_count: data.result_count || 0,
+              offset: data.offset || 0,
+              limit: data.limit || requestedLimit,
               returned_count: data.returned_count || (data.items || []).length,
             };
           })());
@@ -436,6 +498,7 @@ function createServer() {
               original_text: query,
               question: query,
               collections: externalCollections,
+              query_match: queryMatch,
             });
             if (outcome.status !== 200 || !outcome.payload?.ok) {
               throw new Error(outcome.payload?.message || 'external_retrieval_failed');
@@ -449,6 +512,7 @@ function createServer() {
               collection_label: collectionLabels[item.collection] || item.collection,
               source_title: item.source_title || '外典书名未注明',
               matched_text: item.full_text || item.context_text || '',
+              matched_terms: corpusQueryTerms(query).filter((term) => String(item.full_text || item.context_text || '').includes(term)),
               result_id: item.chunk_id,
               location: [item.source_title, item.chapter, `第${item.ordinal}段`]
                 .filter(Boolean).join(' · '),
@@ -467,18 +531,29 @@ function createServer() {
           tasks.push((async () => {
             const data = await readingHarness.runCorpusBridge(config, 'sources', {
               query,
+              query_match: queryMatch,
               collections: externalCollections,
               limit: Math.min(requestedLimit, 100),
               offset: titleOffset,
             });
             const items = (data.items || []).map((item) => {
-              const titleHit = String(item.title || '').normalize('NFKC').includes(query.normalize('NFKC'));
-              const relpathHit = String(item.relpath || '').normalize('NFKC').includes(query.normalize('NFKC'));
+              const queryTerms = corpusQueryTerms(query);
+              const title = String(item.title || '').normalize('NFKC');
+              const relpath = String(item.relpath || '').normalize('NFKC');
+              const matchedTitleTerms = queryTerms.filter((term) => title.includes(term));
+              const matchedPathTerms = queryTerms.filter((term) => relpath.includes(term));
+              const titleHit = queryMatch === 'all'
+                ? queryTerms.length > 0 && matchedTitleTerms.length === queryTerms.length
+                : matchedTitleTerms.length > 0;
+              const relpathHit = queryMatch === 'all'
+                ? queryTerms.length > 0 && matchedPathTerms.length === queryTerms.length
+                : matchedPathTerms.length > 0;
               return {
                 ...item,
                 kind: 'external_source',
                 match_scope: titleHit ? 'title' : 'path',
                 match_label: titleHit ? '书名命中' : relpathHit ? '路径命中' : '来源信息命中',
+                matched_terms: [...new Set([...matchedTitleTerms, ...matchedPathTerms])],
                 collection_label: collectionLabels[item.collection] || item.collection,
                 source_title: item.title || '外典书名未注明',
                 matched_text: titleHit ? item.title : item.relpath,
@@ -504,13 +579,18 @@ function createServer() {
             ok: true,
             query,
             mode,
+            query_match: queryMatch,
             collections,
             items,
             counts: {
               original: {
                 candidate_count: byKind.original?.candidate_count || 0,
                 candidate_count_capped: Boolean(byKind.original?.candidate_count_capped),
+                result_count: byKind.original?.result_count || 0,
+                offset: byKind.original?.offset || 0,
+                limit: byKind.original?.limit || requestedLimit,
                 returned_count: byKind.original?.returned_count || 0,
+                work_keys: byKind.original?.work_keys || workKeys,
               },
               external_body: {
                 candidate_count: byKind.external_body?.candidate_count || 0,
@@ -538,7 +618,9 @@ function createServer() {
         const query = parsedUrl.query.q || '';
         const workKey = parsedUrl.query.work_key || '';
         const limit = Number(parsedUrl.query.limit || 8);
+        const offset = Number(parsedUrl.query.offset || 0);
         const includeCases = ['1', 'true', 'yes'].includes(String(parsedUrl.query.include_cases || '').toLowerCase());
+        const allowSingleCharacter = ['1', 'true', 'yes'].includes(String(parsedUrl.query.allow_single_character || '').toLowerCase());
         if (caseId) {
           const casePayload = await getV2Acceptance(config, 'case', [caseId]);
           if (!casePayload?.ok) return sendJson(res, 404, casePayload);
@@ -556,7 +638,9 @@ function createServer() {
           query,
           workKey,
           limit,
+          offset,
           includeCases,
+          allowSingleCharacter,
         }));
       }
 
@@ -576,6 +660,30 @@ function createServer() {
         if (page) bridgeArgs.push('--page', page);
         if (pageSize) bridgeArgs.push('--page-size', pageSize);
         return sendJson(res, 200, await getV2Acceptance(config, 'cases', bridgeArgs));
+      }
+
+      if (parsedUrl.pathname.startsWith('/api/machine/')) {
+        if (req.method !== 'GET') return sendJson(res, 405, { ok: false, message: 'Method Not Allowed' });
+        const command = parsedUrl.pathname.slice('/api/machine/'.length);
+        if (command === 'search') {
+          let query;
+          try { query = machineQuery(parsedUrl); } catch (error) {
+            return sendJson(res, 400, { ok: false, message: error.message });
+          }
+          const payload = await searchMachineLibrary(config, query);
+          return sendJson(res, payload.available === false ? 503 : 200, payload);
+        }
+        if (command === 'meta') {
+          const payload = await getMachineLibrary(config, 'meta');
+          return sendJson(res, payload.available === false ? 503 : 200, payload);
+        }
+        if (command === 'detail') {
+          const id = String(parsedUrl.query.id || '');
+          if (!id || id.length > 200) return sendJson(res, 400, { ok: false, message: '无效的机器记录 ID' });
+          const payload = await getMachineLibrary(config, 'detail', ['--id', id]);
+          return sendJson(res, payload.available === false ? 503 : payload.ok === false || payload.found === false ? 404 : 200, payload);
+        }
+        return sendJson(res, 404, { ok: false, message: 'Machine library API not found' });
       }
 
       if (parsedUrl.pathname === '/api/v2/case') {
@@ -856,7 +964,7 @@ function createServer() {
       const page = resolvePage(requestUrl);
       if (page?.file) {
         return sendFile(res, path.join(config.WEB_DIR, page.file), html =>
-          html.replace('<!--site-navigation-->', renderNavigation(parsedUrl.pathname)));
+          html.replace('<!--site-navigation-->', renderNavigation(requestUrl)));
       }
       if (parsedUrl.pathname.startsWith('/assets/') || parsedUrl.pathname.startsWith('/media/')) {
         return sendFile(res, resolveStaticFile(parsedUrl.pathname));

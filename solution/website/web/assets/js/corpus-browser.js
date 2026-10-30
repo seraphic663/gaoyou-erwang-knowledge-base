@@ -1,13 +1,26 @@
 (() => {
-  const state = { requestId: 0, titleOffset: 0, items: [], counts: null };
+  const state = {
+    requestId: 0,
+    titleOffset: 0,
+    originalOffset: 0,
+    originalLimit: 10,
+    items: [],
+    counts: null,
+    abortController: null,
+    savedExternalCollections: null,
+  };
+  let debounceTimer = 0;
+  let isComposing = false;
   const elements = {
     status: document.querySelector('#corpusStatus'),
     resultCount: document.querySelector('#corpusResultCount'),
     form: document.querySelector('#corpusSearchForm'),
     query: document.querySelector('#corpusQuery'),
-    work: document.querySelector('#corpusWork'),
-    searchButton: document.querySelector('#corpusSearchButton'),
-    reset: document.querySelector('#corpusReset'),
+    allowSingleCharacter: document.querySelector('#corpusAllowSingleCharacter'),
+    originalEnabled: document.querySelector('#corpusOriginalEnabled'),
+    externalEnabled: document.querySelector('#corpusExternalEnabled'),
+    originalRow: document.querySelector('#corpusOriginalRow'),
+    externalRow: document.querySelector('#corpusExternalRow'),
     searchStatus: document.querySelector('#corpusSearchStatus'),
     results: document.querySelector('#corpusResults'),
   };
@@ -24,6 +37,7 @@
     external_mid: '外典·中频',
     external_low: '外典·低频',
   };
+  const defaultExternalCollections = ['external_high', 'external_mid', 'external_low'];
 
   function labelForWork(workKey) {
     return workLabels[String(workKey || '')] || String(workKey || '作品未注明');
@@ -37,18 +51,92 @@
     return document.querySelector('input[name="corpusMode"]:checked')?.value || 'unified';
   }
 
-  function selectedCollections() {
-    return [...document.querySelectorAll('input[name="corpusCollection"]:checked')].map((input) => input.value);
+  function selectedQueryMatch() {
+    return document.querySelector('input[name="corpusQueryMatch"]:checked')?.value || 'all';
   }
 
-  function populateWorkFilter() {
-    if (!elements.work) return;
-    elements.work.innerHTML = [
-      '<option value="all">四部著作</option>',
-      ...Object.entries(workLabels).map(([value, label]) => (
-        `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`
-      )),
-    ].join('');
+  function selectedCollections() {
+    return [
+      ...(selectedWorkKeys().length ? ['original'] : []),
+      ...externalInputs().filter((input) => input.checked).map((input) => input.value),
+    ];
+  }
+
+  function isSingleHanQuery(value) {
+    const normalized = String(value || '').normalize('NFKC').trim();
+    return Array.from(normalized).length === 1 && /^\p{Script=Han}$/u.test(normalized);
+  }
+
+  function queryTerms(value) {
+    const normalized = String(value || '').normalize('NFKC').trim();
+    return [...new Set(normalized.split(/[\s,，。；;、？！!?：:/|]+/u).filter(Boolean))].slice(0, 12);
+  }
+
+  function containsSingleHanTerm(value) {
+    return queryTerms(value).some((term) => isSingleHanQuery(term));
+  }
+
+  function workInputs() {
+    return [...document.querySelectorAll('input[name="corpusWork"]')];
+  }
+
+  function externalInputs() {
+    return [...document.querySelectorAll('input[name="corpusCollection"]')];
+  }
+
+  function selectedWorkKeys() {
+    return workInputs().filter((input) => input.checked).map((input) => input.value);
+  }
+
+  function syncOriginalWorkState() {
+    const inputs = workInputs();
+    const selectedCount = inputs.filter((input) => input.checked).length;
+    const allSelected = inputs.length > 0 && selectedCount === inputs.length;
+    const anySelected = selectedCount > 0;
+    elements.originalEnabled.checked = allSelected;
+    elements.originalEnabled.indeterminate = anySelected && !allSelected;
+    elements.originalEnabled.setAttribute('aria-checked', anySelected && !allSelected ? 'mixed' : String(allSelected));
+    inputs.forEach((input) => { input.disabled = !anySelected; });
+    elements.originalRow?.classList.toggle('is-inactive', !anySelected);
+  }
+
+  function syncExternalCollectionState() {
+    const inputs = externalInputs();
+    const selectedCount = inputs.filter((input) => input.checked).length;
+    const allSelected = inputs.length > 0 && selectedCount === inputs.length;
+    const anySelected = selectedCount > 0;
+    const isFrozen = elements.allowSingleCharacter?.checked === true;
+    elements.externalEnabled.checked = allSelected;
+    elements.externalEnabled.indeterminate = anySelected && !allSelected;
+    elements.externalEnabled.setAttribute('aria-checked', anySelected && !allSelected ? 'mixed' : String(allSelected));
+    elements.externalEnabled.disabled = isFrozen;
+    inputs.forEach((input) => { input.disabled = isFrozen || !anySelected; });
+    elements.externalRow?.classList.toggle('is-inactive', !anySelected && !isFrozen);
+  }
+
+  function syncSingleCharacterScope({ restoreExternal = true } = {}) {
+    const inputs = externalInputs();
+    const isEnabled = elements.allowSingleCharacter?.checked === true;
+    if (isEnabled) {
+      if (state.savedExternalCollections === null) {
+        state.savedExternalCollections = inputs.filter((input) => input.checked).map((input) => input.value);
+      }
+      inputs.forEach((input) => {
+        input.checked = false;
+        input.disabled = true;
+      });
+      elements.externalRow?.classList.add('is-frozen');
+      elements.externalRow?.setAttribute('aria-disabled', 'true');
+    } else {
+      if (restoreExternal && state.savedExternalCollections !== null) {
+        const restored = new Set(state.savedExternalCollections);
+        inputs.forEach((input) => { input.checked = restored.has(input.value); });
+      }
+      state.savedExternalCollections = null;
+      elements.externalRow?.classList.remove('is-frozen');
+      elements.externalRow?.removeAttribute('aria-disabled');
+    }
+    syncExternalCollectionState();
   }
 
   function stableItems(items, append) {
@@ -64,10 +152,10 @@
   }
 
   function renderRelatedCases(cases) {
-    if (!cases.length) return '<p class="corpus-note">当前正文还没有关联案例。</p>';
+    if (!cases.length) return '';
     return `
-      <div class="corpus-related-block">
-        <div class="corpus-detail-topline"><strong>关联案例</strong><span class="summary-pill">${escapeHtml(String(cases.length))} 条</span></div>
+      <details class="corpus-context-fold corpus-related-block">
+        <summary>关联案例（${escapeHtml(String(cases.length))}）</summary>
         <div class="corpus-related-list">
           ${cases.map((caseItem) => `
             <a class="corpus-related-case" href="${escapeHtml(Site.caseUrl('v2', caseItem.case_id))}">
@@ -76,8 +164,22 @@
             </a>${Site.link(Site.auditUrl(caseItem.case_id), '开始本案释证与审校')}
           `).join('')}
         </div>
-      </div>
+      </details>
     `;
+  }
+
+  function highlightQueryTerms(value) {
+    const text = String(value || '');
+    const terms = queryTerms(elements.query?.value)
+      .filter((term) => text.includes(term))
+      .sort((left, right) => right.length - left.length);
+    if (!terms.length) return escapeHtml(text);
+    const escapedTerms = terms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const matcher = new RegExp(`(${escapedTerms.join('|')})`, 'gu');
+    const exactTerms = new Set(terms);
+    return text.split(matcher).map((part) => exactTerms.has(part)
+      ? `<mark class="match-mark">${escapeHtml(part)}</mark>`
+      : escapeHtml(part)).join('');
   }
 
   function renderItem(item, index) {
@@ -125,21 +227,35 @@
     const title = kind === 'external_source'
       ? sourceTitle
       : `${sourceTitle}${item.chapter && item.chapter !== sourceTitle ? ` · ${item.chapter}` : ''}`;
+    const safeMatchedText = highlightQueryTerms(matchedText);
+    const queryTermCount = queryTerms(elements.query?.value).length;
+    const matchedTerms = Array.isArray(item.matched_terms)
+      ? item.matched_terms
+      : queryTerms(elements.query?.value).filter((term) => matchedText.includes(term));
+    const matchedTermsMeta = queryTermCount > 1 && matchedTerms.length
+      ? [`本条命中：${matchedTerms.join('、')}`]
+      : [];
     const matchText = kind === 'external_source'
       ? `<p class="corpus-result-text corpus-title-match">书名或路径包含：${escapeHtml(matchedText || sourceTitle)}</p>`
-      : `<p class="corpus-result-text">${escapeHtml(matchedText || '没有可展示的命中文段。')}</p>`;
+      : `<p class="corpus-result-text">${safeMatchedText || '没有可展示的命中文段。'}</p>`;
+
+    const resultNumber = index + 1;
+    const resultAnchor = kind === 'original_passage' ? `corpus-result-${resultNumber}` : '';
+    const resultRank = resultAnchor
+      ? `<a class="corpus-rank corpus-rank-link" href="#${resultAnchor}" aria-label="定位到第 ${resultNumber} 条">${resultNumber}</a>`
+      : `<span class="corpus-rank">${resultNumber}</span>`;
 
     return `
-      <article class="corpus-result">
+      <article class="corpus-result"${resultAnchor ? ` id="${resultAnchor}"` : ''}>
         <div class="corpus-detail-topline">
           <div class="corpus-result-title">
-            <span class="corpus-rank">${escapeHtml(String(index + 1))}</span>
+            ${resultRank}
             <span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(collectionLabel)} · ${escapeHtml(location)}</small></span>
           </div>
           <span class="corpus-status-chip">${escapeHtml(label)}</span>
         </div>
         ${matchText}
-        <p class="corpus-result-meta">${meta.map((value) => escapeHtml(String(value))).join(' · ')}</p>
+        <p class="corpus-result-meta">${[...meta, ...matchedTermsMeta].map((value) => escapeHtml(String(value))).join(' · ')}</p>
         ${expansion}
         ${relatedCases.length ? renderRelatedCases(relatedCases) : ''}
       </article>
@@ -148,18 +264,12 @@
 
   function renderCounts(counts) {
     const parts = [];
-    if (counts?.original?.returned_count) {
-      const originalCandidates = counts.original.candidate_count_capped
-        ? `至少 ${counts.original.candidate_count} 条（查询候选上限）`
-        : `${counts.original.candidate_count} 条`;
-      parts.push(`二王原典显示前 ${counts.original.returned_count} 条，当前查询候选 ${originalCandidates}`);
-    }
+    if (counts?.original?.candidate_count_capped) parts.push(`原典候选至少 ${counts.original.candidate_count} 段；分页范围为前 500 段`);
     if (counts?.external_body?.returned_count) {
-      parts.push(`外典正文显示前 ${counts.external_body.returned_count} 条（单次最多 ${counts.external_body.result_limit || 6} 条），索引候选 ${counts.external_body.candidate_count} 段`);
+      parts.push(`外典候选 ${counts.external_body.candidate_count} 段`);
     }
     if (counts?.external_title?.total) {
-      const loaded = Number(counts.external_title.offset || 0) + Number(counts.external_title.returned_count || 0);
-      parts.push(`书名/路径共 ${counts.external_title.total} 项，当前已加载 ${Math.min(loaded, counts.external_title.total)} 项`);
+      parts.push(`书名/路径 ${counts.external_title.total} 项`);
     }
     return parts;
   }
@@ -167,20 +277,66 @@
   function renderResults(payload, { append = false } = {}) {
     const items = Array.isArray(payload?.items) ? payload.items : [];
     state.items = stableItems(items, append);
-    state.counts = payload?.counts || state.counts;
-    elements.resultCount.textContent = state.items.length ? `当前显示 ${state.items.length} 条` : '没有结果';
+    state.counts = payload?.counts || null;
+    const originalPage = state.counts?.original;
+    const originalTotal = Number(originalPage?.result_count || 0);
+    const originalOffset = Number(originalPage?.offset || 0);
+    const originalReturned = Number(originalPage?.returned_count || 0);
+    state.originalOffset = originalOffset;
+    elements.resultCount.textContent = originalReturned
+      ? `显示 ${originalOffset + 1}–${originalOffset + originalReturned} / ${originalPage?.candidate_count_capped ? `当前 ${originalTotal}` : `共 ${originalTotal}`} 段`
+      : state.items.length ? `显示 ${state.items.length} 条` : '没有结果';
     if (!state.items.length) {
-      elements.results.innerHTML = '<div class="corpus-empty">当前检索范围没有返回匹配项。外典正文只提供字面线索，未命中不代表全库无相关材料。</div>';
+      elements.results.innerHTML = '<div class="corpus-empty">未找到匹配项。外典结果仅为字面线索，未命中不代表没有相关材料。</div>';
       return;
     }
 
-    const rendered = state.items.map(renderItem).join('');
+    const rendered = state.items.map((item, index) => renderItem(item, originalOffset + index)).join('');
     const titleInfo = state.counts?.external_title;
     const titleHasMore = titleInfo && Number(titleInfo.offset || 0) + Number(titleInfo.returned_count || 0) < Number(titleInfo.total || 0);
-    const moreButton = titleHasMore
+    const pageSize = Math.max(1, Number(originalPage?.limit || state.originalLimit));
+    const pageNumber = Math.floor(originalOffset / pageSize) + 1;
+    const pageCount = Math.max(1, Math.ceil(originalTotal / pageSize));
+    const hasPreviousOriginalPage = originalOffset > 0;
+    const hasNextOriginalPage = originalOffset + originalReturned < originalTotal;
+    const originalPagination = originalTotal > pageSize ? `<nav class="corpus-more-actions corpus-pagination" aria-label="原典结果分页"><button class="corpus-previous-original-page search-clear toolbar-button" type="button"${hasPreviousOriginalPage ? '' : ' disabled'}>上一页</button><span>第 ${pageNumber}/${pageCount} 页 · 每页 ${pageSize} 段</span><button class="corpus-next-original-page search-clear toolbar-button" type="button"${hasNextOriginalPage ? '' : ' disabled'}>下一页</button><label class="corpus-page-jump">跳至<input class="corpus-page-number" type="number" min="1" max="${pageCount}" value="${pageNumber}" aria-label="跳转到第几页" />/${pageCount} 页</label><button class="corpus-page-jump-button search-clear toolbar-button" type="button">跳转</button></nav>` : '';
+    const moreTitlesButton = titleHasMore
       ? `<button id="corpusMoreTitles" class="search-clear toolbar-button" type="button">加载更多书名结果（${escapeHtml(String(Math.max(0, Number(titleInfo.total) - Number(titleInfo.offset) - Number(titleInfo.returned_count))))} 项）</button>`
       : '';
-    elements.results.innerHTML = rendered + (moreButton ? `<div class="corpus-more-actions">${moreButton}</div>` : '');
+    elements.results.innerHTML = rendered + originalPagination + (moreTitlesButton ? `<div class="corpus-more-actions">${moreTitlesButton}</div>` : '');
+    const pageAnchor = location.hash.slice(1);
+    const anchorTarget = pageAnchor ? document.getElementById(pageAnchor) : null;
+    const currentQuery = String(elements.query?.value || '').trim();
+    if (currentQuery) updateSearchAddress(currentQuery, { preserveHash: Boolean(anchorTarget) });
+    if (anchorTarget) window.requestAnimationFrame(() => anchorTarget.scrollIntoView({ block: 'start' }));
+    elements.results.querySelectorAll('.corpus-previous-original-page').forEach((button) => {
+      button.addEventListener('click', () => {
+        state.originalOffset = Math.max(0, originalOffset - pageSize);
+        runSearch({ pageOriginal: true });
+      });
+    });
+    elements.results.querySelectorAll('.corpus-next-original-page').forEach((button) => {
+      button.addEventListener('click', () => {
+        state.originalOffset = originalOffset + pageSize;
+        runSearch({ pageOriginal: true });
+      });
+    });
+    const pageInput = elements.results.querySelector('.corpus-page-number');
+    const jumpToPage = () => {
+      const requestedPage = Number(pageInput?.value);
+      if (!Number.isInteger(requestedPage) || !pageInput) return;
+      const targetPage = Math.min(pageCount, Math.max(1, requestedPage));
+      pageInput.value = String(targetPage);
+      state.originalOffset = (targetPage - 1) * pageSize;
+      runSearch({ pageOriginal: true });
+    };
+    elements.results.querySelector('.corpus-page-jump-button')?.addEventListener('click', jumpToPage);
+    pageInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        jumpToPage();
+      }
+    });
     elements.results.querySelector('#corpusMoreTitles')?.addEventListener('click', () => {
       state.titleOffset = Number(titleInfo.offset || 0) + Number(titleInfo.returned_count || 0);
       runSearch({ appendTitles: true });
@@ -233,96 +389,203 @@
     }
   }
 
-  async function runSearch({ appendTitles = false } = {}) {
-    const query = String(elements.query?.value || '').trim();
-    const workKey = elements.work?.value || 'all';
-    const mode = selectedMode();
+  function updateSearchAddress(query, { preserveHash = false } = {}) {
+    const address = new URLSearchParams(location.search);
+    address.delete('case_id');
+    address.delete('q');
+    if (query) address.set('q', query);
+    address.set('mode', selectedMode());
+    address.set('match', selectedQueryMatch());
+    address.set('scope_set', '1');
+    address.delete('work_key');
+    selectedWorkKeys().forEach((workKey) => address.append('work_key', workKey));
+    address.set('page', String(Math.floor(state.originalOffset / state.originalLimit) + 1));
+    address.delete('original_offset');
+    if (elements.allowSingleCharacter?.checked) address.set('single_char', '1');
+    else address.delete('single_char');
+    address.delete('collection');
+    selectedCollections().forEach((collection) => address.append('collection', collection));
+    const queryString = address.toString();
+    const hash = preserveHash ? location.hash : '';
+    history.replaceState(null, '', `${queryString ? `/corpus?${queryString}` : '/corpus'}${hash}`);
+  }
+
+  function searchValidation(query) {
+    if (!query) return { message: '', count: '尚未检索' };
+    const terms = queryTerms(query);
+    const hasSingleHanTerm = terms.some((term) => isSingleHanQuery(term));
+    if (hasSingleHanTerm && !elements.allowSingleCharacter.checked) {
+      return { message: '检索词包含单字；勾选“允许单字词检索”后可查二王原典。', count: '单字词检索未开启' };
+    }
+    if (!terms.some((term) => Array.from(term).length >= 2 || isSingleHanQuery(term))) {
+      return { message: '默认检索至少两个字符。', count: '请输入检索词' };
+    }
     const collections = selectedCollections();
-    if (!query) {
-      elements.searchStatus.textContent = '输入书名、篇名或正文片段后检索。';
-      elements.resultCount.textContent = '尚未检索';
-      elements.results.innerHTML = '';
-      return;
+    if (hasSingleHanTerm && !collections.includes('original')) {
+      return { message: '单字词检索需勾选至少一部二王原典。', count: '请选择二王原典' };
     }
     if (!collections.length) {
-      state.requestId += 1;
-      state.items = [];
-      elements.searchStatus.textContent = '未选择任何典籍范围；请选择原典或至少一档外典。';
-      elements.resultCount.textContent = '无检索范围';
-      elements.results.innerHTML = '<div class="corpus-empty">没有选择检索范围。</div>';
+      return { message: '请至少选择一类典籍范围。', count: '无检索范围' };
+    }
+    return null;
+  }
+
+  function cancelPendingSearch() {
+    if (debounceTimer) window.clearTimeout(debounceTimer);
+    debounceTimer = 0;
+    state.abortController?.abort();
+    state.abortController = null;
+    state.requestId += 1;
+  }
+
+  function clearSearchResults(message = '', count = '尚未检索') {
+    state.titleOffset = 0;
+    state.originalOffset = 0;
+    state.items = [];
+    state.counts = null;
+    elements.searchStatus.textContent = message;
+    elements.resultCount.textContent = count;
+    elements.results.innerHTML = '';
+  }
+
+  function scheduleSearch({ delay = 350 } = {}) {
+    cancelPendingSearch();
+    state.titleOffset = 0;
+    state.originalOffset = 0;
+    state.items = [];
+    state.counts = null;
+    const query = String(elements.query?.value || '').trim();
+    updateSearchAddress(query);
+    if (!query) {
+      clearSearchResults();
       return;
     }
+    const validation = searchValidation(query);
+    if (validation) {
+      clearSearchResults(validation.message, validation.count);
+      return;
+    }
+    const requestId = state.requestId;
+    elements.searchStatus.textContent = '正在等待检索……';
+    elements.resultCount.textContent = '正在检索';
+    elements.results.innerHTML = '<div class="corpus-empty">正在检索……</div>';
+    debounceTimer = window.setTimeout(() => {
+      if (requestId !== state.requestId) return;
+      debounceTimer = 0;
+      runSearch();
+    }, delay);
+  }
+
+  async function runSearch({ appendTitles = false, pageOriginal = false, preserveHash = false } = {}) {
+    if (debounceTimer) window.clearTimeout(debounceTimer);
+    debounceTimer = 0;
+    state.abortController?.abort();
+    state.abortController = null;
+    const requestId = ++state.requestId;
+    const query = String(elements.query?.value || '').trim();
+    const workKeys = selectedWorkKeys();
+    const mode = selectedMode();
+    const queryMatch = selectedQueryMatch();
+    const selectedCollectionValues = selectedCollections();
+    const hasSingleHanTerm = containsSingleHanTerm(query);
+    const allowSingleCharacter = elements.allowSingleCharacter?.checked === true;
+    const validation = searchValidation(query);
+    if (validation) {
+      if (!appendTitles) clearSearchResults(validation.message, validation.count);
+      return;
+    }
+    const collections = hasSingleHanTerm ? ['original'] : selectedCollectionValues;
 
     if (!appendTitles) {
-      state.titleOffset = 0;
+      if (!pageOriginal) {
+        state.titleOffset = 0;
+        state.originalOffset = 0;
+      }
       state.items = [];
       state.counts = null;
     }
-    const requestId = ++state.requestId;
-    elements.searchButton.disabled = true;
+    updateSearchAddress(query, { preserveHash });
+    const controller = new AbortController();
+    state.abortController = controller;
     elements.searchStatus.textContent = appendTitles ? '正在读取下一页书名结果……' : '正在搜索所选典籍……';
     elements.results.innerHTML = '<div class="corpus-empty">正在读取检索结果……</div>';
-    const address = new URLSearchParams(location.search);
-    address.delete('case_id');
-    address.set('q', query);
-    address.set('mode', mode);
-    address.set('work_key', workKey);
-    address.delete('collection');
-    collections.forEach((collection) => address.append('collection', collection));
-    history.replaceState(null, '', '/corpus?' + address);
 
     try {
       const payload = await requestJson('/api/corpus/unified-search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           query,
           mode,
+          query_match: queryMatch,
           collections,
-          work_key: workKey === 'all' ? '' : workKey,
-          limit: 8,
+          work_key: workKeys.length === 1 ? workKeys[0] : '',
+          work_keys: workKeys,
+          allow_single_character: allowSingleCharacter,
+          limit: state.originalLimit,
+          original_offset: state.originalOffset,
           title_offset: state.titleOffset,
         }),
       });
       if (requestId !== state.requestId) return;
       renderResults(payload, { append: appendTitles });
       const countParts = renderCounts(payload.counts);
-      const shown = (payload.items || []).length;
       elements.searchStatus.textContent = countParts.length
-        ? `${countParts.join('；')}。${appendTitles ? '书名结果已续载。' : ''}`
-        : `当前检索没有返回结果；显示 0 条。正文检索未命中不代表全库没有相关材料。`;
-      if (shown) elements.status.textContent = `检索完成 · ${collections.map((value) => collectionLabels[value]).join('、')} · ${mode === 'unified' ? '统一模式' : mode === 'body' ? '仅正文' : '仅书名'}`;
+        ? countParts.join('；')
+        : (payload.items || []).length ? '' : '未找到匹配项。';
     } catch (error) {
-      if (requestId !== state.requestId) return;
+      if (requestId !== state.requestId || error.name === 'AbortError') return;
       elements.results.innerHTML = `<div class="corpus-empty">典籍检索失败：${escapeHtml(error.message)}</div>`;
-      elements.searchStatus.textContent = '请稍后重试。';
+      elements.searchStatus.textContent = '检索失败，请稍后重试。';
       elements.resultCount.textContent = '检索失败';
     } finally {
-      if (requestId === state.requestId) elements.searchButton.disabled = false;
+      if (requestId === state.requestId) state.abortController = null;
     }
   }
 
+  elements.query?.addEventListener('compositionstart', () => {
+    isComposing = true;
+    cancelPendingSearch();
+    clearSearchResults();
+  });
+  elements.query?.addEventListener('compositionend', () => {
+    isComposing = false;
+    scheduleSearch();
+  });
+  elements.query?.addEventListener('input', () => {
+    if (!isComposing) scheduleSearch();
+  });
   elements.form?.addEventListener('submit', (event) => {
     event.preventDefault();
-    runSearch();
+    scheduleSearch({ delay: 0 });
   });
-  elements.reset?.addEventListener('click', () => {
-    state.requestId += 1;
-    state.titleOffset = 0;
-    state.items = [];
-    state.counts = null;
-    elements.searchButton.disabled = false;
-    history.replaceState(null, '', '/corpus');
-    elements.query.value = '';
-    elements.work.value = 'all';
-    document.querySelector('input[name="corpusMode"][value="unified"]').checked = true;
-    document.querySelectorAll('input[name="corpusCollection"]').forEach((input) => { input.checked = true; });
-    elements.searchStatus.textContent = '全选默认检索二王原典和外典三组；书名命中与正文命中会分别标注。';
-    elements.resultCount.textContent = '尚未检索';
-    elements.results.innerHTML = '';
+  elements.allowSingleCharacter?.addEventListener('change', () => {
+    syncSingleCharacterScope();
+    scheduleSearch({ delay: 100 });
   });
-
-  populateWorkFilter();
+  elements.originalEnabled?.addEventListener('change', () => {
+    const selectAll = elements.originalEnabled.checked;
+    workInputs().forEach((input) => { input.checked = selectAll; });
+    syncOriginalWorkState();
+    scheduleSearch({ delay: 100 });
+  });
+  elements.externalEnabled?.addEventListener('change', () => {
+    const selectAll = elements.externalEnabled.checked;
+    externalInputs().forEach((input) => { input.checked = selectAll; });
+    syncExternalCollectionState();
+    scheduleSearch({ delay: 100 });
+  });
+  workInputs().forEach((input) => input.addEventListener('change', () => {
+    syncOriginalWorkState();
+    scheduleSearch({ delay: 100 });
+  }));
+  externalInputs().forEach((input) => input.addEventListener('change', () => {
+    syncExternalCollectionState();
+    scheduleSearch({ delay: 100 });
+  }));
+  document.querySelectorAll('input[name="corpusMode"]').forEach((input) => input.addEventListener('change', () => scheduleSearch({ delay: 100 })));
+  document.querySelectorAll('input[name="corpusQueryMatch"]').forEach((input) => input.addEventListener('change', () => scheduleSearch({ delay: 100 })));
   loadCorpusSummary();
 
   async function loadCasePassages(caseId) {
@@ -361,18 +624,55 @@
   }
 
   const initial = new URLSearchParams(location.search);
-  if (initial.has('q')) {
-    elements.query.value = initial.get('q');
-    if (initial.has('work_key')) elements.work.value = initial.get('work_key');
-    if (initial.has('mode')) {
-      const mode = document.querySelector(`input[name="corpusMode"][value="${CSS.escape(initial.get('mode'))}"]`);
-      if (mode) mode.checked = true;
+  const initialWorkKeys = [...new Set(initial.getAll('work_key').filter((workKey) => workLabels[workKey]))];
+  const initialCollections = initial.getAll('collection');
+  const hasInitialScope = initial.get('scope_set') === '1' || initialCollections.length > 0;
+  const initialSingleCharacter = initial.get('single_char') === '1';
+  const initialPageValue = Number(initial.get('page'));
+  const initialPage = Number.isInteger(initialPageValue) && initialPageValue > 0 ? initialPageValue : 0;
+  const resultAnchorMatch = /^corpus-result-(\d+)$/.exec(location.hash.slice(1));
+  const anchoredResultNumber = resultAnchorMatch ? Number(resultAnchorMatch[1]) : 0;
+  if (initial.has('q')) elements.query.value = initial.get('q');
+  if (initial.has('mode')) {
+    const mode = document.querySelector(`input[name="corpusMode"][value="${CSS.escape(initial.get('mode'))}"]`);
+    if (mode) mode.checked = true;
+  }
+  if (initial.has('match')) {
+    const queryMatch = document.querySelector(`input[name="corpusQueryMatch"][value="${CSS.escape(initial.get('match'))}"]`);
+    if (queryMatch) queryMatch.checked = true;
+  }
+  if (hasInitialScope) {
+    const selectedCollectionsFromUrl = new Set(initialCollections);
+    const includeOriginal = selectedCollectionsFromUrl.has('original');
+    const useAllOriginalWorks = includeOriginal && (!initialWorkKeys.length || initialWorkKeys.includes('all'));
+    workInputs().forEach((input) => {
+      input.checked = includeOriginal && (useAllOriginalWorks || initialWorkKeys.includes(input.value));
+    });
+    externalInputs().forEach((input) => { input.checked = selectedCollectionsFromUrl.has(input.value); });
+  } else if (initialWorkKeys.length && !initialWorkKeys.includes('all')) {
+    workInputs().forEach((input) => { input.checked = initialWorkKeys.includes(input.value); });
+  }
+  elements.allowSingleCharacter.checked = initialSingleCharacter;
+  if (initialSingleCharacter && !externalInputs().some((input) => input.checked)) {
+    state.savedExternalCollections = [...defaultExternalCollections];
+  }
+  syncOriginalWorkState();
+  syncSingleCharacterScope({ restoreExternal: false });
+  loadCorpusSummary();
+
+  const initialQuery = String(elements.query?.value || '').trim();
+  if (initialQuery) {
+    const initialOriginalOffset = Number(initial.get('original_offset') || 0);
+    if (initialPage) {
+      state.originalOffset = Math.min((initialPage - 1) * state.originalLimit, 100000);
+    } else if (anchoredResultNumber > 0) {
+      const anchorPage = Math.floor((anchoredResultNumber - 1) / state.originalLimit) + 1;
+      state.originalOffset = Math.min((anchorPage - 1) * state.originalLimit, 100000);
+    } else {
+      state.originalOffset = Number.isInteger(initialOriginalOffset) && initialOriginalOffset > 0
+        ? Math.min(initialOriginalOffset, 100000) : 0;
     }
-    if (initial.getAll('collection').length) {
-      const selected = new Set(initial.getAll('collection'));
-      document.querySelectorAll('input[name="corpusCollection"]').forEach((input) => { input.checked = selected.has(input.value); });
-    }
-    runSearch();
+    runSearch({ pageOriginal: true, preserveHash: anchoredResultNumber > 0 });
   } else if (initial.has('case_id')) {
     loadCasePassages(initial.get('case_id'));
   }

@@ -26,8 +26,9 @@
           </div>
           <div class="hero-actions"><a class="cta" href="/reading-lab">开始校读实验</a>
             <a class="ghost-link" href="/audit">进入案例审校</a>
+            <a class="ghost-link" href="/cases?source=annotation">进入人工标注库</a>
             <a class="ghost-link" href="#case-walkthrough">“造舟于河”案例分析</a>
-            <a class="ghost-link" href="/cases?source=main">浏览案例</a>
+            <a class="ghost-link" href="/cases?view=cases">浏览机器案例</a>
           </div>
         </div>
 
@@ -85,13 +86,13 @@
             <h2>当前库藏</h2>
           </div>
           <div class="head-actions">
-            <a class="page-link" href="/terms">字词库</a>
+            <a class="page-link" href="/terms?view=terms">机器字词视图</a>
             <a class="page-link page-link-muted" href="/cases?source=annotation">人工标注材料</a>
-            <a class="page-link page-link-muted" href="/cases">案例库</a>
+            <a class="page-link page-link-muted" href="/cases?view=cases">机器案例视图</a>
             <a class="page-link page-link-muted" href="/quality?view=schema">查看数据结构</a>
           </div>
         </div>
-        <p id="dbStatus" class="db-status">数据库状态：正在初始化...</p>
+        <p id="dbStatus" class="db-status">机器库状态：正在初始化...</p>
         <div id="dbStats" class="stats-grid"></div>
       </section>
 
@@ -105,18 +106,18 @@
           <article class="card site-map-card">
             <span class="site-map-step">01 · 查阅</span>
             <h3>查阅材料</h3>
-            <p>字词库用于查找字词；案例库按来源统一浏览主库、人工标注和工作材料。</p>
+            <p>机器结果可按字词或按案例查看；人工标注材料从独立入口浏览。</p>
             <div class="site-map-card-links">
-              <a class="detail-link" href="/terms">字词库</a>
+              <a class="detail-link" href="/terms?view=terms">按字词查看</a>
               <a class="detail-link detail-link-muted" href="/cases?source=annotation">人工标注材料</a>
             </div>
           </article>
           <article class="card site-map-card">
             <span class="site-map-step">02 · 选案</span>
-            <h3>案例库</h3>
-            <p>按标题、来源或目标典籍找到一个具体案例，进入它的审校页面。</p>
+            <h3>机器案例视图</h3>
+            <p>按校读点查看机器关系命中的出处与原文。</p>
             <div class="site-map-card-links">
-              <a class="detail-link" href="/cases">选择案例</a>
+              <a class="detail-link" href="/cases?view=cases">按案例查看</a>
               <a class="detail-link detail-link-muted" href="/knowledge">查看训诂知识</a>
             </div>
           </article>
@@ -208,9 +209,9 @@
         </div>
         <div class="search-panel card">
           <div class="search-bar">
-            <input id="searchInput" type="text" placeholder="输入字词、方法词或片段" />
-            <a class="detail-link" href="/terms">进入字词检索</a>
-            <a class="detail-link detail-link-muted" href="/cases">进入 案例库</a>
+            <input id="searchInput" type="text" placeholder="输入字词或短语，如：農、毋 無" />
+            <a class="detail-link" href="/terms?view=terms">按字词查看</a>
+            <a class="detail-link detail-link-muted" href="/cases?view=cases">按案例查看</a>
             <button id="clearSearch" class="search-clear" type="button">清空</button>
           </div>
           <div id="searchQuick" class="search-quick"></div>
@@ -218,13 +219,13 @@
         <div id="searchSummary" class="search-summary"></div>
         <div class="result-head">
           <div>
-            <h3>相关字词条目</h3>
+            <h3>关系字词预览</h3>
           </div>
         </div>
         <div id="termList" class="grid search-result-grid"></div>
         <div class="result-head">
           <div>
-            <h3>相关考据案例</h3>
+            <h3>校读点预览</h3>
           </div>
         </div>
         <div id="caseList" class="grid search-result-grid"></div>

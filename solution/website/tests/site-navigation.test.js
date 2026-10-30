@@ -15,11 +15,19 @@ test('canonical pages load directly, with absolute assets and one consistent nav
       assert.equal(response.status,200,route);
       const html = await response.text();
       const nav = html.match(/<nav class="nav"[\s\S]*?<\/nav>/)[0];
-      for (const target of ['/', '/audit','/cases','/terms','/corpus','/reading-lab','/knowledge']) assert.ok(nav.includes('href="'+target+'"'),route+target);
+      for (const target of ['/', '/audit','/library','/cases?source=annotation','/corpus','/reading-lab','/knowledge']) assert.ok(nav.includes('href="'+target+'"'),route+target);
+      assert.equal((nav.match(/href="\/library"/g) || []).length, 1, route);
+      assert.doesNotMatch(nav, /href="\/(?:cases|terms)"/);
+      if (['/library', '/terms', '/cases', '/case', '/term'].includes(route)) assert.match(nav, /href="\/library" aria-current="page"/);
       assert.doesNotMatch(html,/src="\.\/|href="\.\//);
       for (const m of html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)) assert.equal((await fetch(base+m[1])).status,200,m[1]);
     }
     assert.equal((await fetch(base+'/case?source=v2&id=candidate-shell%3A%E8%AF%BB%2F%3F')).status,200);
+    const humanHtml = await (await fetch(base+'/cases?source=annotation')).text();
+    const humanNav = humanHtml.match(/<nav class="nav"[\s\S]*?<\/nav>/)[0];
+    assert.match(humanNav, /href="\/cases\?source=annotation" aria-current="page"/);
+    assert.doesNotMatch(humanNav, /href="\/library" aria-current="page"/);
+    assert.match(await (await fetch(base+'/')).text(), /class="ghost-link" href="\/cases\?source=annotation">进入人工标注库/);
     assert.equal((await fetch(base+'/does-not-exist')).status,404);
   } finally { server.closeAllConnections(); await new Promise(r=>server.close(r)); }
 });

@@ -1,0 +1,14 @@
+{
+  "schema": "machine-library.bundle.v1",
+  "database_bytes": 223113216,
+  "database_sha256": "1fc4948dd922d1f98dadb7359805b3302dd7e4b3afc06c5b5cbe707bdd9c73aa",
+  "bundle_bytes": 27190844,
+  "bundle_sha256": "96d96f054565913df9f37d0de27e047ea19c7ab6e9afcfc7da17e61e5687e580",
+  "run": {
+    "run_id": "ml-1b5de2fb23cfca0c8efc",
+    "parser_sha256": "fdb1c12f92568df4a163f402ab1eec2acfa4b344c63ad47a58a4c3797207405a",
+    "machine_library_sha256": "d75d47dea21fdf5a97df1ad4cf6743f7f041021cd8a9c23f3cce064789100497",
+    "input_manifest_sha256": "8422ba474fc02e85f354b60e2819ac449a7f9445a50bed11b9fddaa39c7054dd",
+    "content_sha256": "f74145084aa0c33ec35a80bf340873f62cf1d3c3170c814562db1abf4e957503"
+  }
+}

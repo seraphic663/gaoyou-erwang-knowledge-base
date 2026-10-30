@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node ../solution/website/server.js",
     "start:web": "npm --prefix ../solution/website start",
-    "sync:sqlite": "python ../solution/website/scripts/sqlite_bridge.py export",
+    "machine:build": "npm --prefix ../solution/website run machine:build",
+    "machine:pack": "npm --prefix ../solution/website run machine:pack",
     "sync:annotation": "python ../solution/website/scripts/annotation_bridge.py export"
   },
   "dependencies": {

@@ -14,8 +14,7 @@
       <div class="hero-content">
         <p class="badge">Corpus · 原典与外典统一检索</p>
         <h1>典籍检索</h1>
-        <p class="hero-copy">在二王原典与外典正文间检索，查看书名、命中文段、来源位置和邻接原文。正文结果来自现有检索索引，书名命中会单独标出。</p>
-        <p><a class="page-link" href="/reading-lab">试用校读对照实验 →</a></p>
+        <p class="hero-copy">检索二王原典与外典，查看命中原文和出处。</p>
       </div>
     </header>
 
@@ -35,11 +34,7 @@
           <form id="corpusSearchForm" class="corpus-search-form">
             <label class="corpus-query-field">
               <span>检索词或正文片段</span>
-              <textarea id="corpusQuery" rows="4" placeholder="可输入书名、篇名或正文片段"></textarea>
-            </label>
-            <label class="toolbar-field">
-              <span>二王原典作品</span>
-              <select id="corpusWork"><option value="all">四部著作</option></select>
+              <textarea id="corpusQuery" rows="4" placeholder="多个词用空格分开，按下方关系组合，如：農 毋"></textarea>
             </label>
             <fieldset class="corpus-filter-group corpus-mode-group">
               <legend>检索模式</legend>
@@ -47,19 +42,38 @@
               <label><input type="radio" name="corpusMode" value="body" /> 仅正文</label>
               <label><input type="radio" name="corpusMode" value="title" /> 仅书名</label>
             </fieldset>
-            <fieldset class="corpus-filter-group corpus-collections">
-              <legend>典籍范围（可多选）</legend>
-              <label><input type="checkbox" name="corpusCollection" value="original" checked /> 二王原典</label>
-              <label><input type="checkbox" name="corpusCollection" value="external_high" checked /> 外典·高频</label>
-              <label><input type="checkbox" name="corpusCollection" value="external_mid" checked /> 外典·中频</label>
-              <label><input type="checkbox" name="corpusCollection" value="external_low" checked /> 外典·低频</label>
+            <fieldset class="corpus-filter-group corpus-mode-group">
+              <legend>多词关系</legend>
+              <label><input type="radio" name="corpusQueryMatch" value="all" checked /> 全部命中（AND）</label>
+              <label><input type="radio" name="corpusQueryMatch" value="any" /> 任一命中（OR）</label>
             </fieldset>
-            <div class="corpus-search-actions">
-              <button id="corpusSearchButton" class="page-link toolbar-button" type="submit">检索典籍</button>
-              <button id="corpusReset" class="search-clear toolbar-button" type="button">清空</button>
-            </div>
+            <fieldset class="corpus-filter-group corpus-mode-group">
+              <legend>检索长度</legend>
+              <label><input id="corpusAllowSingleCharacter" type="checkbox" /> 允许单字词检索</label>
+              <p class="compact-note">默认双字及以上；单字词组合只查二王原典。</p>
+            </fieldset>
+            <fieldset class="corpus-filter-group corpus-scope-group">
+              <legend>典籍范围（可多选）</legend>
+              <div class="corpus-scope-row" id="corpusOriginalRow">
+                <label class="corpus-scope-heading"><input id="corpusOriginalEnabled" type="checkbox" checked /> 二王原典</label>
+                <div class="corpus-scope-options" id="corpusOriginalWorks">
+                  <label><input type="checkbox" name="corpusWork" value="dushu_zazhi" checked /> 读书杂志</label>
+                  <label><input type="checkbox" name="corpusWork" value="guangya_shuzheng" checked /> 广雅疏证</label>
+                  <label><input type="checkbox" name="corpusWork" value="jingyi_shuwen" checked /> 经义述闻</label>
+                  <label><input type="checkbox" name="corpusWork" value="jingzhuan_shici" checked /> 经传释词</label>
+                </div>
+              </div>
+              <div class="corpus-scope-row" id="corpusExternalRow">
+                <label class="corpus-scope-heading"><input id="corpusExternalEnabled" type="checkbox" checked /> 外部典籍</label>
+                <div class="corpus-scope-options">
+                  <label><input type="checkbox" name="corpusCollection" value="external_high" checked /> 高频</label>
+                  <label><input type="checkbox" name="corpusCollection" value="external_mid" checked /> 中频</label>
+                  <label><input type="checkbox" name="corpusCollection" value="external_low" checked /> 低频</label>
+                </div>
+              </div>
+            </fieldset>
           </form>
-          <p id="corpusSearchStatus" class="compact-note" aria-live="polite">全选默认检索二王原典和外典三组；书名命中与正文命中会分别标注。</p>
+          <p id="corpusSearchStatus" class="compact-note" aria-live="polite"></p>
           <div id="corpusResults" class="corpus-results" aria-live="polite"></div>
         </section>
       </section>

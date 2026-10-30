@@ -18,6 +18,7 @@ async function render(source, payload) {
     document: { querySelector: selector => elements[selector] },
     CaseSources,
     escapeHtml: escape,
+    plainTextFromMarkup: value => String(value ?? '').replace(/<\/?[A-Za-z][^>]*>/g, ''),
     requestJson: async () => payload,
     Site: {
       url: (pathname, query) => pathname + '?' + new URLSearchParams(query),
@@ -49,14 +50,15 @@ test('annotation claim and conclusion remain independent and text is escaped', a
     id: 1, case_title: '人工标注', problem: 'PROBLEM', claim: 'CLAIM',
     conclusion: 'CONCLUSION', target_text: 'TARGET',
     terms: [{ term: '原字', related_term: '改字', relation_type: '校勘' }],
-    evidences: [{ quote: '<script>not code</script>', work: '典籍' }],
+    evidences: [{ quote: '<script>not code</script> & literal', work: '典籍' }],
   } };
   const before = JSON.stringify(payload);
   const model = CaseSources.detail('annotation', payload);
   assert.equal(model.terms[0].label, '原字 → 改字');
   const html = await render('annotation', payload);
   for (const field of ['PROBLEM', 'CLAIM', 'CONCLUSION', 'TARGET']) assert.ok(html.includes(field), field);
-  assert.ok(html.includes('&lt;script&gt;not code&lt;/script&gt;'));
+  assert.ok(html.includes('not code &amp; literal'));
+  assert.doesNotMatch(html, /<script>/);
   assert.equal(JSON.stringify(payload), before);
 });
 

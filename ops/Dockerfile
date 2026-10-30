@@ -10,7 +10,13 @@ RUN npm ci --omit=dev
 COPY solution/website ./solution/website
 RUN test -s /app/solution/website/data/sqlite-snapshot.json \
     && test -s /app/solution/website/data/annotation-snapshot.json \
+    && test -s /app/solution/website/runtime-bundle/machine-library.sqlite3.xz \
+    && test -s /app/solution/website/runtime-bundle/machine-library.manifest.json \
     && test -s /app/solution/website/runtime-bundle/harness_corpus.jsonl.xz
+RUN python3 -B /app/solution/website/scripts/machine_bundle.py unpack \
+    --bundle /app/solution/website/runtime-bundle/machine-library.sqlite3.xz \
+    --manifest /app/solution/website/runtime-bundle/machine-library.manifest.json \
+    --output /app/solution/website/runtime-bundle/machine-library.sqlite3
 RUN python3 -B /app/solution/website/scripts/harness_bundle.py unpack \
     --bundle /app/solution/website/runtime-bundle/harness_corpus.jsonl.xz \
     --output /app/solution/website/runtime-release \

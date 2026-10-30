@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>字词与案例 · 高邮二王知识库</title>
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="/assets/css/site.css">
+    <link rel="stylesheet" href="/assets/css/machine-library.css">
+  </head>
+  <body>
+    <header class="subhero machine-library-hero">
+      <!--site-navigation-->
+      <div class="hero-content">
+        <p class="badge">高邮二王 · 研究工作空间</p>
+        <h1>字词与案例</h1>
+        <p class="hero-copy">机器候选 · 待核</p>
+      </div>
+    </header>
+
+    <main class="section machine-library" id="machineLibrary">
+      <p id="machineRunStatus" class="ml-run-status" role="status" hidden></p>
+
+      <section class="ml-search-panel" aria-label="机器关系检索">
+        <form id="machineSearchForm">
+          <label class="ml-query-field" for="machineQuery">
+            <span>字词、短语或多个词</span>
+            <input id="machineQuery" name="q" type="text" autocomplete="off" enterkeyhint="search"
+              placeholder="例如：農、農力、毋 無" aria-describedby="machineQueryHelp">
+          </label>
+          <p id="machineQueryHelp" class="ml-help">空格分词，默认全部匹配。</p>
+
+          <fieldset class="ml-workset">
+            <legend>来源书</legend>
+            <div class="ml-work-row">
+              <label class="ml-original-toggle"><input id="machineOriginalEnabled" type="checkbox" checked> 二王原典</label>
+              <div class="ml-work-options">
+                <label><input type="checkbox" name="machineWork" value="dushu_zazhi" checked> 读书杂志</label>
+                <label><input type="checkbox" name="machineWork" value="guangya_shuzheng" checked> 广雅疏证</label>
+                <label><input type="checkbox" name="machineWork" value="jingyi_shuwen" checked> 经义述闻</label>
+                <label><input type="checkbox" name="machineWork" value="jingzhuan_shici" checked> 经传释词</label>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="ml-filters">
+            <label for="machinePosition">检索位置
+              <select id="machinePosition" name="position" aria-describedby="machinePositionHelp">
+                <option value="any" selected>不限</option>
+                <option value="source">原词／原句</option>
+                <option value="target">释义／异文</option>
+              </select>
+            </label>
+            <label for="machineRelationType">关系类型
+              <select id="machineRelationType" name="type">
+                <option value="">全部类型</option>
+              </select>
+            </label>
+            <label for="machineMatch">多词匹配
+              <select id="machineMatch" name="match">
+                <option value="all" selected>全部（AND）</option>
+                <option value="any">任一（OR）</option>
+              </select>
+            </label>
+          </div>
+          <p id="machinePositionHelp" class="ml-help" hidden>按原文关系 → 前／后筛选；↔ 两端均可。正文提及仍可在下方补查。</p>
+        </form>
+      </section>
+
+      <div class="ml-view-row">
+        <div class="ml-view-switch" role="group" aria-label="结果分组方式">
+          <button type="button" data-machine-view="terms" aria-pressed="true">按字词</button>
+          <button type="button" data-machine-view="cases" aria-pressed="false">按案例</button>
+        </div>
+        <p id="machineResultSummary" class="ml-result-summary" aria-live="polite">输入字词或短语开始检索。</p>
+      </div>
+
+      <p id="machineSearchStatus" class="ml-search-status" role="status" aria-live="polite"></p>
+      <section id="machineResults" class="ml-results" aria-live="polite" aria-label="机器关系结果">
+        <div class="ml-empty">正在读取结果……</div>
+      </section>
+
+      <details id="machineUnsegmented" class="ml-mentions" hidden>
+        <summary>未切分原文段（补查，不计案例）</summary>
+        <p class="ml-help">未形成可定位校读点的原文段单独列出，不并入关系卡或案例数。</p>
+        <ol id="machineUnsegmentedList" class="ml-mention-list"></ol>
+      </details>
+
+      <details id="machineSuppressed" class="ml-mentions" hidden>
+        <summary>否定或条件关系（不计主结果）</summary>
+        <p class="ml-help">这些关系主张单独列出，不混入正向关系命中数。</p>
+        <ol id="machineSuppressedList" class="ml-mention-list"></ol>
+      </details>
+
+      <details id="machineMentions" class="ml-mentions" hidden>
+        <summary>正文与证据中的提及（补查，不计关系）</summary>
+        <p class="ml-help">这些文字命中用于回查上下文，不计入关系或案例数量。</p>
+        <ol id="machineMentionList" class="ml-mention-list"></ol>
+      </details>
+
+      <nav id="machinePager" class="ml-pager" aria-label="机器关系结果分页" hidden>
+        <button id="machinePreviousPage" type="button">上一页</button>
+        <span id="machinePageSummary">第 1 / 1 页 · 每页 10 张完整卡</span>
+        <label for="machinePageInput">跳转页码
+          <input id="machinePageInput" type="number" inputmode="numeric" min="1" step="1" value="1">
+        </label>
+        <button id="machineJumpPage" type="button">跳转</button>
+        <button id="machineNextPage" type="button">下一页</button>
+      </nav>
+
+      <details class="ml-run-details">
+        <summary>机器运行信息</summary>
+        <dl id="machineRunDetails"></dl>
+      </details>
+    </main>
+
+    <footer class="footer">
+      <p><a href="/cases?source=annotation">进入人工标注库</a></p>
+      <p>高邮二王知识库 · 机器候选需经人工核对</p>
+    </footer>
+
+    <script src="/assets/js/utils.js"></script>
+    <script src="/assets/js/page-catalog.js"></script>
+    <script src="/assets/js/site.js"></script>
+    <script src="/assets/js/machine-library.js"></script>
+  </body>
+</html>

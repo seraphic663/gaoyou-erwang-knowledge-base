@@ -142,6 +142,9 @@ module.exports = {
   SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, 'solution/legacy-db', 'data', 'dictionary.db'),
   ANNOTATION_DB_FILE: path.join(WORKSPACE_ROOT, 'solution/legacy-db', 'data', 'annotations.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
+  MACHINE_LIBRARY_DB_FILE: resolveConfiguredPath(process.env.MACHINE_LIBRARY_DB_FILE, ROOT_DIR)
+    || path.join(ROOT_DIR, 'runtime-bundle', 'machine-library.sqlite3'),
+  MACHINE_LIBRARY_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'machine_library.py'),
   V2_DB_FILE,
   V2_DB_DIR,
   CORPUS_DB_FILE,

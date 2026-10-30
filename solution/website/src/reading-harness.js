@@ -192,6 +192,9 @@ async function retrieve(config, input) {
       limit: EVIDENCE_LIMIT,
       max_chars: CONTEXT_LIMIT,
     };
+    if (input.query_match === 'all' || input.query_match === 'any') {
+      bridgeInput.query_match = input.query_match;
+    }
     if (input.collections !== undefined) {
       bridgeInput.collections = [...new Set(input.collections)];
     }
