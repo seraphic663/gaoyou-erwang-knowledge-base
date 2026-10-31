@@ -21,15 +21,8 @@ from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_JSONL = (
-    ROOT
-    / "v2"
-    / "data"
-    / "real_runs"
-    / "manual_annotation_ingress"
-    / "manual_annotation_cases.annotation_case.v1.candidates.jsonl"
-)
-DEFAULT_DB = ROOT / "solution/legacy-db" / "data" / "annotations.db"
+DEFAULT_JSONL = ROOT / "data" / "D-标注" / "04-案例JSONL" / "manual_annotation_cases.annotation_case.v1.candidates.jsonl"
+DEFAULT_DB = ROOT / "data" / "D-标注" / "05-数据库" / "annotations.db"
 SNAPSHOT = ROOT / "solution/website" / "data" / "annotation-snapshot.json"
 PROCESS_FIELDS = (
     ("problem_discovery", "发疑"),
@@ -346,7 +339,7 @@ def replace_database(database_path: Path, records: list[dict[str, Any]], documen
                 )
 
         meta_values = {
-            "manual_import_source": "v2/data/real_runs/manual_annotation_ingress/manual_annotation_cases.annotation_case.v1.candidates.jsonl",
+            "manual_import_source": jsonl_path.relative_to(ROOT).as_posix(),
             "manual_import_source_sha256": jsonl_hash,
             "manual_import_source_case_count": str(len(records)),
             "manual_imported_at_utc": now,

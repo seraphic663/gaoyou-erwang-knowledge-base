@@ -1,52 +1,34 @@
-# Markdown 治理与结构复核
+# Markdown 治理
 
-> 当前复核：2026-09-30
+> 维护边界复核于 2026-10-31。本文不固定全仓 Markdown 文件总数；本地存在被忽略的原文和部署快照，文件数随实验变动。
 
-本文件规定 `D:\26大创` 内 Markdown 的分层、权威顺序和重构边界，避免把项目说明、原始文献、历史快照、临时产物和第三方依赖混成同一种文档。
+## 1. 当前维护文档
 
-## 1. 本次扫描口径
+`README.md`、`docs/project/`、`docs/operations/` 和各业务目录 README 是当前入口。状态文档必须注明核查日期；详细计数只在一个状态入口维护，并链接到生成报告或实时接口。
 
-本次扫描覆盖所有非 Git Markdown；重构前扫描基线为 696 个文件。按职责分为 136 个项目维护文档、296 个原始/来源材料、252 个历史或临时材料和 12 个依赖/环境自带文档。新增本文件后，维护文档和总数各增加 1；这些数量是扫描快照，不是项目研究指标。
-
-扫描不等于逐字改写。项目维护文档按当前目录和运行事实重构；原始文献、外部语料、历史快照和第三方依赖只做路径、链接和边界检查，保留原文与历史身份。
-
-## 2. 当前目录分层
-
-| 层 | 目录 | Markdown 处理规则 |
+| 层 | 目录 | 处理规则 |
 | --- | --- | --- |
-| 当前入口 | `README.md`、`docs/project/`、`docs/operations/`、各业务目录 README | 可以按当前实现、路径和状态重构；必须保留日期和证据边界 |
-| 研究工作 | `research/`、`data/0-当前阅读/annotation/` | 可以补充研究记录和人工工作说明；不得把 machine draft 写成 gold |
-| 来源材料 | `data/`、`data/daizhigev20/`、`v2/data/external_sources/` | 默认只读；只修复明确的链接或派生元数据，不改原始正文 |
-| 工程说明 | `solution/`、`v2/`、`ops/` | 以代码、配置、schema 和生成报告为准，命令必须从当前根路径可执行 |
-| 历史/临时 | `archive/`、`docs/project/archive/`、`tmp/` | 保留历史口径和实验上下文，不倒改成当前说明 |
-| 依赖/环境 | `ops/node_modules/`、`solution/website/node_modules/`、`v2/.venv/` | 不属于项目 Markdown，不手工重构 |
+| 当前入口 | 根 README、`docs/project/`、`docs/operations/`、业务 README | 可按当前实现重写；核对链接、日期和证据边界 |
+| 标注工作 | `data/D-标注/`、标注转换报告 | 保留原始 DOCX；当前转换和数据库路径以 D-标注 README 与脚本为准 |
+| 研究分析 | `research/analysis/`、`solution/corpus-standardization/evaluation/` | 记录具体样本、时间、代码版本和限制；历史报告不冒充当前运行态 |
+| 来源材料 | `data/A-原著原典/`、`B-一级资料/`、`C-二级资料/`、`daizhigev20/` | 默认只读；正文错误按来源边界处理，不为统一格式改写原文 |
+| 运行数据 | `v2/data/`、数据库、JSON 快照、manifest | 默认只读或生成；优先修复生成脚本，不手工改生成文件 |
+| 历史与临时 | `archive/`、`docs/project/archive/`、`tmp/` | 保留其历史身份；tmp 是可重建/忽略的本地材料，不作为当前说明入口 |
 
-## 3. 当前权威顺序
+## 2. 权威顺序
 
-1. 路径、构建和运行行为以源码、配置文件和实际检查结果为准。
-2. 数量、队列和状态以对应日期的生成报告为准；报告日期必须和正文叙述分开写。
-3. 研究结论以来源材料、人工意见和确认版本为准；自动抽取、检索命中和 AI 草稿只能作为过程材料。
-4. 当前说明文档负责解释入口和边界，不覆盖历史快照，也不替代原始资料。
+1. 页面、API、数据库和构建行为以当前代码、配置及线上只读响应为准。
+2. 机器库计数以匹配的 bundle manifest 与 `/api/machine/meta` 为准；人工库计数以 annotation DB/API 为准；V2 状态以当前 V2 DB 和生成报告为准。
+3. 学术结论以二王原文、明确版本、来源材料和人工确认记录为准。机器候选、full JSON 命中、AI 草稿和语料检索结果都是过程材料。
+4. 日期化报告保留创建时的输入、方法和限制；当前入口用链接说明它的历史性质，不倒改旧报告。
 
-## 4. 根层路径地图
+## 3. 修改和归档规则
 
-| 旧职责 | 当前入口 | 说明 |
-| --- | --- | --- |
-| 构建和 Node 依赖 | `ops/Dockerfile`、`ops/package.json`、`ops/package-lock.json` | 根 `railway.toml` 指向 `ops/Dockerfile`，网站源代码仍在 `solution/website/` |
-| 检索层分析 | `research/analysis/benchmarks/` | 只保存 retrieval-layer 评价定义和结果解释 |
-| 一致性和迁移检查 | `docs/operations/` | 当前结构审计和 Markdown 治理入口 |
-| 外部文献及分析 | `data/daizhigev20/` | 外部 evidence acquisition 候选层，不自动成为 canonical |
-| 旧兼容数据库 | `solution/legacy-db/` | 旧 SQLite、重建脚本和桥接链 |
-| V2 工作库 | `v2/` | schema、代码、测试、任务包和运行数据契约 |
+- 修改一个入口文档时，检查其直属目录 README、根 README 和相关当前状态文件，避免同一事实出现互相冲突的副本。
+- 更新目录时同步核对相对链接、代码默认路径、Docker/Railway 路径和生成报告中的 provenance。
+- 对来源文献、人工意见、项目报告和历史实验，优先更新索引或新增日期化说明；不删除原件或把档案改写为当前结论。
+- 将过时计划移出当前阅读路径时，保留原文到有日期的 archive，并在旧入口留一个短指针。
+- 不把 ignored/local-only ParseBench、运行凭据、原始隐私材料或部署stage加入公共文档链接。
+- 清理生成缓存前先确认可重建方式与有无未保存人工内容；docs audit 不等于可批量删除 tmp。
 
-## 5. 修改规则
-
-- 修改当前说明时，同时检查根 README、对应目录 README、`docs/project/` 和 `docs/operations/consistency.md`。
-- 修改路径时，必须同步检查 Markdown 内链、代码默认路径、Docker/Railway 配置、`.gitattributes` 和相关生成 JSON 中的 provenance path。
-- 修改原始文献、外部语料或历史快照前，先确认这不是只读权威来源；结构整理优先通过 README、索引或派生清单完成。
-- 不删除无法立即证明可重建的 Markdown、生成报告、链接目标或历史材料；需要清理时先建立引用和备份证据。
-- 文档可以说明“尚未完成”，但不得使用历史快照中的旧路径、旧数量或旧状态冒充当前事实。
-
-## 6. 本次复核结果
-
-当前根层已收束为 `docs/`、`research/`、`solution/`、`data/`、`archive/`、`ops/`、`v2/` 和 `tmp/`；`analysis/`、`audit/`、`external/` 不再作为根级目录。项目维护文档、历史材料和当前工作材料的内部 Markdown 链接已按当前路径复核，结果为 0 条断链；全量扫描另发现 4,123 条断链全部位于 `data/daizhigev20/` 的上游语料切片内部，它们指向未随本地切片保存的上游文件，不对该只读外部语料做批量改写。
+当前本地库存包含大量 raw corpus、archive 和 ignored tmp 版本；它们不应进入维护文档计数，也不代表项目的研究指标。

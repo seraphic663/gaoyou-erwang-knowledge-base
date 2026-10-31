@@ -1,153 +1,26 @@
-# 数据库目录说明
+# 旧 SQLite 与标注导入工具
 
-> 当前兼容边界复核于 2026-09-30；数据库产物默认只读。
+> 本目录保留历史兼容库和人工标注导入代码。机器字词/案例主链已转到 [网站机器库](../website/MACHINE-LIBRARY.md)。
 
-`solution/legacy-db` 是旧兼容数据层，包含两个独立 SQLite 数据库、各自的生成管线，以及共享工具层。当前 V2 统一工作库另位于 `v2/data/real_runs/annotation_v2.db`；三者性质不同，不能统称为已经人工审校的主库。
+## 目录角色
 
-## 先定位
+- `main/`：旧 `source.txt → parser.py → importer.py → dictionary.db` 管线，原始来源仅为《广雅疏证》。文件保留供旧数据审计和迁移，不用于重建四书机器库。
+- `annotation/` 与 `lib/`：标注数据库 schema、导入和共享 SQLite 工具。当前人工数据目录在仓库根 `data/D-标注/`，数据库位于 `05-数据库/annotations.db`。
+- `data/dictionary.db`：旧机器库文件；网站的 `sqlite-snapshot.json` 是对应旧快照。当前机器库使用网站 `runtime-bundle/machine-library.sqlite3.xz`。
 
-- 要改旧 parser、旧导出或旧快照，读本文的目录结构和维护场景。
-- 要做新来源、V2 状态、人工复核或 benchmark，转到 `v2/` 和 `docs/project/`。
-- 要查当前数据库之间的完整关系、备份和清理边界，读 `docs/project/06-数据库关系与清理状态.md`。
+## 数据库边界
 
-## 目录结构
+| 数据层 | 当前用途 | 状态说明 |
+| --- | --- | --- |
+| `dictionary.db` / `sqlite-snapshot.json` | 旧机器目录兼容和对照 | 49 works、3,385 terms、815 cases、7,120 evidences 是 2026-10-31 旧快照计数；passages 为 0 |
+| `data/D-标注/05-数据库/annotations.db` | 人工撰写案例与证据的展示/检索库 | 78 documents、117 cases；117 条 status 为草稿、certainty 为待核 |
+| `v2/data/real_runs/annotation_v2.db` | 独立 V2 机器/人工审校工作流 | 按 V2 状态和 review gate 管理；不从旧库状态推断 gold |
+| `solution/website/runtime-bundle/machine-library.sqlite3.xz` | 当前四书机器关系和案例浏览 | 由新 parser 构建，所有结果是候选数据 |
 
-```text
-solution/legacy-db/
-  ├── lib/                       共享 SQLite 工具（连接、查询、快照导出）
-  │   ├── __init__.py
-  │   ├── connection.py
-  │   └── snapshot.py
-  ├── main/                      主库管线（《广雅疏证》语料 → dictionary.db）
-  │   ├── source.txt             原始语料输入
-  │   ├── parser.py              解析脚本
-  │   ├── schema.sql             主库 DDL（参考）
-  │   ├── database.py            主库 CRUD 接口
-  │   └── importer.py            批量导入编排（原 bulk_importer.py）
-  ├── annotation/                标注库管线（DOCX 标注 → annotations.db）
-  │   ├── schema.sql             标注库 DDL（参考）
-  │   └── importer.py            标注库建表与查询接口
-  ├── data/                      两个 SQLite 数据库产物
-  │   ├── dictionary.db          旧机器解析展示库（兼容/迁移/对照）
-  │   └── annotations.db         标注库（草稿/待核，内部研究用）
-  └── README.md
-```
+四者不合并身份。人工标注数据库和快照不得被机器构建覆盖；旧 `dictionary.db` 不作为当前机器库的缺失回退。
 
-## 两个数据库的关系
+## 维护
 
-| | dictionary.db（主库） | annotations.db（标注库） |
-|---|---|---|
-| 数据来源 | 《广雅疏证》source.txt，旧 parser/importer 机器解析；不是 DeepSeek 输出 | DOCX 抽取 + DeepSeek 规范化 AI 工作稿 |
-| 数据量 | 49 著作 · 3,385 词条 · 815 案例 · 7,120 证据 | 60 来源文档 · 154 词条 · 87 案例 · 1,125 证据 · 257 过程步骤 |
-| 成熟度 | 旧字段显示 `草稿`/`确定`，但按 V2 只能视为机器结构化材料 | 草稿/待核 |
-| 重建策略 | 全量重建（从 source.txt） | 增量追加（从 run.py） |
-| 网站入口 | 首页、database.html、term.html、case.html | annotation.html（人工库浏览）+ ai-annotation.html（AI 释证） |
-| 核心表 | works, passages, terms, cases, evidences | source_documents, annotation_cases, annotation_terms, annotation_evidences, annotation_process_steps |
+如变更标注 schema 或导入过程，先检查 `annotation/` 代码及 [D-标注流程](../../data/D-标注/README.md)，导入后再通过 `npm --prefix solution/website run sync:annotation` 导出快照。不要在此目录新建或重新启用旧机器 `sync:sqlite` 发布链。
 
-两个库物理独立，架构统一：共享 `lib/` 工具层，产物统一放在 `data/`。
-
-它们与 V2 的关系是：`dictionary.db` 和 `annotations.db` 都可以通过适配器进入 `v2/data/real_runs/annotation_v2.db`，但迁移只保留和规范机器材料，不会把旧 `草稿`、`确定`、`已校对` 等字段自动解释为人工审核。V2 的机器状态、人工状态和 lifecycle 以 `docs/project/03-工程、文件包与V2规范.md` 为准。
-
-## 主库数据链路
-
-```text
-main/source.txt
-  -> main/parser.py
-  -> main/importer.py
-  -> data/dictionary.db
-  -> ../website/scripts/sqlite_bridge.py
-  -> ../website/data/sqlite-snapshot.json
-```
-
-## 标注库数据链路
-
-```text
-../../data/D-标注/ 的 DOCX 文件
-  -> ../../data/D-标注/json/run.py
-  -> data/annotations.db
-  -> ../website/scripts/annotation_bridge.py
-  -> ../website/data/annotation-snapshot.json
-```
-
-## 常用命令
-
-在仓库根目录运行：
-
-```bash
-# 主库
-python solution/legacy-db/main/importer.py --dry-run
-python solution/legacy-db/main/importer.py
-npm --prefix solution/website run sync:sqlite
-
-# 标注库（需先 cd 到 run.py 目录）
-cd data/D-标注/json
-python run.py --api --import-ai
-cd ../../..
-npm --prefix solution/website run sync:annotation
-```
-
-说明：
-
-- `--dry-run` 只解析和统计，不写入数据库。
-- 正式运行 `importer.py` 会重建或更新 `data/dictionary.db`。
-- `npm --prefix solution/website run sync:sqlite` 把主库导出为网站 JSON 快照。
-- `npm --prefix solution/website run sync:annotation` 把标注库导出为网站 JSON 快照。
-- 如需进入 V2 工作库，使用 `python v2/scripts/run_legacy_machine_conversion.py` 转换主库机器材料；不得把主库旧字段 `确定` 解释为 V2 人工 gold。
-
-## 维护场景
-
-### 只增加主库数据
-
-1. 修改 `main/source.txt`。
-2. 运行 `importer.py --dry-run`。
-3. 确认 works、terms、cases、evidences 统计正常。
-4. 运行 `importer.py`。
-5. 运行 `npm --prefix solution/website run sync:sqlite`。
-
-### 修改主库解析规则
-
-1. 修改 `main/parser.py`。
-2. 用 `--dry-run` 检查解析统计。
-3. 如导入字段受影响，同步修改 `main/importer.py` 和 `main/database.py`。
-4. 正式导入并同步网站快照。
-
-### 修改数据库结构
-
-至少检查五处：
-
-```text
-main/database.py        — Schema DDL、CRUD 函数
-main/schema.sql         — DDL 参考文件
-../../solution/website/scripts/sqlite_bridge.py
-../../solution/website/src/store-definitions.js
-../../solution/website/src/data-sources/shared.js
-```
-
-如果网站页面直接消费新字段，还要同步检查 `app.js`、`browser.js`、`detail.js`。
-
-### 增加标注数据
-
-1. 将标注后的 DOCX 放入 `data/D-标注/`。
-2. 在 `D-标注/json/` 下运行 `python run.py --api --import-ai`。
-3. 在仓库根目录运行 `npm --prefix solution/website run sync:annotation`。
-
-## 不应提交的内容
-
-```text
-parsed_data.py
-data/dictionary.empty.db
-data/*.db-journal
-__pycache__/
-*.pyc
-~$*.docx
-```
-
-这些文件要么是自动生成中间文件，要么是缓存和临时文件。
-
-## 当前扩展优先级
-
-1. 旧库只做必要修复、兼容展示和回归检查，不再扩展模板化 case 或把旧 `passages` 补建当作 V2 主任务。
-2. 新的 passage、candidate、来源定位、状态和审校工作进入 `v2/`，不要直接扩展旧 schema。
-3. 全局工程路线以 `docs/project/` 为准；中期 pilot 可以直接选择来源清楚的案例开始人工复核，不必等待全库 target-work 或外部来源队列清空。
-4. 对确需进入正式 V2 review 的案例，再完成 target-work 消歧、外部 canonical 来源/引文核验和正式 gate，之后才可能形成 gold case。
-5. gold 到正式发布库或网站快照的导出方式需单独设计；不要把旧标注库中的草稿直接迁移为正式主库数据。
+新四书机器库的构建、manifest、回滚和在线验收见 [MACHINE-LIBRARY.md](../website/MACHINE-LIBRARY.md)。V2 的来源、审核门禁和生产数据库见 [V2 README](../../v2/README.md)。

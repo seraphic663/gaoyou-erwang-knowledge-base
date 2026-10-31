@@ -18,7 +18,7 @@ from lib.connection import connect, fetch_all, fetch_one, execute
 
 # ─── 当前标注库路径 ──────────────────────────────────────────────────────────
 
-ANNOTATION_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "annotations.db"
+ANNOTATION_DB_PATH = Path(__file__).resolve().parents[3] / "data" / "D-标注" / "05-数据库" / "annotations.db"
 
 
 # ─── DDL（与 annotation/schema.sql 保持一致） ─────────────────────────────────

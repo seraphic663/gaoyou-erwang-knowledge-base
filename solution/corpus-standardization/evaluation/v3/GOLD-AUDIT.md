@@ -4,13 +4,13 @@
 
 ## 当前来源与全量统计
 
-`data/0-当前阅读/annotation/` 有 87 份案例 Markdown，旁边的 `manual_annotation_cases.annotation_case.v1.candidates.jsonl` 也有 87 条。两处都表明这是人工撰写来源：JSONL 的 `_migration.source_layer` 为 `manual_annotation_markdown`，转换方式为确定性 Markdown 解析。每条都有 `submitted_by`，但 `reviewed_by` 为空；迁移记录中的 `human_review.status` 87 条全为 `pending`，`machine_result.status` 87 条全为 `draft`。这里的 pending/draft 是迁移后的审核状态，不能用来否认原始案例由人撰写。
+`data/D-标注/03-案例Markdown/` 有 87 份案例 Markdown，旁边的 `manual_annotation_cases.annotation_case.v1.candidates.jsonl` 也有 87 条。两处都表明这是人工撰写来源：JSONL 的 `_migration.source_layer` 为 `manual_annotation_markdown`，转换方式为确定性 Markdown 解析。每条都有 `submitted_by`，但 `reviewed_by` 为空；迁移记录中的 `human_review.status` 87 条全为 `pending`，`machine_result.status` 87 条全为 `draft`。这里的 pending/draft 是迁移后的审核状态，不能用来否认原始案例由人撰写。
 
 JSONL 的主要字段包括 `source_work`、`source_location`、`source_passage_id`、`target_work`、`target_location`、`target_passage_id`、`target_scope`、`evidences`、`term_relations`、`problem_discovery`、`evidence_collection`、`reasoning`、`conclusion`、`machine_result`、`human_review`、`submitted_by`、`reviewed_by` 和 `_migration`。`_migration.source_sections` 与 `source_section_spans` 各在 87 条中出现，86 条非空；其键是 `claim`、`conclusion`、`counter_argument`、`evidence_text`、`method_terms`、`process_text`、`source_argument`、`target_text` 等案例表单字段，表示案例 Markdown 内的字段跨度，不是原典的章、条、注释或序跋边界。
 
 自动来源匹配在 79 条中生成了 `source_location`：59 条为条题精确匹配，9 条为条题含短语，8 条为父条上下文匹配，3 条为短语命中规范段落；另有 7 条未匹配、1 条歧义。8 条没有 `source_location`。87 条均无 `target_location` 和 `target_passage_id`。这些是迁移器给出的定位结果，没有人工复核状态。
 
-当前遗留库 [annotations.db](D:/26大创/solution/legacy-db/data/annotations.db) 有 87 条案例、60 个来源文档。`annotation_cases` 字段覆盖来源文档、案例题名、来源/目标作品、目标文本、问题、主张、方法、结论、确定度、状态和原始 JSON；87 条全为 `status=草稿`、`certainty=待核`。另有 1,125 条证据、257 个过程步骤、154 个术语关系。证据行的角色说明均表明其引文由标注 Markdown 自动抽取，底本与版本尚未核验。来源文档全标为 `markdown_manual_annotation`，但 `full_json_file`、`ai_json_file` 及来源/段落/批注哈希字段在 60 条中均缺失。案例字段缺失为 `problem` 44 条、`claim` 8 条；证据字段缺失为 `work` 34 条、`term` 1,125 条。
+当前遗留库 [annotations.db](D:/26大创/data/D-标注/05-数据库/annotations.db) 有 87 条案例、60 个来源文档。`annotation_cases` 字段覆盖来源文档、案例题名、来源/目标作品、目标文本、问题、主张、方法、结论、确定度、状态和原始 JSON；87 条全为 `status=草稿`、`certainty=待核`。另有 1,125 条证据、257 个过程步骤、154 个术语关系。证据行的角色说明均表明其引文由标注 Markdown 自动抽取，底本与版本尚未核验。来源文档全标为 `markdown_manual_annotation`，但 `full_json_file`、`ai_json_file` 及来源/段落/批注哈希字段在 60 条中均缺失。案例字段缺失为 `problem` 44 条、`claim` 8 条；证据字段缺失为 `work` 34 条、`term` 1,125 条。
 
 遗留库的术语关系值为：`未定` 54、`训释` 35、`校勘` 27、`字际关系` 23、`虚词用法` 14、`句义解释` 1。这些类别表达的是词义、字际或校勘内容，并非文本结构关系。过程步骤 257 条分别为发疑 43、取证 43、立论 41、释理 43、结论 87。
 
@@ -28,9 +28,9 @@ v2 的 `manual_annotation_ingress/manual_annotation_cases.annotation_case.v1.can
 
 ## 主要来源路径
 
-- 人工撰写案例：`data/0-当前阅读/annotation/*.md`
-- 案例候选及迁移元数据：`data/0-当前阅读/annotation/manual_annotation_cases.annotation_case.v1.candidates.jsonl`
-- 遗留人工 Markdown 案例库：`solution/legacy-db/data/annotations.db`
+- 人工撰写案例：`data/D-标注/03-案例Markdown/*.md`
+- 案例候选及迁移元数据：`data/D-标注/04-案例JSONL/manual_annotation_cases.annotation_case.v1.candidates.jsonl`
+- 遗留人工 Markdown 案例库：`data/D-标注/05-数据库/annotations.db`
 - v2 当前主库：`v2/data/real_runs/annotation_v2.db`
 - v2 人工案例候选子集：`v2/data/real_runs/manual_annotation_ingress/manual_annotation_cases.annotation_case.v1.candidates.jsonl`
 - DOCX/AI JSON/full JSON：`data/D-标注/` 与 `data/D-标注/json/{ai_json,full_json,人工标注}/`

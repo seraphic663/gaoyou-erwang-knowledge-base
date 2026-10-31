@@ -71,8 +71,8 @@ v2/data/local_test/
 
 # ---- Private reading files and superseded local work ----
 # Source documents and their archive copy are retained locally, not published.
-data/0-当前阅读/archive/20261007/
-data/0-当前阅读/archive/20261007.zip
+data/D-标注/01-原始DOCX/20261007/
+data/D-标注/01-原始DOCX/20261007.zip
 # Dated scope note was superseded by current project status docs.
 research/next-step-scope-review_2026-10-10.md
 # Old harness release and one-off database cleanup package are historical workspaces.

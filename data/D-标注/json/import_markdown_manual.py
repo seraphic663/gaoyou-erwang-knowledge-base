@@ -21,8 +21,8 @@ from typing import Any, Iterable
 
 
 ROOT = Path(__file__).resolve().parents[3]
-TEMPLATE_DIR = ROOT / "data" / "0-当前阅读" / "archive" / "md"
-DB_PATH = ROOT / "solution/legacy-db" / "data" / "annotations.db"
+TEMPLATE_DIR = ROOT / "data" / "D-标注" / "02-文档Markdown"
+DB_PATH = ROOT / "data" / "D-标注" / "05-数据库" / "annotations.db"
 TMP_DIR = ROOT / "tmp"
 REPORT_PATH = TMP_DIR / "manual_markdown_ingest_report.json"
 REVIEW_A = TMP_DIR / "manual_ingest_review_A.md"

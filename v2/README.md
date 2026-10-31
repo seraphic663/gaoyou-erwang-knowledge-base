@@ -1,8 +1,8 @@
 # V2 统一工作库
 
-> 目录和路径契约复核于 2026-09-30；数量与状态仍以文中标明日期的生成报告为准。
+> 目录和路径契约复核于 2026-10-31；数量与状态仍以文中标明日期的生成报告和当前只读查询为准。
 
-这是独立于旧 dictionary.db 和 annotations.db 的 V2 工作库目录，包含 schema、实现、测试、机器运行、统一工作数据库、工作队列和人工审校任务。当前验证报告显示，7,581 个案例仍为 machine draft 和 human pending，review_events=0、gold=0。
+这是独立于旧 dictionary.db、人工标注库和网站四书机器 bundle 的 V2 工作库目录，包含 schema、实现、测试、机器运行、统一工作数据库、工作队列和人工审校任务。2026-10-31 只读查询显示，7,581 个案例仍为 machine draft 和 human pending，review_events=0、gold=0。
 
 V2 负责保存机器案例、证据状态和人工任务材料；通用 corpus 检索由 `solution/website/src/corpus-retrieval.js` 和 `/api/corpus/retrieve` 提供。两者共享只读工作数据库，但不再把正文检索写成 V2 工作库功能。
 

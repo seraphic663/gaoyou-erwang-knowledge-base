@@ -4,7 +4,7 @@ One file only:
 
 1. DOCX -> full_json/*.json
 2. optional DeepSeek normalization -> ai_json/*.json
-3. 写入独立标注库 solution/legacy-db/data/annotations.db
+3. 写入独立标注库 data/D-标注/05-数据库/annotations.db
 
 This script never touches dictionary.db.
 """
@@ -36,7 +36,7 @@ WORKSPACE_ROOT = SCRIPT_DIR.parent.parent.parent
 FULL_JSON_DIR = SCRIPT_DIR / "full_json"
 AI_JSON_DIR = SCRIPT_DIR / "ai_json"
 AI_FAILED_DIR = SCRIPT_DIR / "ai_json_failed"
-ANNOTATION_DB_FILE = WORKSPACE_ROOT / "solution/legacy-db" / "data" / "annotations.db"
+ANNOTATION_DB_FILE = WORKSPACE_ROOT / "data" / "D-标注" / "05-数据库" / "annotations.db"
 DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
 DEFAULT_MODEL = "deepseek-v4-flash"
 CURRENT_MAX_TOKENS = 8192

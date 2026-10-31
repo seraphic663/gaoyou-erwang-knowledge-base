@@ -2,7 +2,7 @@
 """
 annotation_bridge.py
 
-将 solution/legacy-db/data/annotations.db 导出为网站 JSON 快照。
+将 data/D-标注/05-数据库/annotations.db 导出为网站 JSON 快照。
 使用 solution/legacy-db/lib/ 共享工具层。
 独立于主库桥接脚本，专用于人工标注灰度库。
 """
@@ -17,7 +17,7 @@ sys.path.insert(0, str(WORKSPACE_ROOT / "solution/legacy-db"))
 from lib.connection import connect, fetch_all
 from lib.snapshot import write_json, loads_json
 
-ANNOTATION_DB_FILE = WORKSPACE_ROOT / "solution/legacy-db" / "data" / "annotations.db"
+ANNOTATION_DB_FILE = WORKSPACE_ROOT / "data" / "D-标注" / "05-数据库" / "annotations.db"
 SNAPSHOT_FILE = WORKSPACE_ROOT / "solution/website" / "data" / "annotation-snapshot.json"
 
 
@@ -78,7 +78,7 @@ def build_snapshot(db_file):
         "schemaVersion": "annotation_snapshot_v1",
         "source": "annotation_db",
         "sourceLabel": "人工标注灰度库",
-        "description": "人工标注与 AI 整理结果暂存库，独立于主库，位于 solution/legacy-db/data/annotations.db。",
+        "description": "人工标注与 AI 整理结果暂存库，独立于主库，位于 data/D-标注/05-数据库/annotations.db。",
         "dbFile": str(db_file.relative_to(WORKSPACE_ROOT)),
         "meta": meta,
         "counts": {

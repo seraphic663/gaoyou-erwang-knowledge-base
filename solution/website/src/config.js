@@ -140,7 +140,7 @@ module.exports = {
   SQLITE_SNAPSHOT_FILE: path.join(DATA_DIR, 'sqlite-snapshot.json'),
   ANNOTATION_SNAPSHOT_FILE: path.join(DATA_DIR, 'annotation-snapshot.json'),
   SQLITE_DB_FILE: path.join(WORKSPACE_ROOT, 'solution/legacy-db', 'data', 'dictionary.db'),
-  ANNOTATION_DB_FILE: path.join(WORKSPACE_ROOT, 'solution/legacy-db', 'data', 'annotations.db'),
+  ANNOTATION_DB_FILE: path.join(WORKSPACE_ROOT, 'data', 'D-标注', '05-数据库', 'annotations.db'),
   SQLITE_BRIDGE_FILE: path.join(ROOT_DIR, 'scripts', 'sqlite_bridge.py'),
   MACHINE_LIBRARY_DB_FILE: resolveConfiguredPath(process.env.MACHINE_LIBRARY_DB_FILE, ROOT_DIR)
     || path.join(ROOT_DIR, 'runtime-bundle', 'machine-library.sqlite3'),

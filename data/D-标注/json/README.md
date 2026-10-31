@@ -1,5 +1,7 @@
 # D-标注 JSON 流程
 
+本目录保留旧 DOCX → full JSON → AI JSON 脚本、失败响应及历史说明；已覆盖的 full_json、ai_json 输出已清理。当前维护流程是原始 DOCX → 文档 Markdown → 案例 Markdown → `../04-案例JSONL/` → `../05-数据库/annotations.db`，以 [标注数据目录](../README.md) 为入口；旧 `ai_json/` 不作为当前案例转换的依据。
+
 本目录是旧人工标注资料的转换区，不是当前 V2 主工作区。要参加中期人工复核，转到 docs/project/01-项目与人工审计指南.md 和 research/midterm-pilot/；要查看当前数据库关系，读 solution/legacy-db/README.md 和 docs/project/06-数据库关系与清理状态.md。
 
 现在只保留一个脚本：
@@ -8,7 +10,7 @@
 run.py
 ```
 
-主要结果目录：
+旧流程输出目录（本批已清理；下文命令仅供历史流程查阅）：
 
 ```text
 full_json/  DOCX 完整转换 JSON
@@ -21,14 +23,14 @@ ai_json/    DeepSeek 整理后的 JSON
 ai_json_failed/  DeepSeek 调用失败时保存的原始响应
 ```
 
-旧的 `annotation_db/` 不再保留。人工标注数据库统一放在 `solution/legacy-db/data/annotations.db`，与主库 `dictionary.db` 相邻，但由 `solution/legacy-db/annotation/` 独立管理。
+旧的 `annotation_db/` 不再保留。人工标注数据库统一放在 `data/D-标注/05-数据库/annotations.db`，与主库 `dictionary.db` 相邻，但由 `solution/legacy-db/annotation/` 独立管理。
 
 不写主库。
 
 这里的”不写数据库”指不碰 `solution/legacy-db/data/dictionary.db` 主库。`run.py` 会自动创建独立的标注库：
 
 ```text
-solution/legacy-db/data/annotations.db
+data/D-标注/05-数据库/annotations.db
 ```
 
 它只用于暂存人工标注和 AI 整理结果，和原数据库不冲突。数据库操作委托到 `solution/legacy-db/annotation/importer.py`。
@@ -103,7 +105,7 @@ python data/D-标注/json/run.py --api --import-ai
 {
   "database_ingestion": {
     "imported": true,
-    "database": "solution/legacy-db/data/annotations.db",
+    "database": "data/D-标注/05-数据库/annotations.db",
     "imported_at": "..."
   }
 }
@@ -155,7 +157,7 @@ python data/D-标注/json/run.py --init-db
 
 ## Markdown 人工整理稿
 
-`data/0-当前阅读/archive/md/` 下经双人核验的 Markdown 来源由独立脚本接入人工标注库，不经过 DOCX/DeepSeek 导入链：
+`data/D-标注/02-文档Markdown/` 下经双人核验的 Markdown 来源由独立脚本接入人工标注库，不经过 DOCX/DeepSeek 导入链：
 
 ```bash
 python data/D-标注/json/import_markdown_manual.py --dry-run
@@ -169,4 +171,4 @@ python data/D-标注/json/import_markdown_manual.py
 - 脚本会自动校验 `full_json` 的段落数、批注数、文本长度和 checksum。
 - 脚本会校验 `ai_json` 的枚举字段。
 - DeepSeek 只接收瘦身后的字段，不发送完整 package 清单。
-- 写入 `solution/legacy-db/data/annotations.db`，不与主库 `dictionary.db` 混用。
+- 写入 `data/D-标注/05-数据库/annotations.db`，不与主库 `dictionary.db` 混用。

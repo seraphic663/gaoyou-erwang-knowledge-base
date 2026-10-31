@@ -503,27 +503,27 @@ def render_current_markdown(
 
 
 def current_tasks(root: Path) -> list[CurrentTask]:
-    archive_current = root.parent / "archive" / "literature" / "04-项目文献" / "0-当前阅读"
-    output_current = root / "0-当前阅读"
+    archive_current = root / "D-标注" / "01-原始DOCX" / "20260716"
+    output_current = root / "D-标注" / "02-文档Markdown"
     template_names = [
-        "《广雅疏证》“始也”条.docx",
-        "《广雅疏证》“敬也”.docx",
-        "《经义述闻》终风且暴.docx",
-        "《经传释词》“允”标注.docx",
-        "《读书杂志》平原之隰.docx",
+        ("《广雅疏证》“始也”条.docx", "003-广雅疏证-广雅-始也-华建光.md"),
+        ("《广雅疏证》“敬也”.docx", "002-广雅疏证-广雅-敬也-徐健怡.md"),
+        ("《经义述闻》终风且暴.docx", "005-经义述闻-诗经-終風且暴-李汶灿.md"),
+        ("《经传释词》“允”标注.docx", "004-经传释词-诸书-允-徐健怡.md"),
+        ("《读书杂志》平原之隰.docx", "001-读书杂志-管子-平原之隰、譕臣-卢飞宇.md"),
     ]
     tasks = [
         CurrentTask(
-            source=archive_current / "整理标注模版" / name,
-            output=output_current / Path(name).with_suffix(".md").name,
+            source=archive_current / name,
+            output=output_current / output_name,
             title=Path(name).stem,
         )
-        for name in template_names
+        for name, output_name in template_names
     ]
     tasks.append(
         CurrentTask(
-            source=root / "0-当前阅读" / "archive" / "20260412" / "“有杞有堂”“终风且暴”.docx",
-            output=output_current / "《经义述闻》有紀有堂.md",
+            source=root / "D-标注" / "01-原始DOCX" / "20260412" / "“有杞有堂”“终风且暴”.docx",
+            output=output_current / "039-经义述闻-诗经-有紀有堂-李妺晗.md",
             title="《经义述闻》有紀有堂",
             paragraph_limit=5,
             scope_note="仅保留原合并文档中独有的“有紀有堂”条；其“終風且暴”条已由整理标注模板的独立 Markdown 完整保存。",

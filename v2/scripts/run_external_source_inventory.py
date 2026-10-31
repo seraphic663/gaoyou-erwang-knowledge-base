@@ -29,6 +29,8 @@ TEXT_ROOTS = (
     PROJECT_ROOT / "data/A-原著原典",
     PROJECT_ROOT / "data/B-一级资料",
     PROJECT_ROOT / "data/0-当前阅读",
+    PROJECT_ROOT / "data/D-标注/02-文档Markdown",
+    PROJECT_ROOT / "data/D-标注/03-案例Markdown",
     PROJECT_ROOT / "data/E-外部原典",
     PROJECT_ROOT / "solution/legacy-db/main",
 )
@@ -71,7 +73,7 @@ def file_role(path: Path) -> str:
         return "wang_core_context"
     if relative_path.startswith("data/B-一级资料/"):
         return "first_level_reference_context"
-    if relative_path.startswith("data/0-当前阅读/"):
+    if relative_path.startswith(("data/0-当前阅读/", "data/D-标注/02-文档Markdown/", "data/D-标注/03-案例Markdown/")):
         return "project_note_context"
     if relative_path.startswith("data/E-外部原典/"):
         return "external_canonical_candidate"

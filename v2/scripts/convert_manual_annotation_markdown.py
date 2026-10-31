@@ -29,9 +29,10 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[2]
 V2_ROOT = ROOT / "v2"
-DEFAULT_SOURCE_DIR = ROOT / "data" / "0-当前阅读" / "annotation"
+DEFAULT_SOURCE_DIR = ROOT / "data" / "D-标注" / "03-案例Markdown"
 DEFAULT_DATABASE = V2_ROOT / "data" / "real_runs" / "annotation_v2.db"
-DEFAULT_OUTPUT_DIR = V2_ROOT / "data" / "real_runs" / "manual_annotation_ingress"
+DEFAULT_OUTPUT_DIR = ROOT / "data" / "D-标注" / "04-案例JSONL"
+DEFAULT_ARCHIVE_DIR = ROOT / "data" / "D-标注" / "02-文档Markdown"
 SCHEMA_PATH = V2_ROOT / "schemas" / "annotation_case.v1.schema.json"
 
 SOURCE_WORK_KEYS = {
@@ -42,6 +43,14 @@ SOURCE_WORK_KEYS = {
 }
 
 SECTION_ALIASES = {
+    "訓詁對象": "target_text",
+    "训诂对象": "target_text",
+    "訓釋義項": "lexical_items",
+    "训释义项": "lexical_items",
+    "訓釋要義": "lexical_items",
+    "训释要义": "lexical_items",
+    "訓詁校勘術語": "method_terms",
+    "训诂校勘术语": "method_terms",
     "考據對象": "target_text",
     "考据对象": "target_text",
     "反駁對象": "counter_argument",
@@ -407,6 +416,21 @@ def extract_evidence_candidates(
                 }
             )
             added = True
+        if not added and from_citation_section:
+            # Some human notes give an explicit book citation without paired quotes.
+            citation = re.match(r"^《([^》]+)》\s*[：:]\s*(.+)$", stripped)
+            if citation:
+                evidences.append({
+                    "quote": citation.group(2).strip().lstrip("‘“「『"),
+                    "evidence_role": "从引用书证栏目转录；原稿未使用完整成对引号，底本和版本未核。",
+                    "source_work": citation.group(1),
+                    "passage_id": None,
+                    "quote_check": "unchecked",
+                    "source_resolution": "external_source_pending",
+                    "citation_context": stripped,
+                    "_source_line": line_offset + index,
+                })
+                added = True
         if not added and re.search(r"《[^》]+》|引文|引曰|注曰|云：|曰：", stripped):
             unparsed_lines.append(
                 {"line": line_offset + index, "text": stripped}
@@ -575,6 +599,8 @@ def build_record(
     archive_dir: Path,
     by_work: dict[str, list[dict[str, Any]]],
     existing_case_ids: set[str],
+    *,
+    compute_hashes: bool = True,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     raw_bytes = path.read_bytes()
     raw_text = raw_bytes.decode("utf-8-sig")
@@ -694,11 +720,11 @@ def build_record(
         "source_layer": "manual_annotation_markdown",
         "transformation_kind": "deterministic_markdown_to_annotation_case_v1_candidate",
         "source_file": relative_source,
-        "source_sha256": sha256_bytes(raw_bytes),
+        "source_sha256": sha256_bytes(raw_bytes) if compute_hashes else None,
         "source_id": meta["case_id"],
         "parent_source_id": source_id,
         "archive_markdown_file": relative_archive,
-        "archive_markdown_sha256": sha256_bytes(archive_bytes) if archive_bytes is not None else None,
+        "archive_markdown_sha256": sha256_bytes(archive_bytes) if compute_hashes and archive_bytes is not None else None,
         "archive_markdown_match_status": (
             "same_file_content" if archive_bytes == raw_bytes else "split_from_archive_source" if archive_bytes else "missing_or_ambiguous"
         ),
@@ -858,7 +884,7 @@ def main() -> int:
     args = parser.parse_args()
 
     source_dir = args.source_dir.resolve()
-    archive_dir = (args.archive_dir or source_dir.parent / "archive" / "md").resolve()
+    archive_dir = (args.archive_dir or (DEFAULT_ARCHIVE_DIR if source_dir == DEFAULT_SOURCE_DIR.resolve() else source_dir.parent / "archive" / "md")).resolve()
     database = args.database.resolve()
     output_dir = args.output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)

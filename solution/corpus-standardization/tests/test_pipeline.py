@@ -150,7 +150,7 @@ class CorpusBuildTests(unittest.TestCase):
             path.write_text("synthetic material", encoding="utf-8")
             expected.add(path)
         for relative in [
-            "research/answer.md", "data/0-当前阅读/annotation/answer.md",
+            "research/answer.md", "data/D-标注/03-案例Markdown/answer.md",
             "data/daizhigev20/README.md", "data/daizhigev20/analysis/answer.md",
             "data/A-原著原典/unlisted.md", "data/daizhigev20/低频/not_markdown.txt",
         ]:
@@ -353,7 +353,7 @@ class CorpusBuildTests(unittest.TestCase):
         pwsh = shutil.which("pwsh.exe")
         if not pwsh:
             self.skipTest("PowerShell 7 is unavailable for a native temporary junction fixture")
-        forbidden = self.workspace / "data" / "0-当前阅读" / "annotation"
+        forbidden = self.workspace / "data" / "D-标注" / "03-案例Markdown"
         forbidden.mkdir(parents=True)
         marker = forbidden / "synthetic-forbidden.md"
         marker.write_text("not an external source", encoding="utf-8")
